@@ -101,15 +101,18 @@
 
 
 
-  <meta name="keywords" content="php">
+  <meta name="description" content="近期一次 502报错, 但是没有达到timeout的值,特此记录">
+<meta name="keywords" content="php">
 <meta property="og:type" content="article">
 <meta property="og:title" content="php错误502问题总结">
 <meta property="og:url" content="http://zhangzw001.github.io/2019/12/02/32-php错误502问题总结/index.html">
 <meta property="og:site_name" content="Zhangzw&#39;s Blog">
+<meta property="og:description" content="近期一次 502报错, 但是没有达到timeout的值,特此记录">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-04-24T08:48:52.000Z">
+<meta property="og:updated_time" content="2020-06-30T09:20:52.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="php错误502问题总结">
+<meta name="twitter:description" content="近期一次 502报错, 但是没有达到timeout的值,特此记录">
 
 
 
@@ -399,7 +402,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-04-24 16:48:52" itemprop="dateModified" datetime="2020-04-24T16:48:52+08:00">2020-04-24</time>
+                <time title="修改时间：2020-06-30 17:20:52" itemprop="dateModified" datetime="2020-06-30T17:20:52+08:00">2020-06-30</time>
               
             
           </span>
@@ -479,7 +482,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">0</span>
+                <span title="本文字数">2.1k</span>
               
 
               
@@ -493,7 +496,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">1 分钟</span>
+                <span title="阅读时长">2 分钟</span>
               
             </div>
           
@@ -513,7 +516,16 @@
       
 
       
-        
+        <p>近期一次 502报错, 但是没有达到timeout的值,特此记录</p>
+<a id="more"></a>
+
+
+
+<h3 id="查看error-log-内容-recv-failed-104-Connection-reset-by-peer-while-reading-response-header-from-upstream"><a href="#查看error-log-内容-recv-failed-104-Connection-reset-by-peer-while-reading-response-header-from-upstream" class="headerlink" title="查看error.log 内容: recv() failed (104: Connection reset by peer) while reading response header from upstream"></a>查看error.log 内容: recv() failed (104: Connection reset by peer) while reading response header from upstream</h3><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">一般来说<span class="number">502</span> 主要是fpm超时进程中止了 或者就是 内存不足导致 fpm中止</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">这里查看了fpm配置 request_terminate_timeout值, 发现并不是该原因</span><br><span class="line"></span><br><span class="line">通过 top 查看了fpm内存, 其中单个内存已经达到了<span class="number">700</span>M</span><br><span class="line"></span><br><span class="line">这里fpm配置的pm 是static, 由于该服务并发不是很高, 可以适当减少max_children的值, 或者采用dynamic 动态方式</span><br><span class="line"></span><br><span class="line">这里设置的max_requests = <span class="number">5500</span>,  可以考虑减小该值</span><br></pre></td></tr></table></figure>
+
+<h3 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h3><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>这里对fpm reload 即可</span><br><span class="line"><span class="symbol">2 </span>改动dynamic 方式</span><br><span class="line"><span class="symbol">3 </span>合理配置max_requests</span><br></pre></td></tr></table></figure>
+
+
       
     </div>
 
@@ -535,7 +547,7 @@
   <p><span>本文标题:</span><a href="/2019/12/02/32-php错误502问题总结/">php错误502问题总结</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 zhangzw 的个人博客">zhangzw</a></p>
   <p><span>发布时间:</span>2019年12月02日 - 17:12</p>
-  <p><span>最后更新:</span>2020年04月24日 - 16:04</p>
+  <p><span>最后更新:</span>2020年06月30日 - 17:06</p>
   <p><span>原始链接:</span><a href="/2019/12/02/32-php错误502问题总结/" title="php错误502问题总结">http://zhangzw001.github.io/2019/12/02/32-php错误502问题总结/</a>
     <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://zhangzw001.github.io/2019/12/02/32-php错误502问题总结/" aria-label="复制成功！"></i></span>
   </p>
@@ -647,8 +659,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -928,6 +949,23 @@
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看error-log-内容-recv-failed-104-Connection-reset-by-peer-while-reading-response-header-from-upstream"><span class="nav-number">1.</span> <span class="nav-text">查看error.log 内容: recv() failed (104: Connection reset by peer) while reading response header from upstream</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题解决"><span class="nav-number">2.</span> <span class="nav-text">问题解决</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
