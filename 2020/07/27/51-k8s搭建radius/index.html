@@ -114,7 +114,8 @@
 <meta property="og:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
 <meta property="og:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
 <meta property="og:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
-<meta property="og:updated_time" content="2020-07-27T02:42:01.000Z">
+<meta property="og:image" content="http://zhangzw001.github.io/images/51/img.jpg">
+<meta property="og:updated_time" content="2020-07-27T02:51:52.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="k8s搭建radius">
 <meta name="twitter:description" content="搭建lnmp+freeradius的账号认证服务">
@@ -391,7 +392,7 @@
                 
               
 
-              <time title="创建时间：2020-07-27 10:19:25 / 修改时间：10:42:01" itemprop="dateCreated datePublished" datetime="2020-07-27T10:19:25+08:00">2020-07-27</time>
+              <time title="创建时间：2020-07-27 10:19:25 / 修改时间：10:51:52" itemprop="dateCreated datePublished" datetime="2020-07-27T10:19:25+08:00">2020-07-27</time>
             
 
             
@@ -566,7 +567,8 @@
 
 <h4 id="通过后台新建账号之后-测试账号连通性"><a href="#通过后台新建账号之后-测试账号连通性" class="headerlink" title="通过后台新建账号之后, 测试账号连通性"></a>通过后台新建账号之后, 测试账号连通性</h4><h5 id="命令行"><a href="#命令行" class="headerlink" title="命令行"></a>命令行</h5><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 在freeradius 容器内支线</span></span><br><span class="line">radtest xxx xxx 127.0.0.1 0 testing123</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在其他客户端执行(configmap-freeradius-clients-conf.yaml 配置允许的ip)</span></span><br><span class="line">radtest xxx xxx k8s1-t.xxx.com 0 testing123-k8s-pod</span><br><span class="line"></span><br><span class="line">Sending Access-Request of id 237 <span class="keyword">to</span> xxx.xxx.xxx.120<span class="built_in"> port </span>1812</span><br><span class="line">        User-Name = <span class="string">"xxx"</span></span><br><span class="line">        User-Password = <span class="string">"xxx"</span></span><br><span class="line">        NAS-IP-Address = 192.168.0.172</span><br><span class="line">        NAS-Port = 0</span><br><span class="line">        Message-Authenticator = 0x00000000000000000000000000000000</span><br><span class="line">rad_recv: Access-Reject packet <span class="keyword">from</span> host xxx.xxx.xxx.120<span class="built_in"> port </span>1812, <span class="attribute">id</span>=237, <span class="attribute">length</span>=20</span><br></pre></td></tr></table></figure>
 
-<h4 id="通过radius-xxx-com-管理页面测试连通性"><a href="#通过radius-xxx-com-管理页面测试连通性" class="headerlink" title="通过radius.xxx.com 管理页面测试连通性"></a>通过radius.xxx.com 管理页面测试连通性</h4>
+<h4 id="通过radius-xxx-com-管理页面测试连通性"><a href="#通过radius-xxx-com-管理页面测试连通性" class="headerlink" title="通过radius.xxx.com 管理页面测试连通性"></a>通过radius.xxx.com 管理页面测试连通性</h4><p><img src="http://zhangzw001.github.io/images/51/img.jpg" alt></p>
+
       
     </div>
 
