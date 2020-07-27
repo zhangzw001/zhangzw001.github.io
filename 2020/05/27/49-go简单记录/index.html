@@ -581,7 +581,7 @@
 <hr>
 <h3 id="9-斐波那契数列"><a href="#9-斐波那契数列" class="headerlink" title="9. 斐波那契数列"></a>9. 斐波那契数列</h3><h4 id="1-递归写法-n-越大-就贼慢"><a href="#1-递归写法-n-越大-就贼慢" class="headerlink" title="1 递归写法(n 越大 就贼慢)"></a>1 递归写法(n 越大 就贼慢)</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Fib</span><span class="params">(n <span class="keyword">int</span> )</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> n &lt;=<span class="number">1</span> &#123; <span class="keyword">return</span> <span class="number">1</span> &#125;</span><br><span class="line">	<span class="keyword">return</span> fib(n<span class="number">-1</span>)+fib(n<span class="number">-2</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h4 id="2-循环的写法"><a href="#2-循环的写法" class="headerlink" title="2 循环的写法"></a>2 循环的写法</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Fib2</span><span class="params">(n <span class="keyword">int</span> )</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	f := [<span class="number">3</span>]<span class="keyword">int</span>&#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>&#125;</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">2</span> ; i &lt; n ; i++ &#123;</span><br><span class="line">		f[<span class="number">2</span>] = f[<span class="number">0</span>] + f[<span class="number">1</span>]</span><br><span class="line">		f[<span class="number">0</span>] = f[<span class="number">1</span>]</span><br><span class="line">		f[<span class="number">1</span>] = f[<span class="number">2</span>]</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> f[<span class="number">2</span>]</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-循环的写法"><a href="#2-循环的写法" class="headerlink" title="2 循环的写法"></a>2 循环的写法</h4><figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">func Fib2(n int ) int &#123;</span><br><span class="line">	f := <span class="string">[3]</span>int&#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>&#125;</span><br><span class="line">	for i := <span class="number">2</span> ; i &lt; n ; i++ &#123;</span><br><span class="line">		f<span class="string">[2]</span> = f<span class="string">[0]</span> + f<span class="string">[1]</span></span><br><span class="line">		f<span class="string">[0]</span> = f<span class="string">[1]</span></span><br><span class="line">		f<span class="string">[1]</span> = f<span class="string">[2]</span></span><br><span class="line">	&#125;</span><br><span class="line">	return f<span class="string">[2]</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h4 id="3-匿名函数写法"><a href="#3-匿名函数写法" class="headerlink" title="3 匿名函数写法"></a>3 匿名函数写法</h4><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Fib3</span><span class="params">()</span></span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> int &#123;</span><br><span class="line"> <span class="keyword">var</span> n,m int</span><br><span class="line"> <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> int &#123;</span><br><span class="line">  <span class="keyword">if</span> n &lt;= <span class="number">1</span> &#123;</span><br><span class="line">   n = <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">  n,m = n+m,n</span><br><span class="line">  <span class="keyword">return</span> m</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -746,7 +746,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">51</span>
+                    <span class="site-state-item-count">52</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -863,7 +863,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">52</span>
+                      
+                    
+                    <span class="site-state-item-count">53</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -968,7 +970,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">46</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">48</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

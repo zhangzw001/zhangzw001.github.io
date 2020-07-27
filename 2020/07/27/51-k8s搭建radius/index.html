@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+
+<script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js">
+</script>
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="搭建lnmp+freeradius的账号认证服务">
+<meta name="keywords" content="k8s,freeradius,daloradius">
+<meta property="og:type" content="article">
+<meta property="og:title" content="k8s搭建radius">
+<meta property="og:url" content="http://zhangzw001.github.io/2020/07/27/51-k8s搭建radius/index.html">
+<meta property="og:site_name" content="Zhangzw&#39;s Blog">
+<meta property="og:description" content="搭建lnmp+freeradius的账号认证服务">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
+<meta property="og:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
+<meta property="og:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
+<meta property="og:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
+<meta property="og:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
+<meta property="og:updated_time" content="2020-07-27T02:42:01.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="k8s搭建radius">
+<meta name="twitter:description" content="搭建lnmp+freeradius的账号认证服务">
+<meta name="twitter:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://zhangzw001.github.io/2020/07/27/51-k8s搭建radius/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>k8s搭建radius | Zhangzw's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Zhangzw's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://zhangzw001.github.io/2020/07/27/51-k8s搭建radius/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhangzw">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zhangzw's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">k8s搭建radius
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+	
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-07-27 10:19:25 / 修改时间：10:42:01" itemprop="dateCreated datePublished" datetime="2020-07-27T10:19:25+08:00">2020-07-27</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/k8s/" itemprop="url" rel="index"><span itemprop="name">k8s</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/radius/" itemprop="url" rel="index"><span itemprop="name">radius</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/07/27/51-k8s搭建radius/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2020/07/27/51-k8s搭建radius/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/07/27/51-k8s搭建radius/" class="leancloud_visitors" data-flag-title="k8s搭建radius">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">119k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">1:48</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>搭建lnmp+freeradius的账号认证服务</p>
+<a id="more"></a>
+
+
+<center>
+<img src="http://zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
+</center>
+
+<h3 id="记录"><a href="#记录" class="headerlink" title="记录"></a>记录</h3><figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">docker:</span>   <span class="number">17.03</span><span class="number">.2</span>-ce</span><br><span class="line"><span class="symbol">k8s:</span>   <span class="number">1.15</span><span class="number">.11</span></span><br><span class="line"><span class="symbol">php:</span>   <span class="number">7.0</span><span class="number">.13</span></span><br><span class="line"><span class="symbol">mysql:</span>   <span class="number">5.6</span></span><br><span class="line"><span class="symbol">freeraidus:</span>  <span class="number">3.0</span><span class="number">.21</span></span><br><span class="line"><span class="symbol">daloradius:</span>  <span class="number">1.1</span><span class="number">-2</span> / <span class="number">08</span> Aug <span class="number">2019</span></span><br></pre></td></tr></table></figure>
+
+<center>
+<img src="http://zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
+</center>
+
+<h3 id="一-首先搭建数据库"><a href="#一-首先搭建数据库" class="headerlink" title="一 首先搭建数据库"></a>一 首先搭建数据库</h3><h4 id="k8s-freeradius-mysql-dev-5-6-36-configmap-yml"><a href="#k8s-freeradius-mysql-dev-5-6-36-configmap-yml" class="headerlink" title="k8s-freeradius-mysql-dev_5.6.36-configmap.yml"></a>k8s-freeradius-mysql-dev_5.6.36-configmap.yml</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ConfigMap</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">freeradius-mysql-dev</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">freeradius-mysql-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">db</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="string">my.cnf:</span> <span class="string">|</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    [mysqld]</span></span><br><span class="line"><span class="string">    innodb_file_per_table=1</span></span><br><span class="line"><span class="string">    user=mysql</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    datadir=/data</span></span><br><span class="line"><span class="string">    socket=/data/mysql.sock</span></span><br><span class="line"><span class="string">    symbolic-links=0</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    binlog_format=mixed</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    #log-bin=mysql-bin</span></span><br><span class="line"><span class="string">    log-bin=/data/mysql-bin.log</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    #general_log   = 1</span></span><br><span class="line"><span class="string">    #general_log_file = /data/general.log</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    #日志</span></span><br><span class="line"><span class="string">    log-error=/data/mysqld.log</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    innodb_log_file_size = 256M</span></span><br><span class="line"><span class="string">    thread_cache_size = 50</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    max_allowed_packet=16M</span></span><br><span class="line"><span class="string">    max_binlog_size=500M</span></span><br><span class="line"><span class="string">    #old_passwords=1</span></span><br><span class="line"><span class="string">    character-set-server=utf8</span></span><br><span class="line"><span class="string">    max_connections=3000</span></span><br><span class="line"><span class="string">    skip-name-resolve</span></span><br><span class="line"><span class="string">    max_allowed_packet=64M</span></span><br><span class="line"><span class="string">    tmp_table_size=200M</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    server-id=101</span></span><br><span class="line"><span class="string">    port=3306</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    skip_slave_start</span></span><br><span class="line"><span class="string">    expire_logs_days=7</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    [mysqld_safe]</span></span><br><span class="line"><span class="string">    log-error=/data/mysqld.log</span></span><br><span class="line"><span class="string">    pid-file=/data/mysqld.pid</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    [mysql]</span></span><br><span class="line"><span class="string">    no-auto-rehash</span></span><br><span class="line"><span class="string">    user=root</span></span><br><span class="line"><span class="string">    default-character-set=utf8</span></span><br><span class="line"><span class="string">    socket=/data/mysql.sock</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    [client]</span></span><br><span class="line"><span class="string">    socket=/data/mysql.sock</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="k8s-freeradius-mysql-dev-5-6-36-yml"><a href="#k8s-freeradius-mysql-dev-5-6-36-yml" class="headerlink" title="k8s-freeradius-mysql-dev_5.6.36.yml"></a>k8s-freeradius-mysql-dev_5.6.36.yml</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">freeradius-mysql-dev</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">freeradius-mysql-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">db</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  replicas:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">  selector:</span></span><br><span class="line"><span class="attr">    matchLabels:</span></span><br><span class="line"><span class="attr">      app:</span> <span class="string">freeradius-mysql-dev</span></span><br><span class="line"><span class="attr">  template:</span></span><br><span class="line"><span class="attr">    metadata:</span></span><br><span class="line"><span class="attr">      labels:</span></span><br><span class="line"><span class="attr">        app:</span> <span class="string">freeradius-mysql-dev</span></span><br><span class="line"><span class="attr">    spec:</span></span><br><span class="line"><span class="attr">      containers:</span></span><br><span class="line"><span class="attr">       - name:</span> <span class="string">freeradius-mysql-dev</span></span><br><span class="line"><span class="attr">         image:</span> <span class="string">hub.xxx.com/mysql:5.6.36-Asia</span></span><br><span class="line"><span class="attr">         ports:</span></span><br><span class="line"><span class="attr">         - containerPort:</span> <span class="number">3306</span></span><br><span class="line"><span class="attr">           name:</span> <span class="string">db-port</span></span><br><span class="line"><span class="attr">         resources:</span></span><br><span class="line"><span class="attr">           requests:</span></span><br><span class="line"><span class="attr">             cpu:</span> <span class="string">"50m"</span></span><br><span class="line"><span class="attr">           limits:</span></span><br><span class="line"><span class="attr">             cpu:</span> <span class="string">"1"</span></span><br><span class="line"><span class="attr">         env:</span></span><br><span class="line"><span class="attr">         - name:</span> <span class="string">MYSQL_ROOT_PASSWORD</span></span><br><span class="line"><span class="attr">           value:</span> <span class="string">"xxx"</span></span><br><span class="line"><span class="attr">         volumeMounts:</span></span><br><span class="line"><span class="attr">         - name:</span> <span class="string">freeradius-mysql-dev-data</span></span><br><span class="line"><span class="attr">           mountPath:</span> <span class="string">/data</span></span><br><span class="line"><span class="attr">         - name:</span> <span class="string">freeradius-mysql-dev-conf</span></span><br><span class="line"><span class="attr">           mountPath:</span> <span class="string">/etc/mysql/my.cnf</span></span><br><span class="line"><span class="attr">           subPath:</span> <span class="string">my.cnf</span></span><br><span class="line"><span class="attr">      volumes:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">freeradius-mysql-dev-data</span></span><br><span class="line"><span class="attr">          nfs:</span></span><br><span class="line"><span class="attr">            server:</span> <span class="string">xxx.xxx.xxx.194</span></span><br><span class="line"><span class="attr">            path:</span> <span class="string">/disk/k8s-nfs-data/k8s-db-t/freeradius-mysql-dev</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">freeradius-mysql-dev-conf</span></span><br><span class="line"><span class="attr">          configMap:</span></span><br><span class="line"><span class="attr">            name:</span> <span class="string">freeradius-mysql-dev</span></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">freeradius-mysql-dev</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">freeradius-mysql-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">db</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">NodePort</span></span><br><span class="line"><span class="attr">  ports:</span></span><br><span class="line"><span class="attr">    - port:</span> <span class="number">3306</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">db-port</span></span><br><span class="line"><span class="attr">      targetPort:</span> <span class="number">3306</span></span><br><span class="line"><span class="attr">      nodePort:</span> <span class="number">3326</span></span><br><span class="line"><span class="attr">      protocol:</span> <span class="string">TCP</span></span><br><span class="line"><span class="attr">  selector:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">freeradius-mysql-dev</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="创建库和账号"><a href="#创建库和账号" class="headerlink" title="创建库和账号"></a>创建库和账号</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">create database radius;</span><br><span class="line">grant all on radius.* to radius@'%' identified by 'xxxxxxxxxxxxxxxxxx';</span><br><span class="line">flush privileges;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试登录</span></span><br><span class="line">mysql -hk8s-db-t.xxx.com -P3326 -uradius -p</span><br></pre></td></tr></table></figure>
+
+<center>
+<img src="http://zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
+</center>
+
+<h3 id="部署freeradius"><a href="#部署freeradius" class="headerlink" title="部署freeradius"></a>部署freeradius</h3><h4 id="deployment-freeradius-yml"><a href="#deployment-freeradius-yml" class="headerlink" title="deployment-freeradius.yml"></a>deployment-freeradius.yml</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">freeradius-dev</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">freeradius-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">radius-dev</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  replicas:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">  selector:</span></span><br><span class="line"><span class="attr">    matchLabels:</span></span><br><span class="line"><span class="attr">      app:</span> <span class="string">freeradius-dev</span></span><br><span class="line"><span class="attr">  template:</span></span><br><span class="line"><span class="attr">    metadata:</span></span><br><span class="line"><span class="attr">      labels:</span></span><br><span class="line"><span class="attr">        app:</span> <span class="string">freeradius-dev</span></span><br><span class="line"><span class="attr">    spec:</span></span><br><span class="line"><span class="attr">      containers:</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">freeradius-dev</span></span><br><span class="line"><span class="attr">        image:</span> <span class="string">hub.xxx.com/freeradius-server:3.0.21</span></span><br><span class="line"><span class="attr">        ports:</span></span><br><span class="line"><span class="attr">        - containerPort:</span> <span class="number">1812</span></span><br><span class="line"><span class="attr">          name:</span> <span class="string">port-1812</span></span><br><span class="line"><span class="attr">          protocol:</span> <span class="string">UDP</span></span><br><span class="line"><span class="attr">        - containerPort:</span> <span class="number">1813</span></span><br><span class="line"><span class="attr">          name:</span> <span class="string">port-1813</span></span><br><span class="line"><span class="attr">          protocol:</span> <span class="string">UDP</span></span><br><span class="line"><span class="attr">        resources:</span></span><br><span class="line"><span class="attr">          requests:</span></span><br><span class="line"><span class="attr">            cpu:</span> <span class="string">"30m"</span></span><br><span class="line"><span class="attr">          limits:</span></span><br><span class="line"><span class="attr">            cpu:</span> <span class="string">"1"</span></span><br><span class="line"><span class="attr">        volumeMounts:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-freeradius-sql-dev</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">/etc/raddb/mods-available/sql</span></span><br><span class="line"><span class="attr">          subPath:</span> <span class="string">sql</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-freeradius-radiusd-dev</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">/etc/raddb/radiusd.conf</span></span><br><span class="line"><span class="attr">          subPath:</span> <span class="string">radiusd.conf</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-freeradius-clients-dev</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">/etc/raddb/clients.conf</span></span><br><span class="line"><span class="attr">          subPath:</span> <span class="string">clients.conf</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-freeradius-log</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">/nginx_logs</span></span><br><span class="line"><span class="attr">      volumes:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-freeradius-sql-dev</span></span><br><span class="line"><span class="attr">          configMap:</span></span><br><span class="line"><span class="attr">            name:</span> <span class="string">daloradius-freeradius-sql-dev</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-freeradius-radiusd-dev</span></span><br><span class="line"><span class="attr">          configMap:</span></span><br><span class="line"><span class="attr">            name:</span> <span class="string">daloradius-freeradius-radiusd-dev</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-freeradius-clients-dev</span></span><br><span class="line"><span class="attr">          configMap:</span></span><br><span class="line"><span class="attr">            name:</span> <span class="string">daloradius-freeradius-clients-dev</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-freeradius-log</span></span><br><span class="line"><span class="attr">          nfs:</span></span><br><span class="line"><span class="attr">            server:</span> <span class="string">xxx.xxx.xxx.194</span></span><br><span class="line"><span class="attr">            path:</span> <span class="string">/disk/k8s-nfs-data/k8s1-t/daloradius-php/nginx_logs</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">freeradius-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">radius-dev</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">freeradius-dev</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">ClusterIP</span></span><br><span class="line"><span class="attr">  ports:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">port-1812</span></span><br><span class="line"><span class="attr">      port:</span> <span class="number">1812</span></span><br><span class="line"><span class="attr">      protocol:</span> <span class="string">UDP</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">port-1813</span></span><br><span class="line"><span class="attr">      port:</span> <span class="number">1813</span></span><br><span class="line"><span class="attr">      protocol:</span> <span class="string">UDP</span></span><br><span class="line"><span class="attr">  selector:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">freeradius-dev</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">freeradius-dev-svc</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">radius-dev</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">freeradius-dev</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">NodePort</span></span><br><span class="line"><span class="attr">  ports:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">port-1812</span></span><br><span class="line"><span class="attr">      port:</span> <span class="number">1812</span></span><br><span class="line"><span class="attr">      targetPort:</span> <span class="number">1812</span></span><br><span class="line"><span class="attr">      nodePort:</span> <span class="number">1812</span></span><br><span class="line"><span class="attr">      protocol:</span> <span class="string">UDP</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">port-1813</span></span><br><span class="line"><span class="attr">      port:</span> <span class="number">1813</span></span><br><span class="line"><span class="attr">      targetPort:</span> <span class="number">1813</span></span><br><span class="line"><span class="attr">      nodePort:</span> <span class="number">1813</span></span><br><span class="line"><span class="attr">      protocol:</span> <span class="string">UDP</span></span><br><span class="line"><span class="attr">  selector:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">freeradius-dev</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="configmap-freeradius-radiusd-conf-yaml"><a href="#configmap-freeradius-radiusd-conf-yaml" class="headerlink" title="configmap-freeradius-radiusd-conf.yaml"></a>configmap-freeradius-radiusd-conf.yaml</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ConfigMap</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">daloradius-freeradius-radiusd-dev</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">daloradius-freeradius-radiusd-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">radius-dev</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="string">radiusd.conf:</span> <span class="string">|</span></span><br><span class="line"><span class="string">    prefix = /usr</span></span><br><span class="line"><span class="string">    exec_prefix = /usr</span></span><br><span class="line"><span class="string">    sysconfdir = /etc</span></span><br><span class="line"><span class="string">    localstatedir = /var</span></span><br><span class="line"><span class="string">    sbindir = $&#123;exec_prefix&#125;/sbin</span></span><br><span class="line"><span class="string">    logdir = /nginx_logs</span></span><br><span class="line"><span class="string">    raddbdir = /etc/freeradius</span></span><br><span class="line"><span class="string">    radacctdir = $&#123;logdir&#125;/radacct</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    name = freeradius</span></span><br><span class="line"><span class="string">    confdir = $&#123;raddbdir&#125;</span></span><br><span class="line"><span class="string">    modconfdir = $&#123;confdir&#125;/mods-config</span></span><br><span class="line"><span class="string">    certdir = $&#123;confdir&#125;/certs</span></span><br><span class="line"><span class="string">    cadir   = $&#123;confdir&#125;/certs</span></span><br><span class="line"><span class="string">    run_dir = $&#123;localstatedir&#125;/run/$&#123;name&#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    # Should likely be $&#123;localstatedir&#125;/lib/radiusd</span></span><br><span class="line"><span class="string">    db_dir = $&#123;raddbdir&#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    libdir = /usr/lib/freeradius</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    pidfile = $&#123;run_dir&#125;/$&#123;name&#125;.pid</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    correct_escapes = true</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    max_request_time = 30</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    cleanup_delay = 5</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    max_requests = 16384</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    hostname_lookups = no</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    log &#123;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     destination = files</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     colourise = yes</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     file = $&#123;logdir&#125;/radius.log</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     syslog_facility = daemon</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     stripped_names = no</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     auth = no</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     # auth_accept = no</span></span><br><span class="line"><span class="string">     # auth_reject = no</span></span><br><span class="line"><span class="string">     auth_badpass = no</span></span><br><span class="line"><span class="string">     auth_goodpass = no</span></span><br><span class="line"><span class="string">     msg_denied = "You are already logged in - access denied"</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    checkrad = $&#123;sbindir&#125;/checkrad</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    ENV &#123;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    security &#123;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     user = freerad</span></span><br><span class="line"><span class="string">     group = freerad</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     allow_core_dumps = no</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     max_attributes = 200</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     reject_delay = 1</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     status_server = yes</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    proxy_requests  = yes</span></span><br><span class="line"><span class="string">    $INCLUDE proxy.conf</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    $INCLUDE clients.conf</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    thread pool &#123;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     start_servers = 5</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     max_servers = 32</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     min_spare_servers = 3</span></span><br><span class="line"><span class="string">     max_spare_servers = 10</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     max_requests_per_server = 0</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     auto_limit_acct = no</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    modules &#123;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">     $INCLUDE mods-enabled/</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    instantiate &#123;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    policy &#123;</span></span><br><span class="line"><span class="string">     $INCLUDE policy.d/</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    $INCLUDE sites-enabled/</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="configmap-freeradius-clients-conf-yaml"><a href="#configmap-freeradius-clients-conf-yaml" class="headerlink" title="configmap-freeradius-clients-conf.yaml"></a>configmap-freeradius-clients-conf.yaml</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ConfigMap</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">daloradius-freeradius-clients-dev</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">daloradius-freeradius-clients-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">radius-dev</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="string">clients.conf:</span> <span class="string">|</span></span><br><span class="line"><span class="string">    client k8s_pods_clients &#123;</span></span><br><span class="line"><span class="string">     ipaddr = 192.168.0.0/16</span></span><br><span class="line"><span class="string">     secret  = testing123-k8s-pod</span></span><br><span class="line"><span class="string">     require_message_authenticator = no</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    client k8s_svc_clients &#123;</span></span><br><span class="line"><span class="string">     ipaddr = 10.96.0.0/12</span></span><br><span class="line"><span class="string">     secret  = testing123-k8s-svc</span></span><br><span class="line"><span class="string">     require_message_authenticator = no</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    client localhost &#123;</span></span><br><span class="line"><span class="string">     ipaddr = 127.0.0.1</span></span><br><span class="line"><span class="string">     proto = *</span></span><br><span class="line"><span class="string">     secret = testing123</span></span><br><span class="line"><span class="string">     require_message_authenticator = no</span></span><br><span class="line"><span class="string">     nas_type  = other # localhost isn't usually a NAS...</span></span><br><span class="line"><span class="string">     limit &#123;</span></span><br><span class="line"><span class="string">      max_connections = 16</span></span><br><span class="line"><span class="string">      lifetime = 0</span></span><br><span class="line"><span class="string">      idle_timeout = 30</span></span><br><span class="line"><span class="string">     &#125;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">    client localhost_ipv6 &#123;</span></span><br><span class="line"><span class="string">     ipv6addr = ::1</span></span><br><span class="line"><span class="string">     secret  = testing123</span></span><br><span class="line"><span class="string">    &#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="configmap-freeradius-sql-yaml"><a href="#configmap-freeradius-sql-yaml" class="headerlink" title="configmap-freeradius-sql.yaml"></a>configmap-freeradius-sql.yaml</h4><blockquote>
+<p>主要是修改 Connection info 的内容</p>
+</blockquote>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">kind: ConfigMap</span><br><span class="line">metadata:</span><br><span class="line">  name: daloradius-freeradius-sql-dev</span><br><span class="line">  labels:</span><br><span class="line">    app: daloradius-freeradius-sql-dev</span><br><span class="line">  namespace: radius-dev</span><br><span class="line">apiVersion: v1</span><br><span class="line">data:</span><br><span class="line">  sql: |</span><br><span class="line">    sql &#123;</span><br><span class="line">        <span class="attr">dialect</span> = <span class="string">"mysql"</span></span><br><span class="line">        <span class="attr">driver</span> = <span class="string">"rlm_sql_mysql"</span></span><br><span class="line">        sqlite &#123;</span><br><span class="line">            <span class="attr">filename</span> = <span class="string">"/tmp/freeradius.db"</span></span><br><span class="line">            <span class="attr">busy_timeout</span> = <span class="number">200</span></span><br><span class="line">            <span class="attr">bootstrap</span> = <span class="string">"<span class="subst">$&#123;modconfdir&#125;</span>/<span class="subst">$&#123;..:name&#125;</span>/main/sqlite/schema.sql"</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    mysql &#123;</span><br><span class="line">        tls &#123;</span><br><span class="line">            <span class="attr">ca_file</span> = <span class="string">"/etc/ssl/certs/my_ca.crt"</span></span><br><span class="line">            <span class="attr">ca_path</span> = <span class="string">"/etc/ssl/certs/"</span></span><br><span class="line">            <span class="attr">certificate_file</span> = <span class="string">"/etc/ssl/certs/private/client.crt"</span></span><br><span class="line">            <span class="attr">private_key_file</span> = <span class="string">"/etc/ssl/certs/private/client.key"</span></span><br><span class="line">            <span class="attr">cipher</span> = <span class="string">"DHE-RSA-AES256-SHA:AES128-SHA"</span></span><br><span class="line">            <span class="attr">tls_required</span> = yes</span><br><span class="line">            <span class="attr">tls_check_cert</span> = no</span><br><span class="line">            <span class="attr">tls_check_cert_cn</span> = no</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="attr">warnings</span> = auto</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    postgresql &#123;</span><br><span class="line">        <span class="attr">send_application_name</span> = yes</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    mongo &#123;</span><br><span class="line">        <span class="attr">appname</span> = <span class="string">"freeradius"</span></span><br><span class="line">        tls &#123;</span><br><span class="line">             <span class="attr">certificate_file</span> = /path/to/file</span><br><span class="line">             <span class="attr">certificate_password</span> = <span class="string">"password"</span></span><br><span class="line">             <span class="attr">ca_file</span> = /path/to/file</span><br><span class="line">             <span class="attr">ca_dir</span> = /path/to/directory</span><br><span class="line">             <span class="attr">crl_file</span> = /path/to/file</span><br><span class="line">             <span class="attr">weak_cert_validation</span> = <span class="literal">false</span></span><br><span class="line">             <span class="attr">allow_invalid_hostname</span> = <span class="literal">false</span></span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="attr">server</span> = <span class="string">"k8s-db-t.xxx.com"</span></span><br><span class="line">    <span class="attr">port</span> = <span class="number">3326</span></span><br><span class="line">    <span class="attr">login</span> = <span class="string">"radius"</span></span><br><span class="line">    <span class="attr">password</span> = <span class="string">"xxxxxxxxxxxxxxxxxx"</span></span><br><span class="line">    <span class="attr">radius_db</span> = <span class="string">"radius"</span></span><br><span class="line">    <span class="attr">acct_table1</span> = <span class="string">"radacct"</span></span><br><span class="line">    <span class="attr">acct_table2</span> = <span class="string">"radacct"</span></span><br><span class="line">    <span class="attr">postauth_table</span> = <span class="string">"radpostauth"</span></span><br><span class="line">    <span class="attr">authcheck_table</span> = <span class="string">"radcheck"</span></span><br><span class="line">    <span class="attr">groupcheck_table</span> = <span class="string">"radgroupcheck"</span></span><br><span class="line">    <span class="attr">authreply_table</span> = <span class="string">"radreply"</span></span><br><span class="line">    <span class="attr">groupreply_table</span> = <span class="string">"radgroupreply"</span></span><br><span class="line">    <span class="attr">usergroup_table</span> = <span class="string">"radusergroup"</span></span><br><span class="line">    <span class="attr">delete_stale_sessions</span> = yes</span><br><span class="line"></span><br><span class="line">    pool &#123;</span><br><span class="line">        <span class="attr">start</span> = $&#123;thread[pool].start_servers&#125;</span><br><span class="line">        <span class="attr">min</span> = $&#123;thread[pool].min_spare_servers&#125;</span><br><span class="line">        <span class="attr">max</span> = $&#123;thread[pool].max_servers&#125;</span><br><span class="line">        <span class="attr">spare</span> = $&#123;thread[pool].max_spare_servers&#125;</span><br><span class="line">        <span class="attr">uses</span> = <span class="number">0</span></span><br><span class="line">        <span class="attr">retry_delay</span> = <span class="number">30</span></span><br><span class="line">        <span class="attr">lifetime</span> = <span class="number">0</span></span><br><span class="line">        <span class="attr">idle_timeout</span> = <span class="number">60</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="attr">client_table</span> = <span class="string">"nas"</span></span><br><span class="line">    <span class="attr">group_attribute</span> = <span class="string">"SQL-Group"</span></span><br><span class="line">    $INCLUDE $&#123;modconfdir&#125;/$&#123;.:name&#125;/main/$&#123;dialect&#125;/queries.conf</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<center>
+<img src="http://zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
+</center>
+
+<h3 id="部署nignx-php7的daloradius-web管理后台"><a href="#部署nignx-php7的daloradius-web管理后台" class="headerlink" title="部署nignx+php7的daloradius web管理后台"></a>部署nignx+php7的daloradius web管理后台</h3><h4 id="php7部署配置"><a href="#php7部署配置" class="headerlink" title="php7部署配置"></a>php7部署配置</h4><h5 id="php镜像安装扩展-Dockerfile"><a href="#php镜像安装扩展-Dockerfile" class="headerlink" title="php镜像安装扩展 Dockerfile"></a>php镜像安装扩展 Dockerfile</h5><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">from</span> <span class="string">hub.xxx.com/php:develop</span></span><br><span class="line"></span><br><span class="line"><span class="string">user</span> <span class="string">root</span></span><br><span class="line"></span><br><span class="line"><span class="string">RUN</span> <span class="string">pear</span> <span class="string">install</span> <span class="string">DB</span> <span class="string">\</span></span><br><span class="line">  <span class="string">&amp;&amp;</span> <span class="string">pear</span> <span class="string">install</span> <span class="bullet">-a</span> <span class="string">Mail</span> <span class="string">\</span></span><br><span class="line">  <span class="string">&amp;&amp;</span> <span class="string">pear</span> <span class="string">install</span> <span class="bullet">-a</span> <span class="string">Mail_Mime</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="deployment-php-yml"><a href="#deployment-php-yml" class="headerlink" title="deployment-php.yml"></a>deployment-php.yml</h5><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">daloradius-php-dev</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">daloradius-php-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">radius-dev</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  replicas:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">  strategy:</span></span><br><span class="line"><span class="attr">    rollingUpdate:</span></span><br><span class="line"><span class="attr">      maxSurge:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">      maxUnavailable:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">    type:</span> <span class="string">RollingUpdate</span></span><br><span class="line"><span class="attr">  selector:</span></span><br><span class="line"><span class="attr">    matchLabels:</span></span><br><span class="line"><span class="attr">      app:</span> <span class="string">daloradius-php-dev</span></span><br><span class="line"><span class="attr">  template:</span></span><br><span class="line"><span class="attr">    metadata:</span></span><br><span class="line"><span class="attr">      labels:</span></span><br><span class="line"><span class="attr">        app:</span> <span class="string">daloradius-php-dev</span></span><br><span class="line"><span class="attr">    spec:</span></span><br><span class="line"><span class="attr">      containers:</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">daloradius-php-dev</span></span><br><span class="line"><span class="attr">        image:</span> <span class="string">hub.xxx.com/php:radius</span></span><br><span class="line"><span class="attr">        imagePullPolicy:</span> <span class="string">Always</span></span><br><span class="line"><span class="attr">        ports:</span></span><br><span class="line"><span class="attr">        - containerPort:</span> <span class="number">9000</span></span><br><span class="line"><span class="attr">          name:</span> <span class="string">fpm-9000</span></span><br><span class="line"><span class="attr">          protocol:</span> <span class="string">TCP</span></span><br><span class="line"><span class="attr">        resources:</span></span><br><span class="line"><span class="attr">          requests:</span></span><br><span class="line"><span class="attr">            cpu:</span> <span class="string">"50m"</span></span><br><span class="line"><span class="attr">          limits:</span></span><br><span class="line"><span class="attr">            cpu:</span> <span class="string">"600m"</span></span><br><span class="line"><span class="attr">        volumeMounts:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-nginx-dev</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">/webwww</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-php-cfg-dev</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">"/usr/local/etc/php/php.ini"</span></span><br><span class="line"><span class="attr">          subPath:</span> <span class="string">php.ini</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-fpm-cfg-dev</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">"/usr/local/etc/php-fpm.d/www.conf"</span></span><br><span class="line"><span class="attr">          subPath:</span> <span class="string">www.conf</span></span><br><span class="line"><span class="attr">      volumes:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-nginx-dev</span></span><br><span class="line"><span class="attr">          nfs:</span></span><br><span class="line"><span class="attr">            server:</span> <span class="string">xxx.xxx.xxx.194</span></span><br><span class="line"><span class="attr">            path:</span> <span class="string">/disk/k8s-nfs-data/k8s1-t/daloradius-php</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-php-cfg-dev</span></span><br><span class="line"><span class="attr">          configMap:</span></span><br><span class="line"><span class="attr">            name:</span> <span class="string">daloradius-php-cfg-dev</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-fpm-cfg-dev</span></span><br><span class="line"><span class="attr">          configMap:</span></span><br><span class="line"><span class="attr">            name:</span> <span class="string">daloradius-fpm-cfg-dev</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">daloradius-php-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">radius-dev</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">daloradius-php-dev</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">ClusterIP</span></span><br><span class="line"><span class="attr">  ports:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">fpm-9000</span></span><br><span class="line"><span class="attr">      port:</span> <span class="number">9000</span></span><br><span class="line"><span class="attr">      protocol:</span> <span class="string">TCP</span></span><br><span class="line"><span class="attr">  selector:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">daloradius-php-dev</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">daloradius-php-dev-svc</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">radius-dev</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">daloradius-php-dev</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">NodePort</span></span><br><span class="line"><span class="attr">  selector:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">daloradius-php-dev</span></span><br><span class="line"><span class="attr">  ports:</span></span><br><span class="line"><span class="attr">   - name:</span> <span class="string">fpm-9000</span></span><br><span class="line"><span class="attr">     port:</span> <span class="number">9000</span></span><br><span class="line"><span class="attr">     targetPort:</span> <span class="number">9000</span></span><br><span class="line"><span class="attr">     nodePort:</span> <span class="number">32101</span></span><br><span class="line"><span class="attr">     protocol:</span> <span class="string">TCP</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="configmap-php-fpm-yaml"><a href="#configmap-php-fpm-yaml" class="headerlink" title="configmap-php-fpm.yaml"></a>configmap-php-fpm.yaml</h5><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ConfigMap</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">daloradius-fpm-cfg-dev</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">daloradius-fpm-cfg-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">radius-dev</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="string">www.conf:</span> <span class="string">|</span></span><br><span class="line"><span class="string">        [www]</span></span><br><span class="line"><span class="string">        user = 101</span></span><br><span class="line"><span class="string">        group = 101</span></span><br><span class="line"><span class="string">        listen = 127.0.0.1:9000</span></span><br><span class="line"><span class="string">        pm = static</span></span><br><span class="line"><span class="string">        pm.max_children = 20</span></span><br><span class="line"><span class="string">        pm.start_servers = 10</span></span><br><span class="line"><span class="string">        pm.min_spare_servers = 5</span></span><br><span class="line"><span class="string">        pm.max_spare_servers = 5</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="configmap-php-yaml"><a href="#configmap-php-yaml" class="headerlink" title="configmap-php.yaml"></a>configmap-php.yaml</h5><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ConfigMap</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">daloradius-php-cfg-dev</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">daloradius-php-cfg-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">radius-dev</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="string">php.ini:</span> <span class="string">|</span></span><br><span class="line"><span class="string">        [PHP]</span></span><br><span class="line"><span class="string">        engine = On</span></span><br><span class="line"><span class="string">        short_open_tag = Off</span></span><br><span class="line"><span class="string">        precision = 14</span></span><br><span class="line"><span class="string">        output_buffering = 4096</span></span><br><span class="line"><span class="string">        zlib.output_compression = Off</span></span><br><span class="line"><span class="string">        implicit_flush = Off</span></span><br><span class="line"><span class="string">        unserialize_callback_func =</span></span><br><span class="line"><span class="string">        serialize_precision = 17</span></span><br><span class="line"><span class="string">        disable_functions =</span></span><br><span class="line"><span class="string">        disable_classes =</span></span><br><span class="line"><span class="string">        zend.enable_gc = On</span></span><br><span class="line"><span class="string">        expose_php = On</span></span><br><span class="line"><span class="string">        max_execution_time = 30</span></span><br><span class="line"><span class="string">        max_input_time = 60</span></span><br><span class="line"><span class="string">        memory_limit = 128M</span></span><br><span class="line"><span class="string">        max_input_vars = 10000</span></span><br><span class="line"><span class="string">        error_reporting = E_ALL &amp; ~E_DEPRECATED &amp; ~E_STRICT</span></span><br><span class="line"><span class="string">        display_errors = On</span></span><br><span class="line"><span class="string">        display_startup_errors = Off</span></span><br><span class="line"><span class="string">        log_errors = On</span></span><br><span class="line"><span class="string">        log_errors_max_len = 1024</span></span><br><span class="line"><span class="string">        ignore_repeated_errors = Off</span></span><br><span class="line"><span class="string">        ignore_repeated_source = Off</span></span><br><span class="line"><span class="string">        report_memleaks = On</span></span><br><span class="line"><span class="string">        track_errors = Off</span></span><br><span class="line"><span class="string">        html_errors = On</span></span><br><span class="line"><span class="string">        error_log = php_errors.log</span></span><br><span class="line"><span class="string">        variables_order = "GPCS"</span></span><br><span class="line"><span class="string">        request_order = "GP"</span></span><br><span class="line"><span class="string">        register_argc_argv = Off</span></span><br><span class="line"><span class="string">        auto_globals_jit = On</span></span><br><span class="line"><span class="string">        post_max_size = 8M</span></span><br><span class="line"><span class="string">        auto_prepend_file =</span></span><br><span class="line"><span class="string">        auto_append_file =</span></span><br><span class="line"><span class="string">        default_mimetype = "text/html"</span></span><br><span class="line"><span class="string">        default_charset = "UTF-8"</span></span><br><span class="line"><span class="string">        doc_root =</span></span><br><span class="line"><span class="string">        user_dir =</span></span><br><span class="line"><span class="string">        enable_dl = Off</span></span><br><span class="line"><span class="string">        file_uploads = On</span></span><br><span class="line"><span class="string">        upload_max_filesize = 2M</span></span><br><span class="line"><span class="string">        max_file_uploads = 20</span></span><br><span class="line"><span class="string">        allow_url_fopen = On</span></span><br><span class="line"><span class="string">        allow_url_include = Off</span></span><br><span class="line"><span class="string">        default_socket_timeout = 60</span></span><br><span class="line"><span class="string">        [CLI Server]</span></span><br><span class="line"><span class="string">        cli_server.color = On</span></span><br><span class="line"><span class="string">        [Date]</span></span><br><span class="line"><span class="string">        date.timezone =Asia/Shanghai</span></span><br><span class="line"><span class="string">        [filter]</span></span><br><span class="line"><span class="string">        [iconv]</span></span><br><span class="line"><span class="string">        [intl]</span></span><br><span class="line"><span class="string">        [sqlite3]</span></span><br><span class="line"><span class="string">        [Pcre]</span></span><br><span class="line"><span class="string">        [Pdo]</span></span><br><span class="line"><span class="string">        [Pdo_mysql]</span></span><br><span class="line"><span class="string">        pdo_mysql.cache_size = 2000</span></span><br><span class="line"><span class="string">        pdo_mysql.default_socket=</span></span><br><span class="line"><span class="string">        [Phar]</span></span><br><span class="line"><span class="string">        [mail function]</span></span><br><span class="line"><span class="string">        SMTP = localhost</span></span><br><span class="line"><span class="string">        smtp_port = 25</span></span><br><span class="line"><span class="string">        mail.add_x_header = On</span></span><br><span class="line"><span class="string">        [SQL]</span></span><br><span class="line"><span class="string">        sql.safe_mode = Off</span></span><br><span class="line"><span class="string">        [ODBC]</span></span><br><span class="line"><span class="string">        odbc.allow_persistent = On</span></span><br><span class="line"><span class="string">        odbc.check_persistent = On</span></span><br><span class="line"><span class="string">        odbc.max_persistent = -1</span></span><br><span class="line"><span class="string">        odbc.max_links = -1</span></span><br><span class="line"><span class="string">        odbc.defaultlrl = 4096</span></span><br><span class="line"><span class="string">        odbc.defaultbinmode = 1</span></span><br><span class="line"><span class="string">        [Interbase]</span></span><br><span class="line"><span class="string">        ibase.allow_persistent = 1</span></span><br><span class="line"><span class="string">        ibase.max_persistent = -1</span></span><br><span class="line"><span class="string">        ibase.max_links = -1</span></span><br><span class="line"><span class="string">        ibase.timestampformat = "%Y-%m-%d %H:%M:%S"</span></span><br><span class="line"><span class="string">        ibase.dateformat = "%Y-%m-%d"</span></span><br><span class="line"><span class="string">        ibase.timeformat = "%H:%M:%S"</span></span><br><span class="line"><span class="string">        [MySQLi]</span></span><br><span class="line"><span class="string">        mysqli.max_persistent = -1</span></span><br><span class="line"><span class="string">        mysqli.allow_persistent = On</span></span><br><span class="line"><span class="string">        mysqli.max_links = -1</span></span><br><span class="line"><span class="string">        mysqli.cache_size = 2000</span></span><br><span class="line"><span class="string">        mysqli.default_port = 3306</span></span><br><span class="line"><span class="string">        mysqli.default_socket =</span></span><br><span class="line"><span class="string">        mysqli.default_host =</span></span><br><span class="line"><span class="string">        mysqli.default_user =</span></span><br><span class="line"><span class="string">        mysqli.default_pw =</span></span><br><span class="line"><span class="string">        mysqli.reconnect = Off</span></span><br><span class="line"><span class="string">        [mysqlnd]</span></span><br><span class="line"><span class="string">        mysqlnd.collect_statistics = On</span></span><br><span class="line"><span class="string">        mysqlnd.collect_memory_statistics = Off</span></span><br><span class="line"><span class="string">        [OCI8]</span></span><br><span class="line"><span class="string">        [PostgreSQL]</span></span><br><span class="line"><span class="string">        pgsql.allow_persistent = On</span></span><br><span class="line"><span class="string">        pgsql.auto_reset_persistent = Off</span></span><br><span class="line"><span class="string">        pgsql.max_persistent = -1</span></span><br><span class="line"><span class="string">        pgsql.max_links = -1</span></span><br><span class="line"><span class="string">        pgsql.ignore_notice = 0</span></span><br><span class="line"><span class="string">        pgsql.log_notice = 0</span></span><br><span class="line"><span class="string">        [bcmath]</span></span><br><span class="line"><span class="string">        bcmath.scale = 0</span></span><br><span class="line"><span class="string">        [browscap]</span></span><br><span class="line"><span class="string">        [Session]</span></span><br><span class="line"><span class="string">        session.save_handler = redis</span></span><br><span class="line"><span class="string">        session.save_path = "tcp://xxx.xxx.xxx.194:6399"</span></span><br><span class="line"><span class="string">        session.use_strict_mode = 0</span></span><br><span class="line"><span class="string">        session.use_cookies = 1</span></span><br><span class="line"><span class="string">        session.use_only_cookies = 1</span></span><br><span class="line"><span class="string">        session.name = PHPSESSID</span></span><br><span class="line"><span class="string">        session.auto_start = 0</span></span><br><span class="line"><span class="string">        session.cookie_lifetime = 0</span></span><br><span class="line"><span class="string">        session.cookie_path = /</span></span><br><span class="line"><span class="string">        session.cookie_domain =</span></span><br><span class="line"><span class="string">        session.cookie_httponly =</span></span><br><span class="line"><span class="string">        session.serialize_handler = php</span></span><br><span class="line"><span class="string">        session.gc_probability = 1</span></span><br><span class="line"><span class="string">        session.gc_divisor = 1000</span></span><br><span class="line"><span class="string">        session.gc_maxlifetime = 1440</span></span><br><span class="line"><span class="string">        session.referer_check =</span></span><br><span class="line"><span class="string">        session.cache_limiter = nocache</span></span><br><span class="line"><span class="string">        session.cache_expire = 180</span></span><br><span class="line"><span class="string">        session.use_trans_sid = 0</span></span><br><span class="line"><span class="string">        session.hash_function = 0</span></span><br><span class="line"><span class="string">        session.hash_bits_per_character = 5</span></span><br><span class="line"><span class="string">        url_rewriter.tags = "a=href,area=href,frame=src,input=src,form=fakeentry"</span></span><br><span class="line"><span class="string">        [Assertion]</span></span><br><span class="line"><span class="string">        zend.assertions = -1</span></span><br><span class="line"><span class="string">        tidy.clean_output = Off</span></span><br><span class="line"><span class="string">        [soap]</span></span><br><span class="line"><span class="string">        soap.wsdl_cache_enabled=1</span></span><br><span class="line"><span class="string">        soap.wsdl_cache_dir="/tmp"</span></span><br><span class="line"><span class="string">        soap.wsdl_cache_ttl=86400</span></span><br><span class="line"><span class="string">        soap.wsdl_cache_limit = 5</span></span><br><span class="line"><span class="string">        [sysvshm]</span></span><br><span class="line"><span class="string">        [ldap]</span></span><br><span class="line"><span class="string">        ldap.max_links = -1</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="nginx部署配置"><a href="#nginx部署配置" class="headerlink" title="nginx部署配置"></a>nginx部署配置</h4><h5 id="deployment-nginx-yml"><a href="#deployment-nginx-yml" class="headerlink" title="deployment-nginx.yml"></a>deployment-nginx.yml</h5><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">daloradius-nginx-dev</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">daloradius-nginx-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">radius-dev</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  replicas:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">  selector:</span></span><br><span class="line"><span class="attr">    matchLabels:</span></span><br><span class="line"><span class="attr">      app:</span> <span class="string">daloradius-nginx-dev</span></span><br><span class="line"><span class="attr">  template:</span></span><br><span class="line"><span class="attr">    metadata:</span></span><br><span class="line"><span class="attr">      labels:</span></span><br><span class="line"><span class="attr">        app:</span> <span class="string">daloradius-nginx-dev</span></span><br><span class="line"><span class="attr">    spec:</span></span><br><span class="line"><span class="attr">      containers:</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">daloradius-nginx-dev</span></span><br><span class="line"><span class="attr">        image:</span> <span class="string">hub.xxx.com/nginx:1.16.0-develop</span></span><br><span class="line"><span class="attr">        ports:</span></span><br><span class="line"><span class="attr">        - containerPort:</span> <span class="number">80</span></span><br><span class="line"><span class="attr">          name:</span> <span class="string">nginx-80</span></span><br><span class="line"><span class="attr">          protocol:</span> <span class="string">TCP</span></span><br><span class="line"><span class="attr">        resources:</span></span><br><span class="line"><span class="attr">          requests:</span></span><br><span class="line"><span class="attr">            cpu:</span> <span class="string">"30m"</span></span><br><span class="line"><span class="attr">          limits:</span></span><br><span class="line"><span class="attr">            cpu:</span> <span class="string">"500m"</span></span><br><span class="line"><span class="attr">        volumeMounts:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">nginx-www-dev</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">/webwww</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-nginx-dev-cm</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">/etc/nginx/nginx.conf</span></span><br><span class="line"><span class="attr">          subPath:</span> <span class="string">nginx.conf</span></span><br><span class="line"><span class="attr">      volumes:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">nginx-www-dev</span></span><br><span class="line"><span class="attr">          nfs:</span></span><br><span class="line"><span class="attr">            server:</span> <span class="string">xxx.xxx.xxx.194</span></span><br><span class="line"><span class="attr">            path:</span> <span class="string">/disk/k8s-nfs-data/k8s1-t/daloradius-php</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">daloradius-nginx-dev-cm</span></span><br><span class="line"><span class="attr">          configMap:</span></span><br><span class="line"><span class="attr">            name:</span> <span class="string">daloradius-nginx-dev-cm</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr"> labels:</span></span><br><span class="line"><span class="attr">   app:</span> <span class="string">daloradius-nginx-dev</span></span><br><span class="line"><span class="attr"> name:</span> <span class="string">daloradius-nginx-dev</span></span><br><span class="line"><span class="attr"> namespace:</span> <span class="string">radius-dev</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr"> type:</span> <span class="string">NodePort</span></span><br><span class="line"><span class="attr"> ports:</span></span><br><span class="line"><span class="attr">   - name:</span> <span class="string">nginx-80</span></span><br><span class="line"><span class="attr">     port:</span> <span class="number">80</span></span><br><span class="line"><span class="attr">     targetPort:</span> <span class="number">80</span></span><br><span class="line"><span class="attr">     nodePort:</span> <span class="number">32100</span></span><br><span class="line"><span class="attr">     protocol:</span> <span class="string">TCP</span></span><br><span class="line"><span class="attr"> selector:</span></span><br><span class="line"><span class="attr">   app:</span> <span class="string">daloradius-nginx-dev</span></span><br><span class="line"><span class="meta">---</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="configmap-php-nginx-yaml"><a href="#configmap-php-nginx-yaml" class="headerlink" title="configmap-php-nginx.yaml"></a>configmap-php-nginx.yaml</h5><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ConfigMap</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">daloradius-nginx-dev-cm</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">daloradius-nginx-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">radius-dev</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="string">nginx.conf:</span> <span class="string">|</span></span><br><span class="line"><span class="string">    user  www-data;</span></span><br><span class="line"><span class="string">    worker_processes  1;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    error_log  /var/log/nginx/error.log warn;</span></span><br><span class="line"><span class="string">    pid        /var/run/nginx.pid;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    events &#123;</span></span><br><span class="line"><span class="string">        worker_connections  1024;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    http &#123;</span></span><br><span class="line"><span class="string">        include       /etc/nginx/mime.types;</span></span><br><span class="line"><span class="string">        default_type  application/octet-stream;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '</span></span><br><span class="line"><span class="string">                          '$status $body_bytes_sent "$http_referer" '</span></span><br><span class="line"><span class="string">                          '"$http_user_agent" "$http_x_forwarded_for"';</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        access_log  /var/log/nginx/access.log  main;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        sendfile        on;</span></span><br><span class="line"><span class="string">        #tcp_nopush     on;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        keepalive_timeout  65;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        #gzip  on;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        include /etc/nginx/conf.d/*.conf;</span></span><br><span class="line"><span class="string">        server &#123;</span></span><br><span class="line"><span class="string">                listen 80 default_server;</span></span><br><span class="line"><span class="string">                server_name  radius.xxx.com ;</span></span><br><span class="line"><span class="string">                root   /webwww;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">                location = /50x.html &#123;</span></span><br><span class="line"><span class="string">                    root   html;</span></span><br><span class="line"><span class="string">                &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">               location / &#123;</span></span><br><span class="line"><span class="string">                    index index.php  index.html index.htm;</span></span><br><span class="line"><span class="string">                &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">                location ~ \.php$ &#123;</span></span><br><span class="line"><span class="string">                    fastcgi_pass   daloradius-php-dev:9000;</span></span><br><span class="line"><span class="string">                    fastcgi_index  index.php;</span></span><br><span class="line"><span class="string">                    fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;</span></span><br><span class="line"><span class="string">                    fastcgi_param  HTTP_HOST          $server_name;</span></span><br><span class="line"><span class="string">                    include        fastcgi_params;</span></span><br><span class="line"><span class="string">                &#125;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br></pre></td></tr></table></figure>
+
+<center>
+<img src="http://zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
+</center>
+
+<h3 id="页面登录测试"><a href="#页面登录测试" class="headerlink" title="页面登录测试"></a>页面登录测试</h3><h4 id="通过前端nginx代理转发到nodeport端口"><a href="#通过前端nginx代理转发到nodeport端口" class="headerlink" title="通过前端nginx代理转发到nodeport端口"></a>通过前端nginx代理转发到nodeport端口</h4><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">       <span class="attribute">listen</span>  <span class="number">80</span>;</span><br><span class="line">       <span class="attribute">charset</span> utf-<span class="number">8</span>;</span><br><span class="line">       <span class="attribute">listen</span> <span class="number">443</span> ssl http2;</span><br><span class="line">       <span class="attribute">server_name</span> radius.xxx.com;</span><br><span class="line"></span><br><span class="line">       <span class="attribute">ssl_certificate</span>   /etc/nginx/server.pem;</span><br><span class="line">       <span class="attribute">ssl_certificate_key</span>   /etc/nginx/server.key;</span><br><span class="line">       <span class="attribute">ssl_session_timeout</span> <span class="number">5m</span>;</span><br><span class="line">       <span class="attribute">ssl_protocols</span> TLSv1 TLSv1.<span class="number">1</span> TLSv1.<span class="number">2</span>;</span><br><span class="line">       <span class="attribute">ssl_ciphers</span> AESGCM:ALL:!DH:!EXPORT:!RC4:+HIGH:!MEDIUM:!LOW:!aNULL:!eNULL;</span><br><span class="line">       <span class="attribute">ssl_prefer_server_ciphers</span> <span class="literal">on</span>;</span><br><span class="line"></span><br><span class="line">       <span class="comment">#转向预发布环境</span></span><br><span class="line">       <span class="attribute">location</span> / &#123;</span><br><span class="line">           <span class="attribute">proxy_pass</span> http://xxx.xxx.xxx.221:32100/;</span><br><span class="line">           <span class="attribute">proxy_redirect</span> http://<span class="variable">$host</span>:32100  http://<span class="variable">$host</span>;</span><br><span class="line">           <span class="attribute">proxy_set_header</span> Host <span class="variable">$host</span>;</span><br><span class="line">           <span class="attribute">proxy_set_header</span> X-Real-IP <span class="variable">$remote_addr</span>;</span><br><span class="line">           <span class="attribute">proxy_set_header</span> X-Forwarded-For <span class="variable">$proxy_add_x_forwarded_for</span>;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="attribute">error_page</span>   <span class="number">500</span> <span class="number">502</span> <span class="number">503</span> <span class="number">504</span>  /50x.html;</span><br><span class="line">       <span class="attribute">location</span> = /50x.html &#123;</span><br><span class="line">           <span class="attribute">root</span>   html;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="配置k8s的ingress"><a href="#配置k8s的ingress" class="headerlink" title="配置k8s的ingress"></a>配置k8s的ingress</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">extensions/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Ingress</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">daloradius-nginx-dev</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">daloradius-nginx-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">radius-dev</span></span><br><span class="line"><span class="attr">  annotations:</span></span><br><span class="line">    <span class="string">kubernetes.io/ingress.class:</span> <span class="string">"traefik"</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  rules:</span></span><br><span class="line"><span class="attr">  - host:</span> <span class="string">radius.xxx.com</span></span><br><span class="line"><span class="attr">    http:</span></span><br><span class="line"><span class="attr">      paths:</span></span><br><span class="line"><span class="attr">      - path:</span> <span class="string">/</span></span><br><span class="line"><span class="attr">        backend:</span></span><br><span class="line"><span class="attr">          serviceName:</span> <span class="string">daloradius-nginx-dev</span></span><br><span class="line"><span class="attr">          servicePort:</span> <span class="number">80</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="登录测试"><a href="#登录测试" class="headerlink" title="登录测试"></a>登录测试</h4><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">登录地址: radius<span class="selector-class">.xxx</span><span class="selector-class">.com</span></span><br><span class="line">账号密码: administrator/radius</span><br></pre></td></tr></table></figure>
+
+<h4 id="通过后台新建账号之后-测试账号连通性"><a href="#通过后台新建账号之后-测试账号连通性" class="headerlink" title="通过后台新建账号之后, 测试账号连通性"></a>通过后台新建账号之后, 测试账号连通性</h4><h5 id="命令行"><a href="#命令行" class="headerlink" title="命令行"></a>命令行</h5><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 在freeradius 容器内支线</span></span><br><span class="line">radtest xxx xxx 127.0.0.1 0 testing123</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在其他客户端执行(configmap-freeradius-clients-conf.yaml 配置允许的ip)</span></span><br><span class="line">radtest xxx xxx k8s1-t.xxx.com 0 testing123-k8s-pod</span><br><span class="line"></span><br><span class="line">Sending Access-Request of id 237 <span class="keyword">to</span> xxx.xxx.xxx.120<span class="built_in"> port </span>1812</span><br><span class="line">        User-Name = <span class="string">"xxx"</span></span><br><span class="line">        User-Password = <span class="string">"xxx"</span></span><br><span class="line">        NAS-IP-Address = 192.168.0.172</span><br><span class="line">        NAS-Port = 0</span><br><span class="line">        Message-Authenticator = 0x00000000000000000000000000000000</span><br><span class="line">rad_recv: Access-Reject packet <span class="keyword">from</span> host xxx.xxx.xxx.120<span class="built_in"> port </span>1812, <span class="attribute">id</span>=237, <span class="attribute">length</span>=20</span><br></pre></td></tr></table></figure>
+
+<h4 id="通过radius-xxx-com-管理页面测试连通性"><a href="#通过radius-xxx-com-管理页面测试连通性" class="headerlink" title="通过radius.xxx.com 管理页面测试连通性"></a>通过radius.xxx.com 管理页面测试连通性</h4>
+      
+    </div>
+
+    
+
+    
+    
+    
+    
+      <div>
+        
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script type="text/javascript" src="http://jslibs.wuxubj.cn/sweetalert_mini/jquery-1.7.1.min.js"></script>
+  <script src="http://jslibs.wuxubj.cn/sweetalert_mini/sweetalert.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="http://jslibs.wuxubj.cn/sweetalert_mini/sweetalert.mini.css">
+  <p><span>本文标题:</span><a href="/2020/07/27/51-k8s搭建radius/">k8s搭建radius</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 zhangzw 的个人博客">zhangzw</a></p>
+  <p><span>发布时间:</span>2020年07月27日 - 10:07</p>
+  <p><span>最后更新:</span>2020年07月27日 - 10:07</p>
+  <p><span>原始链接:</span><a href="/2020/07/27/51-k8s搭建radius/" title="k8s搭建radius">http://zhangzw001.github.io/2020/07/27/51-k8s搭建radius/</a>
+    <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://zhangzw001.github.io/2020/07/27/51-k8s搭建radius/" aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
+</div>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+    clipboard.on('success', $(function(){
+      $(".fa-clipboard").click(function(){
+        swal({   
+          title: "",   
+          text: '复制成功',   
+          html: false,
+          timer: 500,   
+          showConfirmButton: false
+        });
+      });
+    }));  
+</script>
+
+
+      </div>
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/k8s/" rel="tag"># k8s</a>
+          
+            <a href="/tags/freeradius/" rel="tag"># freeradius</a>
+          
+            <a href="/tags/daloradius/" rel="tag"># daloradius</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/12/50-记一次windows安装OpenSSH问题/" rel="next" title="记一次windows安装OpenSSH问题">
+                <i class="fa fa-chevron-left"></i> 记一次windows安装OpenSSH问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zhangzw</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">52</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">53</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">48</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                友链
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://johnnywl.github.io/" title="https://johnnywl.github.io/" rel="noopener" target="_blank">johnny</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.qikqiak.com/" title="https://www.qikqiak.com/" rel="noopener" target="_blank">阳明</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#记录"><span class="nav-number">1.</span> <span class="nav-text">记录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一-首先搭建数据库"><span class="nav-number">2.</span> <span class="nav-text">一 首先搭建数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#k8s-freeradius-mysql-dev-5-6-36-configmap-yml"><span class="nav-number">2.1.</span> <span class="nav-text">k8s-freeradius-mysql-dev_5.6.36-configmap.yml</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#k8s-freeradius-mysql-dev-5-6-36-yml"><span class="nav-number">2.2.</span> <span class="nav-text">k8s-freeradius-mysql-dev_5.6.36.yml</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建库和账号"><span class="nav-number">2.3.</span> <span class="nav-text">创建库和账号</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署freeradius"><span class="nav-number">3.</span> <span class="nav-text">部署freeradius</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#deployment-freeradius-yml"><span class="nav-number">3.1.</span> <span class="nav-text">deployment-freeradius.yml</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#configmap-freeradius-radiusd-conf-yaml"><span class="nav-number">3.2.</span> <span class="nav-text">configmap-freeradius-radiusd-conf.yaml</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#configmap-freeradius-clients-conf-yaml"><span class="nav-number">3.3.</span> <span class="nav-text">configmap-freeradius-clients-conf.yaml</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#configmap-freeradius-sql-yaml"><span class="nav-number">3.4.</span> <span class="nav-text">configmap-freeradius-sql.yaml</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署nignx-php7的daloradius-web管理后台"><span class="nav-number">4.</span> <span class="nav-text">部署nignx+php7的daloradius web管理后台</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#php7部署配置"><span class="nav-number">4.1.</span> <span class="nav-text">php7部署配置</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#php镜像安装扩展-Dockerfile"><span class="nav-number">4.1.1.</span> <span class="nav-text">php镜像安装扩展 Dockerfile</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#deployment-php-yml"><span class="nav-number">4.1.2.</span> <span class="nav-text">deployment-php.yml</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#configmap-php-fpm-yaml"><span class="nav-number">4.1.3.</span> <span class="nav-text">configmap-php-fpm.yaml</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#configmap-php-yaml"><span class="nav-number">4.1.4.</span> <span class="nav-text">configmap-php.yaml</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#nginx部署配置"><span class="nav-number">4.2.</span> <span class="nav-text">nginx部署配置</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#deployment-nginx-yml"><span class="nav-number">4.2.1.</span> <span class="nav-text">deployment-nginx.yml</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#configmap-php-nginx-yaml"><span class="nav-number">4.2.2.</span> <span class="nav-text">configmap-php-nginx.yaml</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#页面登录测试"><span class="nav-number">5.</span> <span class="nav-text">页面登录测试</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#通过前端nginx代理转发到nodeport端口"><span class="nav-number">5.1.</span> <span class="nav-text">通过前端nginx代理转发到nodeport端口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置k8s的ingress"><span class="nav-number">5.2.</span> <span class="nav-text">配置k8s的ingress</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#登录测试"><span class="nav-number">5.3.</span> <span class="nav-text">登录测试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过后台新建账号之后-测试账号连通性"><span class="nav-number">5.4.</span> <span class="nav-text">通过后台新建账号之后, 测试账号连通性</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#命令行"><span class="nav-number">5.4.1.</span> <span class="nav-text">命令行</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过radius-xxx-com-管理页面测试连通性"><span class="nav-number">5.5.</span> <span class="nav-text">通过radius.xxx.com 管理页面测试连通性</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhangzw</span>
+
+  
+
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v6.7.0</div>
+
+
+
+-->
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="96,96,96" opacity="0.5" zindex="-1" count="229" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  <script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  <script>
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item) > -1;
+    });
+    new Valine({
+      el: '#comments' ,
+      verify: false,
+      notify: false,
+      appId: 'Q7DcnSqtpo3sXcnqbvDv7PkE-gzGzoHsz',
+      appKey: 'OLwBbxGhnrwtyHRU3bJynspO',
+      placeholder: 'ヾﾉ≧∀≦)o 来呀！快活呀！~啦啦啦~ 啦啦啦啦~',
+      avatar: 'mm',
+      meta:guest,
+      pageSize: '10' || 10,
+      visitor: true
+    });
+  </script>
+
+
+
+
+  
+
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<!-- 预加载 -->
+<script type="text/javascript" src="/js/src/instantclick.js" data-no-instant></script>
+<script data-no-instant>InstantClick.init();</script>
+
+</body>
+</html>
+
+<!-- 鼠标桃心动画 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+<!-- 鼠标移动星星特效 -->
+<!--<script type="text/javascript" src="/js/src/love2.js"></script>-->
+<!-- 看板娘 -->
+<!--<script src="/live2d-widget/autoload.js"></script> -->
