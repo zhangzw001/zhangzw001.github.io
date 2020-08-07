@@ -1,0 +1,2034 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <!-- title -->
+
+
+
+
+<!-- keywords -->
+
+
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="zhangzw">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="zhangzw">
+    
+    <meta name="keywords" content="hexo,hexo-theme,hexo-blog">
+    
+    <meta name="description" content>
+    <meta name="description" content="shell中 gt 和 &amp;gt; 的一些相关问题介绍和测试">
+<meta name="keywords" content="linux,shell">
+<meta property="og:type" content="article">
+<meta property="og:title" content="shell中gt和&gt;的区别">
+<meta property="og:url" content="http://zhangzw001.github.io/2019/10/17/19-shell中gt和>的区别/index.html">
+<meta property="og:site_name" content="Zhangzw&#39;s Blog">
+<meta property="og:description" content="shell中 gt 和 &amp;gt; 的一些相关问题介绍和测试">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
+<meta property="og:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
+<meta property="og:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
+<meta property="og:updated_time" content="2020-08-07T06:57:51.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="shell中gt和&gt;的区别">
+<meta name="twitter:description" content="shell中 gt 和 &amp;gt; 的一些相关问题介绍和测试">
+<meta name="twitter:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>shell中gt和&gt;的区别 · zhangzw&#39;s Blog</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20180824" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet" href="/css/mobile.css?v=20180824" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href="/assets/favicon.ico">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js" as="script">
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >zhangzw&#39;s Blog</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">shell中gt和>的区别</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>zhangzw's Blog</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style="
+
+
+
+
+
+
+
+height:50vh;
+">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            shell中gt和>的区别
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "linux">linux</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "shell">shell</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                        <span>字数统计: <span class="post-count word-count">564</span>阅读时长: <span class="post-count reading-time">2 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2019/10/17</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        <script>
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <p>shell中 gt 和 &gt; 的一些相关问题介绍和测试</p>
+<a id="more"></a>
+
+
+<blockquote>
+<p>以下是bash的测试, 注意如果你是zsh可能会不同喔😯</p>
+</blockquote>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
+<font face="黑体" size="4"> [[]] , [] 和test比较 </font>
+</center>
+
+<p>[] 和test:    两者是一样的，在命令行里test expr和[ expr ]的效果相同。test中可用的比较运算符只有==和!=，两者都是用于字符串比较的，不可用于整数比较，整数比较只能使用-eq, -gt这种形式。<br>通过which [ 和which test 可以看到是命令</p>
+<blockquote>
+<p>[] 和test 例子</p>
+</blockquote>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># a=<span class="string">"abcdef"</span></span></span><br><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># test <span class="string">"$a"</span> = <span class="string">"abcdef"</span></span></span><br><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># echo $?</span></span><br><span class="line"><span class="number">0</span></span><br><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># [ <span class="string">"$a"</span> = <span class="string">"abcdef"</span> ]</span></span><br><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># echo $?</span></span><br><span class="line"><span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p>[[ ]]具体功能:    </p>
+<ul>
+<li><p>[[是 bash 程序语言的关键字。并不是一个命令，[[ ]] 结构比[ ]结构更加通用。在[[和]]之间所有的字符都不会发生文件名扩展或者单词分割，但是会发生参数扩展和命令替换。</p>
+</li>
+<li><p>支持字符串的模式匹配（使用=~操作符时甚至支持shell的正则表达 式）,右边的字符串不加双引号的情况,可以把右边作为模式. 比如[[ hello == hell? ]]，结果为真。当然加引号就是文本字符串比较.</p>
+</li>
+<li><p>使用[[ … ]]条件判断结构，而不是[ … ]，能够防止脚本中的许多逻辑错误。比如，&amp;&amp;、||、&lt;和&gt; 操作符能够正常存在于[[ ]]条件判断结构中，但是如果出现在[ ]结构中的话，会报错。比如可以直接使用if [[ $a != 1 &amp;&amp; $a != 2 ]], 如果不适用双括号, 则为if [ $a -ne 1] &amp;&amp; [ $a != 2 ]或者if [ $a -ne 1 -a $a != 2 ]。</p>
+</li>
+</ul>
+<hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
+<font face="黑体" size="4"> 纯数字比较 </font>
+</center>
+
+<h3 id="gt-通过比较ASCII值-gt仅能比较数字"><a href="#gt-通过比较ASCII值-gt仅能比较数字" class="headerlink" title="&gt; 通过比较ASCII值,gt仅能比较数字"></a>&gt; 通过比较ASCII值,gt仅能比较数字</h3><figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@dk-ce<span class="symbol">ntos6</span> ~]<span class="attr"># [ 2</span> \&gt; <span class="number">1</span> ]</span><br><span class="line">[root@dk-ce<span class="symbol">ntos6</span> ~]<span class="attr"># echo $?</span></span><br><span class="line"><span class="attr">0</span></span><br><span class="line">[root@dk-ce<span class="symbol">ntos6</span> ~]<span class="attr"># [ 2</span> -<span class="keyword">gt</span> <span class="number">1</span> ]</span><br><span class="line">[root@dk-ce<span class="symbol">ntos6</span> ~]<span class="attr"># echo $?</span></span><br><span class="line"><span class="attr">0</span></span><br><span class="line">[root@dk-ce<span class="symbol">ntos6</span> ~]<span class="attr"># [[ 2</span> &gt; <span class="number">1</span> ]]</span><br><span class="line">[root@dk-ce<span class="symbol">ntos6</span> ~]<span class="attr"># echo $?</span></span><br><span class="line"><span class="attr">0</span></span><br><span class="line">[root@dk-ce<span class="symbol">ntos6</span> ~]<span class="attr"># [[ 2</span> -<span class="keyword">gt</span> <span class="number">1</span> ]]</span><br><span class="line">[root@dk-ce<span class="symbol">ntos6</span> ~]<span class="attr"># echo $?</span></span><br><span class="line"><span class="attr">0</span></span><br></pre></td></tr></table></figure>
+
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
+<font face="黑体" size="4"> 字符串比较 </font>
+</center>
+
+<h3 id="单括号中如果要比较符号-“-lt-”-“-gt-”-需要转义-否则判断结果错误"><a href="#单括号中如果要比较符号-“-lt-”-“-gt-”-需要转义-否则判断结果错误" class="headerlink" title="单括号中如果要比较符号 “&lt;” “&gt;”, 需要转义, 否则判断结果错误"></a>单括号中如果要比较符号 “&lt;” “&gt;”, 需要转义, 否则判断结果错误</h3><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># [ <span class="string">"b"</span> &gt; <span class="string">"a"</span> ]</span></span><br><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># echo $?</span></span><br><span class="line"><span class="number">0</span></span><br><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># [ <span class="string">"b"</span> &lt; <span class="string">"a"</span> ]</span></span><br><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># echo $?</span></span><br><span class="line"><span class="number">0</span></span><br><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># [ <span class="string">"b"</span> \&lt; <span class="string">"a"</span> ]</span></span><br><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># echo $?</span></span><br><span class="line"><span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="双括号不用转义-直接执行即可"><a href="#双括号不用转义-直接执行即可" class="headerlink" title="双括号不用转义 , 直接执行即可"></a>双括号不用转义 , 直接执行即可</h3><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># [[ <span class="string">"b"</span> &gt; <span class="string">"a"</span> ]]</span></span><br><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># echo $?</span></span><br><span class="line"><span class="number">0</span></span><br><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># [[ <span class="string">"b"</span> &lt; <span class="string">"a"</span> ]]</span></span><br><span class="line">[root<span class="symbol">@dk</span>-centos6 ~]<span class="meta"># echo $?</span></span><br><span class="line"><span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+
+    </article>
+    <!-- license  -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="http://zhangzw001.github.io">zhangzw</a>
+            <p>原文链接：<a href="http://zhangzw001.github.io/2019/10/17/19-shell中gt和>的区别/">http://zhangzw001.github.io/2019/10/17/19-shell中gt和>的区别/</a>
+            <p>发表日期：<a href="http://zhangzw001.github.io/2019/10/17/19-shell中gt和>的区别/">October 17th 2019, 11:48:22 am</a>
+            <p>更新日期：<a href="http://zhangzw001.github.io/2019/10/17/19-shell中gt和>的区别/">August 7th 2020, 2:57:51 pm</a>
+            <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href= "/2019/10/24/20-k8s搭建mysql5-7-24主从/" title= "k8s搭建mysql5.7.24主从">
+                    <div class="nextTitle">k8s搭建mysql5.7.24主从</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href= "/2019/10/17/18-收藏链接/" title= "收藏链接">
+                    <div class="prevTitle">收藏链接</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!-- gitalk评论 -->
+
+    <!-- utteranc评论 -->
+
+    <!-- partial('_partial/comment/changyan') -->
+    <!--PC版-->
+
+
+    
+    
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+    <div id="comment"></div>
+    <script>
+    new Valine({
+        el: '#comment' ,
+        notify:false, 
+        verify:false, 
+        appId: "Q7DcnSqtpo3sXcnqbvDv7PkE-gzGzoHsz",
+        appKey: "OLwBbxGhnrwtyHRU3bJynspO",
+        placeholder: "ヾﾉ≧∀≦)o 来呀！快活呀！~啦啦啦~ 啦啦啦啦~",
+        path:window.location.pathname, 
+        avatar:'mm' 
+    });
+    </script>
+
+
+    <!-- 评论 -->
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:17521124096@sina.cn" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://github.com/zhangzw001" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+            
+                <span class="iconfont-archer wechat" title=wechat>
+                  
+                  <img class="profile-qr" src="/images/wechat.jpg" />
+                </span>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+    
+    <span id="busuanzi_container_site_uv">PV: <span id="busuanzi_value_site_uv"></span> :)</span>
+    
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#gt-通过比较ASCII值-gt仅能比较数字"><span class="toc-number">1.</span> <span class="toc-text">&gt; 通过比较ASCII值,gt仅能比较数字</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#单括号中如果要比较符号-“-lt-”-“-gt-”-需要转义-否则判断结果错误"><span class="toc-number">2.</span> <span class="toc-text">单括号中如果要比较符号 “&lt;” “&gt;”, 需要转义, 否则判断结果错误</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#双括号不用转义-直接执行即可"><span class="toc-number">3.</span> <span class="toc-text">双括号不用转义 , 直接执行即可</span></a></li></ol>
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 54
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2020 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/07</span><a class="archive-post-title" href= "/2020/08/07/53-hexo部署到coding-net开启静态网站/" >hexo部署到coding.net开启静态网站</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/04</span><a class="archive-post-title" href= "/2020/08/04/52-istio测试nginx-php项目/" >istio环境下配置nginx+php</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/27</span><a class="archive-post-title" href= "/2020/07/27/51-k8s搭建radius/" >k8s搭建radius</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/12</span><a class="archive-post-title" href= "/2020/06/12/50-记一次windows安装OpenSSH问题/" >记一次windows安装OpenSSH问题</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/27</span><a class="archive-post-title" href= "/2020/05/27/49-go简单记录/" >go简单记录</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/18</span><a class="archive-post-title" href= "/2020/05/18/48-k8s升级-1-10-1-15/" >k8s升级(1.10->1.15)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/14</span><a class="archive-post-title" href= "/2020/05/14/47-k8s安装promethues-alertmanager-grafana/" >k8s安装promethues+alertmanager+grafana</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/13</span><a class="archive-post-title" href= "/2020/05/13/46-docker安装nginx第三方模块/" >docker安装nginx第三方模块</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/23</span><a class="archive-post-title" href= "/2020/04/23/45-gitlab-ci与k8s结合/" >gitlab-ci与k8s结合</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/09</span><a class="archive-post-title" href= "/2020/04/09/44-k8s部署fluentd-kafka-logstash-es/" >k8s部署fluentd+kafka+logstash+es</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/31</span><a class="archive-post-title" href= "/2020/03/31/43-k8s的yaml配置名词解释-模板/" >k8s的yaml配置名词解释(模板)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/24</span><a class="archive-post-title" href= "/2020/03/24/42-kubeadm安装高可用k8s集群/" >kubeadm安装高可用k8s集群</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/19</span><a class="archive-post-title" href= "/2020/03/19/41-记一次es集群内存溢出的问题/" >记一次es集群内存溢出的问题</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/18</span><a class="archive-post-title" href= "/2020/03/18/40-记一次跨域的nginx配置问题/" >记一次跨域的nginx配置问题</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/18</span><a class="archive-post-title" href= "/2020/03/18/39-记一次nginx的request-time-和upstream-response-time差值很大问题/" >记一次nginx的request_time 和upstream_response_time差值很大问题</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/12</span><a class="archive-post-title" href= "/2020/03/12/38-es集群节点出现overhead脱机的问题/" >es集群节点出现overhead脱机的问题</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/10</span><a class="archive-post-title" href= "/2020/03/10/37-mac一些常用命令/" >mac一些常用命令</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/27</span><a class="archive-post-title" href= "/2020/02/27/36-centos单网卡配置多ip的几种方法/" >centos单网卡配置多ip的几种方法</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/27</span><a class="archive-post-title" href= "/2020/02/27/35-raid1盘数据迁移/" >raid1盘数据迁移</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2019 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/05</span><a class="archive-post-title" href= "/2019/12/05/34-k8s一些命令总结/" >k8s一些命令总结</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/03</span><a class="archive-post-title" href= "/2019/12/03/29-k3s安装配置/" >k3s安装配置</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/03</span><a class="archive-post-title" href= "/2019/12/03/33-k3s1.16部署nginx+php5.2.17/" >k3s1.16部署nginx+php5.2.17</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/02</span><a class="archive-post-title" href= "/2019/12/02/32-php错误502问题总结/" >php错误502问题总结</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/26</span><a class="archive-post-title" href= "/2019/11/26/31-systemd一些命令/" >systemd一些命令</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/25</span><a class="archive-post-title" href= "/2019/11/25/29-k3s集群部署项目报挂载nfs错误/" >29-k3s集群部署项目报挂载nfs错误</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/25</span><a class="archive-post-title" href= "/2019/11/25/30-k3s集群部署项目报挂载nfs错误/" >k3s集群部署项目报挂载nfs错误</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/25</span><a class="archive-post-title" href= "/2019/11/25/28-k8s1-16使用旧yml部署配置问题/" >k8s1.16使用旧yml部署配置问题</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/21</span><a class="archive-post-title" href= "/2019/11/21/27-k8s一条命令部署es5-2-0集群/" >k8s一条命令部署es5.2.0集群</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/08</span><a class="archive-post-title" href= "/2019/11/08/26-logstash配置/" >logstash配置</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/01</span><a class="archive-post-title" href= "/2019/11/01/25-linux一些脚本汇总/" >Linux一些脚本汇总</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/30</span><a class="archive-post-title" href= "/2019/10/30/24-filebeat7收集mysql慢日志到es/" >filebeat7收集mysql慢日志到es</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/29</span><a class="archive-post-title" href= "/2019/10/29/23-mysql5-5主与mysql5-7从部署配置/" >mysql5.5主与mysql5.7从部署配置</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/28</span><a class="archive-post-title" href= "/2019/10/28/22-es集群磁盘扩容/" >es5集群磁盘扩容</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/28</span><a class="archive-post-title" href= "/2019/10/28/21-流量复制工具gor/" >流量复制工具gor</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/24</span><a class="archive-post-title" href= "/2019/10/24/20-k8s搭建mysql5-7-24主从/" >k8s搭建mysql5.7.24主从</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/17</span><a class="archive-post-title" href= "/2019/10/17/18-收藏链接/" >收藏链接</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/17</span><a class="archive-post-title" href= "/2019/10/17/19-shell中gt和>的区别/" >shell中gt和>的区别</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span><a class="archive-post-title" href= "/2019/10/16/17-markdown一些写法记录/" >markdown一些写法记录</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span><a class="archive-post-title" href= "/2019/10/16/15-docker简介和使用/" >docker简介和使用</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/16</span><a class="archive-post-title" href= "/2019/10/16/16-dockerfile介绍/" >Dockerfile介绍</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/15</span><a class="archive-post-title" href= "/2019/10/15/14-mysql目录copy方式迁移/" >mysql5.5目录copy方式迁移</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/12</span><a class="archive-post-title" href= "/2019/10/12/13-云原生博客汇总/" >云原生博客汇总</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/11</span><a class="archive-post-title" href= "/2019/10/11/12-awk简单记录/" >awk简单记录</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/10</span><a class="archive-post-title" href= "/2019/10/10/11-mysql简单记录/" >mysql简单记录</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/27</span><a class="archive-post-title" href= "/2019/09/27/10-centos6安装nginx1-16-php7-2/" >centos6安装nginx1.16+php7.2</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2019/09/26/9-linux遇到一些问题统计总结/" >linux遇到一些问题统计总结</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2019/09/26/8-mysql5-7二进制部署/" >mysql5.7二进制部署</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2019/09/26/7-k8s部署storageclass动态创建pv-nfs-rbd/" >k8s部署storageclass动态创建pv(nfs&rbd)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2019/09/26/6-ceph安装部署/" >ceph安装部署</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/24</span><a class="archive-post-title" href= "/2019/09/24/5-hexo添加看板娘/" >hexo添加看板娘</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/24</span><a class="archive-post-title" href= "/2019/09/24/4-hexo鼠标移动和鼠标点击特效/" >hexo鼠标移动和鼠标点击特效</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/20</span><a class="archive-post-title" href= "/2019/09/20/3-k8s遇到的一些问题统计总结/" >k8s遇到的一些问题统计总结</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span><a class="archive-post-title" href= "/2019/09/19/2-部署elk7-2-0/" >部署elk7.2.0</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span><a class="archive-post-title" href= "/2019/09/19/首次搭建hexo博客系统/" >首次搭建hexo博客系统</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
+    
+        <span class="sidebar-tag-name" data-tags="nginx"><span class="iconfont-archer">&#xe606;</span>nginx</span>
+    
+        <span class="sidebar-tag-name" data-tags="php7"><span class="iconfont-archer">&#xe606;</span>php7</span>
+    
+        <span class="sidebar-tag-name" data-tags="linux"><span class="iconfont-archer">&#xe606;</span>linux</span>
+    
+        <span class="sidebar-tag-name" data-tags="awk"><span class="iconfont-archer">&#xe606;</span>awk</span>
+    
+        <span class="sidebar-tag-name" data-tags="云原生"><span class="iconfont-archer">&#xe606;</span>云原生</span>
+    
+        <span class="sidebar-tag-name" data-tags="cloud native"><span class="iconfont-archer">&#xe606;</span>cloud native</span>
+    
+        <span class="sidebar-tag-name" data-tags="大佬博客"><span class="iconfont-archer">&#xe606;</span>大佬博客</span>
+    
+        <span class="sidebar-tag-name" data-tags="docker"><span class="iconfont-archer">&#xe606;</span>docker</span>
+    
+        <span class="sidebar-tag-name" data-tags="markdown"><span class="iconfont-archer">&#xe606;</span>markdown</span>
+    
+        <span class="sidebar-tag-name" data-tags="收藏"><span class="iconfont-archer">&#xe606;</span>收藏</span>
+    
+        <span class="sidebar-tag-name" data-tags="网址"><span class="iconfont-archer">&#xe606;</span>网址</span>
+    
+        <span class="sidebar-tag-name" data-tags="k8s"><span class="iconfont-archer">&#xe606;</span>k8s</span>
+    
+        <span class="sidebar-tag-name" data-tags="shell"><span class="iconfont-archer">&#xe606;</span>shell</span>
+    
+        <span class="sidebar-tag-name" data-tags="gor"><span class="iconfont-archer">&#xe606;</span>gor</span>
+    
+        <span class="sidebar-tag-name" data-tags="http流量复制工具"><span class="iconfont-archer">&#xe606;</span>http流量复制工具</span>
+    
+        <span class="sidebar-tag-name" data-tags="elasticsearch5"><span class="iconfont-archer">&#xe606;</span>elasticsearch5</span>
+    
+        <span class="sidebar-tag-name" data-tags="filebeat7"><span class="iconfont-archer">&#xe606;</span>filebeat7</span>
+    
+        <span class="sidebar-tag-name" data-tags="elk7"><span class="iconfont-archer">&#xe606;</span>elk7</span>
+    
+        <span class="sidebar-tag-name" data-tags="elk"><span class="iconfont-archer">&#xe606;</span>elk</span>
+    
+        <span class="sidebar-tag-name" data-tags="logstash"><span class="iconfont-archer">&#xe606;</span>logstash</span>
+    
+        <span class="sidebar-tag-name" data-tags="elk5"><span class="iconfont-archer">&#xe606;</span>elk5</span>
+    
+        <span class="sidebar-tag-name" data-tags="k3s"><span class="iconfont-archer">&#xe606;</span>k3s</span>
+    
+        <span class="sidebar-tag-name" data-tags="systemd"><span class="iconfont-archer">&#xe606;</span>systemd</span>
+    
+        <span class="sidebar-tag-name" data-tags="php"><span class="iconfont-archer">&#xe606;</span>php</span>
+    
+        <span class="sidebar-tag-name" data-tags="ip"><span class="iconfont-archer">&#xe606;</span>ip</span>
+    
+        <span class="sidebar-tag-name" data-tags="raid"><span class="iconfont-archer">&#xe606;</span>raid</span>
+    
+        <span class="sidebar-tag-name" data-tags="kubectl"><span class="iconfont-archer">&#xe606;</span>kubectl</span>
+    
+        <span class="sidebar-tag-name" data-tags="mac"><span class="iconfont-archer">&#xe606;</span>mac</span>
+    
+        <span class="sidebar-tag-name" data-tags="hexo6"><span class="iconfont-archer">&#xe606;</span>hexo6</span>
+    
+        <span class="sidebar-tag-name" data-tags="特效"><span class="iconfont-archer">&#xe606;</span>特效</span>
+    
+        <span class="sidebar-tag-name" data-tags="fluentd"><span class="iconfont-archer">&#xe606;</span>fluentd</span>
+    
+        <span class="sidebar-tag-name" data-tags="go"><span class="iconfont-archer">&#xe606;</span>go</span>
+    
+        <span class="sidebar-tag-name" data-tags="windows"><span class="iconfont-archer">&#xe606;</span>windows</span>
+    
+        <span class="sidebar-tag-name" data-tags="ssh"><span class="iconfont-archer">&#xe606;</span>ssh</span>
+    
+        <span class="sidebar-tag-name" data-tags="ceph"><span class="iconfont-archer">&#xe606;</span>ceph</span>
+    
+        <span class="sidebar-tag-name" data-tags="cephfs"><span class="iconfont-archer">&#xe606;</span>cephfs</span>
+    
+        <span class="sidebar-tag-name" data-tags="k8s存储"><span class="iconfont-archer">&#xe606;</span>k8s存储</span>
+    
+        <span class="sidebar-tag-name" data-tags="mysql5.7"><span class="iconfont-archer">&#xe606;</span>mysql5.7</span>
+    
+        <span class="sidebar-tag-name" data-tags="elasticsearch7"><span class="iconfont-archer">&#xe606;</span>elasticsearch7</span>
+    
+        <span class="sidebar-tag-name" data-tags="php5"><span class="iconfont-archer">&#xe606;</span>php5</span>
+    
+        <span class="sidebar-tag-name" data-tags="istio"><span class="iconfont-archer">&#xe606;</span>istio</span>
+    
+        <span class="sidebar-tag-name" data-tags="nfs"><span class="iconfont-archer">&#xe606;</span>nfs</span>
+    
+        <span class="sidebar-tag-name" data-tags="storageclass"><span class="iconfont-archer">&#xe606;</span>storageclass</span>
+    
+        <span class="sidebar-tag-name" data-tags="hexo美化"><span class="iconfont-archer">&#xe606;</span>hexo美化</span>
+    
+        <span class="sidebar-tag-name" data-tags="gitlab-runner"><span class="iconfont-archer">&#xe606;</span>gitlab-runner</span>
+    
+        <span class="sidebar-tag-name" data-tags="freeradius"><span class="iconfont-archer">&#xe606;</span>freeradius</span>
+    
+        <span class="sidebar-tag-name" data-tags="daloradius"><span class="iconfont-archer">&#xe606;</span>daloradius</span>
+    
+        <span class="sidebar-tag-name" data-tags="promethues"><span class="iconfont-archer">&#xe606;</span>promethues</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="技术文档"><span class="iconfont-archer">&#xe60a;</span>技术文档</span>
+    
+        <span class="sidebar-category-name" data-categories="linux"><span class="iconfont-archer">&#xe60a;</span>linux</span>
+    
+        <span class="sidebar-category-name" data-categories="mysql"><span class="iconfont-archer">&#xe60a;</span>mysql</span>
+    
+        <span class="sidebar-category-name" data-categories="docker"><span class="iconfont-archer">&#xe60a;</span>docker</span>
+    
+        <span class="sidebar-category-name" data-categories="网址"><span class="iconfont-archer">&#xe60a;</span>网址</span>
+    
+        <span class="sidebar-category-name" data-categories="nginx"><span class="iconfont-archer">&#xe60a;</span>nginx</span>
+    
+        <span class="sidebar-category-name" data-categories="markdown"><span class="iconfont-archer">&#xe60a;</span>markdown</span>
+    
+        <span class="sidebar-category-name" data-categories="k8s"><span class="iconfont-archer">&#xe60a;</span>k8s</span>
+    
+        <span class="sidebar-category-name" data-categories="linux/awk"><span class="iconfont-archer">&#xe60a;</span>linux/awk</span>
+    
+        <span class="sidebar-category-name" data-categories="linux/shell"><span class="iconfont-archer">&#xe60a;</span>linux/shell</span>
+    
+        <span class="sidebar-category-name" data-categories="流量复制工具"><span class="iconfont-archer">&#xe60a;</span>流量复制工具</span>
+    
+        <span class="sidebar-category-name" data-categories="elk"><span class="iconfont-archer">&#xe60a;</span>elk</span>
+    
+        <span class="sidebar-category-name" data-categories="elk7"><span class="iconfont-archer">&#xe60a;</span>elk7</span>
+    
+        <span class="sidebar-category-name" data-categories="网址/大佬博客"><span class="iconfont-archer">&#xe60a;</span>网址/大佬博客</span>
+    
+        <span class="sidebar-category-name" data-categories="docker/Dockerfile"><span class="iconfont-archer">&#xe60a;</span>docker/Dockerfile</span>
+    
+        <span class="sidebar-category-name" data-categories="k3s"><span class="iconfont-archer">&#xe60a;</span>k3s</span>
+    
+        <span class="sidebar-category-name" data-categories="linux/systemd"><span class="iconfont-archer">&#xe60a;</span>linux/systemd</span>
+    
+        <span class="sidebar-category-name" data-categories="php"><span class="iconfont-archer">&#xe60a;</span>php</span>
+    
+        <span class="sidebar-category-name" data-categories="网址/收藏"><span class="iconfont-archer">&#xe60a;</span>网址/收藏</span>
+    
+        <span class="sidebar-category-name" data-categories="raid"><span class="iconfont-archer">&#xe60a;</span>raid</span>
+    
+        <span class="sidebar-category-name" data-categories="网卡"><span class="iconfont-archer">&#xe60a;</span>网卡</span>
+    
+        <span class="sidebar-category-name" data-categories="mac"><span class="iconfont-archer">&#xe60a;</span>mac</span>
+    
+        <span class="sidebar-category-name" data-categories="k8s/mysql"><span class="iconfont-archer">&#xe60a;</span>k8s/mysql</span>
+    
+        <span class="sidebar-category-name" data-categories="有趣"><span class="iconfont-archer">&#xe60a;</span>有趣</span>
+    
+        <span class="sidebar-category-name" data-categories="nginx/问题总结"><span class="iconfont-archer">&#xe60a;</span>nginx/问题总结</span>
+    
+        <span class="sidebar-category-name" data-categories="流量复制工具/gor"><span class="iconfont-archer">&#xe60a;</span>流量复制工具/gor</span>
+    
+        <span class="sidebar-category-name" data-categories="go"><span class="iconfont-archer">&#xe60a;</span>go</span>
+    
+        <span class="sidebar-category-name" data-categories="elk/elasticsearch5"><span class="iconfont-archer">&#xe60a;</span>elk/elasticsearch5</span>
+    
+        <span class="sidebar-category-name" data-categories="windows"><span class="iconfont-archer">&#xe60a;</span>windows</span>
+    
+        <span class="sidebar-category-name" data-categories="elk7/filebeat7"><span class="iconfont-archer">&#xe60a;</span>elk7/filebeat7</span>
+    
+        <span class="sidebar-category-name" data-categories="存储"><span class="iconfont-archer">&#xe60a;</span>存储</span>
+    
+        <span class="sidebar-category-name" data-categories="elk/logstash"><span class="iconfont-archer">&#xe60a;</span>elk/logstash</span>
+    
+        <span class="sidebar-category-name" data-categories="k8s/问题总结"><span class="iconfont-archer">&#xe60a;</span>k8s/问题总结</span>
+    
+        <span class="sidebar-category-name" data-categories="k8s/elk5"><span class="iconfont-archer">&#xe60a;</span>k8s/elk5</span>
+    
+        <span class="sidebar-category-name" data-categories="nfs"><span class="iconfont-archer">&#xe60a;</span>nfs</span>
+    
+        <span class="sidebar-category-name" data-categories="php/问题总结"><span class="iconfont-archer">&#xe60a;</span>php/问题总结</span>
+    
+        <span class="sidebar-category-name" data-categories="k8s/kubectl"><span class="iconfont-archer">&#xe60a;</span>k8s/kubectl</span>
+    
+        <span class="sidebar-category-name" data-categories="item2"><span class="iconfont-archer">&#xe60a;</span>item2</span>
+    
+        <span class="sidebar-category-name" data-categories="博客"><span class="iconfont-archer">&#xe60a;</span>博客</span>
+    
+        <span class="sidebar-category-name" data-categories="fluentd"><span class="iconfont-archer">&#xe60a;</span>fluentd</span>
+    
+        <span class="sidebar-category-name" data-categories="有趣/二次元"><span class="iconfont-archer">&#xe60a;</span>有趣/二次元</span>
+    
+        <span class="sidebar-category-name" data-categories="k8s/elk7"><span class="iconfont-archer">&#xe60a;</span>k8s/elk7</span>
+    
+        <span class="sidebar-category-name" data-categories="存储/ceph"><span class="iconfont-archer">&#xe60a;</span>存储/ceph</span>
+    
+        <span class="sidebar-category-name" data-categories="博客/美化"><span class="iconfont-archer">&#xe60a;</span>博客/美化</span>
+    
+        <span class="sidebar-category-name" data-categories="mysql/主从"><span class="iconfont-archer">&#xe60a;</span>mysql/主从</span>
+    
+        <span class="sidebar-category-name" data-categories="elk/elasticsearch7"><span class="iconfont-archer">&#xe60a;</span>elk/elasticsearch7</span>
+    
+        <span class="sidebar-category-name" data-categories="k3s/lnmp"><span class="iconfont-archer">&#xe60a;</span>k3s/lnmp</span>
+    
+        <span class="sidebar-category-name" data-categories="k8s/storageclass"><span class="iconfont-archer">&#xe60a;</span>k8s/storageclass</span>
+    
+        <span class="sidebar-category-name" data-categories="linux/问题总结"><span class="iconfont-archer">&#xe60a;</span>linux/问题总结</span>
+    
+        <span class="sidebar-category-name" data-categories="存储/nfs"><span class="iconfont-archer">&#xe60a;</span>存储/nfs</span>
+    
+        <span class="sidebar-category-name" data-categories="gitlab-ci"><span class="iconfont-archer">&#xe60a;</span>gitlab-ci</span>
+    
+        <span class="sidebar-category-name" data-categories="radius"><span class="iconfont-archer">&#xe60a;</span>radius</span>
+    
+        <span class="sidebar-category-name" data-categories="k8s/prometheus"><span class="iconfont-archer">&#xe60a;</span>k8s/prometheus</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "zhangzw"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+     
+    </body>
+</html>
+
+
