@@ -113,7 +113,7 @@
 <meta property="og:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
 <meta property="og:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
 <meta property="og:image" content="http://zhangzw001.github.io/images/dockerniu.jpeg">
-<meta property="og:updated_time" content="2020-04-24T08:48:52.000Z">
+<meta property="og:updated_time" content="2020-08-07T06:57:51.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="k8s搭建mysql5.7.24主从">
 <meta name="twitter:description" content="k8s上简单部署mysql5.7.24主从">
@@ -407,7 +407,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-04-24 16:48:52" itemprop="dateModified" datetime="2020-04-24T16:48:52+08:00">2020-04-24</time>
+                <time title="修改时间：2020-08-07 14:57:51" itemprop="dateModified" datetime="2020-08-07T14:57:51+08:00">2020-08-07</time>
               
             
           </span>
@@ -501,7 +501,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">27 分钟</span>
+                <span title="阅读时长">26 分钟</span>
               
             </div>
           
@@ -526,7 +526,7 @@
 
 
 <center>
-<img src="http://zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
 <font color="blue" face="黑体" size="5"> k8s搭建mysql5.7.24主从 </font>
 </center>
 
@@ -535,7 +535,7 @@
 <h3 id="从hub-docker-com拉取官方镜像"><a href="#从hub-docker-com拉取官方镜像" class="headerlink" title="从hub.docker.com拉取官方镜像"></a>从hub.docker.com拉取官方镜像</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">docker</span> <span class="selector-tag">pull</span> <span class="selector-tag">mysql</span><span class="selector-pseudo">:5.7.24</span></span><br></pre></td></tr></table></figure>
 
 <center>
-<img src="http://zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
 <font color="blue" face="黑体" size="5"> build镜像 </font>
 </center>
 
@@ -568,7 +568,7 @@
 <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker build -t hub<span class="selector-class">.zhangzw</span><span class="selector-class">.com</span>/bq/mysql-slave:<span class="number">5.7</span>.<span class="number">24</span> .</span><br><span class="line">docker push hub<span class="selector-class">.zhangzw</span><span class="selector-class">.com</span>/bq/mysql-slave:<span class="number">5.7</span>.<span class="number">24</span></span><br></pre></td></tr></table></figure>
 
 <center>
-<img src="http://zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
 <font color="blue" face="黑体" size="5"> 开始部署 </font>
 </center>
 
@@ -584,7 +584,7 @@
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">StatefulSet</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">php-mysql-slave-dev</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">php-mysql-slave-dev</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">db</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  serviceName:</span> <span class="string">"php-mysql-slave-dev"</span></span><br><span class="line"><span class="attr">  replicas:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">  selector:</span></span><br><span class="line"><span class="attr">    matchLabels:</span></span><br><span class="line"><span class="attr">      app:</span> <span class="string">php-mysql-slave-dev</span></span><br><span class="line"><span class="attr">  template:</span></span><br><span class="line"><span class="attr">    metadata:</span></span><br><span class="line"><span class="attr">      labels:</span></span><br><span class="line"><span class="attr">        app:</span> <span class="string">php-mysql-slave-dev</span></span><br><span class="line"><span class="attr">    spec:</span></span><br><span class="line"><span class="attr">      containers:</span></span><br><span class="line"><span class="attr">       - name:</span> <span class="string">php-mysql-slave-dev</span></span><br><span class="line"><span class="attr">         image:</span> <span class="string">hub.zhangzw.com/bq/mysql-slave:5.7.24</span></span><br><span class="line"><span class="attr">         ports:</span></span><br><span class="line"><span class="attr">         - containerPort:</span> <span class="number">3306</span></span><br><span class="line"><span class="attr">           name:</span> <span class="string">db-port</span></span><br><span class="line"><span class="attr">         resources:</span></span><br><span class="line"><span class="attr">           requests:</span></span><br><span class="line"><span class="attr">             cpu:</span> <span class="string">"50m"</span></span><br><span class="line"><span class="attr">           limits:</span></span><br><span class="line"><span class="attr">             cpu:</span> <span class="string">"1000m"</span></span><br><span class="line"><span class="attr">         env:</span></span><br><span class="line"><span class="attr">         - name:</span> <span class="string">MYSQL_ROOT_PASSWORD</span></span><br><span class="line"><span class="attr">           value:</span> <span class="string">"admin"</span></span><br><span class="line"><span class="attr">         - name:</span> <span class="string">MYSQL_REPLICATION_USER</span></span><br><span class="line"><span class="attr">           value:</span> <span class="string">"repl"</span></span><br><span class="line"><span class="attr">         - name:</span> <span class="string">MYSQL_REPLICATION_PASSWORD</span></span><br><span class="line"><span class="attr">           value:</span> <span class="string">"7a5b21ac65712bd95e39d3c1"</span></span><br><span class="line"><span class="attr">         - name:</span> <span class="string">MYSQL_MASTER_SERVICE_HOST</span></span><br><span class="line"><span class="attr">           value:</span> <span class="string">"php-mysql-master-dev-service"</span></span><br><span class="line"><span class="attr">         volumeMounts:</span></span><br><span class="line"><span class="attr">         - name:</span> <span class="string">order-slave-dev-data</span></span><br><span class="line"><span class="attr">           mountPath:</span> <span class="string">/var/lib/mysql</span></span><br><span class="line"><span class="attr">         - name:</span> <span class="string">order-slave-dev-cfg</span></span><br><span class="line"><span class="attr">           mountPath:</span> <span class="string">/etc/mysql</span></span><br><span class="line"><span class="attr">      volumes:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">order-slave-dev-data</span></span><br><span class="line"><span class="attr">          hostPath:</span></span><br><span class="line"><span class="attr">            path:</span> <span class="string">/data/k8s-container/php-mysql-dev/slave/data</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">order-slave-dev-cfg</span></span><br><span class="line"><span class="attr">          hostPath:</span></span><br><span class="line"><span class="attr">            path:</span> <span class="string">/data/k8s-container/php-mysql-dev/slave/etc-mysql</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">php-mysql-slave-dev</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">php-mysql-slave-dev-service</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">db</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">NodePort</span></span><br><span class="line"><span class="attr">  ports:</span></span><br><span class="line"><span class="attr">    - port:</span> <span class="number">3306</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">db-port</span></span><br><span class="line"><span class="attr">      targetPort:</span> <span class="number">3306</span></span><br><span class="line"><span class="attr">      nodePort:</span> <span class="number">23307</span></span><br><span class="line"><span class="attr">      protocol:</span> <span class="string">TCP</span></span><br><span class="line"><span class="attr">  selector:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">php-mysql-slave-dev</span></span><br></pre></td></tr></table></figure>
 
 <center>
-<img src="http://zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width="100" height="100" style="border: 0">
 <font color="blue" face="黑体" size="5"> 问题总结 </font>
 </center>
 
@@ -607,7 +607,7 @@
 
 </li>
 </ul>
-<h3 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h3><p><a href="http://zhangzw001.github.io/sh/master-docker-entrypoint.sh">master配置docker-entrypoint.sh</a><br><a href="http://zhangzw001.github.io/sh/slave-docker-entrypoint.sh">slave配置docker-entrypoint.sh</a></p>
+<h3 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h3><p><a href="//zhangzw001.github.io/sh/master-docker-entrypoint.sh">master配置docker-entrypoint.sh</a><br><a href="//zhangzw001.github.io/sh/slave-docker-entrypoint.sh">slave配置docker-entrypoint.sh</a></p>
 
       
     </div>
@@ -630,7 +630,7 @@
   <p><span>本文标题:</span><a href="/2019/10/24/20-k8s搭建mysql5-7-24主从/">k8s搭建mysql5.7.24主从</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 zhangzw 的个人博客">zhangzw</a></p>
   <p><span>发布时间:</span>2019年10月24日 - 18:10</p>
-  <p><span>最后更新:</span>2020年04月24日 - 16:04</p>
+  <p><span>最后更新:</span>2020年08月07日 - 14:08</p>
   <p><span>原始链接:</span><a href="/2019/10/24/20-k8s搭建mysql5-7-24主从/" title="k8s搭建mysql5.7.24主从">http://zhangzw001.github.io/2019/10/24/20-k8s搭建mysql5-7-24主从/</a>
     <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://zhangzw001.github.io/2019/10/24/20-k8s搭建mysql5-7-24主从/" aria-label="复制成功！"></i></span>
   </p>
