@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>读书清单 on zhangzw</title>
+    <link>https://blog.k1s.club/tags/%E8%AF%BB%E4%B9%A6%E6%B8%85%E5%8D%95/</link>
+    <description>Recent content in 读书清单 on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Fri, 24 Apr 2020 22:00:45 +0800</lastBuildDate><atom:link href="https://blog.k1s.club/tags/%E8%AF%BB%E4%B9%A6%E6%B8%85%E5%8D%95/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>2020年下半年：读书清单</title>
+      <link>https://blog.k1s.club/posts.bak/reading/2020-04-24-book/</link>
+      <pubDate>Fri, 24 Apr 2020 22:00:45 +0800</pubDate>
+      
+      <guid>https://blog.k1s.club/posts.bak/reading/2020-04-24-book/</guid>
+      <description>2020 年的上半年因为一些事情耽搁了整体的进程，不过最近也快要到 Deadline 了，因此又愉快的能空出手了。
+回顾这几年在个人技能上，我随着公司的大泥球应用再到微服务化的飞速发展，经历了很多，突破了更多，有了不少新的感悟。因此今年打算再修修内功，认识一下自己的弱小，所以读书清单会比较偏基础方向，如下：
+必看  《图解 TCP/IP》 《TCP/IP 详解 卷1：协议》 《深入理解计算机系统》 《大话数据结构》 《算法（第4版）》 《剑指 Offer》 《操作系统_清华大学》  可选  《Unix 环境高级编程（第3版）》 《SRE Google 运维解密》：进行中，已经了看了不少。 《Google 工作法》：进行中，已经了看了不少。  所有的目标都需要有一个验收的标准和奖罚，否则所谓的目标意义不会特别大。我想，验收标准就是 《重读 CS》 的基本成型，其它不在该集合类的属于第二梯队，考虑释出读书笔记。
+惩罚的话，发红包还是送书呢，先想想。</description>
+    </item>
+    
+  </channel>
+</rss>

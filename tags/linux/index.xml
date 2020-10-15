@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>linux on zhangzw</title>
+    <link>https://blog.k1s.club/tags/linux/</link>
+    <description>Recent content in linux on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Thu, 27 Feb 2020 11:48:51 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>centos单网卡配置多ip的几种方法</title>
+      <link>https://blog.k1s.club/posts/36-centos%E5%8D%95%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE%E5%A4%9Aip%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95/</link>
+      <pubDate>Thu, 27 Feb 2020 11:48:51 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/36-centos%E5%8D%95%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE%E5%A4%9Aip%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95/</guid>
+      <description>centos单网卡配置多ip的几种方法
+方法一 新建IP别名  临时设置, 不需要重启
+ ifconfig enp0s3:1 192.168.53.109/24 ifconfig enp0s3:1 down  配置文件设置, 需要重启
+ #cat ifcfg-enp0s3:1 DEVICE=enp0s3 IPADDR=192.168.53.109 NETMASK=255.255.255.0 # 重启网络 service network restart # 查看(ifconfig 也可以查看) ip a 或ifconfig 方法二 临时设置, 不需要重启 ip addr add 192.168.53.110/24 dev enp0s3 label enp0s3:2 方法三 临时设置, 不需要重启 ifconfig enp0s3:3 192.168.53.111 netmask 255.255.255.0 方法四 同一个配置文件设置, 需要重启。IP地址没有别名不好进行管理。 #cat ifcfg-enp0s3 DEVICE=enp0s3 IPADDR=192.168.53.106 IPADDR1=192.168.53.112 IPADDR2=192.168.53.113 PREFIX=24 PREFIX1=24 PREFIX2=24 # 重启网络 service network restart # 查看(ifconfig 不可以查看) ip a  注: 这里奇怪的是, 实际配置中,出现个别ip使用方法二,三时仅部分内网可以联通,例如 10.</description>
+    </item>
+    
+    <item>
+      <title>shell中gt和&gt;的区别</title>
+      <link>https://blog.k1s.club/posts/19-shell%E4%B8%ADgt%E5%92%8C%E7%9A%84%E5%8C%BA%E5%88%AB/</link>
+      <pubDate>Thu, 17 Oct 2019 11:48:22 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/19-shell%E4%B8%ADgt%E5%92%8C%E7%9A%84%E5%8C%BA%E5%88%AB/</guid>
+      <description>shell中 gt 和 &amp;gt; 的一些相关问题介绍和测试
+ 以下是bash的测试, 注意如果你是zsh可能会不同喔😯
+ [] 和test:	两者是一样的，在命令行里test expr和[ expr ]的效果相同。test中可用的比较运算符只有==和!=，两者都是用于字符串比较的，不可用于整数比较，整数比较只能使用-eq, -gt这种形式。 通过which [ 和which test 可以看到是命令
+ [] 和test 例子
+ [root@dk-centos6 ~]# a=&amp;quot;abcdef&amp;quot; [root@dk-centos6 ~]# test &amp;quot;$a&amp;quot; = &amp;quot;abcdef&amp;quot; [root@dk-centos6 ~]# echo $? 0 [root@dk-centos6 ~]# [ &amp;quot;$a&amp;quot; = &amp;quot;abcdef&amp;quot; ] [root@dk-centos6 ~]# echo $? 0 [[ ]]具体功能:
+  [[是 bash 程序语言的关键字。并不是一个命令，[] 结构比结构更加通用。在[[和]]之间所有的字符都不会发生文件名扩展或者单词分割，但是会发生参数扩展和命令替换。
+  支持字符串的模式匹配（使用=~操作符时甚至支持shell的正则表达 式）,右边的字符串不加双引号的情况,可以把右边作为模式. 比如[[ hello == hell? ]]，结果为真。当然加引号就是文本字符串比较.
+  使用[[ &amp;hellip; ]]条件判断结构，而不是[ &amp;hellip; ]，能够防止脚本中的许多逻辑错误。比如，&amp;amp;&amp;amp;、||、&amp;lt;和&amp;gt; 操作符能够正常存在于[]条件判断结构中，但是如果出现在结构中的话，会报错。比如可以直接使用if [[ $a !</description>
+    </item>
+    
+    <item>
+      <title>awk简单记录</title>
+      <link>https://blog.k1s.club/posts/12-awk%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</link>
+      <pubDate>Fri, 11 Oct 2019 15:23:48 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/12-awk%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</guid>
+      <description>记录一些简单使用
+实例1: 计算nginx日志中某个接口的次数和平均响应时间 例如我的a.txt nginx日志格式如下 a.b.com 1.1.1.1 [08/Sep/2019:23:57:01 +0800] &amp;quot;GET /v1/actionname?xxxx HTTP/1.1&amp;quot; 200 386 &amp;quot;-&amp;quot; &amp;quot;Mozilla/5.0 (Linux; Android 9; V1831A Build/P00610; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36&amp;quot; &amp;quot;-&amp;quot; &amp;quot;0.023&amp;quot; a.b.com 1.1.1.1 [08/Sep/2019:23:57:01 +0800] &amp;quot;GET /v1/actionname2?xxxx HTTP/1.1&amp;quot; 200 386 &amp;quot;-&amp;quot; &amp;quot;Mozilla/5.0 (Linux; Android 9; V1831A Build/P00610; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36&amp;quot; &amp;quot;-&amp;quot; &amp;quot;0.016&amp;quot;  这里我只想取出接口名: /v1/actionname 和 0.023 响应时间
+ 首先我取出这两列 cat a.txt|awk -F &#39;&amp;quot;&#39; &#39;{print $(NF-1),$2}&#39;|awk -F &#39;?</description>
+    </item>
+    
+    <item>
+      <title>linux遇到一些问题统计</title>
+      <link>https://blog.k1s.club/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
+      <pubDate>Thu, 26 Sep 2019 17:33:38 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
+      <description>记录一些Linux,nginx或其他服务一些问题
+CAP 一致性 (Consistency)：一个写操作返回成功，那么之后的读请求都必须读到这个新数据；如果返回失败，那么所有读操作都不能读到这个数据。所有节点访问同一份最新的数据。 可用性 (Availability)：对数据更新具备高可用性，请求能够及时处理，不会一直等待，即使出现节点失效。 分区容错性 (Partition tolerance)：能容忍网络分区，在网络断开的情况下，被分隔的节点仍能正常对外提供服务。 分布式算法 Basic paxos 算法 1. 获取一个Proposal ID n，为了保证Proposal ID唯一，可采用时间戳+Server ID生成； 2. Proposer向所有Acceptors广播Prepare(n)请求； 3. Acceptor比较n和minProposal，如果n&amp;gt;minProposal，minProposal=n，并且将 acceptedProposal 和 acceptedValue 返回； 4. Proposer接收到过半数回复后，如果发现有acceptedValue返回，将所有回复中acceptedProposal最大的acceptedValue作为本次提案的value，否则可以任意决定本次提案的value； 5. 到这里可以进入第二阶段，广播Accept (n,value) 到所有节点； 6. Acceptor比较n和minProposal，如果n&amp;gt;=minProposal，则acceptedProposal=minProposal=n，acceptedValue=value，本地持久化后，返回；否则，返回minProposal。 7. 提议者接收到过半数请求后，如果发现有返回值result &amp;gt;n，表示有更新的提议，跳转到1；否则value达成一致。 Multi-Paxos 算法  为了解决实际应用中连续多值传输的高效性,改进了Basix Paxos为Multi-Paxos:
+ 1. 针对每一个要确定的值，运行一次Paxos算法实例（Instance），形成决议。每一个Paxos实例使用唯一的Instance ID标识。 2. 在所有Proposers中选举一个Leader，由Leader唯一地提交Proposal给Acceptors进行表决。这样没有Proposer竞争，解决了活锁问题。在系统中仅有一个Leader进行Value提交的情况下，Prepare阶段就可以跳过，从而将两阶段变为一阶段，提高效率。 raft  为了更简便理解和实现,改进了Multi-Paxos 为raft
+ 1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的) 2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选.</description>
+    </item>
+    
+  </channel>
+</rss>

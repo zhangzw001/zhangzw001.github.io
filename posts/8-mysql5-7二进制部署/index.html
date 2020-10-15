@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="mysql5.7二进制部署">
+<meta itemprop="description" content="二进制方式部署mysql5.7
+ 下载glibc二进制包 #打开下载页面, 可能会有小版本更新(注意：选择操作系统时选Linux-Generic） https://dev.mysql.com/downloads/mysql/5.7.html#downloads # 最新的可能有小版本变化 wget https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz 安装配置 tar -xvf mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz mv mysql-5.7.24-linux-glibc2.12-x86_64 /usr/local/ cd /usr/local/ # 我的镜像是安装过5.5mysql, 所以需要mv一下 mv mysql mysql-5.5.37 # 由于以前安装过php指定了该mysq目录, 这可能导致以前安装的php缺少libmysqlclient.so.18 ln -s /usr/local/mysql-5.5.37/lib/libmysqlclient.so.18 /usr/local/mysql-5.7.24-linux-glibc2.12-x86_64/lib/libmysqlclient.so.18 ln -s mysql-5.7.24-linux-glibc2.12-x86_64 mysql # 添加启动文件 \cp mysql/support-files/mysql.server /etc/init.d/mysqld echo &quot;PATH=$PATH:/usr/local/mysql/bin/&quot; &gt;&gt;~/.bashrc # 可选 wget http://centos.mirrors.ucloud.cn/centos/6/os/x86_64/Packages/numactl-2.0.9-2.el6.x86_64.rpm yum localinstall numactl-2.0.9-2.el6.x86_64.rpm \rm numactl-2.0.9-2.el6.x86_64.rpm useradd mysql # 配置下mysql的数据目录 cd /data/ mkdir u01 mkdir u02 chown -R mysql.mysql u01 chown -R mysql.">
+<meta itemprop="datePublished" content="2019-09-26T15:11:05+00:00" />
+<meta itemprop="dateModified" content="2019-09-26T15:11:05+00:00" />
+<meta itemprop="wordCount" content="479">
+
+
+
+<meta itemprop="keywords" content="mysql,mysql5.7," />
+<meta property="og:title" content="mysql5.7二进制部署" />
+<meta property="og:description" content="二进制方式部署mysql5.7
+ 下载glibc二进制包 #打开下载页面, 可能会有小版本更新(注意：选择操作系统时选Linux-Generic） https://dev.mysql.com/downloads/mysql/5.7.html#downloads # 最新的可能有小版本变化 wget https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz 安装配置 tar -xvf mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz mv mysql-5.7.24-linux-glibc2.12-x86_64 /usr/local/ cd /usr/local/ # 我的镜像是安装过5.5mysql, 所以需要mv一下 mv mysql mysql-5.5.37 # 由于以前安装过php指定了该mysq目录, 这可能导致以前安装的php缺少libmysqlclient.so.18 ln -s /usr/local/mysql-5.5.37/lib/libmysqlclient.so.18 /usr/local/mysql-5.7.24-linux-glibc2.12-x86_64/lib/libmysqlclient.so.18 ln -s mysql-5.7.24-linux-glibc2.12-x86_64 mysql # 添加启动文件 \cp mysql/support-files/mysql.server /etc/init.d/mysqld echo &quot;PATH=$PATH:/usr/local/mysql/bin/&quot; &gt;&gt;~/.bashrc # 可选 wget http://centos.mirrors.ucloud.cn/centos/6/os/x86_64/Packages/numactl-2.0.9-2.el6.x86_64.rpm yum localinstall numactl-2.0.9-2.el6.x86_64.rpm \rm numactl-2.0.9-2.el6.x86_64.rpm useradd mysql # 配置下mysql的数据目录 cd /data/ mkdir u01 mkdir u02 chown -R mysql.mysql u01 chown -R mysql." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/8-mysql5-7%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2/" />
+<meta property="article:published_time" content="2019-09-26T15:11:05+00:00" />
+<meta property="article:modified_time" content="2019-09-26T15:11:05+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="mysql5.7二进制部署"/>
+<meta name="twitter:description" content="二进制方式部署mysql5.7
+ 下载glibc二进制包 #打开下载页面, 可能会有小版本更新(注意：选择操作系统时选Linux-Generic） https://dev.mysql.com/downloads/mysql/5.7.html#downloads # 最新的可能有小版本变化 wget https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz 安装配置 tar -xvf mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz mv mysql-5.7.24-linux-glibc2.12-x86_64 /usr/local/ cd /usr/local/ # 我的镜像是安装过5.5mysql, 所以需要mv一下 mv mysql mysql-5.5.37 # 由于以前安装过php指定了该mysq目录, 这可能导致以前安装的php缺少libmysqlclient.so.18 ln -s /usr/local/mysql-5.5.37/lib/libmysqlclient.so.18 /usr/local/mysql-5.7.24-linux-glibc2.12-x86_64/lib/libmysqlclient.so.18 ln -s mysql-5.7.24-linux-glibc2.12-x86_64 mysql # 添加启动文件 \cp mysql/support-files/mysql.server /etc/init.d/mysqld echo &quot;PATH=$PATH:/usr/local/mysql/bin/&quot; &gt;&gt;~/.bashrc # 可选 wget http://centos.mirrors.ucloud.cn/centos/6/os/x86_64/Packages/numactl-2.0.9-2.el6.x86_64.rpm yum localinstall numactl-2.0.9-2.el6.x86_64.rpm \rm numactl-2.0.9-2.el6.x86_64.rpm useradd mysql # 配置下mysql的数据目录 cd /data/ mkdir u01 mkdir u02 chown -R mysql.mysql u01 chown -R mysql."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>mysql5.7二进制部署</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/posts/">文章</a>
+					<a href="https://blog.k1s.club/k8s-categories/">Kubernetes系列</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Sep 26, 2019</span></div>
+				<h1>mysql5.7二进制部署</h1>
+			</header>
+			<div class="content">
+				<blockquote>
+<p>二进制方式部署mysql5.7</p>
+</blockquote>
+<!-- raw HTML omitted -->
+<h3 id="下载glibc二进制包">下载glibc二进制包<a href="#下载glibc二进制包" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>#打开下载页面, 可能会有小版本更新(注意：选择操作系统时选Linux-Generic）
+https://dev.mysql.com/downloads/mysql/5.7.html#downloads
+
+# 最新的可能有小版本变化
+wget https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz
+</code></pre><h3 id="安装配置">安装配置<a href="#安装配置" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>tar -xvf mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz
+mv mysql-5.7.24-linux-glibc2.12-x86_64 /usr/local/
+cd /usr/local/
+
+# 我的镜像是安装过5.5mysql, 所以需要mv一下
+mv mysql mysql-5.5.37
+
+# 由于以前安装过php指定了该mysq目录, 这可能导致以前安装的php缺少libmysqlclient.so.18
+ln -s /usr/local/mysql-5.5.37/lib/libmysqlclient.so.18 /usr/local/mysql-5.7.24-linux-glibc2.12-x86_64/lib/libmysqlclient.so.18
+ln -s mysql-5.7.24-linux-glibc2.12-x86_64 mysql
+
+# 添加启动文件
+\cp mysql/support-files/mysql.server /etc/init.d/mysqld
+echo &quot;PATH=$PATH:/usr/local/mysql/bin/&quot; &gt;&gt;~/.bashrc
+
+# 可选
+wget http://centos.mirrors.ucloud.cn/centos/6/os/x86_64/Packages/numactl-2.0.9-2.el6.x86_64.rpm
+yum localinstall numactl-2.0.9-2.el6.x86_64.rpm
+\rm numactl-2.0.9-2.el6.x86_64.rpm
+
+useradd mysql
+
+# 配置下mysql的数据目录
+cd /data/
+mkdir u01
+mkdir u02
+chown -R mysql.mysql u01
+chown -R mysql.mysql u02
+chmod 750 u01
+chmod 750 u02
+cd /data/u01/
+
+# 初始化
+/usr/local/mysql/bin/mysqld --initialize-insecure --user=mysql --basedir=/usr/local/mysql --datadir=/data/u01
+cat auto.cnf
+
+# 启动服务 (在这之前准备好 /etc/my.cnf)
+/etc/init.d/mysqld start
+
+# 记录下variables
+mysql -e &quot;show global variables&quot; &gt;mysql_option_default.log
+</code></pre><h3 id="mycnf">my.cnf<a href="#mycnf" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>[client]
+port = 3306
+socket = /data/u01/mysql.sock
+
+[mysql]
+prompt=&quot;\u@m1-u [\d]&gt; &quot;
+no-auto-rehash
+
+[mysqld]
+user = mysql
+port = 3306
+basedir = /usr/local/mysql
+datadir = /data/u01
+socket = /data/u01/mysql.sock
+pid-file = /data/u01/m1-u.pid
+tmpdir = /data/u02
+server-id = 1001
+character-set-server = utf8
+skip_name_resolve = 1
+innodb_file_per_table = 1
+explicit_defaults_for_timestamp = 0
+
+# buffer&amp;cache
+table_open_cache = 100
+table_definition_cache = 400
+table_open_cache_instances = 64
+sort_buffer_size = 4M
+join_buffer_size = 4M
+read_buffer_size = 8M
+read_rnd_buffer_size = 4M
+
+# thread&amp;connection
+thread_stack = 256K
+thread_cache_size = 768
+back_log = 1024
+max_connections = 3000
+max_connect_errors = 1000000
+
+# temptable
+tmp_table_size = 32M
+max_heap_table_size = 32M
+
+# network
+max_allowed_packet = 32M
+#lock_wait_timeout = 3600
+#interactive_timeout = 600
+#wait_timeout = 600
+
+# query cache
+query_cache_size = 0
+query_cache_type = 0
+
+# 设置errorlog、slowlog和generallog的时区，默认UTC
+log_timestamps = SYSTEM
+
+# error-log
+log_error = /data/u02/mysqld.log
+
+# slow-log
+slow_query_log = 1
+slow_query_log_file = /data/u02/slow.log
+long_query_time = 0.1
+log_queries_not_using_indexes =1
+log_throttle_queries_not_using_indexes = 60
+min_examined_row_limit = 100
+log_slow_admin_statements = 1
+log_slow_slave_statements = 1
+
+# general log
+#general-log = 1
+general_log_file=/data/u02/query.log
+
+# binlog
+binlog_format = row
+binlog_checksum = 1
+log-bin = /data/u02/bdm1-bin
+log-bin-index = /data/u02/bdm1-bin.index
+sync_binlog = 0
+binlog_cache_size = 4M
+max_binlog_cache_size = 2G
+max_binlog_size = 512M
+expire_logs_days = 15
+
+# GTID
+gtid_mode = on
+enforce_gtid_consistency = 1
+log_slave_updates
+
+# Replication
+master_info_repository = TABLE
+relay_log_info_repository = TABLE
+slave-rows-search-algorithms = 'INDEX_SCAN,HASH_SCAN'
+relay_log_recovery = 1
+relay_log_purge = 1
+relay-log=/data/u02/bdm1-relay-bin
+relay-log-index=/data/u02/bdm1-relay-bin.index
+
+# innodb-buffer&amp;cache
+innodb_buffer_pool_size = 2G
+innodb_buffer_pool_instances = 4
+#innodb_additional_mem_pool_size = 16M
+innodb_max_dirty_pages_pct = 50
+
+# innodb log
+innodb_data_file_path = ibdata1:1G:autoextend
+innodb_log_file_size = 1G
+innodb_log_files_in_group = 2
+innodb_flush_log_at_trx_commit = 2
+innodb_log_buffer_size = 32M
+#innodb_max_undo_log_size = 4G
+#innodb_undo_directory = undolog
+innodb_undo_tablespaces = 4
+
+# innodb-io
+innodb_flush_method = O_DIRECT
+innodb_io_capacity = 600
+innodb_io_capacity_max = 2000
+innodb_flush_sync = 0
+innodb_flush_neighbors = 0
+#innodb_lru_scan_depth = 4000
+innodb_write_io_threads = 8
+innodb_read_io_threads = 8
+innodb_purge_threads = 4
+innodb_page_cleaners = 4
+
+# transaction,lock
+#innodb_sync_spin_loops = 100
+#innodb_spin_wait_delay = 30
+innodb_lock_wait_timeout = 10
+innodb_print_all_deadlocks = 1
+innodb_rollback_on_timeout = 1
+
+innodb_open_files = 65535
+
+innodb_online_alter_log_max_size = 2G
+
+# innodb status
+innodb_status_file = 1
+# 注意: 开启 innodb_status_output &amp; innodb_status_output_locks 后, 可能会导致log-error文件增长较快
+innodb_status_output = 0
+innodb_status_output_locks = 0
+
+#performance_schema
+performance_schema = 1
+performance_schema_instrument = '%=on'
+
+#innodb monitor
+innodb_monitor_enable=&quot;module_innodb&quot;
+innodb_monitor_enable=&quot;module_server&quot;
+innodb_monitor_enable=&quot;module_dml&quot;
+innodb_monitor_enable=&quot;module_ddl&quot;
+innodb_monitor_enable=&quot;module_trx&quot;
+innodb_monitor_enable=&quot;module_os&quot;
+innodb_monitor_enable=&quot;module_purge&quot;
+innodb_monitor_enable=&quot;module_log&quot;
+innodb_monitor_enable=&quot;module_lock&quot;
+innodb_monitor_enable=&quot;module_buffer&quot;
+innodb_monitor_enable=&quot;module_index&quot;
+innodb_monitor_enable=&quot;module_ibuf_system&quot;
+innodb_monitor_enable=&quot;module_buffer_page&quot;
+innodb_monitor_enable=&quot;module_adaptive_hash&quot;
+
+# MyISAM
+key_buffer_size = 1024M
+bulk_insert_buffer_size = 64M
+myisam_sort_buffer_size = 128M
+myisam_repair_threads = 1
+
+
+[mysqldump]
+quick
+max_allowed_packet = 32M
+</code></pre>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/mysql">mysql</a></span><span class="tag"><a href="https://blog.k1s.club/tags/mysql5.7">mysql5.7</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>479 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-09-26 23:11 &#43;0800</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>linux遇到一些问题统计</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/7-k8s%E9%83%A8%E7%BD%B2storageclass%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BApv-nfs-rbd/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>k8s部署storageclass动态创建pv(nfs&amp;rbd)</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-166045776-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

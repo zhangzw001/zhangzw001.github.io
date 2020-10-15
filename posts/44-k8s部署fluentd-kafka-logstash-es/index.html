@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="k8s部署fluentd&#43;kafka&#43;logstash&#43;es">
+<meta itemprop="description" content="客户端采集数据的软件比较多, 有logstash,flume,fluentd/fluent-bit,filebeat等,这里在k8s集群中部署fluentd开启UDP端口接收代码写入的json日志,并写入到kafka中
+1. 一些服务版本 docker镜像: docker pull fluentd:v1.9.1-1.0 kafka: kafka-server-0.10.0&#43;kafka2.1.0-1.2.1.0.p0.63.el6.noarch fluent-plugin-kafka: 0.5.7 2. fluentd 镜像安装kafka扩展 Dockerfile  由于fluent-plugin-kafka版本要求 我们的kafka是0.10, 所以高版本有问题, 安装了fluent-plugin-kafka 0.5.7 则正常
+ 官方文档: https://rubygems.org/gems/fluent-plugin-kafka/versions/0.5.7
+from fluentd:v1.9.1-1.0 MAINTAINER zhangzw &lt;zhangzw@xxx.com&gt; USER root RUN fluent-gem install fluent-plugin-kafka -v 0.5.7 USER fluent 3. fluentd配置文件 fluent-udp-to-kafka.conf  &lt;source&gt; @type udp @label @mainstream tag udplog # required &lt;parse&gt; @type regexp expression /^(?&lt;message&gt;.*)$/ &lt;/parse&gt; port 12301 # optional. 5160 by default bind 0.0.0.0 # optional.">
+<meta itemprop="datePublished" content="2020-04-09T17:40:58+00:00" />
+<meta itemprop="dateModified" content="2020-04-09T17:40:58+00:00" />
+<meta itemprop="wordCount" content="493">
+
+
+
+<meta itemprop="keywords" content="fluentd," />
+<meta property="og:title" content="k8s部署fluentd&#43;kafka&#43;logstash&#43;es" />
+<meta property="og:description" content="客户端采集数据的软件比较多, 有logstash,flume,fluentd/fluent-bit,filebeat等,这里在k8s集群中部署fluentd开启UDP端口接收代码写入的json日志,并写入到kafka中
+1. 一些服务版本 docker镜像: docker pull fluentd:v1.9.1-1.0 kafka: kafka-server-0.10.0&#43;kafka2.1.0-1.2.1.0.p0.63.el6.noarch fluent-plugin-kafka: 0.5.7 2. fluentd 镜像安装kafka扩展 Dockerfile  由于fluent-plugin-kafka版本要求 我们的kafka是0.10, 所以高版本有问题, 安装了fluent-plugin-kafka 0.5.7 则正常
+ 官方文档: https://rubygems.org/gems/fluent-plugin-kafka/versions/0.5.7
+from fluentd:v1.9.1-1.0 MAINTAINER zhangzw &lt;zhangzw@xxx.com&gt; USER root RUN fluent-gem install fluent-plugin-kafka -v 0.5.7 USER fluent 3. fluentd配置文件 fluent-udp-to-kafka.conf  &lt;source&gt; @type udp @label @mainstream tag udplog # required &lt;parse&gt; @type regexp expression /^(?&lt;message&gt;.*)$/ &lt;/parse&gt; port 12301 # optional. 5160 by default bind 0.0.0.0 # optional." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/44-k8s%E9%83%A8%E7%BD%B2fluentd-kafka-logstash-es/" />
+<meta property="article:published_time" content="2020-04-09T17:40:58+00:00" />
+<meta property="article:modified_time" content="2020-04-09T17:40:58+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="k8s部署fluentd&#43;kafka&#43;logstash&#43;es"/>
+<meta name="twitter:description" content="客户端采集数据的软件比较多, 有logstash,flume,fluentd/fluent-bit,filebeat等,这里在k8s集群中部署fluentd开启UDP端口接收代码写入的json日志,并写入到kafka中
+1. 一些服务版本 docker镜像: docker pull fluentd:v1.9.1-1.0 kafka: kafka-server-0.10.0&#43;kafka2.1.0-1.2.1.0.p0.63.el6.noarch fluent-plugin-kafka: 0.5.7 2. fluentd 镜像安装kafka扩展 Dockerfile  由于fluent-plugin-kafka版本要求 我们的kafka是0.10, 所以高版本有问题, 安装了fluent-plugin-kafka 0.5.7 则正常
+ 官方文档: https://rubygems.org/gems/fluent-plugin-kafka/versions/0.5.7
+from fluentd:v1.9.1-1.0 MAINTAINER zhangzw &lt;zhangzw@xxx.com&gt; USER root RUN fluent-gem install fluent-plugin-kafka -v 0.5.7 USER fluent 3. fluentd配置文件 fluent-udp-to-kafka.conf  &lt;source&gt; @type udp @label @mainstream tag udplog # required &lt;parse&gt; @type regexp expression /^(?&lt;message&gt;.*)$/ &lt;/parse&gt; port 12301 # optional. 5160 by default bind 0.0.0.0 # optional."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>k8s部署fluentd&#43;kafka&#43;logstash&#43;es</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/posts/">文章</a>
+					<a href="https://blog.k1s.club/k8s-categories/">Kubernetes系列</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Apr 9, 2020</span></div>
+				<h1>k8s部署fluentd&#43;kafka&#43;logstash&#43;es</h1>
+			</header>
+			<div class="content">
+				<p>客户端采集数据的软件比较多, 有logstash,flume,fluentd/fluent-bit,filebeat等,这里在k8s集群中部署fluentd开启UDP端口接收代码写入的json日志,并写入到kafka中</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<h3 id="1-一些服务版本">1. 一些服务版本<a href="#1-一些服务版本" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>docker镜像: docker pull fluentd:v1.9.1-1.0
+kafka: kafka-server-0.10.0+kafka2.1.0-1.2.1.0.p0.63.el6.noarch
+fluent-plugin-kafka: 0.5.7
+</code></pre><!-- raw HTML omitted -->
+<h3 id="2-fluentd-镜像安装kafka扩展-dockerfile">2. fluentd 镜像安装kafka扩展 Dockerfile<a href="#2-fluentd-镜像安装kafka扩展-dockerfile" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>由于fluent-plugin-kafka版本要求
+我们的kafka是0.10, 所以高版本有问题, 安装了fluent-plugin-kafka 0.5.7 则正常</p>
+</blockquote>
+<p>官方文档: <a href="https://rubygems.org/gems/fluent-plugin-kafka/versions/0.5.7">https://rubygems.org/gems/fluent-plugin-kafka/versions/0.5.7</a></p>
+<pre><code>from fluentd:v1.9.1-1.0
+
+MAINTAINER zhangzw &lt;zhangzw@xxx.com&gt;
+
+USER root
+
+RUN fluent-gem install fluent-plugin-kafka -v 0.5.7
+
+USER fluent
+
+</code></pre><!-- raw HTML omitted -->
+<h3 id="3-fluentd配置文件-fluent-udp-to-kafkaconf">3. fluentd配置文件 fluent-udp-to-kafka.conf<a href="#3-fluentd配置文件-fluent-udp-to-kafkaconf" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>
+&lt;source&gt;
+  @type udp
+  @label @mainstream
+  tag udplog # required
+  &lt;parse&gt;
+    @type regexp
+    expression /^(?&lt;message&gt;.*)$/
+  &lt;/parse&gt;
+  port 12301               # optional. 5160 by default
+  bind 0.0.0.0             # optional. 0.0.0.0 by default
+  message_length_limit 1MB # optional. 4096 bytes by default
+&lt;/source&gt;
+
+&lt;filter **&gt;
+  @type stdout
+&lt;/filter&gt;
+
+&lt;label @mainstream&gt;
+  &lt;match **&gt;
+    @type kafka2
+
+    # list of seed brokers，这个地方可以通过逗号写多个地址比如 host1:9092,host2:9092
+    brokers 192.168.xxx.142:9092
+    use_event_time true
+
+    # buffer settings
+    &lt;buffer topic&gt;
+    @type file
+    # 下面的path可能需要手动创建目录，并给写入权限，我直接给了777
+    path /fluentd/log/td-agent/buffer/td
+    flush_interval 3s
+    &lt;/buffer&gt;
+
+    # data type settings
+    &lt;format&gt;
+    @type json
+    &lt;/format&gt;
+
+    # kafka中创建的topic
+    topic_key udplog
+    # 默认topic
+    default_topic udplog
+    get_kafka_client_log true
+    # producer settings
+    required_acks -1
+    compression_codec gzip
+  &lt;/match&gt;
+&lt;/label&gt;
+</code></pre><!-- raw HTML omitted -->
+<h3 id="4-k8s部署-开启input-udp-12301接收数据-并output给kafka">4. k8s部署 开启input udp 12301接收数据, 并output给kafka<a href="#4-k8s部署-开启input-udp-12301接收数据-并output给kafka" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>k8s-fluentd-udplog-udp-to-kafka.yml
+---
+kind: Deployment
+apiVersion: apps/v1beta2
+metadata:
+  labels:
+    elastic-app: fluentd-udplog
+  name: fluentd-udplog
+  namespace: ns-elastic7
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      elastic-app: fluentd-udplog
+  template:
+    metadata:
+      labels:
+        elastic-app: fluentd-udplog
+    spec:
+      containers:
+        - name: fluentd-udplog
+          image: hub.xxx.com/bq/fluentd:v1.9.1-1.0-kafka-0.10
+          ports:
+            - containerPort: 12301
+              name: port12301
+              protocol: UDP
+          resources:
+            requests:
+              cpu: &quot;50m&quot;
+            limits:
+              cpu: &quot;500m&quot;
+          volumeMounts:
+            - name: fluentd-udplog-logs
+              mountPath: /fluentd/log
+            - name: fluentd-udplog-cfg
+              mountPath: /fluentd/etc/fluent.conf
+      volumes:
+        - name: fluentd-udplog-logs
+          hostPath:
+            path: /data/k8s-container/elk-7.2.0/fluentd/logs/
+        - name: fluentd-udplog-cfg
+          hostPath:
+            path: /data/k8s-container/elk-7.2.0/fluentd/fluent-udp-to-kafka.conf
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+ labels:
+   elastic-app: fluentd-udplog
+ name: fluentd-udplog-service-nodeport
+ namespace: ns-elastic7
+spec:
+ type: NodePort
+ ports:
+   - name: port12301
+     port: 12301
+     targetPort: 12301
+     nodePort: 12301
+     protocol: UDP
+ selector:
+   elastic-app: fluentd-udplog
+</code></pre><!-- raw HTML omitted -->
+<h3 id="5-修改logstash的配置">5. 修改logstash的配置<a href="#5-修改logstash的配置" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>config/pipeline/logstash.conf
+input {
+ kafka{
+  type =&gt;&quot;php-mysql-dev-252-log&quot;
+  bootstrap_servers =&gt; &quot;192.168.xxx.142:9092&quot;
+  topics =&gt; &quot;php-mysql-dev-0-slowlog&quot;
+ }
+
+        kafka{
+                type =&gt;&quot;udplog&quot;
+                bootstrap_servers =&gt; &quot;192.168.xxx.142:9092&quot;
+                topics =&gt; &quot;udplog&quot;
+        }
+
+}
+
+
+
+filter{
+
+###############
+    if [type] == &quot;php-mysql-dev-252-log&quot; {
+ 	json {
+  		source =&gt; &quot;message&quot;
+ 	}
+
+ 	mutate {
+     		gsub =&gt; [ &quot;message&quot;, &quot;\n&quot;, &quot;&quot; ]
+  	}
+ 	grok {
+  		match =&gt; [&quot;message&quot;,&quot;(?m)^# User@Host: %{USER:user}\[[^\]]+\] @  \[%{IP:clientip}\]# Query_time: %{NUMBER:query_time:float}\s+Lock_time: %{NUMBER:lock_time:float}\s+Rows_sent: %{NUMBER:rows_sent:int}\s+Rows_examined: %{NUMBER:rows_examined:int}(?&lt;dbnameall&gt;.*)SET\s+timestamp=%{NUMBER:timestamp_mysql:int};(?&lt;query&gt;.*)&quot;]
+ 	}
+ 	date {
+  		match =&gt; [&quot;timestamp_mysql&quot;, &quot;UNIX&quot;]
+  		target =&gt; &quot;@timestamp&quot;
+ 	}
+    }
+######
+    if [type] == &quot;udplog&quot; {
+ 	grok {
+          match =&gt; {
+            &quot;message&quot; =&gt; &quot;&lt;%{NUMBER🆔int}&gt;%{NUMBER:id_N:int} (?&lt;http_time&gt;\S+) %{DATA:hostname} %{DATA:ident} %{NUMBER:pid:int} - - %{DATA:logLevel}: X-Request-Id:%{DATA:Request_Id} module:%{DATA:moduleName} act:%{DATA:Act} sql:(?&lt;sql&gt;(.*)) cost:%{NUMBER:sqlDuring:int}ms \[\] \[\]&quot;
+                }
+     	}
+       	grok {
+         match =&gt; {&quot;sql&quot; =&gt;&quot; %{DATA:operation} &quot;}
+       	}
+
+   	if &quot;_grokparsefailure&quot; not in [tags] {
+      	 if [sqlDuring] &lt; 5 {
+          drop {}
+        }
+   }
+   else {
+    	 drop {}
+   	}
+    }
+
+}
+
+output {
+###
+   if [type] == &quot;php-mysql-dev-252-log&quot; {
+      elasticsearch {
+        hosts =&gt;  [ &quot;http://192.168.xxx.120:19230&quot; ]
+        index =&gt; &quot;php-mysql-dev-252-%{+YYYY.MM.dd}&quot;
+      }
+   }
+###
+    if [type] == &quot;udplog&quot; {
+      elasticsearch {
+        hosts =&gt;  [ &quot;http://192.168.xxx.120:19230&quot; ]
+        index =&gt; &quot;udplog-%{+YYYY.MM.dd}&quot;
+      }
+    }
+}
+
+</code></pre><!-- raw HTML omitted -->
+<h3 id="6-部署k8s-logstash-分析后写入到es中-k8s-logstash-720-kafka-to-esyml">6. 部署k8s logstash 分析后写入到es中 k8s-logstash-7.2.0-kafka-to-es.yml<a href="#6-部署k8s-logstash-分析后写入到es中-k8s-logstash-720-kafka-to-esyml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>---
+kind: Deployment
+apiVersion: apps/v1beta2
+metadata:
+  labels:
+    elastic-app:  slowlog-logstash-kafka-to-es
+  name: slowlog-logstash-kafka-to-es
+  namespace: ns-elastic7
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      elastic-app: slowlog-logstash-kafka-to-es
+  template:
+    metadata:
+      labels:
+        elastic-app: slowlog-logstash-kafka-to-es
+    spec:
+      containers:
+        - name: slowlog-logstash-kafka-to-es
+          image: hub.xxx.com/bq/logstash:7.2.0
+          resources:
+            requests:
+              cpu: &quot;50m&quot;
+            limits:
+              cpu: &quot;500m&quot;
+          volumeMounts:
+            - name: slowlog-toes-cfg
+              mountPath: /usr/share/logstash/config
+      volumes:
+        - name: slowlog-toes-cfg
+          hostPath:
+            path: /data/k8s-container/elk-7.2.0/mysqlslowlog-logstash-7.2.0/config
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+
+</code></pre>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/fluentd">fluentd</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>493 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-04-10 01:40 &#43;0800</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>gitlab-ci与k8s结合</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/43-k8s%E7%9A%84yaml%E9%85%8D%E7%BD%AE%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A-%E6%A8%A1%E6%9D%BF/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>k8s的yaml配置名词解释(模板)</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-166045776-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="gitlab-ci与k8s结合">
+<meta itemprop="description" content="本文介绍如何通过gitlab-ci整合k8s实现流水线部署
+  https://www.cnblogs.com/Sinte-Beuve/p/11739196.html https://www.qikqiak.com/post/gitlab-ci-k8s-cluster-feature/   环境版本统计 1 gitlab/gitlab-runner 0.15.0 2 helm 2.16 3 k8s 1.16.4 4 gitlab 11.5 5 CentOS Linux release 7.7 /kernel 5.2  小节
+ 1. gitlab 通过admin管理页面的runner配置, 安装gitlab-runner, 安装方式可以是二进制, docker 或k8s (这里是k8s) 2. gitlab 项目目录的 Operations -&gt; kubernetes -&gt; Add Kubernetes Cluster -&gt; Add existing cluster 是结合k8s, 每个项目都需要设置一个k8s集群,k8s集群需要配置rbac权限 3. ci 在提交到私有harbor上是需要验证账号密码, 私有仓库拉取也需要验证 k8s yaml直接部署 gitlab-ci-token-secret.yaml  具体token值 请查看 gitlab的admin页面-&gt; Overview -&gt; Runners 查看, 然后base64加密">
+<meta itemprop="datePublished" content="2020-04-23T16:20:33+00:00" />
+<meta itemprop="dateModified" content="2020-04-23T16:20:33+00:00" />
+<meta itemprop="wordCount" content="1254">
+
+
+
+<meta itemprop="keywords" content="gitlab-runner,k8s," />
+<meta property="og:title" content="gitlab-ci与k8s结合" />
+<meta property="og:description" content="本文介绍如何通过gitlab-ci整合k8s实现流水线部署
+  https://www.cnblogs.com/Sinte-Beuve/p/11739196.html https://www.qikqiak.com/post/gitlab-ci-k8s-cluster-feature/   环境版本统计 1 gitlab/gitlab-runner 0.15.0 2 helm 2.16 3 k8s 1.16.4 4 gitlab 11.5 5 CentOS Linux release 7.7 /kernel 5.2  小节
+ 1. gitlab 通过admin管理页面的runner配置, 安装gitlab-runner, 安装方式可以是二进制, docker 或k8s (这里是k8s) 2. gitlab 项目目录的 Operations -&gt; kubernetes -&gt; Add Kubernetes Cluster -&gt; Add existing cluster 是结合k8s, 每个项目都需要设置一个k8s集群,k8s集群需要配置rbac权限 3. ci 在提交到私有harbor上是需要验证账号密码, 私有仓库拉取也需要验证 k8s yaml直接部署 gitlab-ci-token-secret.yaml  具体token值 请查看 gitlab的admin页面-&gt; Overview -&gt; Runners 查看, 然后base64加密" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/" />
+<meta property="article:published_time" content="2020-04-23T16:20:33+00:00" />
+<meta property="article:modified_time" content="2020-04-23T16:20:33+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="gitlab-ci与k8s结合"/>
+<meta name="twitter:description" content="本文介绍如何通过gitlab-ci整合k8s实现流水线部署
+  https://www.cnblogs.com/Sinte-Beuve/p/11739196.html https://www.qikqiak.com/post/gitlab-ci-k8s-cluster-feature/   环境版本统计 1 gitlab/gitlab-runner 0.15.0 2 helm 2.16 3 k8s 1.16.4 4 gitlab 11.5 5 CentOS Linux release 7.7 /kernel 5.2  小节
+ 1. gitlab 通过admin管理页面的runner配置, 安装gitlab-runner, 安装方式可以是二进制, docker 或k8s (这里是k8s) 2. gitlab 项目目录的 Operations -&gt; kubernetes -&gt; Add Kubernetes Cluster -&gt; Add existing cluster 是结合k8s, 每个项目都需要设置一个k8s集群,k8s集群需要配置rbac权限 3. ci 在提交到私有harbor上是需要验证账号密码, 私有仓库拉取也需要验证 k8s yaml直接部署 gitlab-ci-token-secret.yaml  具体token值 请查看 gitlab的admin页面-&gt; Overview -&gt; Runners 查看, 然后base64加密"/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>gitlab-ci与k8s结合</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/posts/">文章</a>
+					<a href="https://blog.k1s.club/k8s-categories/">Kubernetes系列</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Apr 23, 2020</span></div>
+				<h1>gitlab-ci与k8s结合</h1>
+			</header>
+			<div class="content">
+				<p>本文介绍如何通过gitlab-ci整合k8s实现流水线部署</p>
+<!-- raw HTML omitted -->
+<blockquote>
+<ol>
+<li><a href="https://www.cnblogs.com/Sinte-Beuve/p/11739196.html">https://www.cnblogs.com/Sinte-Beuve/p/11739196.html</a></li>
+<li><a href="https://www.qikqiak.com/post/gitlab-ci-k8s-cluster-feature/">https://www.qikqiak.com/post/gitlab-ci-k8s-cluster-feature/</a></li>
+</ol>
+</blockquote>
+<h3 id="环境版本统计">环境版本统计<a href="#环境版本统计" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>1 gitlab/gitlab-runner 0.15.0
+2 helm 2.16
+3 k8s 1.16.4
+4 gitlab 11.5
+5 CentOS Linux release 7.7 /kernel 5.2
+</code></pre><blockquote>
+<p>小节</p>
+</blockquote>
+<pre><code>1. gitlab 通过admin管理页面的runner配置, 安装gitlab-runner, 安装方式可以是二进制, docker 或k8s (这里是k8s)
+2. gitlab 项目目录的 Operations -&gt; kubernetes -&gt; Add Kubernetes Cluster -&gt; Add existing cluster 是结合k8s, 每个项目都需要设置一个k8s集群,k8s集群需要配置rbac权限
+3. ci 在提交到私有harbor上是需要验证账号密码, 私有仓库拉取也需要验证
+</code></pre><!-- raw HTML omitted -->
+<h3 id="k8s-yaml直接部署">k8s yaml直接部署<a href="#k8s-yaml直接部署" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="gitlab-ci-token-secretyaml">gitlab-ci-token-secret.yaml<a href="#gitlab-ci-token-secretyaml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<blockquote>
+<p>具体token值 请查看 gitlab的admin页面-&gt; Overview -&gt; Runners 查看, 然后base64加密</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Secret</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-token</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">kube-ops</span><span class="w">
+</span><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-runner</span><span class="w">
+</span><span class="w"></span><span class="nt">data</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">GITLAB_CI_TOKEN</span><span class="p">:</span><span class="w"> </span><span class="l">$(echo &#34;gitlab_ci_token&#34;|base64)</span><span class="w">
+</span></code></pre></div><h4 id="runner-configmapyaml">runner-configmap.yaml<a href="#runner-configmapyaml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ConfigMap</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-runner</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-runner-cm</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">kube-ops</span><span class="w">
+</span><span class="w"></span><span class="nt">data</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">REGISTER_NON_INTERACTIVE</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">REGISTER_LOCKED</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;false&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">METRICS_SERVER</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;0.0.0.0:9100&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">CI_SERVER_URL</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;http://gitlab.xxx.com/ci&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">RUNNER_REQUEST_CONCURRENCY</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;4&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">RUNNER_EXECUTOR</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;kubernetes&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">KUBERNETES_NAMESPACE</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;kube-ops&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">KUBERNETES_PRIVILEGED</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">KUBERNETES_CPU_LIMIT</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">KUBERNETES_MEMORY_LIMIT</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1Gi&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">KUBERNETES_SERVICE_CPU_LIMIT</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">KUBERNETES_SERVICE_MEMORY_LIMIT</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1Gi&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">KUBERNETES_HELPER_CPU_LIMIT</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;500m&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">KUBERNETES_HELPER_MEMORY_LIMIT</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;100Mi&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">KUBERNETES_PULL_POLICY</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;if-not-present&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">KUBERNETES_TERMINATIONGRACEPERIODSECONDS</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;10&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">KUBERNETES_POLL_INTERVAL</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;5&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">KUBERNETES_POLL_TIMEOUT</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;360&#34;</span><span class="w">
+</span></code></pre></div><h4 id="runner-rbacyaml">runner-rbac.yaml<a href="#runner-rbacyaml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ServiceAccount</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">kube-ops</span><span class="w">
+</span><span class="w"></span><span class="nn">---</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Role</span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">kube-ops</span><span class="w">
+</span><span class="w"></span><span class="nt">rules</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="nt">apiGroups</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;&#34;</span><span class="p">]</span><span class="w">
+</span><span class="w">    </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]</span><span class="w">
+</span><span class="w">    </span><span class="nt">verbs</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]</span><span class="w">
+</span><span class="w"></span><span class="nn">---</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">RoleBinding</span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">kube-ops</span><span class="w">
+</span><span class="w"></span><span class="nt">subjects</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ServiceAccount</span><span class="w">
+</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci</span><span class="w">
+</span><span class="w">    </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">kube-ops</span><span class="w">
+</span><span class="w"></span><span class="nt">roleRef</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Role</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci</span><span class="w">
+</span><span class="w">  </span><span class="nt">apiGroup</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io</span><span class="w">
+</span></code></pre></div><h4 id="runner-scripts-cmyaml">runner-scripts-cm.yaml<a href="#runner-scripts-cmyaml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">data</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">run.sh</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span><span class="sd">    #!/bin/bash
+</span><span class="sd">    unregister() {
+</span><span class="sd">        kill %1
+</span><span class="sd">        echo &#34;Unregistering runner ${RUNNER_NAME} ...&#34;
+</span><span class="sd">        /usr/bin/gitlab-ci-multi-runner unregister -t &#34;$(/usr/bin/gitlab-ci-multi-runner list 2&gt;&amp;1 | tail -n1 | awk &#39;{print $4}&#39; | cut -d&#39;=&#39; -f2)&#34; -n ${RUNNER_NAME}
+</span><span class="sd">        exit $?
+</span><span class="sd">    }
+</span><span class="sd">    trap &#39;unregister&#39; EXIT HUP INT QUIT PIPE TERM
+</span><span class="sd">    echo &#34;Registering runner ${RUNNER_NAME} ...&#34;
+</span><span class="sd">    /usr/bin/gitlab-ci-multi-runner register -r ${GITLAB_CI_TOKEN}
+</span><span class="sd">    sed -i &#39;s/^concurrent.*/concurrent = &#39;&#34;${RUNNER_REQUEST_CONCURRENCY}&#34;&#39;/&#39; /home/gitlab-runner/.gitlab-runner/config.toml
+</span><span class="sd">    echo &#34;Starting runner ${RUNNER_NAME} ...&#34;
+</span><span class="sd">    /usr/bin/gitlab-ci-multi-runner run -n ${RUNNER_NAME} &amp;
+</span><span class="sd">    wait</span><span class="w">    
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ConfigMap</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-runner</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-runner-scripts</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">kube-ops</span><span class="w">
+</span></code></pre></div><h4 id="runner-statefulsetyaml">runner-statefulset.yaml<a href="#runner-statefulsetyaml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">apps/v1beta1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">StatefulSet</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-runner</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">kube-ops</span><span class="w">
+</span><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-runner</span><span class="w">
+</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">updateStrategy</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">RollingUpdate</span><span class="w">
+</span><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span><span class="w">  </span><span class="nt">serviceName</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-runner</span><span class="w">
+</span><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-runner</span><span class="w">
+</span><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-runner-scripts</span><span class="w">
+</span><span class="w">        </span><span class="nt">projected</span><span class="p">:</span><span class="w">
+</span><span class="w">          </span><span class="nt">sources</span><span class="p">:</span><span class="w">
+</span><span class="w">          </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span><span class="w">              </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-runner-scripts</span><span class="w">
+</span><span class="w">              </span><span class="nt">items</span><span class="p">:</span><span class="w">
+</span><span class="w">              </span>- <span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">run.sh</span><span class="w">
+</span><span class="w">                </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">run.sh</span><span class="w">
+</span><span class="w">                </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="m">0755</span><span class="w">
+</span><span class="w">      </span><span class="nt">serviceAccountName</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci</span><span class="w">
+</span><span class="w">      </span><span class="nt">securityContext</span><span class="p">:</span><span class="w">
+</span><span class="w">        </span><span class="nt">runAsNonRoot</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="w">        </span><span class="nt">runAsUser</span><span class="p">:</span><span class="w"> </span><span class="m">999</span><span class="w">
+</span><span class="w">        </span><span class="nt">supplementalGroups</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="m">999</span><span class="p">]</span><span class="w">
+</span><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab/gitlab-runner:latest</span><span class="w">
+</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-runner</span><span class="w">
+</span><span class="w">        </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span><span class="w">          </span><span class="nt">requests</span><span class="p">:</span><span class="w">
+</span><span class="w">            </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;50m&#34;</span><span class="w">
+</span><span class="w">          </span><span class="nt">limits</span><span class="p">:</span><span class="w">
+</span><span class="w">            </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;800m&#34;</span><span class="w">
+</span><span class="w">        </span><span class="nt">command</span><span class="p">:</span><span class="w">
+</span><span class="w">        </span>- <span class="l">/scripts/run.sh</span><span class="w">
+</span><span class="w">        </span><span class="nt">envFrom</span><span class="p">:</span><span class="w">
+</span><span class="w">        </span>- <span class="nt">configMapRef</span><span class="p">:</span><span class="w">
+</span><span class="w">            </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-runner-cm</span><span class="w">
+</span><span class="w">        </span>- <span class="nt">secretRef</span><span class="p">:</span><span class="w">
+</span><span class="w">            </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-token</span><span class="w">
+</span><span class="w">        </span><span class="nt">env</span><span class="p">:</span><span class="w">
+</span><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">RUNNER_NAME</span><span class="w">
+</span><span class="w">          </span><span class="nt">valueFrom</span><span class="p">:</span><span class="w">
+</span><span class="w">            </span><span class="nt">fieldRef</span><span class="p">:</span><span class="w">
+</span><span class="w">              </span><span class="nt">fieldPath</span><span class="p">:</span><span class="w"> </span><span class="l">metadata.name</span><span class="w">
+</span><span class="w">        </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span><span class="w">        </span>- <span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">9100</span><span class="w">
+</span><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">http-metrics</span><span class="w">
+</span><span class="w">          </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l">TCP</span><span class="w">
+</span><span class="w">        </span><span class="nt">volumeMounts</span><span class="p">:</span><span class="w">
+</span><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab-ci-runner-scripts</span><span class="w">
+</span><span class="w">          </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;/scripts&#34;</span><span class="w">
+</span><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="w">      </span><span class="nt">restartPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">Always</span><span class="w">
+</span></code></pre></div><h4 id="部署和检查">部署和检查<a href="#部署和检查" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="l">kubectl apply -f ../</span><span class="w">
+</span><span class="w"></span><span class="l">kubectl get all -n kube-ops</span><span class="w">
+</span></code></pre></div><!-- raw HTML omitted -->
+<h3 id="helm216安装">helm2.16安装<a href="#helm216安装" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>wget https://get.helm.sh/helm-v2.16.2-linux-amd64.tar.gz
+tar -xvf helm-v2.16.2-linux-amd64.tar.gz
+mv linux-amd64/helm /usr/local/bin/helm
+
+kubectl create serviceaccount --namespace=kube-system tiller
+kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+
+helm init --upgrade -i registry.cn-hangzhou.aliyuncs.com/google_containers/tiller:v2.16.2 --stable-repo-url https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts --service-account tiller
+
+
+</code></pre><p><img src="//zhangzw001.github.io/images/45/02.png" alt=""></p>
+<!-- raw HTML omitted -->
+<h3 id="从官方拉取helm2-配置文件">从官方拉取helm2 配置文件<a href="#从官方拉取helm2-配置文件" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code># 添加源
+helm repo add gitlab https://charts.gitlab.io
+
+# 查看
+helm search runner
+gitlab/gitlab-runner 0.15.0        12.9.0      GitLab Runner
+
+# 下载charts压缩包gitlab-runner-0.15.0.tgz
+helm fetch gitlab/gitlab-runner
+
+# 创建gitlab-runner的rbac账号
+kubectl create serviceaccount  gitlab-cluster-admin
+kubectl create clusterrolebinding gitlab-cluster-admin --clusterrole=cluster-admin --group=system:serviceaccounts --namespace=default
+
+# 然后修改 values.yaml
+gitlabUrl: http://gitlab.zhangzw.com #gitlab服务器上管理页面上的URL
+runnerRegistrationToken: #gitlab服务器管理页面的token
+serviceAccountName: gitlab-cluster-admin
+
+# 修改 templates/configmap.yaml (如果后面配置dind采用tcp://0.0.0.0:2375的方式应该不用挂载sock文件)
+    #
+    if ! sh /scripts/register-the-runner; then
+      exit 1
+    fi
+
+    # add new config start
+    cat &gt;&gt;/home/gitlab-runner/.gitlab-runner/config.toml &lt;&lt;EOF
+      [[runners.kubernetes.volumes.host_path]]
+            name = &quot;docker&quot;
+            mount_path = &quot;/var/run/docker.sock&quot;
+            read_only = false
+            host_path = &quot;/var/run/docker.sock&quot;
+    EOF
+    # add new config end
+
+    # Start the runner
+    exec /entrypoint run --user=gitlab-runner \
+      --working-directory=/home/gitlab-runner
+
+
+# helm启动,更新,删除gitlab-runner
+helm install  --name gitlab-runner .
+helm upgrade gitlab-runner .
+helm delete --purge gitlab-runner
+</code></pre><h3 id="登录到gitlab-runner-镜像register注册">登录到gitlab-runner 镜像register注册<a href="#登录到gitlab-runner-镜像register注册" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>以下大部分都是回车, 只有token需要手动输入(输入values.yaml中的runnerRegistrationToken即可)</p>
+</blockquote>
+<pre><code>bash-5.0$ gitlab-runner register
+Runtime platform                                    arch=amd64 os=linux pid=4257 revision=4c96e5ad version=12.9.0
+WARNING: Running in user-mode.                     
+WARNING: The user-mode requires you to manually start builds processing:
+WARNING: $ gitlab-runner run                       
+WARNING: Use sudo for system-mode:                 
+WARNING: $ sudo gitlab-runner...                   
+
+Please enter the gitlab-ci coordinator URL (e.g. https://gitlab.zhangzw.com/):
+[http://gitlab.zhangzw.com]:
+Please enter the gitlab-ci token for this runner:
+djs47LiKFy-64FxAACp5
+Please enter the gitlab-ci description for this runner:
+[gitlab-runner-gitlab-runner-6cf8c6bff4-rhhs5]:
+Please enter the gitlab-ci tags for this runner (comma separated):
+
+Registering runner... succeeded                     runner=djs47LiK
+Please enter the executor: docker+machine, docker-ssh+machine, kubernetes, docker, docker-ssh, shell, ssh, virtualbox, custom, parallels:
+[kubernetes]:
+Runner registered successfully. Feel free to start it, but if its running already the config should be automatically reloaded!
+bash-5.0$
+</code></pre><!-- raw HTML omitted -->
+<h3 id="在项目的页面点击-add-kubernetes-cluster---add-existing-cluster">在项目的页面点击 Add Kubernetes Cluster -&gt; Add existing cluster<a href="#在项目的页面点击-add-kubernetes-cluster---add-existing-cluster" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>
+<ol>
+<li>API URL 是你的集群的apiserver的地址， 一般可以通过输入kubectl cluster-info获取</li>
+</ol>
+</li>
+</ul>
+<pre><code>kubectl cluster-info
+
+Kubernetes master is running at https://master.k8s.io:16443
+KubeDNS is running at https://master.k8s.io:16443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+Metrics-server is running at https://master.k8s.io:16443/api/v1/namespaces/kube-system/services/https:metrics-server:/proxy
+</code></pre><ul>
+<li>
+<ol start="2">
+<li>CA证书</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<p>由于我们在部署阶段需要去创建、删除一些资源对象，所以我们也需要对象的 RBAC 权限，这里为了简单，我们直接新建一个 ServiceAccount，绑定上一个cluster-admin的权限(gitlab-serviceAccount.yaml)</p>
+</blockquote>
+<pre><code>---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gitlab
+  namespace: gitlab
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: gitlab
+  namespace: gitlab
+subjects:
+  - kind: ServiceAccount
+    name: gitlab
+    namespace: gitlab
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+</code></pre><pre><code>#可以通过上面创建的 ServiceAccount 获取 CA 证书和 Token：
+kubectl get serviceaccount gitlab -n gitlab -o json | jq -r '.secrets[0].name'
+gitlab-token-9jlpr
+
+# 然后根据上面的Secret找到CA证书
+kubectl get secret gitlab-token-9jlpr -n gitlab -o json | jq -r '.data[&quot;ca.crt&quot;]' | base64 -d
+xxxxxCA证书内容xxxxx
+
+# 当然要找到对应的 Token 也很简单
+kubectl get secret gitlab-token-9jlpr  -n gitlab -o json | jq -r '.data.token' | base64 -d
+xxxxxxtoken值xxxx
+</code></pre><blockquote>
+<p>然后复制对应的值贴到项目的k8s配置中即可</p>
+</blockquote>
+<!-- raw HTML omitted -->
+<h3 id="简单测试">简单测试<a href="#简单测试" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>#.gitlab-ci.yml
+image: busybox
+stages:
+  - build
+  - deploy
+Job1:
+  stage: build
+  script:
+    - echo &quot;go go go !!!~&quot;
+  only:
+    - master
+
+deploy:
+  stage: deploy
+  script:
+    - echo &quot;部署开始&quot;
+  only:
+    - master
+
+</code></pre><p><img src="//zhangzw001.github.io/images/45/03.png" alt=""></p>
+<!-- raw HTML omitted -->
+<h3 id="gitlab-ciyaml配置">.gitlab-ci.yaml配置<a href="#gitlab-ciyaml配置" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>以下一些配置写到gitlab项目页面-&gt; Settings -&gt; CI/CD -&gt; Variables
+其实也可以写到.gitlab-ca.yaml中, 我在deployment.yaml也无法用如下变量</p>
+</blockquote>
+<pre><code>CI_REGISTRY_USER: admin
+CI_REGISTRY_PASSWORD: xxxxx
+CI_REGISTRY: hub.xxx.com
+CI_REGISTRY_IMAGE: hub.xxx.com/public/nginx
+</code></pre><pre><code>variables:
+  GIT_CURL_VERBOSE: 1
+  GIT_TRACE: 1
+
+stages:
+  - release
+  - review
+  - deploy
+
+
+
+buildPushImage:
+  stage: release
+  image: docker:latest
+  services:
+    - name: docker:dind
+      command: [&quot;--insecure-registry=hub.zhangzw.com&quot;]
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://192.168.0.136:2375
+  script:
+    - docker login -u &quot;${CI_REGISTRY_USER}&quot; -p &quot;${CI_REGISTRY_PASSWORD}&quot; &quot;${CI_REGISTRY}&quot;
+    - docker build -t &quot;${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}&quot; .
+    - docker push &quot;${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}&quot;
+
+deploy_review:
+  image: bitnami/kubectl:1.16.3
+  stage: review
+  only:
+    - branches
+  except:
+    - tags
+  environment:
+    name: dev
+    url: http://dev-gitlab-k8s-demo.zhangzw.com
+    on_stop: stop_review
+  script:
+    - kubectl version
+    - cd deploy/
+    - sed -i &quot;s/__CI_ENVIRONMENT_SLUG__/${CI_ENVIRONMENT_SLUG}/&quot; deployment.yaml ingress.yaml service.yaml
+    - sed -i &quot;s/__VERSION__/${CI_COMMIT_REF_NAME}/&quot; deployment.yaml ingress.yaml service.yaml
+    - |
+      if kubectl apply -f deployment.yaml | grep -q unchanged; then
+          echo &quot;=&gt; Patching deployment to force image update.&quot;
+          kubectl patch -f deployment.yaml -p &quot;{\&quot;spec\&quot;:{\&quot;template\&quot;:{\&quot;metadata\&quot;:{\&quot;annotations\&quot;:{\&quot;ci-last-updated\&quot;:\&quot;$(date +'%s')\&quot;}}}}}&quot;
+      else
+          echo &quot;=&gt; Deployment apply has changed the object, no need to force image update.&quot;
+      fi
+    - kubectl apply -f service.yaml || true
+    - kubectl apply -f ingress.yaml
+    - kubectl rollout status -f deployment.yaml
+    - kubectl get all,ing -l ref=${CI_ENVIRONMENT_SLUG}
+
+
+stop_review:
+  image: bitnami/kubectl:1.16.3
+  stage: review
+  variables:
+    GIT_STRATEGY: none
+  when: manual
+  only:
+    - branches
+  except:
+    - master
+    - tags
+  environment:
+    name: dev
+    action: stop
+  script:
+    - kubectl version
+    - kubectl delete ing -l ref=${CI_ENVIRONMENT_SLUG}
+    - kubectl delete all -l ref=${CI_ENVIRONMENT_SLUG}
+
+
+deploy_live:
+  image: bitnami/kubectl:1.16.3
+  stage: deploy
+  environment:
+    name: live
+    url: http://live-gitlab-k8s-demo.zhangzw.com
+  script:
+    - echo &quot;部署开始&quot;
+    - cd deploy
+    - sed -i &quot;s/__CI_ENVIRONMENT_SLUG__/${CI_ENVIRONMENT_SLUG}/&quot; deployment.yaml ingress.yaml service.yaml
+    - sed -i &quot;s/__VERSION__/${CI_COMMIT_REF_NAME}/&quot; deployment.yaml ingress.yaml service.yaml
+    - kubectl apply -f deployment.yaml
+    - kubectl apply -f service.yaml
+    - kubectl apply -f ingress.yaml
+    - kubectl rollout status -f deployment.yaml
+    - kubectl get all,ing -l ref=${CI_ENVIRONMENT_SLUG}
+  only:
+    - tags
+  when: manual
+
+</code></pre><h3 id="deploydeploymentyaml">deploy/deployment.yaml<a href="#deploydeploymentyaml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab-k8s-demo-__CI_ENVIRONMENT_SLUG__
+  labels:
+    app: gitlab-k8s-demo
+    ref: __CI_ENVIRONMENT_SLUG__
+    track: stable
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gitlab-k8s-demo
+      ref: __CI_ENVIRONMENT_SLUG__
+  template:
+    metadata:
+      labels:
+        app: gitlab-k8s-demo
+        ref: __CI_ENVIRONMENT_SLUG__
+        track: stable
+    spec:
+      imagePullSecrets:
+        - name: myregistry
+      containers:
+      - name: app
+        image: hub.zhangzw.com/bq/nginx:__VERSION__
+        imagePullPolicy: Always
+        ports:
+        - name: http-metrics
+          protocol: TCP
+          containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3
+          timeoutSeconds: 2
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3
+          timeoutSeconds: 2
+</code></pre><h3 id="如果我们harbor中设置的是私有镜像-则需要设置imagepullsecret-才能拉取镜像">如果我们harbor中设置的是私有镜像, 则需要设置imagePullSecret 才能拉取镜像<a href="#如果我们harbor中设置的是私有镜像-则需要设置imagepullsecret-才能拉取镜像" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>kubectl create secret docker-registry gitlab-hub-secret --docker-server=hub.zhangzw.com --docker-username=xxx --docker-password=xxx --docker-email=zhangzw@zhangzw.com
+</code></pre><h3 id="deployserviceyaml">deploy/service.yaml<a href="#deployserviceyaml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitlab-k8s-demo-__CI_ENVIRONMENT_SLUG__
+  labels:
+    app: gitlab-k8s-demo
+    ref: __CI_ENVIRONMENT_SLUG__
+  annotations:
+    prometheus.io/scrape: &quot;true&quot;
+    prometheus.io/port: &quot;80&quot;
+    prometheus.io/scheme: &quot;http&quot;
+    prometheus.io/path: &quot;/&quot;
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-metrics
+      port: 80
+      protocol: TCP
+  selector:
+    app: gitlab-k8s-demo
+    ref: __CI_ENVIRONMENT_SLUG__
+</code></pre><h3 id="deployingressyaml">deploy/ingress.yaml<a href="#deployingressyaml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gitlab-k8s-demo-__CI_ENVIRONMENT_SLUG__
+  labels:
+    app: gitlab-k8s-demo
+    ref: __CI_ENVIRONMENT_SLUG__
+  annotations:
+    kubernetes.io/ingress.class: &quot;traefik&quot;
+spec:
+  rules:
+  - host: __CI_ENVIRONMENT_SLUG__-gitlab-k8s-demo.zhangzw.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: gitlab-k8s-demo-__CI_ENVIRONMENT_SLUG__
+          servicePort: 80
+</code></pre><!-- raw HTML omitted -->
+<h3 id="遇到的问题">遇到的问题<a href="#遇到的问题" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="err1--流水线打包的时候提示没有权限">err1.  流水线打包的时候提示没有权限<a href="#err1--流水线打包的时候提示没有权限" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>ERROR: Job failed (system failure): pods is forbidden: User &quot;system:serviceaccount:default:default&quot; cannot create resource &quot;pods&quot; in API group &quot;&quot; in the namespace &quot;default&quot;
+
+
+kubectl create serviceaccount  gitlab-cluster-admin
+kubectl create clusterrolebinding gitlab-cluster-admin --clusterrole=cluster-admin --group=system:serviceaccounts --namespace=default
+</code></pre><h4 id="err2-流水线打包提示无法拉取项目">err2. 流水线打包提示无法拉取项目<a href="#err2-流水线打包提示无法拉取项目" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>fatal: unable to access 'http://gitlab.zhangzw.com/k8s/rancher-dev-php.git/': Failed to connect to gitlab.zhangzw.com port 80: Connection refused
+Uploading artifacts for failed job
+ERROR: Job failed: command terminated with exit code 1
+</code></pre><blockquote>
+<p>难道是因为我们的项目是私有项目?</p>
+</blockquote>
+<p>显然我们在官网 <a href="https://docs.gitlab.zhangzw.com/runner/configuration/advanced-configuration.html">https://docs.gitlab.zhangzw.com/runner/configuration/advanced-configuration.html</a> 这里看到下面一句话</p>
+<pre><code>Only if the clone_url is set, the runner will construct a clone URL in the form of http://gitlab-ci-token:s3cr3tt0k3n@192.168.1.23/namespace/project.git.
+
+# 尝试修改 values.yaml
+cloneUrl: http://gitlab.zhangzw.com
+</code></pre><blockquote>
+<p>之后还是出现了该问题</p>
+</blockquote>
+<blockquote>
+<p>所以这应该是gitlab-runner register的问题</p>
+</blockquote>
+<blockquote>
+<p>但是这里诡异的是, 我三个步骤,前两个都是正常, 第三个一直是报错connection refused, 但是我重试了三遍又正常了, 这么不稳定的吗?</p>
+</blockquote>
+<p><img src="//zhangzw001.github.io/images/45/01.png" alt=""></p>
+<blockquote>
+<p>看日志错误有点像是这么回事, 我的nginx反向代理了gitlab.zhangzw.com proxy_pass的是ip:10080, 而日志中看起来报错提示是链接到ip:80</p>
+</blockquote>
+<p>我这里试着将helm安装gitlab-runner的配置文件values.yaml修改如下:</p>
+<pre><code>gitlabUrl: http://192.168.0.65:10080
+  cloneUrl: http://192.168.0.65:10080
+</code></pre><blockquote>
+<p>测试之后还是会出现无法连接, 所以也不是这个问题, 这里git clone http 方式经过nginx代理是没问题的</p>
+</blockquote>
+<p>如果是项目权限问题, 那我新建一个public项目应该不会报错</p>
+<blockquote>
+<p>测试之后还是会出现无法连接, 看起问题还是网络方面问题, 为什么会网络无法连接呢?</p>
+</blockquote>
+<p>嗯??? 我查看了下 gitlab admin -&gt; runners -&gt; 点击Runner token 进入 -&gt; Assigned projects  这里我之前是加过的, 但是helm 安装的gitlab-runner upgrade之后就好像丢失了, 可能是我这边没有mount数据存储到nfs, 不过这里可以不用按照分配的方式, 就设置为share即可,如果有多个runner,需要更细致的权限部署划分,可以设置</p>
+<p>所以现在这个问题就变成, 有可能第一次会成功, 有可能会失败, 有可能第二个步骤失败 , 然后retry 2次?3次或6次又成功了, 蛋疼中&hellip;</p>
+<p><code>2020-04-24 15:58:40 补:  我这边测试的gitlab-runner安装的网段和gitlab的网段之间网络问题,  现在新搭建的gitlab-runner和gitlab在同一网段就不在报错了...</code></p>
+<h4 id="err3-k8s116安装helm214的有报错-error-error-installing-the-server-could-not-find-the-requested-resource-这是由于-extensionsv1beta1-已经被-appsv1-替代相信在215-或者-3-版本发布之后-应该就不会遇到这个问题了还是生态比较慢的原因">err3. k8s1.16安装helm2.14的有报错: Error: error installing: the server could not find the requested resource, 这是由于 extensions/v1beta1 已经被 apps/v1 替代。相信在2.15 或者 3 版本发布之后, 应该就不会遇到这个问题了。还是生态比较慢的原因。<a href="#err3-k8s116安装helm214的有报错-error-error-installing-the-server-could-not-find-the-requested-resource-这是由于-extensionsv1beta1-已经被-appsv1-替代相信在215-或者-3-版本发布之后-应该就不会遇到这个问题了还是生态比较慢的原因" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>helm init -i registry.cn-hangzhou.aliyuncs.com/google_containers/tiller:v2.14.3 --stable-repo-url http://mirror.azure.cn/kubernetes/charts/ --service-account tiller --override spec.selector.matchLabels.'name'='tiller',spec.selector.matchLabels.'app'='helm' --output yaml | sed 's@apiVersion: extensions/v1beta1@apiVersion: apps/v1@' | kubectl apply -f -
+</code></pre><h4 id="err4-cannot-connect-to-the-docker-daemon-at-unixvarrundockersock-is-the-docker-daemon-running">err4. Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?<a href="#err4-cannot-connect-to-the-docker-daemon-at-unixvarrundockersock-is-the-docker-daemon-running" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>不确定为什么会报这个错误, 第二次启动又没问题了
+</code></pre><h4 id="err5-time2020-04-22t023912z-levelerror-msgfailed-to-dial-grpc-cannot-connect-to-the-docker-daemon-is-docker-daemon-running-on-this-host-dial-tcp-1270012375-connect-connection-refused">err5. time=&ldquo;2020-04-22T02:39:12Z&rdquo; level=error msg=&ldquo;failed to dial gRPC: cannot connect to the Docker daemon. Is &lsquo;docker daemon&rsquo; running on this host?: dial tcp 127.0.0.1:2375: connect: connection refused&rdquo;<a href="#err5-time2020-04-22t023912z-levelerror-msgfailed-to-dial-grpc-cannot-connect-to-the-docker-daemon-is-docker-daemon-running-on-this-host-dial-tcp-1270012375-connect-connection-refused" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>这种情况需要docker或者k8s的docker启动方式添加tcp方式
+vim /usr/lib/systemd/system/docker.service
+ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock -H fd:// --containerd=/run/containerd/containerd.sock
+</code></pre>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/gitlab-runner">gitlab-runner</a></span><span class="tag"><a href="https://blog.k1s.club/tags/k8s">k8s</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1254 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-04-24 00:20 &#43;0800</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/46-docker%E5%AE%89%E8%A3%85nginx%E7%AC%AC%E4%B8%89%E6%96%B9%E6%A8%A1%E5%9D%97/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>docker安装nginx第三方模块</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/44-k8s%E9%83%A8%E7%BD%B2fluentd-kafka-logstash-es/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>k8s部署fluentd&#43;kafka&#43;logstash&#43;es</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-166045776-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

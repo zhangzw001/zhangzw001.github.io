@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>elasticsearch7 on zhangzw</title>
+    <link>https://blog.k1s.club/tags/elasticsearch7/</link>
+    <description>Recent content in elasticsearch7 on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Thu, 19 Sep 2019 17:59:53 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/elasticsearch7/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>部署elk7.2.0</title>
+      <link>https://blog.k1s.club/posts/2-%E9%83%A8%E7%BD%B2elk7-2-0/</link>
+      <pubDate>Thu, 19 Sep 2019 17:59:53 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/2-%E9%83%A8%E7%BD%B2elk7-2-0/</guid>
+      <description>说明:
+ 1 单台k8s,本机目录挂载(未配置cephfs) 2 如果replicas大于1, 就会出现多个es挂载同一个目录,会出现报错(uuid block) 1. es配置本地挂载 k8s-es-7.2.0.yml --- apiVersion: v1 kind: ServiceAccount metadata: labels: app: elasticsearch name: elasticsearch7-admin namespace: ns-elastic7 --- apiVersion: rbac.authorization.k8s.io/v1 kind: ClusterRoleBinding metadata: name: elasticsearch7-admin labels: app: elasticsearch roleRef: apiGroup: rbac.authorization.k8s.io kind: ClusterRole name: cluster-admin subjects: - kind: ServiceAccount name: elasticsearch7-admin namespace: ns-elastic7 --- apiVersion: apps/v1 kind: StatefulSet metadata: labels: app: elasticsearch role: master name: elasticsearch-master namespace: ns-elastic7 spec: replicas: 1 serviceName: elasticsearch-master selector: matchLabels: app: elasticsearch role: master template: metadata: labels: app: elasticsearch role: master spec: serviceAccountName: elasticsearch7-admin restartPolicy: Always securityContext: fsGroup: 1000 containers: - name: elasticsearch-master image: hub.</description>
+    </item>
+    
+  </channel>
+</rss>

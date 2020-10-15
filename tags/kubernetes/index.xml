@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>kubernetes on zhangzw</title>
+    <link>https://blog.k1s.club/tags/kubernetes/</link>
+    <description>Recent content in kubernetes on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Sun, 10 May 2020 21:20:26 +0800</lastBuildDate><atom:link href="https://blog.k1s.club/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>使用 Go 程序调用 Kubernetes API</title>
+      <link>https://blog.k1s.club/posts.bak/kubernetes/2020-05-10-api/</link>
+      <pubDate>Sun, 10 May 2020 21:20:26 +0800</pubDate>
+      
+      <guid>https://blog.k1s.club/posts.bak/kubernetes/2020-05-10-api/</guid>
+      <description>在前面的章节中，我们介绍了快速部署 Kubernetes 和应用程序的方法，接下来在本章节中我们将对 Kubernetes 的 API 进行了解，并且进行调用，这是开发人员最关注的一环之一。
+因为不论是 DevOps、基础架构，又或是自愈，都需要与 Kubernetes API 直接/间接接触，因此即使在你不懂 Kubernetes 的情况下，Kubernetes API 的知识点仍然属于必知必会，API 总得会调。
+查看 Kubernetes API kube-apiserver 架构图 （图来自 kubernetes.io）
+在 Kubernetes 的架构中，由 kube-apiserver 组件在主节点上提供 Kubernetes API 服务，kube-apiserver 是 Kubernetes 所有控制的前端，对外提供大量的 RESTful API。
+最常见的就是 kubelet 命令，实际上也是在调用 kube-apiserver 所提供的的 API。
+访问 API 和查看列表 在了解 Kubernetes 的基本架构和提供 API 的方式后，接下来我们需要知道 Kubernetes 到底提供了哪些 API。为了方便调试，首先我们需要在本地运行 kubectl proxy 命令，kube-apiserver 就会在本地的 8001 端口上进行监听，也就是提供了一个 Kubernetes API 服务的 HTTP 代理。
+这个时候我们可以访问：
+$ curl http://localhost:8001/api/v1/ 查看所提供的对应 API‘s：</description>
+    </item>
+    
+    <item>
+      <title>在 Kubernetes 中部署应用程序</title>
+      <link>https://blog.k1s.club/posts.bak/kubernetes/2020-05-03-deployment/</link>
+      <pubDate>Sun, 03 May 2020 11:05:00 +0800</pubDate>
+      
+      <guid>https://blog.k1s.club/posts.bak/kubernetes/2020-05-03-deployment/</guid>
+      <description>在完成了本地 Kubernetes 的快速搭建（基于 Docker）后，我们已经可以正式的使用它了。对于我们平时最常见的需求，那就是往 Kubernetes 里部署应用程序，如果你没有看过 Kubernetes 相关的知识，这时候你可能会六神无主，但问题不大，我们就可以使用最经典的 Nginx 来小试身手。
+创建 Deployment 创建 nginx-deployment.yaml 文件：
+apiVersion:apps/v1kind:Deploymentmetadata:name:nginx-deploymentlabels:app:nginxspec:replicas:2selector:matchLabels:app:nginxtemplate:metadata:labels:app:nginxspec:containers:- name:nginximage:nginx:1.18.0应用 nginx-deployment.yaml 文件：
+$ kubectl apply -f nginx-deployment.yaml deployment.apps/nginx-deployment created 查看运行状态 查看 Pod 运行情况：
+$ kubectl get pods NAME READY STATUS RESTARTS AGE nginx-deployment-9fbc65d67-9j68x 1/1 Running 0 1m nginx-deployment-9fbc65d67-nwbhj 1/1 Running 0 1m 查看 Deployment 部署情况：
+$ kubectl get deployment NAME READY UP-TO-DATE AVAILABLE AGE nginx-deployment 2/2 2 2 29m 我们也可以通过 describe 命令进行查看
+$ kubectl describe pod nginx-deployment-9fbc65d67-9j68x Name: nginx-deployment-9fbc65d67-9j68x Namespace: default Priority: 0 Node: docker-desktop/192.</description>
+    </item>
+    
+    <item>
+      <title>Kubernetes 本地快速启动（基于 Docker）</title>
+      <link>https://blog.k1s.club/posts.bak/kubernetes/2020-05-01-install/</link>
+      <pubDate>Fri, 01 May 2020 11:25:52 +0800</pubDate>
+      
+      <guid>https://blog.k1s.club/posts.bak/kubernetes/2020-05-01-install/</guid>
+      <description>Kubernetes 在容器编排大战结束后已经在云原生中占据了明确的一席，最近几年越来越火热，目前搜索趋势：
+Kubernetes 的热度很明显是不断地在上涨，因此学习和使用 Kubernetes 是一件相对正确的事，同时公司大多都在往容器化上接近，在拥抱 Kubernetes，所以我们所开发的应用也总是跑在容器环境中。更甚的是，需要对接 Kubernetes API 来做一些功能的开发。
+这个时候，我们就需要一个 Kubernetes 环境来进行开发和调试，但你准备开始时，又遇到了一个问题，虽然在 2020 年的现在，Kubernetes 的安装已经有了极大的简化，教程也满地跑，但 Kubernetes 的安装和运行依然有一定的要求，像我，就遇到了如下问题：
+显然，我的小水管 Mac 承受不起，但是又需要对 Kubernetes 进行学习和使用，除了买云服务器，又或是再在台式机上搭虚拟机，还有没有什么办法呢。
+非运维开发的情况下，入门级中最简单的方式就是采用 Docker 所提供的 Kubernetes 支持。
+Docker for Mac/Windows with Kubernetes Docker 在 17.12.ce 起就提供了 Mac 版本的 Kubernetes Beta 支持，在初始使用上来说非常的方便。首先我们检查 Docker 的版本，点击 Docker -&amp;gt; Check for Updates 确保你的 Docker 在最新版本。
+快速安装 Kubernetes 在升级完成后，我们可以点击 Docker -&amp;gt; Preferences -&amp;gt; Kubernetes，如下图：
+你会发现存在三个选项，分别是：Enable Kubernete、Deploy Docker Stacks to Kubernetes by default、Show system containers (advanced)。</description>
+    </item>
+    
+  </channel>
+</rss>

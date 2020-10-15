@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="k8s的yaml配置名词解释(模板)">
+<meta itemprop="description" content="针对Deployment的yaml配置解释说明
+ 原文: K8s Deployment YAML 名词解释
+ Deployment API 版本对照表 Kubernetes 版本 Deployment 版本 v1.5-v1.15 extensions/v1beta1 v1.7-v1.15 apps/v1beta1 v1.8-v1.15 apps/v1beta2 v1.9&#43; apps/v1 Deployment yaml 名词解释： apiVersion:apps/v1 # 指定api版本，此值必须在kubectl api-versions中 kind:Deployment # 指定创建资源的角色/类型 metadata:# 资源的元数据/属性name:demo # 资源的名字，在同一个namespace中必须唯一namespace:default# 部署在哪个namespace中labels:# 设定资源的标签app:demoversion:stablespec:# 资源规范字段replicas:1# 声明副本数目revisionHistoryLimit:3# 保留历史版本selector:# 选择器matchLabels:# 匹配标签app:demoversion:stablestrategy:# 策略rollingUpdate:# 滚动更新maxSurge:30%# 最大额外可以存在的副本数，可以为百分比，也可以为整数maxUnavailable:30%# 示在更新过程中能够进入不可用状态的 Pod 的最大值，可以为百分比，也可以为整数type:RollingUpdate# 滚动更新策略template:# 模版metadata:# 资源的元数据/属性annotations:# 自定义注解列表sidecar.istio.io/inject:&#34;false&#34;# 自定义注解名字labels:# 设定资源的标签app:demoversion:stablespec:# 资源规范字段containers:- name:demo# 容器的名字 image:demo:v1# 容器使用的镜像地址 imagePullPolicy:IfNotPresent# 每次Pod启动拉取镜像策略，三个选择 Always、Never、IfNotPresent# Always，每次都检查；Never，每次都不检查（不管本地是否有）；IfNotPresent，如果本地有就不检查，如果没有就拉取resources:# 资源管理limits:# 最大使用cpu:300m# CPU，1核心 = 1000mmemory:500Mi# 内存，1G = 1000Mirequests:# 容器运行时，最低资源需求，也就是说最少需要多少资源容器才能正常运行cpu:100mmemory:100MilivenessProbe:# pod 内部健康检查的设置httpGet:# 通过httpget检查健康，返回200-399之间，则认为容器正常path:/healthCheck# URI地址port:8080# 端口scheme:HTTP# 协议# host: 127.">
+<meta itemprop="datePublished" content="2020-03-31T17:21:23+00:00" />
+<meta itemprop="dateModified" content="2020-03-31T17:21:23+00:00" />
+<meta itemprop="wordCount" content="144">
+
+
+
+<meta itemprop="keywords" content="k8s," />
+<meta property="og:title" content="k8s的yaml配置名词解释(模板)" />
+<meta property="og:description" content="针对Deployment的yaml配置解释说明
+ 原文: K8s Deployment YAML 名词解释
+ Deployment API 版本对照表 Kubernetes 版本 Deployment 版本 v1.5-v1.15 extensions/v1beta1 v1.7-v1.15 apps/v1beta1 v1.8-v1.15 apps/v1beta2 v1.9&#43; apps/v1 Deployment yaml 名词解释： apiVersion:apps/v1 # 指定api版本，此值必须在kubectl api-versions中 kind:Deployment # 指定创建资源的角色/类型 metadata:# 资源的元数据/属性name:demo # 资源的名字，在同一个namespace中必须唯一namespace:default# 部署在哪个namespace中labels:# 设定资源的标签app:demoversion:stablespec:# 资源规范字段replicas:1# 声明副本数目revisionHistoryLimit:3# 保留历史版本selector:# 选择器matchLabels:# 匹配标签app:demoversion:stablestrategy:# 策略rollingUpdate:# 滚动更新maxSurge:30%# 最大额外可以存在的副本数，可以为百分比，也可以为整数maxUnavailable:30%# 示在更新过程中能够进入不可用状态的 Pod 的最大值，可以为百分比，也可以为整数type:RollingUpdate# 滚动更新策略template:# 模版metadata:# 资源的元数据/属性annotations:# 自定义注解列表sidecar.istio.io/inject:&#34;false&#34;# 自定义注解名字labels:# 设定资源的标签app:demoversion:stablespec:# 资源规范字段containers:- name:demo# 容器的名字 image:demo:v1# 容器使用的镜像地址 imagePullPolicy:IfNotPresent# 每次Pod启动拉取镜像策略，三个选择 Always、Never、IfNotPresent# Always，每次都检查；Never，每次都不检查（不管本地是否有）；IfNotPresent，如果本地有就不检查，如果没有就拉取resources:# 资源管理limits:# 最大使用cpu:300m# CPU，1核心 = 1000mmemory:500Mi# 内存，1G = 1000Mirequests:# 容器运行时，最低资源需求，也就是说最少需要多少资源容器才能正常运行cpu:100mmemory:100MilivenessProbe:# pod 内部健康检查的设置httpGet:# 通过httpget检查健康，返回200-399之间，则认为容器正常path:/healthCheck# URI地址port:8080# 端口scheme:HTTP# 协议# host: 127." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/43-k8s%E7%9A%84yaml%E9%85%8D%E7%BD%AE%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A-%E6%A8%A1%E6%9D%BF/" />
+<meta property="article:published_time" content="2020-03-31T17:21:23+00:00" />
+<meta property="article:modified_time" content="2020-03-31T17:21:23+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="k8s的yaml配置名词解释(模板)"/>
+<meta name="twitter:description" content="针对Deployment的yaml配置解释说明
+ 原文: K8s Deployment YAML 名词解释
+ Deployment API 版本对照表 Kubernetes 版本 Deployment 版本 v1.5-v1.15 extensions/v1beta1 v1.7-v1.15 apps/v1beta1 v1.8-v1.15 apps/v1beta2 v1.9&#43; apps/v1 Deployment yaml 名词解释： apiVersion:apps/v1 # 指定api版本，此值必须在kubectl api-versions中 kind:Deployment # 指定创建资源的角色/类型 metadata:# 资源的元数据/属性name:demo # 资源的名字，在同一个namespace中必须唯一namespace:default# 部署在哪个namespace中labels:# 设定资源的标签app:demoversion:stablespec:# 资源规范字段replicas:1# 声明副本数目revisionHistoryLimit:3# 保留历史版本selector:# 选择器matchLabels:# 匹配标签app:demoversion:stablestrategy:# 策略rollingUpdate:# 滚动更新maxSurge:30%# 最大额外可以存在的副本数，可以为百分比，也可以为整数maxUnavailable:30%# 示在更新过程中能够进入不可用状态的 Pod 的最大值，可以为百分比，也可以为整数type:RollingUpdate# 滚动更新策略template:# 模版metadata:# 资源的元数据/属性annotations:# 自定义注解列表sidecar.istio.io/inject:&#34;false&#34;# 自定义注解名字labels:# 设定资源的标签app:demoversion:stablespec:# 资源规范字段containers:- name:demo# 容器的名字 image:demo:v1# 容器使用的镜像地址 imagePullPolicy:IfNotPresent# 每次Pod启动拉取镜像策略，三个选择 Always、Never、IfNotPresent# Always，每次都检查；Never，每次都不检查（不管本地是否有）；IfNotPresent，如果本地有就不检查，如果没有就拉取resources:# 资源管理limits:# 最大使用cpu:300m# CPU，1核心 = 1000mmemory:500Mi# 内存，1G = 1000Mirequests:# 容器运行时，最低资源需求，也就是说最少需要多少资源容器才能正常运行cpu:100mmemory:100MilivenessProbe:# pod 内部健康检查的设置httpGet:# 通过httpget检查健康，返回200-399之间，则认为容器正常path:/healthCheck# URI地址port:8080# 端口scheme:HTTP# 协议# host: 127."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>k8s的yaml配置名词解释(模板)</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/posts/">文章</a>
+					<a href="https://blog.k1s.club/k8s-categories/">Kubernetes系列</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Mar 31, 2020</span></div>
+				<h1>k8s的yaml配置名词解释(模板)</h1>
+			</header>
+			<div class="content">
+				<p>针对Deployment的yaml配置解释说明</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<blockquote>
+<p>原文: <a href="https://zhuanlan.zhihu.com/p/100237194">K8s Deployment YAML 名词解释</a></p>
+</blockquote>
+<h3 id="deployment-api-版本对照表">Deployment API 版本对照表<a href="#deployment-api-版本对照表" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>Kubernetes 版本 Deployment 版本
+
+v1.5-v1.15 extensions/v1beta1
+v1.7-v1.15 apps/v1beta1
+v1.8-v1.15 apps/v1beta2
+v1.9+ apps/v1
+</code></pre><h3 id="deployment-yaml-名词解释">Deployment yaml 名词解释：<a href="#deployment-yaml-名词解释" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">apps/v1 </span><span class="w"> </span><span class="c"># 指定api版本，此值必须在kubectl api-versions中  </span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Deployment </span><span class="w"> </span><span class="c"># 指定创建资源的角色/类型   </span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">  </span><span class="c"># 资源的元数据/属性</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">demo </span><span class="w"> </span><span class="c"># 资源的名字，在同一个namespace中必须唯一</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">default</span><span class="w"> </span><span class="c"># 部署在哪个namespace中</span><span class="w">
+</span><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">  </span><span class="c"># 设定资源的标签</span><span class="w">
+</span><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">demo</span><span class="w">
+</span><span class="w">    </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l">stable</span><span class="w">
+</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w"> </span><span class="c"># 资源规范字段</span><span class="w">
+</span><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="c"># 声明副本数目</span><span class="w">
+</span><span class="w">  </span><span class="nt">revisionHistoryLimit</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="c"># 保留历史版本</span><span class="w">
+</span><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w"> </span><span class="c"># 选择器</span><span class="w">
+</span><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w"> </span><span class="c"># 匹配标签</span><span class="w">
+</span><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">demo</span><span class="w">
+</span><span class="w">      </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l">stable</span><span class="w">
+</span><span class="w">  </span><span class="nt">strategy</span><span class="p">:</span><span class="w"> </span><span class="c"># 策略</span><span class="w">
+</span><span class="w">    </span><span class="nt">rollingUpdate</span><span class="p">:</span><span class="w"> </span><span class="c"># 滚动更新</span><span class="w">
+</span><span class="w">      </span><span class="nt">maxSurge</span><span class="p">:</span><span class="w"> </span><span class="m">30</span><span class="l">%</span><span class="w"> </span><span class="c"># 最大额外可以存在的副本数，可以为百分比，也可以为整数</span><span class="w">
+</span><span class="w">      </span><span class="nt">maxUnavailable</span><span class="p">:</span><span class="w"> </span><span class="m">30</span><span class="l">%</span><span class="w"> </span><span class="c"># 示在更新过程中能够进入不可用状态的 Pod 的最大值，可以为百分比，也可以为整数</span><span class="w">
+</span><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">RollingUpdate</span><span class="w"> </span><span class="c"># 滚动更新策略</span><span class="w">
+</span><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="c"># 模版</span><span class="w">
+</span><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w"> </span><span class="c"># 资源的元数据/属性</span><span class="w">
+</span><span class="w">      </span><span class="nt">annotations</span><span class="p">:</span><span class="w"> </span><span class="c"># 自定义注解列表</span><span class="w">
+</span><span class="w">        </span><span class="nt">sidecar.istio.io/inject</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;false&#34;</span><span class="w"> </span><span class="c"># 自定义注解名字</span><span class="w">
+</span><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w"> </span><span class="c"># 设定资源的标签</span><span class="w">
+</span><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">demo</span><span class="w">
+</span><span class="w">        </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l">stable</span><span class="w">
+</span><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w"> </span><span class="c"># 资源规范字段</span><span class="w">
+</span><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">demo</span><span class="w"> </span><span class="c"># 容器的名字   </span><span class="w">
+</span><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">demo:v1</span><span class="w"> </span><span class="c"># 容器使用的镜像地址   </span><span class="w">
+</span><span class="w">        </span><span class="nt">imagePullPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">IfNotPresent</span><span class="w"> </span><span class="c"># 每次Pod启动拉取镜像策略，三个选择 Always、Never、IfNotPresent</span><span class="w">
+</span><span class="w">                                      </span><span class="c"># Always，每次都检查；Never，每次都不检查（不管本地是否有）；IfNotPresent，如果本地有就不检查，如果没有就拉取</span><span class="w">
+</span><span class="w">        </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span><span class="c"># 资源管理</span><span class="w">
+</span><span class="w">          </span><span class="nt">limits</span><span class="p">:</span><span class="w"> </span><span class="c"># 最大使用</span><span class="w">
+</span><span class="w">            </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l">300m</span><span class="w"> </span><span class="c"># CPU，1核心 = 1000m</span><span class="w">
+</span><span class="w">            </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l">500Mi</span><span class="w"> </span><span class="c"># 内存，1G = 1000Mi</span><span class="w">
+</span><span class="w">          </span><span class="nt">requests</span><span class="p">:</span><span class="w">  </span><span class="c"># 容器运行时，最低资源需求，也就是说最少需要多少资源容器才能正常运行</span><span class="w">
+</span><span class="w">            </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l">100m</span><span class="w">
+</span><span class="w">            </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l">100Mi</span><span class="w">
+</span><span class="w">        </span><span class="nt">livenessProbe</span><span class="p">:</span><span class="w"> </span><span class="c"># pod 内部健康检查的设置</span><span class="w">
+</span><span class="w">          </span><span class="nt">httpGet</span><span class="p">:</span><span class="w"> </span><span class="c"># 通过httpget检查健康，返回200-399之间，则认为容器正常</span><span class="w">
+</span><span class="w">            </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/healthCheck</span><span class="w"> </span><span class="c"># URI地址</span><span class="w">
+</span><span class="w">            </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">8080</span><span class="w"> </span><span class="c"># 端口</span><span class="w">
+</span><span class="w">            </span><span class="nt">scheme</span><span class="p">:</span><span class="w"> </span><span class="l">HTTP</span><span class="w"> </span><span class="c"># 协议</span><span class="w">
+</span><span class="w">            </span><span class="c"># host: 127.0.0.1 # 主机地址</span><span class="w">
+</span><span class="w">          </span><span class="nt">initialDelaySeconds</span><span class="p">:</span><span class="w"> </span><span class="m">30</span><span class="w"> </span><span class="c"># 表明第一次检测在容器启动后多长时间后开始</span><span class="w">
+</span><span class="w">          </span><span class="nt">timeoutSeconds</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="c"># 检测的超时时间</span><span class="w">
+</span><span class="w">          </span><span class="nt">periodSeconds</span><span class="p">:</span><span class="w"> </span><span class="m">30</span><span class="w"> </span><span class="c"># 检查间隔时间</span><span class="w">
+</span><span class="w">          </span><span class="nt">successThreshold</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="c"># 成功门槛</span><span class="w">
+</span><span class="w">          </span><span class="nt">failureThreshold</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="c"># 失败门槛，连接失败5次，pod杀掉，重启一个新的pod</span><span class="w">
+</span><span class="w">        </span><span class="nt">readinessProbe</span><span class="p">:</span><span class="w"> </span><span class="c"># Pod 准备服务健康检查设置</span><span class="w">
+</span><span class="w">          </span><span class="nt">httpGet</span><span class="p">:</span><span class="w">
+</span><span class="w">            </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/healthCheck</span><span class="w">
+</span><span class="w">            </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">8080</span><span class="w">
+</span><span class="w">            </span><span class="nt">scheme</span><span class="p">:</span><span class="w"> </span><span class="l">HTTP</span><span class="w">
+</span><span class="w">          </span><span class="nt">initialDelaySeconds</span><span class="p">:</span><span class="w"> </span><span class="m">30</span><span class="w">
+</span><span class="w">          </span><span class="nt">timeoutSeconds</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span><span class="w">          </span><span class="nt">periodSeconds</span><span class="p">:</span><span class="w"> </span><span class="m">10</span><span class="w">
+</span><span class="w">          </span><span class="nt">successThreshold</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span><span class="w">          </span><span class="nt">failureThreshold</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span><span class="w">       </span><span class="c">#也可以用这种方法   </span><span class="w">
+</span><span class="w">       </span><span class="c">#exec: 执行命令的方法进行监测，如果其退出码不为0，则认为容器正常   </span><span class="w">
+</span><span class="w">       </span><span class="c">#  command:   </span><span class="w">
+</span><span class="w">       </span><span class="c">#    - cat   </span><span class="w">
+</span><span class="w">       </span><span class="c">#    - /tmp/health   </span><span class="w">
+</span><span class="w">       </span><span class="c">#也可以用这种方法   </span><span class="w">
+</span><span class="w">       </span><span class="c">#tcpSocket: # 通过tcpSocket检查健康  </span><span class="w">
+</span><span class="w">       </span><span class="c">#  port: number</span><span class="w">
+</span><span class="w">        </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span><span class="w">          </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">http</span><span class="w"> </span><span class="c"># 名称</span><span class="w">
+</span><span class="w">            </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">8080</span><span class="w"> </span><span class="c"># 容器开发对外的端口</span><span class="w">
+</span><span class="w">            </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l">TCP</span><span class="w"> </span><span class="c"># 协议</span><span class="w">
+</span><span class="w">      </span><span class="nt">imagePullSecrets</span><span class="p">:</span><span class="w"> </span><span class="c"># 镜像仓库拉取密钥</span><span class="w">
+</span><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">harbor-certification</span><span class="w">
+</span><span class="w">      </span><span class="nt">affinity</span><span class="p">:</span><span class="w"> </span><span class="c"># 亲和性调试</span><span class="w">
+</span><span class="w">        </span><span class="nt">nodeAffinity</span><span class="p">:</span><span class="w"> </span><span class="c"># 节点亲和力</span><span class="w">
+</span><span class="w">          </span><span class="nt">requiredDuringSchedulingIgnoredDuringExecution</span><span class="p">:</span><span class="w"> </span><span class="c"># pod 必须部署到满足条件的节点上</span><span class="w">
+</span><span class="w">            </span><span class="nt">nodeSelectorTerms</span><span class="p">:</span><span class="w"> </span><span class="c"># 节点满足任何一个条件就可以</span><span class="w">
+</span><span class="w">            </span>- <span class="nt">matchExpressions</span><span class="p">:</span><span class="w"> </span><span class="c"># 有多个选项，则只有同时满足这些逻辑选项的节点才能运行 pod</span><span class="w">
+</span><span class="w">              </span>- <span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">beta.kubernetes.io/arch</span><span class="w">
+</span><span class="w">                </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l">In</span><span class="w">
+</span><span class="w">                </span><span class="nt">values</span><span class="p">:</span><span class="w">
+</span><span class="w">                </span>- <span class="l">amd64</span><span class="w">
+</span></code></pre></div><h3 id="service-yaml-名词解释">Service yaml 名词解释：<a href="#service-yaml-名词解释" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w"> </span><span class="c"># 指定api版本，此值必须在kubectl api-versions中 </span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Service</span><span class="w"> </span><span class="c"># 指定创建资源的角色/类型 </span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w"> </span><span class="c"># 资源的元数据/属性</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">demo</span><span class="w"> </span><span class="c"># 资源的名字，在同一个namespace中必须唯一</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">default</span><span class="w"> </span><span class="c"># 部署在哪个namespace中</span><span class="w">
+</span><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w"> </span><span class="c"># 设定资源的标签</span><span class="w">
+</span><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">demo</span><span class="w">
+</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w"> </span><span class="c"># 资源规范字段</span><span class="w">
+</span><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterIP</span><span class="w"> </span><span class="c"># ClusterIP 类型</span><span class="w">
+</span><span class="w">  </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">8080</span><span class="w"> </span><span class="c"># service 端口</span><span class="w">
+</span><span class="w">      </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="l">http</span><span class="w"> </span><span class="c"># 容器暴露的端口</span><span class="w">
+</span><span class="w">      </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l">TCP</span><span class="w"> </span><span class="c"># 协议</span><span class="w">
+</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">http</span><span class="w"> </span><span class="c"># 端口名称</span><span class="w">
+</span><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w"> </span><span class="c"># 选择器</span><span class="w">
+</span><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">demo</span><span class="w">
+</span></code></pre></div>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/k8s">k8s</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>144 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-04-01 01:21 &#43;0800</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/44-k8s%E9%83%A8%E7%BD%B2fluentd-kafka-logstash-es/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>k8s部署fluentd&#43;kafka&#43;logstash&#43;es</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/42-kubeadm%E5%AE%89%E8%A3%85%E9%AB%98%E5%8F%AF%E7%94%A8k8s%E9%9B%86%E7%BE%A4/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>kubeadm安装高可用k8s集群</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-166045776-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

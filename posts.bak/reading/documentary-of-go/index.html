@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="Go: A Documentary 发布！">
+<meta itemprop="description" content="以前经常有读者问我，哪儿可以找到 Go 语言的前世今生，这种时候我们往往会告诉他去看 issues 和 proposals。但资料有点分散，且没有索引体系。因此不少人新入门的读者读着读着就跑偏了，又或是在第一步找资料上就被拦住了。
+最近欧神（@changkun）低调的发布了 《Go: A Documentary》，这个文档收集了 Go 开发过程中许多有趣（公开可见的）的问题，讨论，提案，CL 和演讲，其目的是为 Go 历史提供全面的参考。
+个人认为这份资料非常的有价值，相当于欧神把资料索引整理好了，强烈推荐对 Go 语言感兴趣的读者进行阅读：
+内容索引主要分为：
+ Sources Committers  Core Authors Compiler/Runtime Team Library/Tools/Security/Community Group Interviews   Timeline Language Design  Misc Slice Package Management (1.4, 1.5, 1.7) Type alias (1.9) Defer (1.13) Error values (1.13) Channel/Select Generics   Compiler Toolchain  Compiler Linker Debugger Tracer Builder Modules gopls Testing   Runtime Core  Statistics Scheduler Execution Stack Memory Allocator Garbage Collector Memory model ABI   Standard Library  syscall io go/* sync Pool Mutex atomic time context encoding image, x/image misc   Unclassified But Relevant Links Fun Facts Acknowledgements  《Go: A Documentary》 的访问地址是 https://golang.">
+<meta itemprop="datePublished" content="2020-09-11T20:46:38+08:00" />
+<meta itemprop="dateModified" content="2020-09-11T20:46:38+08:00" />
+<meta itemprop="wordCount" content="101">
+
+
+
+<meta itemprop="keywords" content="untagged," />
+<meta property="og:title" content="Go: A Documentary 发布！" />
+<meta property="og:description" content="以前经常有读者问我，哪儿可以找到 Go 语言的前世今生，这种时候我们往往会告诉他去看 issues 和 proposals。但资料有点分散，且没有索引体系。因此不少人新入门的读者读着读着就跑偏了，又或是在第一步找资料上就被拦住了。
+最近欧神（@changkun）低调的发布了 《Go: A Documentary》，这个文档收集了 Go 开发过程中许多有趣（公开可见的）的问题，讨论，提案，CL 和演讲，其目的是为 Go 历史提供全面的参考。
+个人认为这份资料非常的有价值，相当于欧神把资料索引整理好了，强烈推荐对 Go 语言感兴趣的读者进行阅读：
+内容索引主要分为：
+ Sources Committers  Core Authors Compiler/Runtime Team Library/Tools/Security/Community Group Interviews   Timeline Language Design  Misc Slice Package Management (1.4, 1.5, 1.7) Type alias (1.9) Defer (1.13) Error values (1.13) Channel/Select Generics   Compiler Toolchain  Compiler Linker Debugger Tracer Builder Modules gopls Testing   Runtime Core  Statistics Scheduler Execution Stack Memory Allocator Garbage Collector Memory model ABI   Standard Library  syscall io go/* sync Pool Mutex atomic time context encoding image, x/image misc   Unclassified But Relevant Links Fun Facts Acknowledgements  《Go: A Documentary》 的访问地址是 https://golang." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts.bak/reading/documentary-of-go/" />
+<meta property="article:published_time" content="2020-09-11T20:46:38+08:00" />
+<meta property="article:modified_time" content="2020-09-11T20:46:38+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Go: A Documentary 发布！"/>
+<meta name="twitter:description" content="以前经常有读者问我，哪儿可以找到 Go 语言的前世今生，这种时候我们往往会告诉他去看 issues 和 proposals。但资料有点分散，且没有索引体系。因此不少人新入门的读者读着读着就跑偏了，又或是在第一步找资料上就被拦住了。
+最近欧神（@changkun）低调的发布了 《Go: A Documentary》，这个文档收集了 Go 开发过程中许多有趣（公开可见的）的问题，讨论，提案，CL 和演讲，其目的是为 Go 历史提供全面的参考。
+个人认为这份资料非常的有价值，相当于欧神把资料索引整理好了，强烈推荐对 Go 语言感兴趣的读者进行阅读：
+内容索引主要分为：
+ Sources Committers  Core Authors Compiler/Runtime Team Library/Tools/Security/Community Group Interviews   Timeline Language Design  Misc Slice Package Management (1.4, 1.5, 1.7) Type alias (1.9) Defer (1.13) Error values (1.13) Channel/Select Generics   Compiler Toolchain  Compiler Linker Debugger Tracer Builder Modules gopls Testing   Runtime Core  Statistics Scheduler Execution Stack Memory Allocator Garbage Collector Memory model ABI   Standard Library  syscall io go/* sync Pool Mutex atomic time context encoding image, x/image misc   Unclassified But Relevant Links Fun Facts Acknowledgements  《Go: A Documentary》 的访问地址是 https://golang."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>Go: A Documentary 发布！</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/posts/">文章</a>
+					<a href="https://blog.k1s.club/k8s-categories/">Kubernetes系列</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner thin animated fadeIn faster">
+		<h1>Go: A Documentary 发布！</h1>
+		<div class="content">
+			<p>以前经常有读者问我，哪儿可以找到 Go 语言的前世今生，这种时候我们往往会告诉他去看 issues 和 proposals。但资料有点分散，且没有索引体系。因此不少人新入门的读者读着读着就跑偏了，又或是在第一步找资料上就被拦住了。</p>
+<p>最近欧神（@changkun）低调的发布了 《Go: A Documentary》，这个文档收集了 Go 开发过程中许多有趣（公开可见的）的问题，讨论，提案，CL 和演讲，其目的是为 Go 历史提供全面的参考。</p>
+<p>个人认为这份资料非常的有价值，相当于欧神把资料索引整理好了，强烈推荐对 Go 语言感兴趣的读者进行阅读：</p>
+<p><img src="https://image.eddycjy.com/0643ae29cdb8fb99d5a83bf67b443a9a.jpg" alt="image"></p>
+<p>内容索引主要分为：</p>
+<ul>
+<li>Sources</li>
+<li>Committers
+<ul>
+<li>Core Authors</li>
+<li>Compiler/Runtime Team</li>
+<li>Library/Tools/Security/Community</li>
+<li>Group Interviews</li>
+</ul>
+</li>
+<li>Timeline</li>
+<li>Language Design
+<ul>
+<li>Misc</li>
+<li>Slice</li>
+<li>Package Management (1.4, 1.5, 1.7)</li>
+<li>Type alias (1.9)</li>
+<li>Defer (1.13)</li>
+<li>Error values (1.13)</li>
+<li>Channel/Select</li>
+<li>Generics</li>
+</ul>
+</li>
+<li>Compiler Toolchain
+<ul>
+<li>Compiler</li>
+<li>Linker</li>
+<li>Debugger</li>
+<li>Tracer</li>
+<li>Builder</li>
+<li>Modules</li>
+<li>gopls</li>
+<li>Testing</li>
+</ul>
+</li>
+<li>Runtime Core
+<ul>
+<li>Statistics</li>
+<li>Scheduler</li>
+<li>Execution Stack</li>
+<li>Memory Allocator</li>
+<li>Garbage Collector</li>
+<li>Memory model</li>
+<li>ABI</li>
+</ul>
+</li>
+<li>Standard Library
+<ul>
+<li>syscall</li>
+<li>io</li>
+<li>go/*</li>
+<li>sync</li>
+<li>Pool</li>
+<li>Mutex</li>
+<li>atomic</li>
+<li>time</li>
+<li>context</li>
+<li>encoding</li>
+<li>image, x/image</li>
+<li>misc</li>
+</ul>
+</li>
+<li>Unclassified But Relevant Links</li>
+<li>Fun Facts</li>
+<li>Acknowledgements</li>
+</ul>
+<p>《Go: A Documentary》 的访问地址是 <code>https://golang.design/history/</code>，GitHub 仓库地址：<code>https://github.com/golang-design/history</code>，大家也可以通过 “阅读原文” 进入。</p>
+
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-166045776-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

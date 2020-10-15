@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="k8s一条命令部署es5.2.0集群">
+<meta itemprop="description" content="由于老项目是基于es5.2.0, 所以准备在k8s基于nfs存储搭建一套,下面简单介绍">
+<meta itemprop="datePublished" content="2019-11-21T18:13:35+00:00" />
+<meta itemprop="dateModified" content="2019-11-21T18:13:35+00:00" />
+<meta itemprop="wordCount" content="284">
+
+
+
+<meta itemprop="keywords" content="k8s,elk,elk5,elasticsearch5," />
+<meta property="og:title" content="k8s一条命令部署es5.2.0集群" />
+<meta property="og:description" content="由于老项目是基于es5.2.0, 所以准备在k8s基于nfs存储搭建一套,下面简单介绍" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/27-k8s%E4%B8%80%E6%9D%A1%E5%91%BD%E4%BB%A4%E9%83%A8%E7%BD%B2es5-2-0%E9%9B%86%E7%BE%A4/" />
+<meta property="article:published_time" content="2019-11-21T18:13:35+00:00" />
+<meta property="article:modified_time" content="2019-11-21T18:13:35+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="k8s一条命令部署es5.2.0集群"/>
+<meta name="twitter:description" content="由于老项目是基于es5.2.0, 所以准备在k8s基于nfs存储搭建一套,下面简单介绍"/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>k8s一条命令部署es5.2.0集群</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/posts/">文章</a>
+					<a href="https://blog.k1s.club/k8s-categories/">Kubernetes系列</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Nov 21, 2019</span></div>
+				<h1>k8s一条命令部署es5.2.0集群</h1>
+			</header>
+			<div class="content">
+				<p>由于老项目是基于es5.2.0, 所以准备在k8s基于nfs存储搭建一套,下面简单介绍</p>
+<h3 id="准备好环境和官方镜像">准备好环境和官方镜像<a href="#准备好环境和官方镜像" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>1 镜像: elasticsearch:5.2.0
+2 k8s环境: k8s.1.10
+3 存储: nfs storageclass 存储
+4 插件: ik分词压缩包(这里ik分词直接使用旧的es配置, 也可以自行下)
+</code></pre><!-- raw HTML omitted -->
+<h3 id="部署命令">部署命令<a href="#部署命令" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>kubectl apply -f k8s-StatefulSet-es520-nfs.yml
+</code></pre><h3 id="配置文件-k8s-statefulset-es520-nfsyml">配置文件 k8s-StatefulSet-es520-nfs.yml<a href="#配置文件-k8s-statefulset-es520-nfsyml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: es520-2-dev
+  namespace: ns-elastic5
+spec:
+  serviceName: &quot;es520-2-dev&quot;
+  replicas: 2
+  volumeClaimTemplates:
+  - metadata:
+      name: es520-2-dev-nfs
+      annotations:
+        volume.beta.kubernetes.io/storage-class: &quot;nfs-retain&quot; # 这里配置 上面创建的 storageclass 的名称
+    spec:
+      accessModes: [ &quot;ReadWriteOnce&quot; ]
+      resources:
+        requests:
+          storage: 2Gi
+  template:
+    metadata:
+      labels:
+        app: es520-2-dev
+    spec:
+      containers:
+      - name: es520-2-dev
+        image: elasticsearch:5.2.0
+        ports:
+        - containerPort: 9200
+          name: es520-2-9200
+          protocol: TCP
+        - containerPort: 9300
+          name: es520-2-9300
+          protocol: TCP
+        resources:
+          requests:
+            cpu: &quot;50m&quot;
+          limits:
+            cpu: &quot;500m&quot;
+        volumeMounts:
+        - name: es520-2-dev-nfs
+          mountPath: /usr/share/elasticsearch/data/
+        - name: es520-2-dev-cfg
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          subPath: elasticsearch.yml
+        - name: es520-2-dev-jvm
+          mountPath: /usr/share/elasticsearch/config/jvm.options
+          subPath: jvm.options
+        - name: es520-2-dev-plu
+          mountPath: /usr/share/elasticsearch/plugins
+      volumes:
+      - name: es520-2-dev-cfg
+        configMap:
+          name: es520-2-dev-cfg
+          items:
+          - key: elasticsearch.yml
+            path: elasticsearch.yml
+      - name: es520-2-dev-jvm
+        configMap:
+          name: es520-2-dev-jvm
+          items:
+          - key: jvm.options
+            path: jvm.options
+      - name: es520-2-dev-plu
+        nfs:
+            server: 192.168.53.106
+            path: /data/nfs/k3s/ns-elastic5-es520-2-dev-nfs-plugins
+---
+kind: Service
+apiVersion: v1
+metadata:
+ labels:
+   app: es520-2-dev
+ name: es520-2-dev
+ namespace: ns-elastic5
+spec:
+ type: NodePort
+ ports:
+   - name: es520-2-9200
+     port: 9200
+     targetPort: 9200
+     nodePort: 31201
+     protocol: TCP
+   - name: es520-2-9300
+     port: 9300
+     targetPort: 9300
+     nodePort: 31301
+     protocol: TCP
+ selector:
+   app: es520-2-dev
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: es520-2-dev-hl
+spec:
+  clusterIP: None
+  selector:
+    app: es520-2-dev
+  ports:
+   - name: es520-2-9200
+     port: 9200
+   - name: es520-2-9300
+     port: 9300
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: es520-2-dev-cfg
+  namespace: ns-elastic5
+data:
+  elasticsearch.yml: |
+
+   cluster.name: k8s-test-nfs
+   network.host: 0.0.0.0
+   bootstrap.system_call_filter: false
+   discovery.zen.ping.unicast.hosts: [&quot;es520-2-dev-0.es520-2-dev:9300&quot;,&quot;es520-2-dev-1.es520-2-dev:9300&quot;,&quot;es520-2-dev-2.es520-2-dev:9300&quot;]
+   http.cors.enabled: true
+   http.cors.allow-origin: &quot;*&quot;
+   thread_pool.bulk.queue_size: 3000
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: es520-2-dev-jvm
+  namespace: ns-elastic5
+data:
+  jvm.options: |
+   -Xms512m
+   -Xmx512m
+   -XX:+UseConcMarkSweepGC
+   -XX:CMSInitiatingOccupancyFraction=75
+   -XX:+UseCMSInitiatingOccupancyOnly
+   -XX:+DisableExplicitGC
+   -XX:+AlwaysPreTouch
+   -server
+   -Xss1m
+   -Djava.awt.headless=true
+   -Dfile.encoding=UTF-8
+   -Djna.nosys=true
+   -Djdk.io.permissionsUseCanonicalPath=true
+   -Dio.netty.noUnsafe=true
+   -Dio.netty.noKeySetOptimization=true
+   -Dio.netty.recycler.maxCapacityPerThread=0
+   -Dlog4j.shutdownHookEnabled=false
+   -Dlog4j2.disable.jmx=true
+   -Dlog4j.skipJansi=true
+   -XX:+HeapDumpOnOutOfMemoryError
+</code></pre><!-- raw HTML omitted -->
+<h3 id="rancher-上效果">rancher 上效果<a href="#rancher-上效果" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<!-- raw HTML omitted -->
+<h3 id="elasticsearch-head-上效果图">elasticsearch-head 上效果图<a href="#elasticsearch-head-上效果图" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<!-- raw HTML omitted -->
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/k8s">k8s</a></span><span class="tag"><a href="https://blog.k1s.club/tags/elk">elk</a></span><span class="tag"><a href="https://blog.k1s.club/tags/elk5">elk5</a></span><span class="tag"><a href="https://blog.k1s.club/tags/elasticsearch5">elasticsearch5</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>284 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-11-22 02:13 &#43;0800</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/28-k8s1-16%E4%BD%BF%E7%94%A8%E6%97%A7yml%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>k8s1.16使用旧yml部署配置问题</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/26-logstash%E9%85%8D%E7%BD%AE/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>logstash配置</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-166045776-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

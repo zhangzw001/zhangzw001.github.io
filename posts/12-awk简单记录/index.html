@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="awk简单记录">
+<meta itemprop="description" content="记录一些简单使用
+实例1: 计算nginx日志中某个接口的次数和平均响应时间 例如我的a.txt nginx日志格式如下 a.b.com 1.1.1.1 [08/Sep/2019:23:57:01 &#43;0800] &quot;GET /v1/actionname?xxxx HTTP/1.1&quot; 200 386 &quot;-&quot; &quot;Mozilla/5.0 (Linux; Android 9; V1831A Build/P00610; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36&quot; &quot;-&quot; &quot;0.023&quot; a.b.com 1.1.1.1 [08/Sep/2019:23:57:01 &#43;0800] &quot;GET /v1/actionname2?xxxx HTTP/1.1&quot; 200 386 &quot;-&quot; &quot;Mozilla/5.0 (Linux; Android 9; V1831A Build/P00610; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36&quot; &quot;-&quot; &quot;0.016&quot;  这里我只想取出接口名: /v1/actionname 和 0.023 响应时间
+ 首先我取出这两列 cat a.txt|awk -F &#39;&quot;&#39; &#39;{print $(NF-1),$2}&#39;|awk -F &#39;?">
+<meta itemprop="datePublished" content="2019-10-11T15:23:48+00:00" />
+<meta itemprop="dateModified" content="2019-10-11T15:23:48+00:00" />
+<meta itemprop="wordCount" content="173">
+
+
+
+<meta itemprop="keywords" content="linux,awk," />
+<meta property="og:title" content="awk简单记录" />
+<meta property="og:description" content="记录一些简单使用
+实例1: 计算nginx日志中某个接口的次数和平均响应时间 例如我的a.txt nginx日志格式如下 a.b.com 1.1.1.1 [08/Sep/2019:23:57:01 &#43;0800] &quot;GET /v1/actionname?xxxx HTTP/1.1&quot; 200 386 &quot;-&quot; &quot;Mozilla/5.0 (Linux; Android 9; V1831A Build/P00610; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36&quot; &quot;-&quot; &quot;0.023&quot; a.b.com 1.1.1.1 [08/Sep/2019:23:57:01 &#43;0800] &quot;GET /v1/actionname2?xxxx HTTP/1.1&quot; 200 386 &quot;-&quot; &quot;Mozilla/5.0 (Linux; Android 9; V1831A Build/P00610; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36&quot; &quot;-&quot; &quot;0.016&quot;  这里我只想取出接口名: /v1/actionname 和 0.023 响应时间
+ 首先我取出这两列 cat a.txt|awk -F &#39;&quot;&#39; &#39;{print $(NF-1),$2}&#39;|awk -F &#39;?" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/12-awk%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/" />
+<meta property="article:published_time" content="2019-10-11T15:23:48+00:00" />
+<meta property="article:modified_time" content="2019-10-11T15:23:48+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="awk简单记录"/>
+<meta name="twitter:description" content="记录一些简单使用
+实例1: 计算nginx日志中某个接口的次数和平均响应时间 例如我的a.txt nginx日志格式如下 a.b.com 1.1.1.1 [08/Sep/2019:23:57:01 &#43;0800] &quot;GET /v1/actionname?xxxx HTTP/1.1&quot; 200 386 &quot;-&quot; &quot;Mozilla/5.0 (Linux; Android 9; V1831A Build/P00610; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36&quot; &quot;-&quot; &quot;0.023&quot; a.b.com 1.1.1.1 [08/Sep/2019:23:57:01 &#43;0800] &quot;GET /v1/actionname2?xxxx HTTP/1.1&quot; 200 386 &quot;-&quot; &quot;Mozilla/5.0 (Linux; Android 9; V1831A Build/P00610; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36&quot; &quot;-&quot; &quot;0.016&quot;  这里我只想取出接口名: /v1/actionname 和 0.023 响应时间
+ 首先我取出这两列 cat a.txt|awk -F &#39;&quot;&#39; &#39;{print $(NF-1),$2}&#39;|awk -F &#39;?"/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>awk简单记录</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/posts/">文章</a>
+					<a href="https://blog.k1s.club/k8s-categories/">Kubernetes系列</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Oct 11, 2019</span></div>
+				<h1>awk简单记录</h1>
+			</header>
+			<div class="content">
+				<p>记录一些简单使用</p>
+<!-- raw HTML omitted -->
+<h3 id="实例1-计算nginx日志中某个接口的次数和平均响应时间">实例1: 计算nginx日志中某个接口的次数和平均响应时间<a href="#实例1-计算nginx日志中某个接口的次数和平均响应时间" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="例如我的atxt-nginx日志格式如下">例如我的a.txt nginx日志格式如下<a href="#例如我的atxt-nginx日志格式如下" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>a.b.com 1.1.1.1 [08/Sep/2019:23:57:01 +0800] &quot;GET /v1/actionname?xxxx HTTP/1.1&quot; 200 386 &quot;-&quot; &quot;Mozilla/5.0 (Linux; Android 9; V1831A Build/P00610; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36&quot; &quot;-&quot; &quot;0.023&quot;
+a.b.com 1.1.1.1 [08/Sep/2019:23:57:01 +0800] &quot;GET /v1/actionname2?xxxx HTTP/1.1&quot; 200 386 &quot;-&quot; &quot;Mozilla/5.0 (Linux; Android 9; V1831A Build/P00610; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36&quot; &quot;-&quot; &quot;0.016&quot;
+</code></pre><blockquote>
+<p>这里我只想取出接口名: /v1/actionname 和 0.023 响应时间</p>
+</blockquote>
+<h4 id="首先我取出这两列">首先我取出这两列<a href="#首先我取出这两列" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>cat a.txt|awk -F '&quot;' '{print $(NF-1),$2}'|awk -F '?' '{print $1}'|awk '{print $1&quot; &quot;$3}' &gt; b.txt
+
+
+cat b.txt
+0.023 /v1/actionname
+0.016 /v1/actionname2
+...
+</code></pre><h4 id="命令详解">命令详解<a href="#命令详解" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>&gt; 第一步 响应时间求和
+{s[$2]+=$1}: 每遇到一个$2,比如遇到/v1/actionname,记录一个数组s[/v1/actionname] = 所有$1的值的总和
+&gt; 第二步 算接口的次数
+{m[$2]++}:  每遇到一个$2,比如遇到/v1/actionname,记录一个数组m[/v1/actionname] = 所有$1的个数
+&gt; 第三步 取平均值
+
+# 这里输出csv文件
+cat b.txt|awk '{m[$2]++} {s[$2]+=$1} ; END {for(i in m) {print s[i]/m[i] &quot;,&quot; m[i] &quot;,&quot; i}}'|awk -F &quot;,&quot; '$2 &gt; 20'|sort -k2nr &gt; test.csv
+</code></pre><h4 id="例如计算总响应时间总数平均值">例如计算总响应时间,总数,平均值<a href="#例如计算总响应时间总数平均值" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code># 这里$17 是接口名 : /v4.5/?xxx , $4 是响应时间 
+# 每遇到一个$17, 就把$4响应时间累加存到 s中,  s可能是 s[&quot;/v4.5/?xxx&quot;]=4.75, s[&quot;/v3.8/?xxx&quot;]=1.469
+# 同理m一样,  m[&quot;/v4.5/?xxx&quot;]=313, m[&quot;/v3.8/?xxx&quot;]=64
+
+tail -1000 openapi.access.log |awk '{s[$17]+=$4} {m[$17]++} END {for(i in s) {print m[i],&quot;\t&quot;,s[i],&quot;\t&quot;,s[i]/m[i],&quot;\t&quot;,i} }'|sort -k1nr|head -10
+
+313   4.75   0.0151757   /v4.5/?xxx
+64   1.469   0.0229531   /v3.8/?xxx
+</code></pre>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/linux">linux</a></span><span class="tag"><a href="https://blog.k1s.club/tags/awk">awk</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>173 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-10-11 23:23 &#43;0800</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/13-%E4%BA%91%E5%8E%9F%E7%94%9F%E5%8D%9A%E5%AE%A2%E6%B1%87%E6%80%BB/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>云原生博客汇总</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/11-mysql%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>mysql简单记录</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-166045776-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

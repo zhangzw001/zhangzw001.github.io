@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>elk on zhangzw</title>
+    <link>https://blog.k1s.club/tags/elk/</link>
+    <description>Recent content in elk on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Thu, 21 Nov 2019 18:13:35 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/elk/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>k8s一条命令部署es5.2.0集群</title>
+      <link>https://blog.k1s.club/posts/27-k8s%E4%B8%80%E6%9D%A1%E5%91%BD%E4%BB%A4%E9%83%A8%E7%BD%B2es5-2-0%E9%9B%86%E7%BE%A4/</link>
+      <pubDate>Thu, 21 Nov 2019 18:13:35 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/27-k8s%E4%B8%80%E6%9D%A1%E5%91%BD%E4%BB%A4%E9%83%A8%E7%BD%B2es5-2-0%E9%9B%86%E7%BE%A4/</guid>
+      <description>&lt;p&gt;由于老项目是基于es5.2.0, 所以准备在k8s基于nfs存储搭建一套,下面简单介绍&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>filebeat7收集mysql慢日志到es</title>
+      <link>https://blog.k1s.club/posts/24-filebeat7%E6%94%B6%E9%9B%86mysql%E6%85%A2%E6%97%A5%E5%BF%97%E5%88%B0es/</link>
+      <pubDate>Wed, 30 Oct 2019 16:56:37 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/24-filebeat7%E6%94%B6%E9%9B%86mysql%E6%85%A2%E6%97%A5%E5%BF%97%E5%88%B0es/</guid>
+      <description>&lt;p&gt;慢日志提供给开发查看, 采用elk统一提供,这里采用k8s环境搭建&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>部署elk7.2.0</title>
+      <link>https://blog.k1s.club/posts/2-%E9%83%A8%E7%BD%B2elk7-2-0/</link>
+      <pubDate>Thu, 19 Sep 2019 17:59:53 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/2-%E9%83%A8%E7%BD%B2elk7-2-0/</guid>
+      <description>说明:
+ 1 单台k8s,本机目录挂载(未配置cephfs) 2 如果replicas大于1, 就会出现多个es挂载同一个目录,会出现报错(uuid block) 1. es配置本地挂载 k8s-es-7.2.0.yml --- apiVersion: v1 kind: ServiceAccount metadata: labels: app: elasticsearch name: elasticsearch7-admin namespace: ns-elastic7 --- apiVersion: rbac.authorization.k8s.io/v1 kind: ClusterRoleBinding metadata: name: elasticsearch7-admin labels: app: elasticsearch roleRef: apiGroup: rbac.authorization.k8s.io kind: ClusterRole name: cluster-admin subjects: - kind: ServiceAccount name: elasticsearch7-admin namespace: ns-elastic7 --- apiVersion: apps/v1 kind: StatefulSet metadata: labels: app: elasticsearch role: master name: elasticsearch-master namespace: ns-elastic7 spec: replicas: 1 serviceName: elasticsearch-master selector: matchLabels: app: elasticsearch role: master template: metadata: labels: app: elasticsearch role: master spec: serviceAccountName: elasticsearch7-admin restartPolicy: Always securityContext: fsGroup: 1000 containers: - name: elasticsearch-master image: hub.</description>
+    </item>
+    
+  </channel>
+</rss>

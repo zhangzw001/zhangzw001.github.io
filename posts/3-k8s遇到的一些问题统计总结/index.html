@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="k8s遇到的一些问题统计总结">
+<meta itemprop="description" content="不定时更新,文章可能比较散乱,&gt;_&lt;
+1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
+  deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1 2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
+ # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000 3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从hub.">
+<meta itemprop="datePublished" content="2019-09-20T09:20:39+00:00" />
+<meta itemprop="dateModified" content="2019-09-20T09:20:39+00:00" />
+<meta itemprop="wordCount" content="298">
+
+
+
+<meta itemprop="keywords" content="k8s," />
+<meta property="og:title" content="k8s遇到的一些问题统计总结" />
+<meta property="og:description" content="不定时更新,文章可能比较散乱,&gt;_&lt;
+1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
+  deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1 2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
+ # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000 3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从hub." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/" />
+<meta property="article:published_time" content="2019-09-20T09:20:39+00:00" />
+<meta property="article:modified_time" content="2019-09-20T09:20:39+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="k8s遇到的一些问题统计总结"/>
+<meta name="twitter:description" content="不定时更新,文章可能比较散乱,&gt;_&lt;
+1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
+  deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1 2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
+ # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000 3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从hub."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>k8s遇到的一些问题统计总结</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/posts/">文章</a>
+					<a href="https://blog.k1s.club/k8s-categories/">Kubernetes系列</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Sep 20, 2019</span></div>
+				<h1>k8s遇到的一些问题统计总结</h1>
+			</header>
+			<div class="content">
+				<p>不定时更新,文章可能比较散乱,&gt;_&lt;</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<h3 id="1-单机版k8s-pod一直是pending的问题">1. 单机版k8s pod一直是pending的问题<a href="#1-单机版k8s-pod一直是pending的问题" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate.
+这是因为master上存在污点,pod不会再改节点上创建
+两种办法:</p>
+</blockquote>
+<ul>
+<li>deploy 的时候加上 容忍该污点</li>
+<li>直接取消master上的污点</li>
+</ul>
+<pre><code># 取消master上污点
+  kubectl taint nodes --all node-role.kubernetes.io/master-
+
+# 查看taint
+kubectl describe node node1
+</code></pre><!-- raw HTML omitted -->
+<h3 id="2-修改service-node-port-range">2. 修改service-node-port-range<a href="#2-修改service-node-port-range" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口</p>
+</blockquote>
+<pre><code># kubeadm 1.14 配置
+apiServer:
+  extraArgs:
+    authorization-mode: Node,RBAC
+    service-node-port-range: 79-33000
+
+# kubeadm 1.10配置
+apiServerExtraArgs:
+  service-node-port-range: 79-33000
+</code></pre><!-- raw HTML omitted -->
+<h3 id="3-traefik断电后重新启动报错-command-traefik-error-field-not-found-node-redirect">3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect<a href="#3-traefik断电后重新启动报错-command-traefik-error-field-not-found-node-redirect" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>看到这个错误猜测可能是用的latest镜像问题, 从hub.docker.com 查看更新了v2.0+的版本
+
+将traefik的deployment配置中 image改成 traefik:1.7
+
+重新部署后 问题解
+</code></pre><!-- raw HTML omitted -->
+<h3 id="4-查看当前集群的customresourcedefinition">4. 查看当前集群的(CustomResourceDefinition)<a href="#4-查看当前集群的customresourcedefinition" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code># 查看k8s有哪些api
+kubectl api-versions
+
+# 查看当前crd
+kubectl get crd
+
+# 其次查看该api是什么版本
+kubectl describe crd destinationrules.networking.istio.io
+
+</code></pre><!-- raw HTML omitted -->
+<h3 id="5-启用自动轮换kubelet-证书证书未过期">5. 启用自动轮换kubelet 证书(证书未过期)<a href="#5-启用自动轮换kubelet-证书证书未过期" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>参考: <a href="https://www.cnblogs.com/skymyyang/p/11093686.html">Kubeadm证书过期时间调整</a></p>
+<p>kubelet证书分为server和client两种， k8s 1.9默认启用了client证书的自动轮换，但server证书自动轮换需要用户开启</p>
+<p>增加 kubelet 参数</p>
+<pre><code># 在/etc/systemd/system/kubelet.service.d/10-kubeadm.conf 增加如下参数
+
+Environment=&quot;KUBELET_EXTRA_ARGS=--feature-gates=RotateKubeletServerCertificate=true&quot;
+</code></pre><p>增加 controller-manager 参数</p>
+<pre><code># 在/etc/kubernetes/manifests/kube-controller-manager.yaml 添加如下参数
+  - command:
+    - kube-controller-manager
+    - --experimental-cluster-signing-duration=87600h0m0s
+    - --feature-gates=RotateKubeletServerCertificate=true
+    - ....
+</code></pre><p>创建 rbac 对象
+创建 rbac对象，允许节点轮换kubelet server证书：</p>
+<pre><code>cat &gt; ca-update.yaml &lt;&lt; EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: &quot;true&quot;
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: system:certificates.k8s.io:certificatesigningrequests:selfnodeserver
+rules:
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests/selfnodeserver
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubeadm:node-autoapprove-certificate-server
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:certificates.k8s.io:certificatesigningrequests:selfnodeserver
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: system:nodes
+EOF
+
+kubectl create –f ca-update.yaml
+</code></pre><p>重新启动kubelet</p>
+<pre><code>systemctl daemon-reload
+systemctl enable kubelet
+systemctl restart kubelet
+</code></pre><!-- raw HTML omitted -->
+<h3 id="6-hpa的一个cpu-percent百分比问题">6. hpa的一个cpu-percent百分比问题<a href="#6-hpa的一个cpu-percent百分比问题" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>kubectl autoscale deployment php-admintest-nginx-dev --cpu-percent=80 --min=1 --max=2 -n php-dev
+</code></pre><p>例如以上,我希望在平均cpu超过80%时,pod能自动调整为2个</p>
+<p>em&hellip;这没啥问题</p>
+<p>但我做简单ab压测发现, 我把cpu压到了100000% &hellip;</p>
+<p>我的deployment 配置中是这样限制cpu的</p>
+<pre><code>        resources:
+          requests:
+            cpu: &quot;1m&quot;
+          limits:
+            cpu: &quot;1000m&quot;
+</code></pre><p>显然我的pod可以使用1个核cpu, 那这个平均cpu是等于啥呢?</p>
+<p>cpu-percent = 1000m/resources.request.cpu =&gt; 1000m/1m =100000%</p>
+<p>-_-!!!</p>
+<p>稍微解释下,为啥我要设置request.cpu=1m:
+比如单机4核k8s,我启动了1个pod,limit是4cpu,那么我request.cpu其实默认也是1, 所以集群就已经预留了4cpu, 此时如果在启动pod, 在配置limit的时候就无法成功启动pod,因为核心不够了,都给那什么玩意了&hellip;(当然这样改动也的确会出现过度分配)</p>
+<blockquote>
+<p>因此建议 修改requests.cpu=500m,  &ndash;cpu-percent可设范围: 0~200% ,或者低一些 250m -&gt; 0~400%</p>
+</blockquote>
+<p>总结:
+request.cpu 必须设置, 这个是对比的对象</p>
+<p>另外:
+对于扩容而言，这个时间段为3分钟，缩容为5分钟(可以通过 &ndash;horizontal-pod-autoscaler-downscale-delay ， &ndash;horizontal-pod-autoscaler-upscale-delay 进行调整)。</p>
+<!-- raw HTML omitted -->
+<h3 id="7-k8s1162metrics-v035-deployment重启之后hpa就失效无法获取到数据">7 k8s1.16.2+metrics v0.3.5 deployment重启之后hpa就失效,无法获取到数据<a href="#7-k8s1162metrics-v035-deployment重启之后hpa就失效无法获取到数据" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>The HPA was unable to compute the replica count: unable to get metrics for resource cpu: no metrics returned from resource metrics API 
+</code></pre><!-- raw HTML omitted -->
+<h3 id="8-k8s机器进程数达到500多的时候-ssh连接到服务报错-shell-request-failed-on-channel-0">8 k8s机器进程数达到500多的时候, ssh连接到服务报错 shell request failed on channel 0<a href="#8-k8s机器进程数达到500多的时候-ssh连接到服务报错-shell-request-failed-on-channel-0" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>原因：目标主机的系统进程数太小，导致不能连接
+
+解决：需要修改/etc/security/limits.d/20-nproc.conf文件中的值，把4096改大一点，如 65535
+
+#cat /etc/security/limits.d/20-nproc.conf
+*          soft    nproc     4096
+root       soft    nproc     unlimited
+
+重新ssh，即可。
+
+</code></pre>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/k8s">k8s</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>298 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-09-20 17:20 &#43;0800</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/4-hexo%E9%BC%A0%E6%A0%87%E7%A7%BB%E5%8A%A8%E5%92%8C%E9%BC%A0%E6%A0%87%E7%82%B9%E5%87%BB%E7%89%B9%E6%95%88/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>hexo鼠标移动和鼠标点击特效</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/2-%E9%83%A8%E7%BD%B2elk7-2-0/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>部署elk7.2.0</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-166045776-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

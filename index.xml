@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>zhangzw</title>
+    <link>https://blog.k1s.club/</link>
+    <description>Recent content on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Fri, 25 Sep 2020 10:11:28 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>关于</title>
+      <link>https://blog.k1s.club/about/</link>
+      <pubDate>Thu, 15 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/about/</guid>
+      <description>联系方式：  Github：https://github.com/zhangzw001/blog 邮箱：@gmail.com  </description>
+    </item>
+    
+    <item>
+      <title>centos8初体验</title>
+      <link>https://blog.k1s.club/posts/56-centos8%E5%88%9D%E4%BD%93%E9%AA%8C/</link>
+      <pubDate>Fri, 25 Sep 2020 10:11:28 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/56-centos8%E5%88%9D%E4%BD%93%E9%AA%8C/</guid>
+      <description>&lt;p&gt;简单记录下 centos8的一些新的内容&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>helm部署metabase简介</title>
+      <link>https://blog.k1s.club/posts/55-helm%E9%83%A8%E7%BD%B2metabase%E7%AE%80%E4%BB%8B/</link>
+      <pubDate>Wed, 16 Sep 2020 18:18:05 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/55-helm%E9%83%A8%E7%BD%B2metabase%E7%AE%80%E4%BB%8B/</guid>
+      <description>helm 简单部署metabase
+版本统计 1. k8s: 1.15.11 2. metabase: v0.36.3 3. mysql: 5.7.24 首先从charts拉取最新的模板 # 首先search查看一下 helm search metabase NAME CHART VERSION APP VERSION DESCRIPTION stable/metabase 0.3.2 v0.27.2 The easy, open source way for everyone in your company to... # 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本 所以这里我从helm官方克隆了charts git clone https://github.com/helm/charts.git cd charts/stable/metabase # 拉取配置 docker pull metabase/metabase:v0.36.3 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3 docker push xxx.com/metabase:v0.36.3 修改values.yaml配置 # 这里改成私有镜像 image: repository: xxx.com/metabase # 修改数据库配置 database: type: mysql host: k8s-db-t.</description>
+    </item>
+    
+    <item>
+      <title>Go: A Documentary 发布！</title>
+      <link>https://blog.k1s.club/posts.bak/reading/documentary-of-go/</link>
+      <pubDate>Fri, 11 Sep 2020 20:46:38 +0800</pubDate>
+      
+      <guid>https://blog.k1s.club/posts.bak/reading/documentary-of-go/</guid>
+      <description>以前经常有读者问我，哪儿可以找到 Go 语言的前世今生，这种时候我们往往会告诉他去看 issues 和 proposals。但资料有点分散，且没有索引体系。因此不少人新入门的读者读着读着就跑偏了，又或是在第一步找资料上就被拦住了。
+最近欧神（@changkun）低调的发布了 《Go: A Documentary》，这个文档收集了 Go 开发过程中许多有趣（公开可见的）的问题，讨论，提案，CL 和演讲，其目的是为 Go 历史提供全面的参考。
+个人认为这份资料非常的有价值，相当于欧神把资料索引整理好了，强烈推荐对 Go 语言感兴趣的读者进行阅读：
+内容索引主要分为：
+ Sources Committers  Core Authors Compiler/Runtime Team Library/Tools/Security/Community Group Interviews   Timeline Language Design  Misc Slice Package Management (1.4, 1.5, 1.7) Type alias (1.9) Defer (1.13) Error values (1.13) Channel/Select Generics   Compiler Toolchain  Compiler Linker Debugger Tracer Builder Modules gopls Testing   Runtime Core  Statistics Scheduler Execution Stack Memory Allocator Garbage Collector Memory model ABI   Standard Library  syscall io go/* sync Pool Mutex atomic time context encoding image, x/image misc   Unclassified But Relevant Links Fun Facts Acknowledgements  《Go: A Documentary》 的访问地址是 https://golang.</description>
+    </item>
+    
+    <item>
+      <title>微服务的战争：选型？分布式链路追踪</title>
+      <link>https://blog.k1s.club/posts.bak/microservice/tracing/</link>
+      <pubDate>Thu, 10 Sep 2020 19:53:59 +0800</pubDate>
+      
+      <guid>https://blog.k1s.club/posts.bak/microservice/tracing/</guid>
+      <description>“微服务的战争” 是一个关于微服务设计思考的系列题材，主要是针对在微服务化后所出现的一些矛盾/冲突点，不涉及具体某一个知识点深入。如果你有任何问题或建议，欢迎随时交流。
+ 背景 在经历 微服务的战争：级联故障和雪崩 的 P0 级别事件后，你小手一摊便葛优躺了。开始进行自我复盘，想起这次排查经历，由于现在什么基础设施都还没有，因此在接收到客户反馈后，你是通过错误日志进行问题检查的。
+但在级联错误中，错误日志产生的实在是太多了，不同的服务不同的链路几乎都挤在一起，修复时间都主要用在了翻日志上，翻了好几页才找到了相对有效的错误信息。
+如果下一次在出现类似的问题，可不得了，MTTR 太久了，4 个 9 很快就会用完。这时候你想到了业界里经常被提起的一个利器，那就是 “分布式链路追踪系统”。粗略来讲，能够看到各种应用的调用依赖：
+其中最著名的是 Google Dapper 论文所介绍的 Dapper。源于 Google 为了解决可能由不同团队，不同语言，不同模块，部署在不同服务器，不同数据中心的所带来的软件复杂性（很难去分析，无法做定位），构建了一个的分布式跟踪系统：
+自此就开启了业界在分布式链路的启发/启蒙之路，很多现在出名的分布式链路追踪系统都是基于 Google Dapper 论文发展而来，基本原理和架构都大同小异。若对此有兴趣的可具体查看 Google Dapper，非常有意思。
+（Google Dapper 中存在跟踪树和 Span 的概念）
+选型？有哪些 想做链路追踪，那必然要挑选一款开源产品作为你的分布式链路追踪系统，不大可能再造一个全新的，先实现业务目的最重要。因此在网上一搜，发现如下大量产品：
+ Twitter：Zipkin。 Uber：Jaeger。 Elastic Stack：Elastic APM。 Apache：SkyWalking（国内开源爱好者吴晟开源）。 Naver：Pinpoint（韩国公司开发）。 阿里：鹰眼。 大众点评：Cat。 京东：Hydra。  随手一搜就发现这类产品特别的多，并且据闻各大公司都有自己的一套内部链路追踪系统，这下你可犯了大难。他们之间都是基于 Google Dapper 演进出来的，那本质上到底有什么区别，怎么延伸出这么多的新产品？
+Jaeger 首先看看由 Uber 开发的 Jaeger，Jaeger 目前由 Cloud Native Computing Foundation（CNCF）托管，是 CNCF 的第七个顶级项目（于 2019 年 10 月毕业）：
+  Jaeger Client：Jaeger 客户端，是 Jaeger 针对 OpenTracing API 的特定语言实现，可用于手动或通过与 OpenTracing 集成的各种现有开源框架（例如Flask，Dropwizard，gRPC等）来检测应用程序以进行分布式跟踪。</description>
+    </item>
+    
+    <item>
+      <title>微服务的战争：级联故障和雪崩</title>
+      <link>https://blog.k1s.club/posts.bak/microservice/linkage/</link>
+      <pubDate>Tue, 25 Aug 2020 21:08:39 +0800</pubDate>
+      
+      <guid>https://blog.k1s.club/posts.bak/microservice/linkage/</guid>
+      <description>“微服务的战争” 是一个关于微服务设计思考的系列题材，主要是针对在微服务化后所出现的一些矛盾/冲突点，不涉及具体某一个知识点深入。如果你有任何问题或建议，欢迎随时交流。
+ 在 微服务的战争：统一且标准化 中，经过好几周与不同业务组不同事业部的跨部门讨论后，终于把初始的标准化方案给定下来了，大家欢快的使用起了内部的统一框架，疯狂的创建起了新服务，没隔多久服务调用链就变成了下图：
+服务间存在多次内部调用，服务 A =》服务 B =》服务 C =》服务D，而 服务 E =》 服务 B，服务 F =》服务 E，也就是存在着多个流量入口，且依赖相同的服务。
+背景 服务与服务中，总存在业务服务，公共服务，基础服务等类型。但在某一个夜晚，突然发现 BFF 调用后端服务开始逐渐不正常，客户给你截图反馈问题，你发现有点问题：
+单从表现来看，你发现是 BFF 调用服务 A 极度缓慢，也不知道怎么了&amp;hellip;正当以为是服务 A 出问题，想着万能重启一下时。你在日志平台和链路追踪系统一看，发现了大量的错误日志和缓慢，让你略微震惊，一时间不知道从何下手。
+这可怎么办？
+级联故障和雪崩 实际上这是一次很经典的级联故障，最终导致系统雪崩的情景再现。单从上述拓扑来看，问题点之一在于服务 B：
+服务 B 本身作为服务 A 和服务 F 的两个流量入口必经之处，想必至少是一个公共服务，但他也依赖了其他多个服务。因此若服务 C 和服务 D 其中一个有问题，在没有熔断措施的情况下，就出现级联故障，系统逐渐崩盘，最后雪崩：
+服务 D 所依赖的外部接口出现了故障，而他并没有做任何的控制，因此扩散到了所有调用到他的服务，自然也就包含服务 B，因此最终出现系统雪崩。
+这种最经典的是出现在默认 Go http client 调用没有设置 Timeout，从而只要出现一次故障，就足矣让记住这类 “坑”，毕竟崩的 ”慢“，错误日志还多。
+解决方法 常见的方式是根据特定的规则/规律进行熔断和降级，避免请求发生堆积：
+  超时时间控制。
+  慢调用比例。
+  错误比例。</description>
+    </item>
+    
+    <item>
+      <title>微服务的战争：统一且标准化</title>
+      <link>https://blog.k1s.club/posts.bak/microservice/standardization/</link>
+      <pubDate>Sat, 22 Aug 2020 21:56:14 +0800</pubDate>
+      
+      <guid>https://blog.k1s.club/posts.bak/microservice/standardization/</guid>
+      <description>“微服务的战争” 是一个关于微服务设计思考的系列题材，主要是针对在微服务化后所出现的一些矛盾/冲突点，不涉及具体某一个知识点深入。如果你有任何问题或建议，欢迎随时交流。
+ 开天辟地 在远古开天辟地时，大单体转换成微服务化后，服务的数量越来越多。每起一个新的服务，就得把项目的目录结构，基础代码重新整理一遍，并且很有可能都是从最初的 template 上 ctrl+c，ctrl+v 复制出来的产物，如下：
+但是基于 template 的模式，很快就会遇到各种各样的新问题：
+随着跨事业部/业务组的使用增多，你根本不知道框架的 template 是什么时间节点被复制粘贴出去的，也不知道所对应的 commit-id 是什么，更不知道先前的 BUG 修复了没，也不知道有没有其他开发人员私下改过被复制走的 template。
+简单来讲，就是不具备可维护性，相对独立，BUG 可能一样，但却没有版本可规管。这时候，就可以选择做一个内部基础框架和对应的内部工具（已经有用户市场了），形成一个脚手架闭环：
+通过基础工具+基础接口的方式，就可以解决项目A、B、C&amp;hellip;的基础框架版本管理和公共维护的问题，且在遇到框架 BUG 时，只需要直接 upgrade 就好了。而在框架维护者层面，还能通过注册机制知道目前基础框架的使用情况（例如：版本分布），便于后续的迭代和规划。
+同时若内部微服务依赖复杂，可以将脚手架直接 “升级”，再做多一层基础平台，通过 CI/CD 平台等关联创建应用，选择应用类型等基本信息，然后关联创建对应的应用模板、构建工具、网关、数据库、接口平台、初始化自动化用例等：
+至此，就可以通过结合基础平台（例如：CI/CD）实现流程上的标准化控制，成为一个提效好帮手。
+大众创新 但，一切都有 “开天辟地” 那么顺利吗。实际上并不，在很多的公司中，大多数是在不同的时间阶段在不同的团队同时进行了多个开天辟地。
+更具现化来讲，就是在一家公司内，不同的团队里做出了多种基础工具和基础框架。更要命的是，他们几家的规范可能还不大一样。例如：框架在 gRPC 错误码的规范处理上的差异：
+  业务错误码放在 grpc.status.details 中。
+  业务错误码放在 grpc-status 中。
+  业务错误码放在 grpc-message 中。
+  又或是 HTTP 状态码的差异：
+  HTTP Status Code 为金标准，不在主体定义业务错误码。
+  HTTP Status Code 都为 200 OK（除宕机导致的 500，503 等），业务错误码由主体另外定义。</description>
+    </item>
+    
+    <item>
+      <title>微服务的战争：按什么维度拆分服务</title>
+      <link>https://blog.k1s.club/posts.bak/microservice/dismantle/</link>
+      <pubDate>Wed, 19 Aug 2020 20:56:55 +0800</pubDate>
+      
+      <guid>https://blog.k1s.club/posts.bak/microservice/dismantle/</guid>
+      <description>“微服务的战争” 是一个关于微服务设计思考的系列题材，主要是针对在微服务化后所出现的一些矛盾/冲突点，不涉及具体某一个知识点深入。如果你有任何问题或建议，欢迎随时交流。
+ 微服务，这三个字正在席卷着目前的互联网软件行业，尤其在近几年云原生迸发后，似乎人人都对微服务有了更广泛的使用和理解，张口就是各种各样的问号，有着强大的好奇心。
+无独有偶，我有一个朋友鲤鱼在内部微服务的早期（每个业务组起步）就经常遇到下述的对话：
+  张三：为什么要拆现在的代码？
+  鲤鱼：因为 ！@）&amp;amp;&amp;amp;#@！）&amp;amp;#！&amp;amp;）@！&amp;amp;！ 的原因。
+  张三：那即将要做的 “微服务” 是按照什么维度去拆分的服务？
+  鲤鱼：常见的一般根据 ！@#*@！#&amp;amp;！（@&amp;amp;！@）#@ 的方式来拆分。
+  张三：照你这么说好像也不大对，我看每个业务组拆分的维度似乎都不大一样？
+  鲤鱼：嗯，每个业务组还有自己的见解，不会完全相同。
+  张三：。。。所以微服务的拆分维度到底是什么？
+  为什么想拆 为什么张三会有这个疑问呢，实际上是因为研发内部希望从原先的大单体，大仓库向微服务体系拆分转换，其原先大单体仓库结构，类 Monorepo：
+但类 Monorepo 又有不少的问题，像是：
+  单个 Repo 体积过大：导致 Git 无法直接拉取。当你设置完再拉取时，在网速慢时还能去泡杯咖啡，并且在开发机性能不佳的情况下，IDE 会比较卡，代码运行起来也慢。
+  单个 Repo 存在公共函数/SDK：在代码仓库中，必然存在公共依赖。因此在解决代码冲突时，若遗留了冲突符，且在动态语言中，不涉及便运行正常。但其实在上线后却又影响到其他业务，可真是糟糕透顶，分分钟被迫抱着事故。
+  单个 Repo 模块职责/边界不清：在实际的软件开发中，涉及数十个业务组同时在一个大 Repo 下进行开发，没有强控边界的情况下，往往会逐渐模糊，即使在设计时管得住自己，你也不一定能 100% 防止别人模糊你的边界。
+  单个 Repo 包含了所有的源码：出现公司源代码泄露时，会导致整个 Repo 外泄，相当的刺激和具有教育意义。因为虽然开放和协同了，不属于你们组的业务代码你也有权限查看了。</description>
+    </item>
+    
+    <item>
+      <title>go单元测试和性能测试</title>
+      <link>https://blog.k1s.club/posts/54-go%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/</link>
+      <pubDate>Wed, 12 Aug 2020 16:44:10 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/54-go%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/</guid>
+      <description>&lt;p&gt;简单记录一下单元测试 和性能测试的例子&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>hexo部署到coding.net开启静态网站</title>
+      <link>https://blog.k1s.club/posts/53-hexo%E9%83%A8%E7%BD%B2%E5%88%B0coding-net%E5%BC%80%E5%90%AF%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</link>
+      <pubDate>Fri, 07 Aug 2020 16:00:08 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/53-hexo%E9%83%A8%E7%BD%B2%E5%88%B0coding-net%E5%BC%80%E5%90%AF%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</guid>
+      <description>&lt;p&gt;由于访问github会比较慢,百度抓取问题等, hexo同时部署到coding.net并开启静态网站&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

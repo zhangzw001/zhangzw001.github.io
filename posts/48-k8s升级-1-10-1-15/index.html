@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="k8s升级(1.10-&gt;1.15)">
+<meta itemprop="description" content="k8s升级一般不能跨版本升级, 所以这里间断介绍升级过程, 每次升级一个大版本">
+<meta itemprop="datePublished" content="2020-05-18T17:43:27+00:00" />
+<meta itemprop="dateModified" content="2020-05-18T17:43:27+00:00" />
+<meta itemprop="wordCount" content="1501">
+
+
+
+<meta itemprop="keywords" content="k8s," />
+<meta property="og:title" content="k8s升级(1.10-&gt;1.15)" />
+<meta property="og:description" content="k8s升级一般不能跨版本升级, 所以这里间断介绍升级过程, 每次升级一个大版本" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/48-k8s%E5%8D%87%E7%BA%A7-1-10-1-15/" />
+<meta property="article:published_time" content="2020-05-18T17:43:27+00:00" />
+<meta property="article:modified_time" content="2020-05-18T17:43:27+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="k8s升级(1.10-&gt;1.15)"/>
+<meta name="twitter:description" content="k8s升级一般不能跨版本升级, 所以这里间断介绍升级过程, 每次升级一个大版本"/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>k8s升级(1.10-&gt;1.15)</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/posts/">文章</a>
+					<a href="https://blog.k1s.club/k8s-categories/">Kubernetes系列</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>May 18, 2020</span></div>
+				<h1>k8s升级(1.10-&gt;1.15)</h1>
+			</header>
+			<div class="content">
+				<p>k8s升级一般不能跨版本升级, 所以这里间断介绍升级过程, 每次升级一个大版本</p>
+<h3 id="k8s升级">k8s升级<a href="#k8s升级" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p><a href="https://blog.51cto.com/newfly/2440901?source=dra">kubernetes集群版本升级攻略</a>
+<a href="https://kuboard.cn/install/upgrade-k8s/1.15.x-1.16.x.html">kuboard网址k8s升级攻略</a>
+<a href="https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/">官方kubeadm升级文档</a>
+<a href="https://github.com/kubernetes/kubernetes/tree/master/CHANGELOG">官方k8s版本changelog</a></p>
+<h3 id="版本关系">版本关系<a href="#版本关系" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>Kubernetes 1.18.0 &ndash;&gt;Docker版本1.13.1, 17.03, 17.06, 17.09, 18.06, 18.09, 19.03
+Kubernetes 1.17.0 &ndash;&gt;Docker版本1.13.1, 17.03, 17.06, 17.09, 18.06, 18.09, 19.03
+Kubernetes 1.16.0 &ndash;&gt;Docker版本1.13.1, 17.03, 17.06, 17.09, 18.06, 18.09
+Kubernetes 1.15.0 &ndash;&gt;Docker版本1.13.1, 17.03, 17.06, 17.09, 18.06, 18.09
+Kubernetes 1.14.0 &ndash;&gt;Docker版本1.13.1, 17.03, 17.06, 17.09, 18.06, 18.09
+Kubernetes 1.13.0 &ndash;&gt;Docker版本1.11.1, 1.12.1, 1.13.1, 17.03, 17.06, 17.09, 18.06
+Kubernetes 1.12.0 &ndash;&gt;Docker版本1.11.1, 1.12.1, 1.13.1, 17.03, 17.06, 17.09, 18.06
+Kubernetes 1.11.* &ndash;&gt;Docker版本1.11.2 to 1.13.1 and 17.03.x (ref)
+Kubernetes 1.10.* &ndash;&gt;Docker版本1.11.2 to 1.13.1 and 17.03.x (ref)</p>
+<hr>
+<!-- raw HTML omitted -->
+<h3 id="k8s110---k8s111">k8s1.10 -&gt; k8s1.11<a href="#k8s110---k8s111" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>注意我这里是单机,所以没有禁止调度,集群在升级前需要禁止调度:</li>
+</ul>
+<blockquote>
+<p>kubectl taint node master-01 node-role.kubernetes.io/master=&quot;&quot;:NoExecute
+kubectl taint node &ndash;all node-role.kubernetes.io/master-</p>
+</blockquote>
+<ul>
+<li>注意备份etcd</li>
+</ul>
+<pre><code>export ETCDCTL_API=3
+# 备份
+etcdctl snapshot save backup-$(date +%Y%m%d_%H).db
+# 恢复
+etcdctl snapshot restore backup-xxxx.db --data-dir=/data/etcd/data
+
+</code></pre><ul>
+<li>更稳妥的方法应该是先 k8s1.10 -&gt; k8s1.10.13(小版本最后一个版本) -&gt; k8s1.11.0</li>
+</ul>
+<h4 id="kubeadm升级准备">kubeadm升级准备<a href="#kubeadm升级准备" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code># 保存配置
+export k8s_old_version=1.10.0
+export k8s_version=1.11.0
+export kubeadm_config=kubeadmin-${k8s_old_version}-view.conf
+
+kubeadm config view &gt; ${kubeadm_config}
+
+# k8s1.10版本要求cni必须是低于kubernetes-cni-0.6.0-0版本
+yum makecache all
+version=$(yum list kubeadm --showduplicates | sort -r|grep ${k8s_version}|awk '{print $2}')
+echo $version
+
+# 这里执行不会升级kubelet
+yum install  kubeadm-${version} --disableexcludes=kubernetes -y
+
+
+# 查看是否可以更新
+kubeadm upgrade plan
+[preflight] Running pre-flight checks.
+[upgrade] Making sure the cluster is healthy:
+[upgrade/config] Making sure the configuration is correct:
+[upgrade/config] Reading configuration from the cluster...
+[upgrade/config] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -oyaml'
+I0520 09:32:03.264259   30047 feature_gate.go:230] feature gates: &amp;{map[]}
+[upgrade] Fetching available versions to upgrade to
+[upgrade/versions] Cluster version: v1.10.0
+[upgrade/versions] kubeadm version: v1.11.0
+[upgrade/versions] WARNING: Couldn't fetch latest stable version from the internet: unable to get URL &quot;https://dl.k8s.io/release/stable.txt&quot;: Get https://storage.googleapis.com/kubernetes-release/release/stable.txt: dial tcp 34.64.4.80:443: i/o timeout
+[upgrade/versions] WARNING: Falling back to current kubeadm version as latest stable version
+[upgrade/versions] Latest version in the v1.10 series: v1.10.13
+
+External components that should be upgraded manually before you upgrade the control plane with 'kubeadm upgrade apply':
+COMPONENT   CURRENT   AVAILABLE
+Etcd        3.3.11    3.1.12
+
+Components that must be upgraded manually after you have upgraded the control plane with 'kubeadm upgrade apply':
+COMPONENT   CURRENT       AVAILABLE
+Kubelet     1 x v1.10.1   v1.10.13
+
+Upgrade to the latest version in the v1.10 series:
+
+COMPONENT            CURRENT   AVAILABLE
+API Server           v1.10.0   v1.10.13
+Controller Manager   v1.10.0   v1.10.13
+Scheduler            v1.10.0   v1.10.13
+Kube Proxy           v1.10.0   v1.10.13
+CoreDNS              1.0.6     1.1.3
+
+You can now apply the upgrade by executing the following command:
+
+ kubeadm upgrade apply v1.10.13
+
+_____________________________________________________________________
+
+External components that should be upgraded manually before you upgrade the control plane with 'kubeadm upgrade apply':
+COMPONENT   CURRENT   AVAILABLE
+Etcd        3.3.11    3.2.18
+
+Components that must be upgraded manually after you have upgraded the control plane with 'kubeadm upgrade apply':
+COMPONENT   CURRENT       AVAILABLE
+Kubelet     1 x v1.10.1   v1.11.0
+
+Upgrade to the latest stable version:
+
+COMPONENT            CURRENT   AVAILABLE
+API Server           v1.10.0   v1.11.0
+Controller Manager   v1.10.0   v1.11.0
+Scheduler            v1.10.0   v1.11.0
+Kube Proxy           v1.10.0   v1.11.0
+CoreDNS              1.0.6     1.1.3
+
+You can now apply the upgrade by executing the following command:
+
+ kubeadm upgrade apply v1.11.0
+
+_____________________________________________________________________
+
+
+</code></pre><h4 id="执行升级操作">执行升级操作<a href="#执行升级操作" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>kubeadm upgrade apply v${k8s_version}  --config ${kubeadm_config} --dry-run
+
+
+# 修改下kubeadmin-10-view.conf配置 imageRepository: registry.cn-hangzhou.aliyuncs.com/k8sth
+vim ${kubeadm_config}
+imageRepository: registry.cn-hangzhou.aliyuncs.com/k8sth
+
+
+docker pull registry.cn-hangzhou.aliyuncs.com/k8sth/kube-proxy-amd64:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/k8sth/kube-controller-manager-amd64:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/k8sth/kube-scheduler-amd64:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/k8sth/kube-apiserver-amd64:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/k8sth/coredns:1.1.3
+
+
+kubeadm upgrade apply v${k8s_version} --config ${kubeadm_config}
+
+</code></pre><h4 id="升级kubelet-kubectl">升级kubelet kubectl<a href="#升级kubelet-kubectl" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>yum install -y kubectl-${version} kubelet-${version} --disableexcludes=kubernetes
+
+# 修改下kubelet配置(否则集群会报错)
+vim /var/lib/kubelet/kubeadm-flags.env
+增加--pod-infra-container-image=registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1
+
+systemctl daemon-reload
+systemctl stop kubelet
+systemctl start kubelet
+kubectl version
+kubelet --version
+kubectl get nodes
+</code></pre><blockquote>
+<p>这里执行完, 我的pod mysql和redis等服务器并没有被重启</p>
+</blockquote>
+<!-- raw HTML omitted -->
+<h3 id="k8s111---k8s112">k8s1.11 -&gt; k8s1.12<a href="#k8s111---k8s112" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code># 在这之前先停一下指标 metrics-server 和 prometheus-adapter (我这里会导致api-server无法启动成功,找不到metrics.k8s.io/v1beta1 等)
+kubectl delete -f /data/k8s-config/prometheus/prometheus-adapter 
+kubectl delete -f /data/k8s-config/metrics-server/metrics-server-0.3.2/deploy/1.8+/
+
+
+# 保存配置
+export k8s_old_version=1.11.0
+export k8s_version=1.12.0
+export kubeadm_config=kubeadmin-${k8s_old_version}-view.conf
+
+kubeadm config view &gt; ${kubeadm_config}
+# 或者通过configmap (注意是 ClusterConfiguration)
+kubectl get configmap -n kube-system kubeadm-config -o jsonpath={.data.MasterConfiguration} &gt; ${kubeadm_config}
+
+
+yum makecache all
+version=$(yum list kubeadm --showduplicates | sort -r|grep ${k8s_version}|awk '{print $2}')
+echo $version
+
+yum install -y kubeadm-${version} --disableexcludes=kubernetes
+
+
+kubeadm upgrade plan
+COMPONENT   CURRENT   AVAILABLE
+Etcd        3.3.11    3.2.24
+
+Upgrade to the latest version in the v1.11 series:
+
+COMPONENT            CURRENT   AVAILABLE
+API Server           v1.11.0   v1.12.0
+Controller Manager   v1.11.0   v1.12.0
+Scheduler            v1.11.0   v1.12.0
+Kube Proxy           v1.11.0   v1.12.0
+CoreDNS              1.1.3     1.2.2
+
+
+
+
+
+
+#修改image地址(之前是registry.cn-hangzhou.aliyuncs.com/k8sth)
+vim ${kubeadm_config}
+imageRepository: registry.cn-hangzhou.aliyuncs.com/google_containers
+
+
+kubeadm upgrade apply v${k8s_version}  --config ${kubeadm_config} --dry-run
+
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-controller-manager:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-scheduler:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-apiserver:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/coredns:1.2.2
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/etcd:3.2.24
+
+kubeadm upgrade apply v${k8s_version} --config ${kubeadm_config}
+
+
+yum install -y kubelet-${version} kubectl-${version} --disableexcludes=kubernetes
+
+systemctl daemon-reload
+systemctl restart kubelet
+kubectl version
+kubelet --version
+kubectl get nodes
+
+</code></pre><!-- raw HTML omitted -->
+<h3 id="k8s112---k8s113">k8s1.12 -&gt; k8s1.13<a href="#k8s112---k8s113" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>
+
+# 保存配置
+export k8s_old_version=1.12.0
+export k8s_version=1.13.0
+export kubeadm_config=kubeadmin-${k8s_old_version}-view.conf
+
+# 通过configmap
+kubectl get configmap -n kube-system kubeadm-config -o jsonpath={.data.ClusterConfiguration} &gt; ${kubeadm_config}
+
+yum makecache all
+version=$(yum list kubeadm --showduplicates | sort -r|grep ${k8s_version}|awk '{print $2}')
+echo $version
+
+yum install -y kubeadm-${version} --disableexcludes=kubernetes
+
+kubeadm upgrade plan
+External components that should be upgraded manually before you upgrade the control plane with 'kubeadm upgrade apply':
+COMPONENT   CURRENT   AVAILABLE
+Etcd        3.3.11    3.2.24
+
+Upgrade to the latest stable version:
+
+COMPONENT            CURRENT   AVAILABLE
+API Server           v1.12.0   v1.13.0
+Controller Manager   v1.12.0   v1.13.0
+Scheduler            v1.12.0   v1.13.0
+Kube Proxy           v1.12.0   v1.13.0
+CoreDNS              1.2.2     1.2.6
+
+
+
+
+
+kubeadm upgrade apply v${k8s_version}  --config ${kubeadm_config} --dry-run
+
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-controller-manager:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-scheduler:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-apiserver:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/coredns:1.2.6
+
+kubeadm upgrade apply v${k8s_version} --config ${kubeadm_config}
+
+yum install -y kubelet-${version} kubectl-${version} --disableexcludes=kubernetes
+
+
+systemctl daemon-reload
+systemctl restart kubelet
+kubectl version
+kubelet --version
+kubectl get nodes
+</code></pre><!-- raw HTML omitted -->
+<h3 id="k8s113---k8s114">k8s1.13 -&gt; k8s1.14<a href="#k8s113---k8s114" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code># 保存配置
+export k8s_old_version=1.13.0
+export k8s_version=1.14.0
+export kubeadm_config=kubeadmin-${k8s_old_version}-view.conf
+
+# config view或者通过configmap(2选1)
+kubeadm config view &gt; ${kubeadm_config}
+kubectl get configmap -n kube-system kubeadm-config -o jsonpath={.data.ClusterConfiguration} &gt; ${kubeadm_config}
+
+
+yum makecache all
+version=$(yum list kubeadm --showduplicates | sort -r|grep ${k8s_version}|awk '{print $2}')
+echo $version
+
+
+# 一起安装是因为kubeadm安装时会依赖kubelet, kubelet会安装最新版本(1.18.2) 
+# (这里1.14会依赖kubernetes-cni:0.7.5-0)
+yum install -y kubeadm-${version} kubelet-${version} kubectl-${version}  --disableexcludes=kubernetes
+
+
+kubeadm upgrade plan
+
+
+kubeadm upgrade apply v${k8s_version}  --config ${kubeadm_config} --dry-run
+
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-controller-manager:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-scheduler:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-apiserver:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1
+
+
+kubeadm upgrade apply v${k8s_version} --config ${kubeadm_config}
+
+
+systemctl daemon-reload
+systemctl restart kubelet
+kubectl version
+kubelet --version
+kubectl get nodes
+</code></pre><!-- raw HTML omitted -->
+<h3 id="k8s114---k8s115">k8s1.14 -&gt; k8s1.15<a href="#k8s114---k8s115" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code># 保存配置
+export k8s_old_version=1.14.0
+export k8s_version=1.15.0
+export kubeadm_config=kubeadmin-${k8s_old_version}-view.conf
+
+# config view或者通过configmap(2选1)
+kubeadm config view &gt; ${kubeadm_config}
+kubectl get configmap -n kube-system kubeadm-config -o jsonpath={.data.ClusterConfiguration} &gt; ${kubeadm_config}
+
+
+yum makecache all
+version=$(yum list kubeadm --showduplicates | sort -r|grep ${k8s_version}|awk '{print $2}')
+
+# 一起安装是因为kubeadm安装时会依赖kubelet, kubelet会安装最新版本(1.18.2) 
+yum install -y kubeadm-${version} kubelet-${version} kubectl-${version}  --disableexcludes=kubernetes
+
+kubeadm upgrade plan
+
+kubeadm upgrade apply v${k8s_version}  --config ${kubeadm_config} --dry-run
+
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-controller-manager:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-scheduler:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-apiserver:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1
+
+
+kubeadm upgrade apply v${k8s_version} --config ${kubeadm_config}
+
+
+systemctl daemon-reload
+systemctl restart kubelet
+kubectl version
+kubelet --version
+kubectl get nodes
+</code></pre><!-- raw HTML omitted -->
+<h3 id="k8s1150---k8s11511-选择11是因为google_containerskube-proxyv11512-not-found">k8s1.15.0 -&gt; k8s1.15.11 (选择11是因为google_containers/kube-proxy:v1.15.12 not found)<a href="#k8s1150---k8s11511-选择11是因为google_containerskube-proxyv11512-not-found" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code># 保存配置
+export k8s_old_version=1.15.0
+export k8s_version=1.15.11
+export kubeadm_config=kubeadmin-${k8s_old_version}-view.conf
+
+# config view或者通过configmap(2选1)
+kubeadm config view &gt; ${kubeadm_config}
+kubectl get configmap -n kube-system kubeadm-config -o jsonpath={.data.ClusterConfiguration} &gt; ${kubeadm_config}
+
+
+yum makecache all
+version=$(yum list kubeadm --showduplicates | sort -r|grep ${k8s_version}|awk '{print $2}')
+
+# 一起安装是因为kubeadm安装时会依赖kubelet, kubelet会安装最新版本(1.18.2) 
+yum install -y kubeadm-${version}  --disableexcludes=kubernetes
+
+kubeadm upgrade plan
+COMPONENT   CURRENT   AVAILABLE
+Etcd        3.3.11    3.3.10
+
+COMPONENT            CURRENT   AVAILABLE
+API Server           v1.15.0   v1.15.11
+Controller Manager   v1.15.0   v1.15.11
+Scheduler            v1.15.0   v1.15.11
+Kube Proxy           v1.15.0   v1.15.11
+CoreDNS              1.3.1     1.3.1
+
+kubeadm upgrade apply v${k8s_version}  --config ${kubeadm_config} --dry-run
+
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-controller-manager:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-scheduler:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-apiserver:v${k8s_version}
+docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1
+
+
+kubeadm upgrade apply v${k8s_version} --config ${kubeadm_config}
+
+yum install -y kubelet-${version} kubectl-${version}  --disableexcludes=kubernetes
+
+systemctl daemon-reload
+systemctl restart kubelet
+kubectl version
+kubelet --version
+kubectl get nodes
+</code></pre><!-- raw HTML omitted -->
+<h3 id="升级docker-慎用">升级docker (慎用)<a href="#升级docker-慎用" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>yum install docker-ce-18.09.9 docker-ce-cli-18.09.9
+
+# 重启docker, k8s集群会间断(如果是多台, 将重启的节点taint剔除集群重启即可)
+service docker restart
+
+</code></pre><hr>
+<!-- raw HTML omitted -->
+<h3 id="升级单机版rancher">升级单机版rancher<a href="#升级单机版rancher" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>这里之前是2.1.9版本, 更新为stable(2.4.3) ,我这里rancher只是用导入方式,rancher宕机不影响k8s集群</p>
+</blockquote>
+<ol>
+<li>首先将swarm启动的rancher停用:
+<code>docker service rm rancher_rancher</code></li>
+<li>其次将data目录备份
+<code>cp -ra /data/rancher /data/rancher_2.1.9_2020-05-20_bak</code></li>
+<li>修改docker-compose.yml重新启动
+<code>docker stack deploy -c docker-compose.yml rancher</code></li>
+<li>查看日志
+<code>docker logs -f $(docker ps|grep rancher_rancher|awk '{print $1}')</code></li>
+<li>恢复(停止服务,将备份的目录还原重新启动即可)</li>
+</ol>
+<ul>
+<li>docker-compose.yml</li>
+</ul>
+<pre><code>version: '3'
+services:
+  rancher:
+    hostname: rancher
+    image: rancher/rancher:stable
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - /data/rancher/data/:/var/lib/rancher/
+    ports:
+      - 10080:80
+      - 10443:443
+    networks:
+      - rancher_net
+networks:
+  rancher_net:
+</code></pre><!-- raw HTML omitted -->
+<hr>
+<h3 id="问题">问题<a href="#问题" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="1-版本选择的image配置问题">1. 版本选择的image配置问题<a href="#1-版本选择的image配置问题" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>开始选择升级到k8s1.11.10版本, 但是镜像版本只有registry.cn-hangzhou.aliyuncs.com/k8sth/kube-proxy-amd64:v1.11.0 , 没有找到v1.11.10
+</code></pre><h4 id="2-112版本开始阿里云镜像地址变化">2. 1.12版本开始阿里云镜像地址变化<a href="#2-112版本开始阿里云镜像地址变化" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v1.12.0
+registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1
+
+</code></pre><h4 id="3-如果执行升级中断或停止-可以">3. 如果执行升级中断或停止, 可以<a href="#3-如果执行升级中断或停止-可以" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>kubeadm upgrade --force。
+</code></pre><h4 id="4-如果跨版本升级">4. 如果跨版本升级<a href="#4-如果跨版本升级" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code> - Specified version to upgrade to &quot;v1.16.2&quot; is too high; kubeadm can upgrade only 1 minor version at a time
+ - Specified version to upgrade to &quot;v1.16.2&quot; is at least one minor release higher than the kubeadm minor release (16 &gt; 11). Such an upgrade is not supported
+</code></pre><h4 id="5-k8s111-开启使用了pause31">5. k8s1.11 开启使用了pause:3.1<a href="#5-k8s111-开启使用了pause31" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>k8s1.11开始kubelet的配置文件修改为:
+vim /var/lib/kubelet/kubeadm-flags.env
+增加--pod-infra-container-image=registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1
+
+</code></pre><h4 id="6-在112-113升级完成后报错-openapi-spec-for-v1beta1metricsk8sio-failed-with-openapi-spec-does-not-exists">6. 在1.12-&gt;1.13升级完成后报错: OpenAPI spec for &ldquo;v1beta1.metrics.k8s.io&rdquo; failed with: OpenAPI spec does not exists<a href="#6-在112-113升级完成后报错-openapi-spec-for-v1beta1metricsk8sio-failed-with-openapi-spec-does-not-exists" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code># 1.11 -&gt; 1.12 k8s_kube-apiserver日志
+E0520 06:21:09.369346       1 memcache.go:134] couldn't get resource list for crd.projectcalico.org/v1: the server could not find the requested resource
+E0520 06:21:09.369725       1 memcache.go:134] couldn't get resource list for authentication.istio.io/v1alpha1: the server could not find the requested resource
+E0520 06:21:09.370842       1 memcache.go:134] couldn't get resource list for certmanager.k8s.io/v1alpha1: the server could not find the requested resource
+E0520 06:21:09.371925       1 memcache.go:134] couldn't get resource list for rbac.istio.io/v1alpha1: the server could not find the requested resource
+E0520 06:21:09.373016       1 memcache.go:134] couldn't get resource list for config.istio.io/v1alpha2: the server could not find the requested resource
+E0520 06:21:09.374083       1 memcache.go:134] couldn't get resource list for networking.istio.io/v1alpha3: the server could not find the requested resource
+E0520 06:21:09.375179       1 memcache.go:134] couldn't get resource list for metrics.k8s.io/v1beta1: the server could not find the requested resource
+
+# 1.12-&gt;1.13 k8s_kube-apiserver日志
+OpenAPI spec for &quot;v1beta1.metrics.k8s.io&quot; failed with: OpenAPI spec does not exists
+
+原因是我这边metrics-server 和prometheus-adapter 部署的时候用到了metrics.k8s.io/v1beta1
+但是升级之后这个api-version丢失了, 所以导致apiserver一直报错, 无法启动成功
+
+
+</code></pre><h4 id="7-单机k8s升级会造成服务中断">7. 单机k8s升级会造成服务中断<a href="#7-单机k8s升级会造成服务中断" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code># 1.10 ~ 1.13
+升级会导致核心组件apiserver,scheduler,controller,coredns,网络calico等由于版本升级都需要重新启动了一次, 部分其他业务pod也会重启
+其中nodejs服务会pm2重启,mysql等也会重启 ,会导致服务器压力上升
+这里检测到有状态statefulset的服务并没有重启, 而无状态的deployment会重启, 由于单机1个pod的服务重启会导致中断
+所以避免业务中断必须是多主机集群, 在升级之前先taint机器升级
+
+# 1.13 -&gt; 1.14
+这期间有状态statefulset的服务也重启了
+
+# 1.14 ~ 1.15.11
+这期间有状态statefulset的服务没有重启
+
+</code></pre><h4 id="8-注意113-114的时候安装kubeadm可能会依赖kubelet自动安装了最新版本">8. 注意1.13-&gt;1.14的时候安装kubeadm可能会依赖kubelet自动安装了最新版本<a href="#8-注意113-114的时候安装kubeadm可能会依赖kubelet自动安装了最新版本" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code># 一起安装是因为kubeadm安装时会依赖kubelet, kubelet会安装最新版本(1.18.2) 
+# (这里1.14会依赖kubernetes-cni:0.7.5-0)
+yum install -y kubeadm-${version} kubelet-${version} kubectl-${version}  --disableexcludes=kubernetes
+
+</code></pre>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/k8s">k8s</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1501 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-05-19 01:43 &#43;0800</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/49-go%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>go简单记录</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/47-k8s%E5%AE%89%E8%A3%85promethues-alertmanager-grafana/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>k8s安装promethues&#43;alertmanager&#43;grafana</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-166045776-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

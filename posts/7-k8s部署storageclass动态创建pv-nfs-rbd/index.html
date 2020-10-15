@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="k8s部署storageclass动态创建pv(nfs&amp;rbd)">
+<meta itemprop="description" content="考虑到k8s存储的问题, 本机目录挂载存在太大局限性, 多node多pod的服务存储急迫需要共享存储, 这里简单应用k8s storageclass nfs和rbd存储
+第一部分 nfs 这里单节点简单配置nfs(高并发可采用nfs&#43;rsync&#43;inotify或Sersync)  高并发参考
+ NFS高可用(NFS&#43;keepalive&#43;Sersync) inotify&#43;rsync实时备份总结
+#安装nfs yum install -y nfs-utils rpcbind # 创建目录 mkdir /data/nfs echo &quot;/data/nfs 192.168.0.0/24(rw,sync,no_root_squash) &quot; &gt;&gt;/etc/exports # 启动服务 systemctl start rpcbind systemctl start nfs k8s部署storageclass环境-nfs 导入外部配置 git clone https://github.com/kubernetes-incubator/external-storage.git cd external-storage/nfs-client/deploy #注意 1 node节点需要安装nfs-utils(centos7),nfs-common(ubuntu) 修改deployment.yaml apiVersion: v1 kind: ServiceAccount metadata: name: nfs-client-provisioner --- kind: Deployment apiVersion: extensions/v1beta1 metadata: name: nfs-client-provisioner spec: replicas: 1 strategy: type: Recreate template: metadata: labels: app: nfs-client-provisioner spec: serviceAccountName: nfs-client-provisioner containers: - name: nfs-client-provisioner image: quay.">
+<meta itemprop="datePublished" content="2019-09-26T14:12:49+00:00" />
+<meta itemprop="dateModified" content="2019-09-26T14:12:49+00:00" />
+<meta itemprop="wordCount" content="768">
+
+
+
+<meta itemprop="keywords" content="ceph,nfs,k8s,k8s存储,storageclass," />
+<meta property="og:title" content="k8s部署storageclass动态创建pv(nfs&amp;rbd)" />
+<meta property="og:description" content="考虑到k8s存储的问题, 本机目录挂载存在太大局限性, 多node多pod的服务存储急迫需要共享存储, 这里简单应用k8s storageclass nfs和rbd存储
+第一部分 nfs 这里单节点简单配置nfs(高并发可采用nfs&#43;rsync&#43;inotify或Sersync)  高并发参考
+ NFS高可用(NFS&#43;keepalive&#43;Sersync) inotify&#43;rsync实时备份总结
+#安装nfs yum install -y nfs-utils rpcbind # 创建目录 mkdir /data/nfs echo &quot;/data/nfs 192.168.0.0/24(rw,sync,no_root_squash) &quot; &gt;&gt;/etc/exports # 启动服务 systemctl start rpcbind systemctl start nfs k8s部署storageclass环境-nfs 导入外部配置 git clone https://github.com/kubernetes-incubator/external-storage.git cd external-storage/nfs-client/deploy #注意 1 node节点需要安装nfs-utils(centos7),nfs-common(ubuntu) 修改deployment.yaml apiVersion: v1 kind: ServiceAccount metadata: name: nfs-client-provisioner --- kind: Deployment apiVersion: extensions/v1beta1 metadata: name: nfs-client-provisioner spec: replicas: 1 strategy: type: Recreate template: metadata: labels: app: nfs-client-provisioner spec: serviceAccountName: nfs-client-provisioner containers: - name: nfs-client-provisioner image: quay." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/7-k8s%E9%83%A8%E7%BD%B2storageclass%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BApv-nfs-rbd/" />
+<meta property="article:published_time" content="2019-09-26T14:12:49+00:00" />
+<meta property="article:modified_time" content="2019-09-26T14:12:49+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="k8s部署storageclass动态创建pv(nfs&amp;rbd)"/>
+<meta name="twitter:description" content="考虑到k8s存储的问题, 本机目录挂载存在太大局限性, 多node多pod的服务存储急迫需要共享存储, 这里简单应用k8s storageclass nfs和rbd存储
+第一部分 nfs 这里单节点简单配置nfs(高并发可采用nfs&#43;rsync&#43;inotify或Sersync)  高并发参考
+ NFS高可用(NFS&#43;keepalive&#43;Sersync) inotify&#43;rsync实时备份总结
+#安装nfs yum install -y nfs-utils rpcbind # 创建目录 mkdir /data/nfs echo &quot;/data/nfs 192.168.0.0/24(rw,sync,no_root_squash) &quot; &gt;&gt;/etc/exports # 启动服务 systemctl start rpcbind systemctl start nfs k8s部署storageclass环境-nfs 导入外部配置 git clone https://github.com/kubernetes-incubator/external-storage.git cd external-storage/nfs-client/deploy #注意 1 node节点需要安装nfs-utils(centos7),nfs-common(ubuntu) 修改deployment.yaml apiVersion: v1 kind: ServiceAccount metadata: name: nfs-client-provisioner --- kind: Deployment apiVersion: extensions/v1beta1 metadata: name: nfs-client-provisioner spec: replicas: 1 strategy: type: Recreate template: metadata: labels: app: nfs-client-provisioner spec: serviceAccountName: nfs-client-provisioner containers: - name: nfs-client-provisioner image: quay."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>k8s部署storageclass动态创建pv(nfs&amp;rbd)</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/posts/">文章</a>
+					<a href="https://blog.k1s.club/k8s-categories/">Kubernetes系列</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Sep 26, 2019</span></div>
+				<h1>k8s部署storageclass动态创建pv(nfs&amp;rbd)</h1>
+			</header>
+			<div class="content">
+				<p>考虑到k8s存储的问题, 本机目录挂载存在太大局限性, 多node多pod的服务存储急迫需要共享存储, 这里简单应用k8s storageclass nfs和rbd存储</p>
+<!-- raw HTML omitted -->
+<h1 id="第一部分-nfs">第一部分 nfs<a href="#第一部分-nfs" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
+<h3 id="这里单节点简单配置nfs高并发可采用nfsrsyncinotify或sersync">这里单节点简单配置nfs(高并发可采用nfs+rsync+inotify或Sersync)<a href="#这里单节点简单配置nfs高并发可采用nfsrsyncinotify或sersync" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>高并发参考</p>
+</blockquote>
+<p><a href="https://cloud.tencent.com/developer/article/1445884">NFS高可用(NFS+keepalive+Sersync)</a>
+<a href="https://blog.51cto.com/lzhnb/2088224">inotify+rsync实时备份总结</a></p>
+<pre><code>#安装nfs
+yum install -y nfs-utils rpcbind
+
+# 创建目录
+mkdir /data/nfs
+echo &quot;/data/nfs 192.168.0.0/24(rw,sync,no_root_squash) &quot; &gt;&gt;/etc/exports
+
+# 启动服务
+systemctl start rpcbind
+systemctl start nfs
+</code></pre><h3 id="k8s部署storageclass环境-nfs">k8s部署storageclass环境-nfs<a href="#k8s部署storageclass环境-nfs" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="导入外部配置">导入外部配置<a href="#导入外部配置" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>git clone https://github.com/kubernetes-incubator/external-storage.git
+cd external-storage/nfs-client/deploy
+
+#注意
+1  node节点需要安装nfs-utils(centos7),nfs-common(ubuntu)
+</code></pre><h4 id="修改deploymentyaml">修改deployment.yaml<a href="#修改deploymentyaml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nfs-client-provisioner
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: nfs-client-provisioner
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nfs-client-provisioner
+    spec:
+      serviceAccountName: nfs-client-provisioner
+      containers:
+        - name: nfs-client-provisioner
+          image: quay.io/external_storage/nfs-client-provisioner:latest
+          volumeMounts:
+            - name: nfs-client-root
+              mountPath: /persistentvolumes
+          env:
+            - name: PROVISIONER_NAME
+              value: nfs.com/nfs
+            - name: NFS_SERVER
+              value: 192.168.0.134
+            - name: NFS_PATH
+              value: /data/nfs
+      volumes:
+        - name: nfs-client-root
+          nfs:
+            server: 192.168.0.134
+            path: /data/nfs
+</code></pre><h4 id="修改classyaml">修改class.yaml<a href="#修改classyaml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs
+provisioner: nfs.com/nfs
+parameters:
+  archiveOnDelete: &quot;false&quot;
+</code></pre><h4 id="rbacyaml不用修改">rbac.yaml不用修改<a href="#rbacyaml不用修改" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>rbac.yaml
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: nfs-client-provisioner
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: nfs-client-provisioner-runner
+rules:
+  - apiGroups: [&quot;&quot;]
+    resources: [&quot;persistentvolumes&quot;]
+    verbs: [&quot;get&quot;, &quot;list&quot;, &quot;watch&quot;, &quot;create&quot;, &quot;delete&quot;]
+  - apiGroups: [&quot;&quot;]
+    resources: [&quot;persistentvolumeclaims&quot;]
+    verbs: [&quot;get&quot;, &quot;list&quot;, &quot;watch&quot;, &quot;update&quot;]
+  - apiGroups: [&quot;storage.k8s.io&quot;]
+    resources: [&quot;storageclasses&quot;]
+    verbs: [&quot;get&quot;, &quot;list&quot;, &quot;watch&quot;]
+  - apiGroups: [&quot;&quot;]
+    resources: [&quot;events&quot;]
+    verbs: [&quot;create&quot;, &quot;update&quot;, &quot;patch&quot;]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: run-nfs-client-provisioner
+subjects:
+  - kind: ServiceAccount
+    name: nfs-client-provisioner
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: nfs-client-provisioner-runner
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: leader-locking-nfs-client-provisioner
+rules:
+  - apiGroups: [&quot;&quot;]
+    resources: [&quot;endpoints&quot;]
+    verbs: [&quot;get&quot;, &quot;list&quot;, &quot;watch&quot;, &quot;create&quot;, &quot;update&quot;, &quot;patch&quot;]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: leader-locking-nfs-client-provisioner
+subjects:
+  - kind: ServiceAccount
+    name: nfs-client-provisioner
+    # replace with namespace where provisioner is deployed
+    namespace: default
+roleRef:
+  kind: Role
+  name: leader-locking-nfs-client-provisioner
+  apiGroup: rbac.authorization.k8s.io
+</code></pre><h4 id="部署nfs环境创建nfs存储类">部署nfs环境(创建nfs存储类)<a href="#部署nfs环境创建nfs存储类" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>kubectl apply -f rbac.yaml -f class.yaml -f deployment.yaml
+</code></pre><hr>
+<h3 id="k8s中部署nginx项目采用nfs存储">k8s中部署nginx项目采用nfs存储<a href="#k8s中部署nginx项目采用nfs存储" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="部署nginx-deployment-nfsyaml测试nfs">部署nginx-deployment-nfs.yaml(测试nfs)<a href="#部署nginx-deployment-nfsyaml测试nfs" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<blockquote>
+<p>这种方式会创建一个pvc 挂载到多个pod中,这种方式适合nginx-html挂载</p>
+</blockquote>
+<pre><code>---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: html0-deploy-nfs
+  annotations:
+    volume.beta.kubernetes.io/storage-class: 'nfs'
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx0-deploy
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx0-deploy
+    spec:
+      containers:
+      - name: nginx0-deploy
+        image: hub.zhangzw.com/bq/nginx:1.15.12
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: html0-deploy-nfs
+          mountPath: /usr/share/nginx/html
+        - name: nginx-config
+          mountPath: &quot;/etc/nginx/conf.d&quot;
+      volumes:
+      - name: nginx-config
+        configMap:
+            name: nginx-config
+      - name: html0-deploy-nfs
+        persistentVolumeClaim:
+          claimName: html0-deploy-nfs
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  default.conf: |
+            server {
+              listen       80;
+              server_name  localhost;
+              root   /usr/share/nginx/html/;
+              access_log  /var/log/nginx/host_access.log;
+              error_log  /var/log/nginx/host_error.log debug;
+              location / {
+                  root   /usr/share/nginx/html/;
+                  index  index.html index.htm index.php;
+              }
+              error_page   500 502 503 504  /50x.html;
+
+              location = /50x.html {
+                  root   /usr/share/nginx/html;
+              }
+              }
+</code></pre><h4 id="部署nginx-statefulset-nfsyaml测试nfs">部署nginx-statefulset-nfs.yaml(测试nfs)<a href="#部署nginx-statefulset-nfsyaml测试nfs" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<blockquote>
+<p>这里statefulset 方式会创建多个pvc, 每个pod的html就可以都不一样!</p>
+</blockquote>
+<pre><code>---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: nginx3
+spec:
+  serviceName: &quot;nginx&quot;
+  replicas: 2
+  volumeClaimTemplates:
+  - metadata:
+      name: html
+      annotations:
+        volume.beta.kubernetes.io/storage-class: &quot;nfs&quot; # 这里配置 上面创建的 storageclass 的名称
+    spec:
+      accessModes: [ &quot;ReadWriteOnce&quot; ]
+      resources:
+        requests:
+          storage: 2Gi
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: hub.zhangzw.com/bq/nginx:1.15.12
+        volumeMounts:
+        - mountPath: &quot;/usr/share/nginx/html/&quot;
+          name: html
+        - mountPath: &quot;/etc/nginx/conf.d&quot;
+          name: nginx-config
+      volumes:
+      - name: nginx-config
+        configMap:
+            name: nginx-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  default.conf: |
+            server {
+              listen       80;
+              server_name  localhost;
+              root   /usr/share/nginx/html/;
+              access_log  /var/log/nginx/host_access.log;
+              error_log  /var/log/nginx/host_error.log debug;
+              location / {
+                  root   /usr/share/nginx/html/;
+                  index  index.html index.htm index.php;
+              }
+              error_page   500 502 503 504  /50x.html;
+
+              location = /50x.html {
+                  root   /usr/share/nginx/html;
+              }
+              }
+</code></pre><hr>
+<h3 id="另外说明一下将nfs作为文件存储类似mount方式这种方式不适用于多容器自动化部署-显然这种并不适合ceph-rbd存储-cephfs是可以的">另外说明一下将nfs作为文件存储类似mount方式,这种方式不适用于多容器自动化部署 ,显然这种并不适合ceph rbd存储, cephfs是可以的<a href="#另外说明一下将nfs作为文件存储类似mount方式这种方式不适用于多容器自动化部署-显然这种并不适合ceph-rbd存储-cephfs是可以的" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="首先需要在nfs目录创建需要挂载的目录">首先需要在nfs目录创建需要挂载的目录<a href="#首先需要在nfs目录创建需要挂载的目录" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>#例如
+mkdir -p /data/nfs/k8s-db-t/mysql-data-dev
+</code></pre><h4 id="在部署的yml中直接mount-nfs的目录">在部署的yml中直接mount nfs的目录<a href="#在部署的yml中直接mount-nfs的目录" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mysql-server
+  namespace: devops
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql-server
+    spec:
+      containers:
+      - image: mysql:5.7.16
+        imagePullPolicy: Always
+        name: mysql-server
+        ports:
+        - containerPort: 3306
+          protocol: TCP
+        volumeMounts:
+          - name: mysql-data
+            mountPath: /var/lib/mysql
+        resources:
+          requests:
+            cpu: 40m
+            memory: 32Mi
+          limits:
+            cpu: &quot;300m&quot;
+            memory: 256Mi
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: &quot;admin&quot;
+        - name: MYSQL_DATABASE
+          value: &quot;gogs&quot;
+        - name: MYSQL_USER
+          value: &quot;gogs&quot;
+        - name: MYSQL_PASSWORD
+          value: &quot;gogspass&quot;
+        - name: TZ
+          value: &quot;Asia/Shanghai&quot;
+      volumes:
+        - name: mysql-data
+          nfs:
+            server: 192.168.0.134
+            path: /data/nfs/k8s-db-t/mysql-data-dev
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: devops
+spec:
+  clusterIP: None
+  selector:
+    app: mysql-server
+  ports:
+  - name: http
+    port: 3306
+</code></pre><hr>
+<h1 id="第二部分-ceph">第二部分 ceph<a href="#第二部分-ceph" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
+<h3 id="k8s部署storageclass环境-ceph">k8s部署storageclass环境-ceph<a href="#k8s部署storageclass环境-ceph" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="如果集群是用kubeadm部署的由于controller-manager官方镜像中没有rbd命令所以我们要导入外部配置">如果集群是用kubeadm部署的，由于controller-manager官方镜像中没有rbd命令，所以我们要导入外部配置<a href="#如果集群是用kubeadm部署的由于controller-manager官方镜像中没有rbd命令所以我们要导入外部配置" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>git clone https://github.com/kubernetes-incubator/external-storage.git
+cd external-storage/ceph/rbd/deploy
+</code></pre><blockquote>
+<p>以下整合在一个文件, 两个版本,默认 和retain</p>
+</blockquote>
+<h4 id="storageclass-cepmcom-rbdyaml">storageclass-cepm.com-rbd.yaml<a href="#storageclass-cepmcom-rbdyaml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>---
+apiVersion: v1
+data:
+  key: QVFEYzJRbGQ1VjI5THhBQU00WUtPUU5sUVJqdWtLSWJ2VDZ0a3c9PQ==
+kind: Secret
+metadata:
+  name: ceph-secret-admin
+type: kubernetes.io/rbd
+---
+apiVersion: v1
+data:
+  key: QVFEYzJRbGQ1VjI5THhBQU00WUtPUU5sUVJqdWtLSWJ2VDZ0a3c9PQ==
+kind: Secret
+metadata:
+  name: ceph-secret-admin
+  namespace: ns-elastic
+type: kubernetes.io/rbd
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rbd
+  annotations:
+    storageclass.kubernetes.io/is-default-class: &quot;true&quot;
+provisioner: ceph.com/rbd
+parameters:
+  monitors: 192.168.0.134:6789
+  adminId: admin
+  adminSecretName: ceph-secret-admin
+  adminSecretNamespace: default
+  pool: storageclass-rbd
+  userId: admin
+  userSecretName: ceph-secret-admin
+  fsType: ext4
+  imageFormat: &quot;2&quot;
+  imageFeatures: &quot;layering&quot;
+</code></pre><h4 id="storageclass-cepmcom-rbd-retainyaml">storageclass-cepm.com-rbd-retain.yaml<a href="#storageclass-cepmcom-rbd-retainyaml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>---
+apiVersion: v1
+data:
+  key: QVFEYzJRbGQ1VjI5THhBQU00WUtPUU5sUVJqdWtLSWJ2VDZ0a3c9PQ==
+kind: Secret
+metadata:
+  name: ceph-secret-admin
+type: kubernetes.io/rbd
+---
+apiVersion: v1
+data:
+  key: QVFEYzJRbGQ1VjI5THhBQU00WUtPUU5sUVJqdWtLSWJ2VDZ0a3c9PQ==
+kind: Secret
+metadata:
+  name: ceph-secret-admin
+  namespace: ns-elastic
+type: kubernetes.io/rbd
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rbd-retain
+  annotations:
+    storageclass.kubernetes.io/is-default-class: &quot;false&quot;
+provisioner: ceph.com/rbd
+reclaimPolicy: Retain
+parameters:
+  monitors: 192.168.0.134:6789
+  adminId: admin
+  adminSecretName: ceph-secret-admin
+  adminSecretNamespace: default
+  pool: storageclass-rbd-retain
+  userId: admin
+  userSecretName: ceph-secret-admin
+  fsType: ext4
+  imageFormat: &quot;2&quot;
+  imageFeatures: &quot;layering&quot;
+</code></pre><h4 id="k8s中部署nginx项目采用-cephcomrbd-和nfs类似-这里省略">k8s中部署nginx项目采用 ceph.com/rbd 和nfs类似, 这里省略<a href="#k8s中部署nginx项目采用-cephcomrbd-和nfs类似-这里省略" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<blockquote>
+<p>以上采用的是persistentVolumeClaim 方式动态分配全部内容</p>
+</blockquote>
+
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/ceph">ceph</a></span><span class="tag"><a href="https://blog.k1s.club/tags/nfs">nfs</a></span><span class="tag"><a href="https://blog.k1s.club/tags/k8s">k8s</a></span><span class="tag"><a href="https://blog.k1s.club/tags/k8s%E5%AD%98%E5%82%A8">k8s存储</a></span><span class="tag"><a href="https://blog.k1s.club/tags/storageclass">storageclass</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>768 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-09-26 22:12 &#43;0800</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/8-mysql5-7%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>mysql5.7二进制部署</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/6-ceph%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>ceph安装部署</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-166045776-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

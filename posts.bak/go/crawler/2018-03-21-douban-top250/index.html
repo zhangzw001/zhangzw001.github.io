@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="爬取豆瓣电影 Top250">
+<meta itemprop="description" content="爬虫是标配了，看数据那一刻很有趣。第一个就从最最最简单最基础的爬虫开始写起吧！
+项目地址：https://github.com/go-crawler/douban-movie
+目标 我们的目标站点是 豆瓣电影 Top250，估计大家都很眼熟了
+本次爬取 8 个字段，用于简单的概括分析。具体的字段如下：
+简单的分析一下目标源
+ 一页共 25 条 含分页（共 10 页）且分页规则是正常的 每一项的数据字段排序都是规则且不变  开始 由于量不大，我们的爬取步骤如下
+ 分析页面，获取所有的分页 分析页面，循环爬取所有页面的电影信息 爬取的电影信息入库  安装 $ go get -u github.com/PuerkitoBio/goquery 运行 $ go run main.go 代码片段 1、获取所有分页 func ParsePages(doc *goquery.Document) (pages []Page) { pages = append(pages, Page{Page: 1, Url: &#34;&#34;}) doc.Find(&#34;#content &gt; div &gt; div.article &gt; div.paginator &gt; a&#34;).Each(func(i int, s *goquery.Selection) { page, _ := strconv.Atoi(s.Text()) url, _ := s.">
+<meta itemprop="datePublished" content="2018-03-21T12:30:00+00:00" />
+<meta itemprop="dateModified" content="2018-03-21T12:30:00+00:00" />
+<meta itemprop="wordCount" content="161">
+
+
+
+<meta itemprop="keywords" content="go,数据分析," />
+<meta property="og:title" content="爬取豆瓣电影 Top250" />
+<meta property="og:description" content="爬虫是标配了，看数据那一刻很有趣。第一个就从最最最简单最基础的爬虫开始写起吧！
+项目地址：https://github.com/go-crawler/douban-movie
+目标 我们的目标站点是 豆瓣电影 Top250，估计大家都很眼熟了
+本次爬取 8 个字段，用于简单的概括分析。具体的字段如下：
+简单的分析一下目标源
+ 一页共 25 条 含分页（共 10 页）且分页规则是正常的 每一项的数据字段排序都是规则且不变  开始 由于量不大，我们的爬取步骤如下
+ 分析页面，获取所有的分页 分析页面，循环爬取所有页面的电影信息 爬取的电影信息入库  安装 $ go get -u github.com/PuerkitoBio/goquery 运行 $ go run main.go 代码片段 1、获取所有分页 func ParsePages(doc *goquery.Document) (pages []Page) { pages = append(pages, Page{Page: 1, Url: &#34;&#34;}) doc.Find(&#34;#content &gt; div &gt; div.article &gt; div.paginator &gt; a&#34;).Each(func(i int, s *goquery.Selection) { page, _ := strconv.Atoi(s.Text()) url, _ := s." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts.bak/go/crawler/2018-03-21-douban-top250/" />
+<meta property="article:published_time" content="2018-03-21T12:30:00+00:00" />
+<meta property="article:modified_time" content="2018-03-21T12:30:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="爬取豆瓣电影 Top250"/>
+<meta name="twitter:description" content="爬虫是标配了，看数据那一刻很有趣。第一个就从最最最简单最基础的爬虫开始写起吧！
+项目地址：https://github.com/go-crawler/douban-movie
+目标 我们的目标站点是 豆瓣电影 Top250，估计大家都很眼熟了
+本次爬取 8 个字段，用于简单的概括分析。具体的字段如下：
+简单的分析一下目标源
+ 一页共 25 条 含分页（共 10 页）且分页规则是正常的 每一项的数据字段排序都是规则且不变  开始 由于量不大，我们的爬取步骤如下
+ 分析页面，获取所有的分页 分析页面，循环爬取所有页面的电影信息 爬取的电影信息入库  安装 $ go get -u github.com/PuerkitoBio/goquery 运行 $ go run main.go 代码片段 1、获取所有分页 func ParsePages(doc *goquery.Document) (pages []Page) { pages = append(pages, Page{Page: 1, Url: &#34;&#34;}) doc.Find(&#34;#content &gt; div &gt; div.article &gt; div.paginator &gt; a&#34;).Each(func(i int, s *goquery.Selection) { page, _ := strconv.Atoi(s.Text()) url, _ := s."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>爬取豆瓣电影 Top250</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/posts/">文章</a>
+					<a href="https://blog.k1s.club/k8s-categories/">Kubernetes系列</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner thin animated fadeIn faster">
+		<h1>爬取豆瓣电影 Top250</h1>
+		<div class="content">
+			<p>爬虫是标配了，看数据那一刻很有趣。第一个就从最最最简单最基础的爬虫开始写起吧！</p>
+<p>项目地址：https://github.com/go-crawler/douban-movie</p>
+<h2 id="目标">目标<a href="#目标" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p>我们的目标站点是 <a href="https://movie.douban.com/top250">豆瓣电影 Top250</a>，估计大家都很眼熟了</p>
+<p>本次爬取 8 个字段，用于简单的概括分析。具体的字段如下：</p>
+<p><img src="https://i.loli.net/2018/03/20/5ab11596b8810.png" alt="image"></p>
+<p>简单的分析一下目标源</p>
+<ul>
+<li>一页共 25 条</li>
+<li>含分页（共 10 页）且分页规则是正常的</li>
+<li>每一项的数据字段排序都是规则且不变</li>
+</ul>
+<h2 id="开始">开始<a href="#开始" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p>由于量不大，我们的爬取步骤如下</p>
+<ul>
+<li>分析页面，获取所有的分页</li>
+<li>分析页面，循环爬取所有页面的电影信息</li>
+<li>爬取的电影信息入库</li>
+</ul>
+<h3 id="安装">安装<a href="#安装" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>$ go get -u github.com/PuerkitoBio/goquery
+</code></pre><h3 id="运行">运行<a href="#运行" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>$ go run main.go
+</code></pre><h3 id="代码片段">代码片段<a href="#代码片段" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="1获取所有分页">1、获取所有分页<a href="#1获取所有分页" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">ParsePages</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">goquery</span><span class="p">.</span><span class="nx">Document</span><span class="p">)</span> <span class="p">(</span><span class="nx">pages</span> <span class="p">[]</span><span class="nx">Page</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">pages</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">pages</span><span class="p">,</span> <span class="nx">Page</span><span class="p">{</span><span class="nx">Page</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">Url</span><span class="p">:</span> <span class="s">&#34;&#34;</span><span class="p">})</span>
+	<span class="nx">doc</span><span class="p">.</span><span class="nf">Find</span><span class="p">(</span><span class="s">&#34;#content &gt; div &gt; div.article &gt; div.paginator &gt; a&#34;</span><span class="p">).</span><span class="nf">Each</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">i</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">s</span> <span class="o">*</span><span class="nx">goquery</span><span class="p">.</span><span class="nx">Selection</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">page</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">strconv</span><span class="p">.</span><span class="nf">Atoi</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nf">Text</span><span class="p">())</span>
+		<span class="nx">url</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">Attr</span><span class="p">(</span><span class="s">&#34;href&#34;</span><span class="p">)</span>
+
+		<span class="nx">pages</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">pages</span><span class="p">,</span> <span class="nx">Page</span><span class="p">{</span>
+			<span class="nx">Page</span><span class="p">:</span> <span class="nx">page</span><span class="p">,</span>
+			<span class="nx">Url</span><span class="p">:</span>  <span class="nx">url</span><span class="p">,</span>
+		<span class="p">})</span>
+	<span class="p">})</span>
+
+	<span class="k">return</span> <span class="nx">pages</span>
+<span class="p">}</span>
+</code></pre></div><h4 id="2分析豆瓣电影信息">2、分析豆瓣电影信息<a href="#2分析豆瓣电影信息" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">ParseMovies</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">goquery</span><span class="p">.</span><span class="nx">Document</span><span class="p">)</span> <span class="p">(</span><span class="nx">movies</span> <span class="p">[]</span><span class="nx">Movie</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">doc</span><span class="p">.</span><span class="nf">Find</span><span class="p">(</span><span class="s">&#34;#content &gt; div &gt; div.article &gt; ol &gt; li&#34;</span><span class="p">).</span><span class="nf">Each</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">i</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">s</span> <span class="o">*</span><span class="nx">goquery</span><span class="p">.</span><span class="nx">Selection</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">title</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">Find</span><span class="p">(</span><span class="s">&#34;.hd a span&#34;</span><span class="p">).</span><span class="nf">Eq</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="nf">Text</span><span class="p">()</span>
+
+		<span class="o">...</span>
+
+		<span class="nx">movieDesc</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">Split</span><span class="p">(</span><span class="nx">DescInfo</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">&#34;/&#34;</span><span class="p">)</span>
+		<span class="nx">year</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">TrimSpace</span><span class="p">(</span><span class="nx">movieDesc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+		<span class="nx">area</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">TrimSpace</span><span class="p">(</span><span class="nx">movieDesc</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+		<span class="nx">tag</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">TrimSpace</span><span class="p">(</span><span class="nx">movieDesc</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+		<span class="nx">star</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">Find</span><span class="p">(</span><span class="s">&#34;.bd .star .rating_num&#34;</span><span class="p">).</span><span class="nf">Text</span><span class="p">()</span>
+
+		<span class="nx">comment</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">TrimSpace</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nf">Find</span><span class="p">(</span><span class="s">&#34;.bd .star span&#34;</span><span class="p">).</span><span class="nf">Eq</span><span class="p">(</span><span class="mi">3</span><span class="p">).</span><span class="nf">Text</span><span class="p">())</span>
+		<span class="nx">compile</span> <span class="o">:=</span> <span class="nx">regexp</span><span class="p">.</span><span class="nf">MustCompile</span><span class="p">(</span><span class="s">&#34;[0-9]&#34;</span><span class="p">)</span>
+		<span class="nx">comment</span> <span class="p">=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">Join</span><span class="p">(</span><span class="nx">compile</span><span class="p">.</span><span class="nf">FindAllString</span><span class="p">(</span><span class="nx">comment</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="s">&#34;&#34;</span><span class="p">)</span>
+
+		<span class="nx">quote</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">Find</span><span class="p">(</span><span class="s">&#34;.quote .inq&#34;</span><span class="p">).</span><span class="nf">Text</span><span class="p">()</span>
+
+		<span class="o">...</span>
+
+		<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;i: %d, movie: %v&#34;</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">movie</span><span class="p">)</span>
+
+		<span class="nx">movies</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">movies</span><span class="p">,</span> <span class="nx">movie</span><span class="p">)</span>
+	<span class="p">})</span>
+
+	<span class="k">return</span> <span class="nx">movies</span>
+<span class="p">}</span>
+</code></pre></div><h3 id="数据">数据<a href="#数据" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p><img src="https://i.loli.net/2018/03/21/5ab1309594741.png" alt="image"></p>
+<p><img src="https://i.loli.net/2018/03/21/5ab131ca582f8.png" alt="image"></p>
+<p><img src="https://i.loli.net/2018/03/21/5ab130d3a00d9.png" alt="image"></p>
+<p>看到这些数据，你有什么想法呢，真是好奇 :=)</p>
+
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-166045776-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

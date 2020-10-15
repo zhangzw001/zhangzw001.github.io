@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="linux遇到一些问题统计">
+<meta itemprop="description" content="记录一些Linux,nginx或其他服务一些问题
+CAP 一致性 (Consistency)：一个写操作返回成功，那么之后的读请求都必须读到这个新数据；如果返回失败，那么所有读操作都不能读到这个数据。所有节点访问同一份最新的数据。 可用性 (Availability)：对数据更新具备高可用性，请求能够及时处理，不会一直等待，即使出现节点失效。 分区容错性 (Partition tolerance)：能容忍网络分区，在网络断开的情况下，被分隔的节点仍能正常对外提供服务。 分布式算法 Basic paxos 算法 1. 获取一个Proposal ID n，为了保证Proposal ID唯一，可采用时间戳&#43;Server ID生成； 2. Proposer向所有Acceptors广播Prepare(n)请求； 3. Acceptor比较n和minProposal，如果n&gt;minProposal，minProposal=n，并且将 acceptedProposal 和 acceptedValue 返回； 4. Proposer接收到过半数回复后，如果发现有acceptedValue返回，将所有回复中acceptedProposal最大的acceptedValue作为本次提案的value，否则可以任意决定本次提案的value； 5. 到这里可以进入第二阶段，广播Accept (n,value) 到所有节点； 6. Acceptor比较n和minProposal，如果n&gt;=minProposal，则acceptedProposal=minProposal=n，acceptedValue=value，本地持久化后，返回；否则，返回minProposal。 7. 提议者接收到过半数请求后，如果发现有返回值result &gt;n，表示有更新的提议，跳转到1；否则value达成一致。 Multi-Paxos 算法  为了解决实际应用中连续多值传输的高效性,改进了Basix Paxos为Multi-Paxos:
+ 1. 针对每一个要确定的值，运行一次Paxos算法实例（Instance），形成决议。每一个Paxos实例使用唯一的Instance ID标识。 2. 在所有Proposers中选举一个Leader，由Leader唯一地提交Proposal给Acceptors进行表决。这样没有Proposer竞争，解决了活锁问题。在系统中仅有一个Leader进行Value提交的情况下，Prepare阶段就可以跳过，从而将两阶段变为一阶段，提高效率。 raft  为了更简便理解和实现,改进了Multi-Paxos 为raft
+ 1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的) 2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选.">
+<meta itemprop="datePublished" content="2019-09-26T17:33:38+00:00" />
+<meta itemprop="dateModified" content="2019-09-26T17:33:38+00:00" />
+<meta itemprop="wordCount" content="806">
+
+
+
+<meta itemprop="keywords" content="linux," />
+<meta property="og:title" content="linux遇到一些问题统计" />
+<meta property="og:description" content="记录一些Linux,nginx或其他服务一些问题
+CAP 一致性 (Consistency)：一个写操作返回成功，那么之后的读请求都必须读到这个新数据；如果返回失败，那么所有读操作都不能读到这个数据。所有节点访问同一份最新的数据。 可用性 (Availability)：对数据更新具备高可用性，请求能够及时处理，不会一直等待，即使出现节点失效。 分区容错性 (Partition tolerance)：能容忍网络分区，在网络断开的情况下，被分隔的节点仍能正常对外提供服务。 分布式算法 Basic paxos 算法 1. 获取一个Proposal ID n，为了保证Proposal ID唯一，可采用时间戳&#43;Server ID生成； 2. Proposer向所有Acceptors广播Prepare(n)请求； 3. Acceptor比较n和minProposal，如果n&gt;minProposal，minProposal=n，并且将 acceptedProposal 和 acceptedValue 返回； 4. Proposer接收到过半数回复后，如果发现有acceptedValue返回，将所有回复中acceptedProposal最大的acceptedValue作为本次提案的value，否则可以任意决定本次提案的value； 5. 到这里可以进入第二阶段，广播Accept (n,value) 到所有节点； 6. Acceptor比较n和minProposal，如果n&gt;=minProposal，则acceptedProposal=minProposal=n，acceptedValue=value，本地持久化后，返回；否则，返回minProposal。 7. 提议者接收到过半数请求后，如果发现有返回值result &gt;n，表示有更新的提议，跳转到1；否则value达成一致。 Multi-Paxos 算法  为了解决实际应用中连续多值传输的高效性,改进了Basix Paxos为Multi-Paxos:
+ 1. 针对每一个要确定的值，运行一次Paxos算法实例（Instance），形成决议。每一个Paxos实例使用唯一的Instance ID标识。 2. 在所有Proposers中选举一个Leader，由Leader唯一地提交Proposal给Acceptors进行表决。这样没有Proposer竞争，解决了活锁问题。在系统中仅有一个Leader进行Value提交的情况下，Prepare阶段就可以跳过，从而将两阶段变为一阶段，提高效率。 raft  为了更简便理解和实现,改进了Multi-Paxos 为raft
+ 1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的) 2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/" />
+<meta property="article:published_time" content="2019-09-26T17:33:38+00:00" />
+<meta property="article:modified_time" content="2019-09-26T17:33:38+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="linux遇到一些问题统计"/>
+<meta name="twitter:description" content="记录一些Linux,nginx或其他服务一些问题
+CAP 一致性 (Consistency)：一个写操作返回成功，那么之后的读请求都必须读到这个新数据；如果返回失败，那么所有读操作都不能读到这个数据。所有节点访问同一份最新的数据。 可用性 (Availability)：对数据更新具备高可用性，请求能够及时处理，不会一直等待，即使出现节点失效。 分区容错性 (Partition tolerance)：能容忍网络分区，在网络断开的情况下，被分隔的节点仍能正常对外提供服务。 分布式算法 Basic paxos 算法 1. 获取一个Proposal ID n，为了保证Proposal ID唯一，可采用时间戳&#43;Server ID生成； 2. Proposer向所有Acceptors广播Prepare(n)请求； 3. Acceptor比较n和minProposal，如果n&gt;minProposal，minProposal=n，并且将 acceptedProposal 和 acceptedValue 返回； 4. Proposer接收到过半数回复后，如果发现有acceptedValue返回，将所有回复中acceptedProposal最大的acceptedValue作为本次提案的value，否则可以任意决定本次提案的value； 5. 到这里可以进入第二阶段，广播Accept (n,value) 到所有节点； 6. Acceptor比较n和minProposal，如果n&gt;=minProposal，则acceptedProposal=minProposal=n，acceptedValue=value，本地持久化后，返回；否则，返回minProposal。 7. 提议者接收到过半数请求后，如果发现有返回值result &gt;n，表示有更新的提议，跳转到1；否则value达成一致。 Multi-Paxos 算法  为了解决实际应用中连续多值传输的高效性,改进了Basix Paxos为Multi-Paxos:
+ 1. 针对每一个要确定的值，运行一次Paxos算法实例（Instance），形成决议。每一个Paxos实例使用唯一的Instance ID标识。 2. 在所有Proposers中选举一个Leader，由Leader唯一地提交Proposal给Acceptors进行表决。这样没有Proposer竞争，解决了活锁问题。在系统中仅有一个Leader进行Value提交的情况下，Prepare阶段就可以跳过，从而将两阶段变为一阶段，提高效率。 raft  为了更简便理解和实现,改进了Multi-Paxos 为raft
+ 1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的) 2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>linux遇到一些问题统计</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/posts/">文章</a>
+					<a href="https://blog.k1s.club/k8s-categories/">Kubernetes系列</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Sep 26, 2019</span></div>
+				<h1>linux遇到一些问题统计</h1>
+			</header>
+			<div class="content">
+				<p>记录一些Linux,nginx或其他服务一些问题</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<h3 id="cap">CAP<a href="#cap" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>一致性 (Consistency)：一个写操作返回成功，那么之后的读请求都必须读到这个新数据；如果返回失败，那么所有读操作都不能读到这个数据。所有节点访问同一份最新的数据。
+可用性 (Availability)：对数据更新具备高可用性，请求能够及时处理，不会一直等待，即使出现节点失效。
+分区容错性 (Partition tolerance)：能容忍网络分区，在网络断开的情况下，被分隔的节点仍能正常对外提供服务。
+</code></pre><h3 id="分布式算法">分布式算法<a href="#分布式算法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="basic-paxos-算法">Basic paxos 算法<a href="#basic-paxos-算法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>1. 获取一个Proposal ID n，为了保证Proposal ID唯一，可采用时间戳+Server ID生成；
+2. Proposer向所有Acceptors广播Prepare(n)请求；
+3. Acceptor比较n和minProposal，如果n&gt;minProposal，minProposal=n，并且将 acceptedProposal 和 acceptedValue 返回；
+4. Proposer接收到过半数回复后，如果发现有acceptedValue返回，将所有回复中acceptedProposal最大的acceptedValue作为本次提案的value，否则可以任意决定本次提案的value；
+5. 到这里可以进入第二阶段，广播Accept (n,value) 到所有节点；
+6. Acceptor比较n和minProposal，如果n&gt;=minProposal，则acceptedProposal=minProposal=n，acceptedValue=value，本地持久化后，返回；否则，返回minProposal。
+7. 提议者接收到过半数请求后，如果发现有返回值result &gt;n，表示有更新的提议，跳转到1；否则value达成一致。
+</code></pre><h4 id="multi-paxos-算法">Multi-Paxos 算法<a href="#multi-paxos-算法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<blockquote>
+<p>为了解决实际应用中连续多值传输的高效性,改进了Basix Paxos为Multi-Paxos:</p>
+</blockquote>
+<pre><code>1. 针对每一个要确定的值，运行一次Paxos算法实例（Instance），形成决议。每一个Paxos实例使用唯一的Instance ID标识。
+2. 在所有Proposers中选举一个Leader，由Leader唯一地提交Proposal给Acceptors进行表决。这样没有Proposer竞争，解决了活锁问题。在系统中仅有一个Leader进行Value提交的情况下，Prepare阶段就可以跳过，从而将两阶段变为一阶段，提高效率。
+
+</code></pre><h4 id="raft">raft<a href="#raft" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<blockquote>
+<p>为了更简便理解和实现,改进了Multi-Paxos 为raft</p>
+</blockquote>
+<pre><code>1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的)
+2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选. 而multi-paxos 是随意的 所以raft 可以看成是简化版本的multi paxos(这里multi-paxos 因为允许并发的写log, 因此不存在一个最新, 最全的日志节点, 因此只能这么做. 这样带来的麻烦就是选主以后, 需要将主里面没有的log 给补全, 并执行commit 过程)
+
+</code></pre><!-- raw HTML omitted -->
+<h3 id="linux内核问题-什么是tcp连接队列">Linux内核问题: 什么是tcp连接队列<a href="#linux内核问题-什么是tcp连接队列" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li><a href="https://blog.csdn.net/whatday/article/details/107740002">https://blog.csdn.net/whatday/article/details/107740002</a></li>
+<li><a href="http://jm.taobao.org/2017/05/25/525-1/">http://jm.taobao.org/2017/05/25/525-1/</a></li>
+<li><a href="https://blog.huoding.com/2014/08/13/367">https://blog.huoding.com/2014/08/13/367</a></li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">1.	net.ipv4.tcp_max_syn_backlog:		半连接队列,保存SYN_RECV状态的连接<span class="o">(</span>tcp握手第一次完成后, server端会将连接添加到sync queue队列 <span class="o">)</span>
+2.	min<span class="o">(</span>net.core.somaxconn,backlog<span class="o">)</span>: 	全连接队列,保存ESTABLISHED状态的连接<span class="o">(</span>tcp握手第三次完成周, server端会将连接添加到accept queue队列<span class="o">)</span>
+
+通过netstat -s <span class="p">|</span>grep overflowed 查看 是否是全连接队列满了
+
+另外如果全连接满了处理方式是 直接丢弃, 如果修改为1 则表示发送reset包给客户端
+cat cat /proc/sys/net/ipv4/tcp_abort_on_overflow
+<span class="m">0</span>
+
+通过ss -l可以查到到nginx的默认backlog 是511
+ss -l<span class="p">|</span>grep http
+
+通过修改nginx配置增加该值,reload nginx<span class="o">(</span>前提是已经修改了net.core.somaxconn<span class="o">)</span>
+ listen  <span class="m">80</span> <span class="nv">backlog</span><span class="o">=</span>4096<span class="p">;</span>
+ listen <span class="m">443</span> ssl <span class="nv">backlog</span><span class="o">=</span>4096<span class="p">;</span>
+
+</code></pre></div><h3 id="linux问题-2020-09-02-一次dnsmasq迁移问题">Linux问题: 2020-09-02 一次dnsmasq迁移问题<a href="#linux问题-2020-09-02-一次dnsmasq迁移问题" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>网卡配置如下</p>
+</blockquote>
+<pre><code>DEVICE=em1
+HWADDR=x
+TYPE=Ethernet
+UUID=x
+ONBOOT=yes
+NM_CONTROLLED=yes
+BOOTPROTO=static
+IPADDR0=172.16.76.100
+PREFIX0=24
+GATEWAY=172.16.76.1
+DNS1=172.16.76.100
+DNS2=172.16.76.101
+</code></pre><blockquote>
+<p>这里有个大问题, 由于本身就是dns服务器, 但配置的DNS1居然是本机, 这导致service network restart 的时候会去修改 /etc/resolv.conf 的配置为 DNS1 和DNS2的ip, 此时dns服务器将无法解析外网域名</p>
+</blockquote>
+<blockquote>
+<p>因此正确的配置是</p>
+</blockquote>
+<pre><code>DNS1=119.29.29.29
+DNS2=223.5.5.5
+DNS3=114.114.114.114
+</code></pre><hr>
+<!-- raw HTML omitted -->
+<h3 id="linux问题-升级内核">Linux问题: 升级内核<a href="#linux问题-升级内核" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+
+# 查看可升级的内核
+yum --disablerepo=&quot;*&quot; --enablerepo=&quot;elrepo-kernel&quot; list available
+yum --enablerepo=elrepo-kernel install kernel-ml
+
+# 查看已经安装的内核
+cat /boot/grub2/grub.cfg |grep menuentry
+
+# 设置5.3的为默认
+grub2-set-default 'CentOS Linux (5.3.13-1.el7.elrepo.x86_64) 7 (Core)'
+
+# grub2-editenv list
+saved_entry=CentOS Linux (5.3.13-1.el7.elrepo.x86_64) 7 (Core)
+</code></pre><hr>
+<!-- raw HTML omitted -->
+<h3 id="linux问题-tcpdump抓包tcp第三次握手ack为1">linux问题: tcpdump抓包tcp第三次握手ack为1<a href="#linux问题-tcpdump抓包tcp第三次握手ack为1" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>执行命令监听: tcpdump -n port 80 (想要详细信息加 -vv)</li>
+</ul>
+<blockquote>
+<p>客户端 telnet x.x.x.x 80</p>
+</blockquote>
+<p>日志如下:</p>
+<pre><code>tcpdump  -n port 80
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes
+11:16:40.689157 IP 192.168.54.141.53444 &gt; 192.168.53.106.http: Flags [SEW], seq 1306124348, win 65535, options [mss 1460,nop,wscale 5,nop,nop,TS val 458678777 ecr 0,sackOK,eol], length 0
+11:16:40.689724 IP 192.168.53.106.http &gt; 192.168.54.141.53444: Flags [S.E], seq 1553518959, ack 1306124349, win 64308, options [mss 1410,sackOK,TS val 4208119240 ecr 458678777,nop,wscale 7], length 0
+11:16:40.690320 IP 192.168.54.141.53444 &gt; 192.168.53.106.http: Flags [.], ack 1, win 4106, options [nop,nop,TS val 458678778 ecr 4208119240], length 0
+</code></pre><p>这里第一和第二次握手都没有问题, 第三次 ack 1, 并非是seq+1</p>
+<p>这里提一下ACK, ACK 是确认值, ack 是确认编号, 第一次握手ACK=0,在第二次握手开始ACK=1, 而ack是=seq+1(收到的随机数+1)</p>
+<p>那么这里ack 1 是啥呢?  &hellip; 应该就是默认tcpdump 显示成相对值了, 通过-S 参数会显示绝对值</p>
+<ul>
+<li>执行命令监听: tcpdump -S  -n port 80</li>
+</ul>
+<pre><code>tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes
+11:16:54.806628 IP 192.168.54.141.53516 &gt; 192.168.53.106.http: Flags [S], seq 316359286, win 65535, options [mss 1460,nop,wscale 5,nop,nop,TS val 458692791 ecr 0,sackOK,eol], length 0
+11:16:54.806861 IP 192.168.53.106.http &gt; 192.168.54.141.53516: Flags [S.], seq 1113466641, ack 316359287, win 64308, options [mss 1410,sackOK,TS val 4208133357 ecr 458692791,nop,wscale 7], length 0
+11:16:54.807576 IP 192.168.54.141.53516 &gt; 192.168.53.106.http: Flags [.], ack 1113466642, win 4106, options [nop,nop,TS val 458692792 ecr 4208133357], length 0
+</code></pre><p>三次握手图
+<img src="/images/tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%9B%BE.png" alt="三次握手图"></p>
+<p>四次挥手图
+<img src="/images/tcp%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B%E5%9B%BE.png" alt="四次挥手图"></p>
+<!-- raw HTML omitted -->
+<h3 id="linux问题-禁ping">linux问题: 禁ping<a href="#linux问题-禁ping" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code># 一次性修改
+echo 1 &gt; /proc/sys/net/ipv4/icmp_echo_ignore_all
+
+# 开机自动修改
+echo 1 &gt; /proc/sys/net/ipv4/icmp_echo_ignore_all
+
+# 永久禁用,加入到/etc/sysctl.conf
+net.ipv4.icmp_echo_ignore_all=1
+</code></pre><hr>
+<!-- raw HTML omitted -->
+<h3 id="linux问题-文件锁问题">linux问题: 文件锁问题<a href="#linux问题-文件锁问题" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>问题描述: php slowlog 出现session_start() 慢
+问题原因: 我们这边有A 和B 两个二级域名,A 会请求 B, 并且由于测试环境在同一台服务器,公用一个php,所以在发生调用的时候同时写了session,而php的sessions配置是默认的file方式, 这就造成了锁的问题
+问题解决: 
+1. 修改代码部分
+2. php的session配置改成redis
+    session.save_handler = redis
+    session.save_path = &quot;tcp://x.x.x.x:xxxx&quot;
+</code></pre><hr>
+<!-- raw HTML omitted -->
+<h3 id="linux问题-内存释放问题">linux问题: 内存释放问题<a href="#linux问题-内存释放问题" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>问题描述: 开发这边写了个统计脚本, 占用49G内存, 从日志发现脚本已经全部执行完成, 但是php脚本依然存在
+问题原因: 通过 strace -p pid 观察进程, 发现是持续性的做内存释放操作 munmap(0x7f6db77ad000, 266240)          = 0
+持续执行munmap函数是因为一直在释放内存(毕竟49G), 结果 =0 说明内存释放执行函数是返回正常了
+问题解决: 
+1. 修改代码降低内存
+2. 等待一段时间内存会释放完成(测试80分钟释放完毕)
+</code></pre><hr>
+<!-- raw HTML omitted -->
+<h3 id="nginx-if-条件--的实现">nginx if 条件 &amp;&amp; 的实现<a href="#nginx-if-条件--的实现" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>1 允许所有人访问 a.php|b.php|c.php|d.php|e.php</li>
+<li>2 仅允许127.0.0.1|172.16.0.2 ip可以访问 aa.php|bb.php</li>
+</ul>
+<pre><code>set $flag &quot;allow&quot;;
+# 以下php 所有人可以访问
+if ( $fastcgi_script_name ~ (a.php|b.php|c.php|d.php|e.php) ) {
+        set $flag &quot;allow_php_ip&quot;;
+}
+
+# 以下php 仅固定ip可以访问
+if ($fastcgi_script_name ~ (aa.php|bb.php)) {
+        set $flag &quot;${flag}_php&quot;;
+}
+
+if ( $proxy_add_x_forwarded_for ~ (127.0.0.1|172.16.0.2)) {
+        set $flag &quot;${flag}_ip&quot;;
+}
+# 写包含是 $flag 可能为 &quot;allow_php_ip_ip&quot; (在允许的ip服务器(127.0.0.1)上访问 /a.php)
+if ( $flag !~ &quot;allow_php_ip&quot; ) {
+        return 403;
+}
+</code></pre><hr>
+<!-- raw HTML omitted -->
+<h3 id="nginx问题-静态文件分离">nginx问题: 静态文件分离<a href="#nginx问题-静态文件分离" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>对于一般的nginx+php的方式, 我们php采用nobody用户,而代码/lumen采用web-www用户, 这样的好处是页面访问到/lumen时是nobody用户, 是无法修改代码的</p>
+<p>可能我们需求是上用户upload图片等, 这时候就可能被传上某个a.php, 这就有可能被代码注入(一般来说图片是放cdn,配置单独域名回源的,这里是直接存在项目目录)</p>
+<p>所以为了防止代码注入,我们需要限制upload目录的访问权限</p>
+<pre><code># nginx配置如下
+        location ~ /images/.*\.(gif|jpg|jpeg|png)$ {
+            root /lumen/storage/uploads/;
+        }
+
+</code></pre><p>这样我们图片传到 /lumen/storage/uploads/images/ 目录, 访问是 <a href="http://www.xxx.com/images/x.png">www.xxx.com/images/x.png</a> 来访问 且不允许其他类型文件访问.</p>
+<hr>
+<!-- raw HTML omitted -->
+<h3 id="nginx问题-root-和alias">nginx问题: root 和alias<a href="#nginx问题-root-和alias" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>在配置文件映射的时候，如果使用了正则表达式，那么可能会出现无法访问文件，nginx可能会将所有的
+文件都映射成为文件夹，导致文件映射失败的情况出现；</p>
+<ul>
+<li>root的例子</li>
+</ul>
+<pre><code>location /a/ {
+	root /lumen/public;
+}
+这里实际访问的路径: www.xxx.com/a/ -&gt; /lumen/public/a/
+</code></pre><ul>
+<li>alias的例子</li>
+</ul>
+<pre><code># 注意这里目录最后加上/
+location /a/ {
+        alias /lumen/public/;
+}
+这里实际访问的路径: www.xxx.com/a/ -&gt; /lumen/public/
+</code></pre><hr>
+<!-- raw HTML omitted -->
+<h3 id="nginx问题-隐藏版本信息">nginx问题: 隐藏版本信息<a href="#nginx问题-隐藏版本信息" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>Syntax:  server_tokens on | off | build | string;
+Default:  server_tokens on;
+Context:  http, server, location
+</code></pre><hr>
+<!-- raw HTML omitted -->
+<h3 id="nginx问题-日志出现encode内容如何查看">nginx问题: 日志出现encode内容如何查看<a href="#nginx问题-日志出现encode内容如何查看" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code># python2 执行decode
+&gt;&gt;&gt; print &quot;\x22content\x22\x0D\x0A\x0D\x0A\xE8\x8A\x8A\xE8\x8A\x8A\xE8\xBF\x98\xE6\x80\x95\xE5\xA6\x9E\xE5\xA6\x9E\xE4\xB8\x8D\xE8\x80\x81\xE5\xAE\x9E\xEF\xBC\x8C\xE7\x89\xB9\xE5\x9C\xB0\xE8\xBF\x87\xE6\x9D\xA5\xE8\xA7\x86\xE5\xAF\x9F\xE4\xB8\x80\xE4\xB8\x8B\x0D\x0A&quot;.decode('utf-8')
+</code></pre><hr>
+<!-- raw HTML omitted -->
+<h3 id="nginx问题-default配置未设置">nginx问题: default配置未设置<a href="#nginx问题-default配置未设置" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>nginx 未设置default时, 如果直接访问服务器外网ip, 会去请求到第一个匹配的server段, 有可能会请求到后端的服务器的内容, 这很有可能暴露我们不想暴露的服务
+一般来说开头添加如下配置</p>
+<pre><code>    server {
+        listen       80 default_server;
+        listen       [::]:80 default_server;
+        server_name  _;
+        deny all;
+	}
+</code></pre><p>nginx 配置已经配置域名方式访问, 如果访问ip会返回403, 正常来说返回403已经不会对服务器造成压力了</p>
+<blockquote>
+<p>可是万万没想到虽然返回了403, 但是也有700字节大小, 大量请求对小带宽来说还是有压力的</p>
+</blockquote>
+<pre><code># 
+server {
+        listen       80 default_server;
+        listen       [::]:80 default_server;
+        server_name  _;
+        return 499;
+   }
+
+#其他location,if配置,
+if ($host != a.example.com) {
+    return 499;
+}
+
+</code></pre><hr>
+<!-- raw HTML omitted -->
+<h3 id="nginx111以前trace_id-生成问题">nginx1.11以前trace_id 生成问题<a href="#nginx111以前trace_id-生成问题" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>如果是前端(upstream)</li>
+</ul>
+<pre><code>log_format  server_name_main '&quot;$request_trace_id&quot; [ $host $request_time ] ' '[ $upstream_addr $upstream_response_time ] ' '$status ' '$remote_addr - $remote_user [$time_local] &quot;$request&quot; '  '$body_bytes_sent &quot;$http_referer&quot; '
+                     '&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot; &quot;$bytes_sent&quot;'    '{$request_body}' ;
+...
+
+server {
+        set $request_trace_id $pid$connection$bytes_sent$msec;
+        if ( $http_x_request_id != &quot;&quot; ){
+                set $request_trace_id $http_x_request_id;
+        }
+        add_header  Bq_F_Traceid $request_trace_id;
+
+	# 一定要写到location中, 因为proxy_pass
+	location / {
+
+		proxy_pass http://xxxx;
+                proxy_set_header  X-Request-Id        $request_trace_id;
+
+	}
+}
+</code></pre><ul>
+<li>如果是后端节点</li>
+</ul>
+<pre><code># 一定要写到server段, 否则后端可能报404错误
+server {
+	listen 80;
+    	server_name  openapi-community-alpha.zhangzw.com ;
+
+        set $request_trace_id $pid$connection$bytes_sent$msec;
+        if ( $http_x_request_id != &quot;&quot; ){
+                set $request_trace_id $http_x_request_id;
+        }
+        add_header  Bq_X_Traceid $request_trace_id;
+
+	location / {
+		try_files $uri $uri/ /index.php?$query_string;
+	}
+}
+</code></pre><hr>
+<!-- raw HTML omitted -->
+<h3 id="修改swap">修改swap<a href="#修改swap" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>dd if=/dev/zero of=/data/swapfilenew bs=4096 count=4096000
+
+swapoff -a 
+
+/sbin/mkswap  /data/swapfilenew
+/sbin/swapon  /data/swapfilenew
+
+vim /etc/fstab
+/data/swapfilenew none swap defaults 0 0
+</code></pre>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/linux">linux</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>806 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-09-27 01:33 &#43;0800</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/10-centos6%E5%AE%89%E8%A3%85nginx1-16-php7-2/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>centos6安装nginx1.16&#43;php7.2</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/8-mysql5-7%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>mysql5.7二进制部署</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-166045776-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

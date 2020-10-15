@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="Prometheus 快速入门">
+<meta itemprop="description" content="一般我们说 Prometheus，有两种理解，我们平时需要注意识别的，其含义有两种，一是指的 Prometheus 自身，是一个时序数据库；另外一种是指 Prometheus 生态圈，指的是是整体的监控报警的生态圈和解决方案（Prometheus&#43;Grafana&#43;Alertmanager）。
+Prometheus 在 2016年加入了 CNCF（Cloud Native Computing Foundation），是继 Kubernetes 之后的第二个托管项目，目前已经毕业，其主要的特点如下：
+ 多维度的数据模型：由指标名称和键/值对标签标识的时间序列数据来组成多维的数据模型。 灵活的查询语言：在 Prometheus 中使用强大的查询语言 PromSQL 来进行查询。 不依赖分布式存储，Prometheus 单个节点也可以直接工作，支持本地存储（TSDB）和远程存储的模式。 服务端采集数据：Prometheus 基于 HTTP pull 方式去对不同的端采集时间序列数据。 客户端主动推送：支持通过 PushGateway 组件主动推送时间序列数据。  Prometheus 生态组件 Prometheus 生态由多个组件共同组成，其中许多组件是可根据实际情况选择的，并且绝大部分由 Go 语言编写，在部署和构建上比较方便，如下：
+ Prometheus Server：Prometheus 服务端，用于收集指标和存储时间序列数据，并提供一系列的查询和设置接口。 Client Libraries：客户端库，用于帮助需要监控采集的服务暴露 metrics handler 给 Prometheus server。例如像 例子 中直接调用 promhttp 暴露了一个 metrics 接口。 Push Gateway：推送网关，Prometheus 服务端仅支持 HTTP pull 的采集方式，而有一些指存在的时间短，Prometheus 来 pull 前就结束了。又或是该类指标，就是要客户端自行上报的，这时候就可以采用 Push Gateway 的方式，客户端将指标 push 到 Push Gateway，再由 Prometheus Server 从 Pushgateway 上 pull。 Exporters：用于暴露已有的第三方服务（HAProxy，StatsD，Graphite）的 metrics 给 Prometheus Server。 Alertmanager：用于处理告警，从 Prometheus server 端接收到 alerts 后，会进行去重，分组，然后路由到对应的Receiver，发出报警。 Support Tools：各种支持工具。  Prometheus 整体流程图 Prometheus 的整体架构和生态组件组成，如下图所示：">
+<meta itemprop="datePublished" content="2020-05-16T12:05:58+08:00" />
+<meta itemprop="dateModified" content="2020-05-16T12:05:58+08:00" />
+<meta itemprop="wordCount" content="261">
+
+
+
+<meta itemprop="keywords" content="prometheus," />
+<meta property="og:title" content="Prometheus 快速入门" />
+<meta property="og:description" content="一般我们说 Prometheus，有两种理解，我们平时需要注意识别的，其含义有两种，一是指的 Prometheus 自身，是一个时序数据库；另外一种是指 Prometheus 生态圈，指的是是整体的监控报警的生态圈和解决方案（Prometheus&#43;Grafana&#43;Alertmanager）。
+Prometheus 在 2016年加入了 CNCF（Cloud Native Computing Foundation），是继 Kubernetes 之后的第二个托管项目，目前已经毕业，其主要的特点如下：
+ 多维度的数据模型：由指标名称和键/值对标签标识的时间序列数据来组成多维的数据模型。 灵活的查询语言：在 Prometheus 中使用强大的查询语言 PromSQL 来进行查询。 不依赖分布式存储，Prometheus 单个节点也可以直接工作，支持本地存储（TSDB）和远程存储的模式。 服务端采集数据：Prometheus 基于 HTTP pull 方式去对不同的端采集时间序列数据。 客户端主动推送：支持通过 PushGateway 组件主动推送时间序列数据。  Prometheus 生态组件 Prometheus 生态由多个组件共同组成，其中许多组件是可根据实际情况选择的，并且绝大部分由 Go 语言编写，在部署和构建上比较方便，如下：
+ Prometheus Server：Prometheus 服务端，用于收集指标和存储时间序列数据，并提供一系列的查询和设置接口。 Client Libraries：客户端库，用于帮助需要监控采集的服务暴露 metrics handler 给 Prometheus server。例如像 例子 中直接调用 promhttp 暴露了一个 metrics 接口。 Push Gateway：推送网关，Prometheus 服务端仅支持 HTTP pull 的采集方式，而有一些指存在的时间短，Prometheus 来 pull 前就结束了。又或是该类指标，就是要客户端自行上报的，这时候就可以采用 Push Gateway 的方式，客户端将指标 push 到 Push Gateway，再由 Prometheus Server 从 Pushgateway 上 pull。 Exporters：用于暴露已有的第三方服务（HAProxy，StatsD，Graphite）的 metrics 给 Prometheus Server。 Alertmanager：用于处理告警，从 Prometheus server 端接收到 alerts 后，会进行去重，分组，然后路由到对应的Receiver，发出报警。 Support Tools：各种支持工具。  Prometheus 整体流程图 Prometheus 的整体架构和生态组件组成，如下图所示：" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts.bak/prometheus/2020-05-16-startup/" />
+<meta property="article:published_time" content="2020-05-16T12:05:58+08:00" />
+<meta property="article:modified_time" content="2020-05-16T12:05:58+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Prometheus 快速入门"/>
+<meta name="twitter:description" content="一般我们说 Prometheus，有两种理解，我们平时需要注意识别的，其含义有两种，一是指的 Prometheus 自身，是一个时序数据库；另外一种是指 Prometheus 生态圈，指的是是整体的监控报警的生态圈和解决方案（Prometheus&#43;Grafana&#43;Alertmanager）。
+Prometheus 在 2016年加入了 CNCF（Cloud Native Computing Foundation），是继 Kubernetes 之后的第二个托管项目，目前已经毕业，其主要的特点如下：
+ 多维度的数据模型：由指标名称和键/值对标签标识的时间序列数据来组成多维的数据模型。 灵活的查询语言：在 Prometheus 中使用强大的查询语言 PromSQL 来进行查询。 不依赖分布式存储，Prometheus 单个节点也可以直接工作，支持本地存储（TSDB）和远程存储的模式。 服务端采集数据：Prometheus 基于 HTTP pull 方式去对不同的端采集时间序列数据。 客户端主动推送：支持通过 PushGateway 组件主动推送时间序列数据。  Prometheus 生态组件 Prometheus 生态由多个组件共同组成，其中许多组件是可根据实际情况选择的，并且绝大部分由 Go 语言编写，在部署和构建上比较方便，如下：
+ Prometheus Server：Prometheus 服务端，用于收集指标和存储时间序列数据，并提供一系列的查询和设置接口。 Client Libraries：客户端库，用于帮助需要监控采集的服务暴露 metrics handler 给 Prometheus server。例如像 例子 中直接调用 promhttp 暴露了一个 metrics 接口。 Push Gateway：推送网关，Prometheus 服务端仅支持 HTTP pull 的采集方式，而有一些指存在的时间短，Prometheus 来 pull 前就结束了。又或是该类指标，就是要客户端自行上报的，这时候就可以采用 Push Gateway 的方式，客户端将指标 push 到 Push Gateway，再由 Prometheus Server 从 Pushgateway 上 pull。 Exporters：用于暴露已有的第三方服务（HAProxy，StatsD，Graphite）的 metrics 给 Prometheus Server。 Alertmanager：用于处理告警，从 Prometheus server 端接收到 alerts 后，会进行去重，分组，然后路由到对应的Receiver，发出报警。 Support Tools：各种支持工具。  Prometheus 整体流程图 Prometheus 的整体架构和生态组件组成，如下图所示："/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>Prometheus 快速入门</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/posts/">文章</a>
+					<a href="https://blog.k1s.club/k8s-categories/">Kubernetes系列</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner thin animated fadeIn faster">
+		<h1>Prometheus 快速入门</h1>
+		<div class="content">
+			<p>一般我们说 Prometheus，有两种理解，我们平时需要注意识别的，其含义有两种，一是指的 Prometheus 自身，是一个时序数据库；另外一种是指 Prometheus 生态圈，指的是是整体的监控报警的生态圈和解决方案（Prometheus+Grafana+Alertmanager）。</p>
+<p>Prometheus 在 2016年加入了 CNCF（Cloud Native Computing Foundation），是继 Kubernetes 之后的第二个托管项目，目前已经毕业，其主要的特点如下：</p>
+<ul>
+<li>多维度的数据模型：由指标名称和键/值对标签标识的时间序列数据来组成多维的数据模型。</li>
+<li>灵活的查询语言：在 Prometheus 中使用强大的查询语言 PromSQL 来进行查询。</li>
+<li>不依赖分布式存储，Prometheus 单个节点也可以直接工作，支持本地存储（TSDB）和远程存储的模式。</li>
+<li>服务端采集数据：Prometheus 基于 HTTP pull 方式去对不同的端采集时间序列数据。</li>
+<li>客户端主动推送：支持通过 PushGateway 组件主动推送时间序列数据。</li>
+</ul>
+<h2 id="prometheus-生态组件">Prometheus 生态组件<a href="#prometheus-生态组件" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p>Prometheus 生态由多个组件共同组成，其中许多组件是可根据实际情况选择的，并且绝大部分由 Go 语言编写，在部署和构建上比较方便，如下：</p>
+<ul>
+<li>Prometheus Server：<a href="https://github.com/prometheus/prometheus">Prometheus 服务端</a>，用于收集指标和存储时间序列数据，并提供一系列的查询和设置接口。</li>
+<li>Client Libraries：<a href="https://prometheus.io/docs/instrumenting/clientlibs/">客户端库</a>，用于帮助需要监控采集的服务暴露 metrics handler 给 Prometheus server。例如像 <a href="https://github.com/prometheus/client_golang/blob/master/examples/simple/main.go">例子</a> 中直接调用 promhttp 暴露了一个 metrics 接口。</li>
+<li>Push Gateway：推送网关，Prometheus 服务端仅支持 HTTP pull 的采集方式，而有一些指存在的时间短，Prometheus 来 pull 前就结束了。又或是该类指标，就是要客户端自行上报的，这时候就可以采用 Push Gateway 的方式，客户端将指标 push 到 Push Gateway，再由 Prometheus Server 从 Pushgateway 上 pull。</li>
+<li>Exporters：用于暴露已有的第三方服务（HAProxy，StatsD，Graphite）的 metrics 给 Prometheus Server。</li>
+<li>Alertmanager：用于处理告警，从 Prometheus server 端接收到 alerts 后，会进行去重，分组，然后路由到对应的Receiver，发出报警。</li>
+<li>Support Tools：各种支持工具。</li>
+</ul>
+<h2 id="prometheus-整体流程图">Prometheus 整体流程图<a href="#prometheus-整体流程图" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p>Prometheus 的整体架构和生态组件组成，如下图所示：</p>
+<p><img src="https://prometheus.io/assets/architecture.png" alt="image"></p>
+<p>Prometheus Server 通过从监控目标中或者间接通过推送网关来拉取监控指标，它在本地存储所有抓取到的样本数据，并对此数据执行一系列规则，以汇总和记录现有数据的新时间序列或生成告警。可以通过 Grafana 或者其他工具来实现监控数据的可视化。</p>
+<h2 id="prometheus-采集的数据存到哪里">Prometheus 采集的数据存到哪里<a href="#prometheus-采集的数据存到哪里" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p>Prometheus 所有采集的指标数据在默认的情况下，都保存在本地所内置的时间序列数据库（TSDB）当中，如果需要另外调整，再将 Prometheus 的存储指向改为远程存储即可。</p>
+<p>Prometheus 采用在默认情况下使用本地存储，能够一定的便利性，例如：开箱即用、运维方便（不用管）等等。但是也有不少缺点，像是海量数据无法持久化等等问题，因此强烈建议在上到企业级的海量应用时，一定对其进行研讨，适当考虑远程存储。</p>
+<h3 id="时序数据库是什么">时序数据库是什么<a href="#时序数据库是什么" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>Prometheus 是时序数据库（Time Series Database），又简称 TSDB。目前在行业中比较出名，流行度较高的时序数据库如下：</p>
+<p><img src="https://image.eddycjy.com/899042452628900ef32fe11f8d7a4b1e.jpg" alt="image"></p>
+<p>时序数据库简单来讲，就是将数据按照时间顺序排列，它具有唯一性和可排序性，因此在 Prometheus 的 Metrics 中即使只添加了一个新标签，也会造成破坏，也就是它不再是原本的那个时序数据了。</p>
+<p>注：时序数据库是一个比较大的话题，后续会单独开一篇文章讲解，此处仅概要。</p>
+<h3 id="prometheus-远程存储的方案">Prometheus 远程存储的方案<a href="#prometheus-远程存储的方案" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>AppOptics: write</li>
+<li>Azure Data Explorer: read and write</li>
+<li>Chronix: write</li>
+<li>Cortex: read and write</li>
+<li>CrateDB: read and write</li>
+<li>Elasticsearch: write</li>
+<li>Gnocchi: write</li>
+<li>Graphite: write</li>
+<li>InfluxDB: read and write</li>
+<li>IRONdb: read and write</li>
+<li>Kafka: write</li>
+<li>M3DB: read and write</li>
+<li>OpenTSDB: write</li>
+<li>PostgreSQL/TimescaleDB: read and write</li>
+<li>QuasarDB: read and write</li>
+<li>SignalFx: write</li>
+<li>Splunk: read and write</li>
+<li>TiKV: read and write</li>
+<li>Thanos: write</li>
+<li>VictoriaMetrics: write</li>
+<li>Wavefront: write</li>
+</ul>
+<h3 id="数据持久化的意义">数据持久化的意义<a href="#数据持久化的意义" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>数据存储与服务提供应当隔离。</li>
+<li>事故、问题的度量指标回溯。</li>
+<li>数据挖掘的考虑。</li>
+<li>提供给外部的自定义平台进行数据查询等等</li>
+<li>&hellip;</li>
+</ul>
+<h2 id="安装-prometheus">安装 Prometheus<a href="#安装-prometheus" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p><a href="https://github.com/prometheus/prometheus">Prometheus</a> 是由 Go 语言编写的，因此安装非常的方便，只需要在 <a href="https://prometheus.io/download/">DOWNLOAD</a> 中下载对应的 tar.gz 文件。进行如下解压：</p>
+<pre><code>$ tar xvfz prometheus-*.tar.gz
+</code></pre><p>就可以看到下述目录：</p>
+<pre><code>prometheus
+├── LICENSE
+├── NOTICE
+├── console_libraries
+├── consoles
+├── data
+├── prometheus
+├── prometheus.yml
+├── prometheus.yml.default
+├── promtool
+├── rules
+└── tsdb
+</code></pre><p>启动 Prometheus：</p>
+<pre><code>$ ./prometheus 
+...
+level=info ts=2020-05-16T07:33:34.138Z caller=main.go:661 msg=&quot;Starting TSDB ...&quot;
+level=info ts=2020-05-16T07:33:34.139Z caller=web.go:508 component=web msg=&quot;Start listening for connections&quot; address=0.0.0.0:9090
+</code></pre><p>默认监听 9090 端口：</p>
+<p><img src="https://image.eddycjy.com/f39b6b6f1c195973285d2bfd690425f3.jpg" alt="image"></p>
+<p>至此我们就完成了 Prometheus 的基本启动了。</p>
+<h2 id="小结">小结<a href="#小结" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p>在本章节中，我们快速了解 Prometheus 的基本概念和整体的生态概要，在下一章节起我们将进一步的实操，知行合一。</p>
+<h2 id="参考资料">参考资料<a href="#参考资料" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<ul>
+<li><a href="https://ryanyang.gitbook.io/prometheus/di-yi-zhang-jie-shao/overview">https://ryanyang.gitbook.io/prometheus/di-yi-zhang-jie-shao/overview</a></li>
+<li><a href="https://www.cnblogs.com/xiangsikai/p/11288632.html">https://www.cnblogs.com/xiangsikai/p/11288632.html</a></li>
+<li><a href="https://www.cnblogs.com/charlieroro/p/8670959.html">https://www.cnblogs.com/charlieroro/p/8670959.html</a></li>
+</ul>
+
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-166045776-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>
