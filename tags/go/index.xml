@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Wed, 12 Aug 2020 16:44:10 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/go/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 15 Oct 2020 14:16:49 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/go/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>gin记录说明</title>
+      <link>https://blog.k1s.club/posts/57-gin%E8%AE%B0%E5%BD%95%E8%AF%B4%E6%98%8E/</link>
+      <pubDate>Thu, 15 Oct 2020 14:16:49 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/57-gin%E8%AE%B0%E5%BD%95%E8%AF%B4%E6%98%8E/</guid>
+      <description>简单记录一些gin框架学习遇到的一些问题</description>
+    </item>
+    
     <item>
       <title>go单元测试和性能测试</title>
       <link>https://blog.k1s.club/posts/54-go%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/</link>
@@ -144,19 +153,6 @@ PID VSZ RSS ... COMMAND 67459 2007m 136m ... ./eddycjy-server 从结果上来看
       <guid>https://blog.k1s.club/posts.bak/go/talk/2019-09-07-go1.13-defer/</guid>
       <description>最近 Go1.13 终于发布了，其中一个值得关注的特性就是 defer 在大部分的场景下性能提升了30%，但是官方并没有具体写是怎么提升的，这让大家非常的疑惑。而我因为之前写过《深入理解 Go defer》 和 《Go defer 会有性能损耗，尽量不要用？》 这类文章，因此我挺感兴趣它是做了什么改变才能得到这样子的结果，所以今天和大家一起探索其中奥妙。
 一、测试 Go1.12 $ go test -bench=. -benchmem -run=none goos: darwin goarch: amd64 pkg: github.com/EDDYCJY/awesomeDefer BenchmarkDoDefer-4 20000000	91.4 ns/op	48 B/op	1 allocs/op BenchmarkDoNotDefer-4 30000000	41.6 ns/op	48 B/op	1 allocs/op PASS ok github.com/EDDYCJY/awesomeDefer	3.234s Go1.13 $ go test -bench=. -benchmem -run=none goos: darwin goarch: amd64 pkg: github.com/EDDYCJY/awesomeDefer BenchmarkDoDefer-4 15986062	74.7 ns/op	48 B/op	1 allocs/op BenchmarkDoNotDefer-4 29231842	40.3 ns/op	48 B/op	1 allocs/op PASS ok github.</description>
-    </item>
-    
-    <item>
-      <title>用 GODEBUG 看 GC</title>
-      <link>https://blog.k1s.club/posts.bak/go/tools/2019-09-02-godebug-gc/</link>
-      <pubDate>Mon, 02 Sep 2019 12:00:00 +0000</pubDate>
-      
-      <guid>https://blog.k1s.club/posts.bak/go/tools/2019-09-02-godebug-gc/</guid>
-      <description>什么是 GC 在计算机科学中，垃圾回收（GC）是一种自动管理内存的机制，垃圾回收器会去尝试回收程序不再使用的对象及其占用的内存。而最早 John McCarthy 在 1959 年左右发明了垃圾回收，以简化 Lisp 中的手动内存管理的机制（来自 wikipedia）。
-为什么要 GC 手动管理内存挺麻烦，管错或者管漏内存也很糟糕，将会直接导致程序不稳定（持续泄露）甚至直接崩溃。
-GC 带来的问题 硬要说会带来什么问题的话，也就数大家最关注的 Stop The World（STW），STW 代指在执行某个垃圾回收算法的某个阶段时，需要将整个应用程序暂停去处理 GC 相关的工作事项。例如：
-   行为 会不会 STW 为什么     标记开始 会 在开始标记时，准备根对象的扫描，会打开写屏障（Write Barrier） 和 辅助GC（mutator assist），而回收器和应用程序是并发运行的，因此会暂停当前正在运行的所有 Goroutine。   并发标记中 不会 标记阶段，主要目的是标记堆内存中仍在使用的值。   标记结束 会 在完成标记任务后，将重新扫描部分根对象，这时候会禁用写屏障（Write Barrier）和辅助GC（mutator assist），而标记阶段和应用程序是并发运行的，所以在标记阶段可能会有新的对象产生，因此在重新扫描时需要进行 STW。    如何调整 GC 频率 可以通过 GOGC 变量设置初始垃圾收集器的目标百分比值，对比的规则为当新分配的数值与上一次收集后剩余的实时数值的比例达到设置的目标百分比时，就会触发 GC，默认值为 GOGC=100。如果将其设置为 GOGC=off 可以完全禁用垃圾回收器，要不试试？
-简单来讲就是，GOGC 的值设置的越大，GC 的频率越低，但每次最终所触发到 GC 的堆内存也会更大。</description>
     </item>
     
   </channel>

@@ -7,7 +7,25 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 25 Sep 2020 10:11:28 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 15 Oct 2020 14:16:49 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>gin</title>
+      <link>https://blog.k1s.club/tags/gin/</link>
+      <pubDate>Thu, 15 Oct 2020 14:16:49 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/tags/gin/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>go</title>
+      <link>https://blog.k1s.club/tags/go/</link>
+      <pubDate>Thu, 15 Oct 2020 14:16:49 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/tags/go/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>centos8</title>
       <link>https://blog.k1s.club/tags/centos8/</link>
@@ -54,15 +72,6 @@
     </item>
     
     <item>
-      <title>go</title>
-      <link>https://blog.k1s.club/tags/go/</link>
-      <pubDate>Wed, 12 Aug 2020 16:44:10 +0000</pubDate>
-      
-      <guid>https://blog.k1s.club/tags/go/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>hexo6</title>
       <link>https://blog.k1s.club/tags/hexo6/</link>
       <pubDate>Fri, 07 Aug 2020 16:00:08 +0000</pubDate>
@@ -86,15 +95,6 @@
       <pubDate>Tue, 04 Aug 2020 16:22:10 +0000</pubDate>
       
       <guid>https://blog.k1s.club/tags/istio/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>k8s</title>
-      <link>https://blog.k1s.club/tags/k8s/</link>
-      <pubDate>Tue, 04 Aug 2020 16:22:10 +0000</pubDate>
-      
-      <guid>https://blog.k1s.club/tags/k8s/</guid>
       <description></description>
     </item>
     

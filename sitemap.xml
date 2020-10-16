@@ -3,6 +3,36 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://blog.k1s.club/tags/gin/</loc>
+    <lastmod>2020-10-15T14:16:49+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blog.k1s.club/posts/57-gin%E8%AE%B0%E5%BD%95%E8%AF%B4%E6%98%8E/</loc>
+    <lastmod>2020-10-15T14:16:49+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blog.k1s.club/tags/go/</loc>
+    <lastmod>2020-10-15T14:16:49+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blog.k1s.club/posts/</loc>
+    <lastmod>2020-10-15T14:16:49+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blog.k1s.club/tags/</loc>
+    <lastmod>2020-10-15T14:16:49+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blog.k1s.club/</loc>
+    <lastmod>2020-10-15T14:16:49+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://blog.k1s.club/about/</loc>
     <lastmod>2020-10-15T00:00:00+00:00</lastmod>
   </url>
@@ -14,21 +44,6 @@
   
   <url>
     <loc>https://blog.k1s.club/posts/56-centos8%E5%88%9D%E4%BD%93%E9%AA%8C/</loc>
-    <lastmod>2020-09-25T10:11:28+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://blog.k1s.club/posts/</loc>
-    <lastmod>2020-09-25T10:11:28+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://blog.k1s.club/tags/</loc>
-    <lastmod>2020-09-25T10:11:28+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://blog.k1s.club/</loc>
     <lastmod>2020-09-25T10:11:28+00:00</lastmod>
   </url>
   
@@ -85,11 +100,6 @@
   <url>
     <loc>https://blog.k1s.club/posts.bak/microservice/dismantle/</loc>
     <lastmod>2020-08-19T20:56:55+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://blog.k1s.club/tags/go/</loc>
-    <lastmod>2020-08-12T16:44:10+00:00</lastmod>
   </url>
   
   <url>
@@ -890,11 +900,6 @@
   <url>
     <loc>https://blog.k1s.club/posts.bak/go/tools/2018-09-15-go-tool-pprof/</loc>
     <lastmod>2018-09-15T12:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://blog.k1s.club/tags/gin/</loc>
-    <lastmod>2018-09-01T12:00:00+00:00</lastmod>
   </url>
   
   <url>

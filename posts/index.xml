@@ -6,8 +6,20 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Fri, 25 Sep 2020 10:11:28 +0000</lastBuildDate>
+		<lastBuildDate>Thu, 15 Oct 2020 14:16:49 +0000</lastBuildDate>
 		<atom:link href="https://blog.k1s.club/posts/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>gin记录说明</title>
+			<link>https://blog.k1s.club/posts/57-gin%E8%AE%B0%E5%BD%95%E8%AF%B4%E6%98%8E/</link>
+			<pubDate>Thu, 15 Oct 2020 14:16:49 +0000</pubDate>
+			
+			<guid>https://blog.k1s.club/posts/57-gin%E8%AE%B0%E5%BD%95%E8%AF%B4%E6%98%8E/</guid>
+			<description>简单记录一些gin框架学习遇到的一些问题</description>
+			<content type="html"><![CDATA[<p>简单记录一些gin框架学习遇到的一些问题</p>
+<!-- raw HTML omitted -->
+]]></content>
+		</item>
 		
 		<item>
 			<title>centos8初体验</title>
@@ -18,20 +30,20 @@
 			<description>&lt;p&gt;简单记录下 centos8的一些新的内容&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>简单记录下 centos8的一些新的内容</p>
 <h3 id="1-时间同步通过chrony-支持">1. 时间同步通过chrony 支持</h3>
-<pre><code>dnf install -y chrony
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">dnf install -y chrony
 
 systemctl start chronyd.service
-systemctl enable chronyd.service
+systemctl <span class="nb">enable</span> chronyd.service
 
-# 查看所有可用区
+<span class="c1"># 查看所有可用区</span>
 timedatectl list-timezones
 
-# 设置时区
+<span class="c1"># 设置时区</span>
 timedatectl set-timezone Asia/Shanghai
 
-# 手动同步
+<span class="c1"># 手动同步</span>
 chronyc -a makestep
-</code></pre>]]></content>
+</code></pre></div>]]></content>
 		</item>
 		
 		<item>
