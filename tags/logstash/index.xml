@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>logstash on zhangzw</title>
+    <link>https://blog.k1s.club/tags/logstash/</link>
+    <description>Recent content in logstash on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Fri, 08 Nov 2019 17:28:26 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/logstash/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>logstash配置</title>
+      <link>https://blog.k1s.club/posts/26-logstash%E9%85%8D%E7%BD%AE/</link>
+      <pubDate>Fri, 08 Nov 2019 17:28:26 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/26-logstash%E9%85%8D%E7%BD%AE/</guid>
+      <description>记录一些logstash的配置问题
+想要排除某些信息 官方文档
+if &amp;quot;_grokparsefailure&amp;quot; not in [tags] { if [sqlDuring] &amp;lt; 5 { drop {} } } else { drop {} }  请务必注意 如果failure 可能会导致找不到 sqlDuring变量 而报错
+ [2019-12-05T17:53:03,017][FATAL][logstash.runner ] An unexpected error occurred! {:error=&amp;gt;#&amp;lt;NoMethodError: undefined method `&amp;lt;&#39; for nil:NilClass&amp;gt;, :backtrace=&amp;gt;[&amp;quot;(eval):139:in `initialize&#39;&amp;quot;, &amp;quot;org/jruby/RubyArray.java:1613:in `each&#39;&amp;quot;, &amp;quot;(eval):137:in `initialize&#39;&amp;quot;, &amp;quot;org/jruby/RubyProc.java:281:in `call&#39;&amp;quot;, &amp;quot;(eval):96:in `filter_func&#39;&amp;quot;, &amp;quot;/usr/local/logstash-5.0.2/logstash-core/lib/logstash/pipeline.rb:260:in `filter_batch&#39;&amp;quot;, &amp;quot;org/jruby/RubyProc.java:281:in `call&#39;&amp;quot;, &amp;quot;/usr/local/logstash-5.0.2/logstash-core/lib/logstash/util/wrapped_synchronous_queue.rb:186:in `each&#39;&amp;quot;, &amp;quot;org/jruby/RubyHash.java:1342:in `each&#39;&amp;quot;, &amp;quot;/usr/local/logstash-5.0.2/logstash-core/lib/logstash/util/wrapped_synchronous_queue.rb:185:in `each&#39;&amp;quot;, &amp;quot;/usr/local/logstash-5.0.2/logstash-core/lib/logstash/pipeline.rb:258:in `filter_batch&#39;&amp;quot;, &amp;quot;/usr/local/logstash-5.0.2/logstash-core/lib/logstash/pipeline.rb:246:in `worker_loop&#39;&amp;quot;, &amp;quot;/usr/local/logstash-5.0.2/logstash-core/lib/logstash/pipeline.rb:225:in `start_workers&#39;&amp;quot;]} </description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>awk on zhangzw</title>
+    <link>https://blog.k1s.club/tags/awk/</link>
+    <description>Recent content in awk on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Fri, 11 Oct 2019 15:23:48 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/awk/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>awk简单记录</title>
+      <link>https://blog.k1s.club/posts/12-awk%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</link>
+      <pubDate>Fri, 11 Oct 2019 15:23:48 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/12-awk%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</guid>
+      <description>记录一些简单使用
+实例1: 计算nginx日志中某个接口的次数和平均响应时间 例如我的a.txt nginx日志格式如下 a.b.com 1.1.1.1 [08/Sep/2019:23:57:01 +0800] &amp;quot;GET /v1/actionname?xxxx HTTP/1.1&amp;quot; 200 386 &amp;quot;-&amp;quot; &amp;quot;Mozilla/5.0 (Linux; Android 9; V1831A Build/P00610; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36&amp;quot; &amp;quot;-&amp;quot; &amp;quot;0.023&amp;quot; a.b.com 1.1.1.1 [08/Sep/2019:23:57:01 +0800] &amp;quot;GET /v1/actionname2?xxxx HTTP/1.1&amp;quot; 200 386 &amp;quot;-&amp;quot; &amp;quot;Mozilla/5.0 (Linux; Android 9; V1831A Build/P00610; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36&amp;quot; &amp;quot;-&amp;quot; &amp;quot;0.016&amp;quot;  这里我只想取出接口名: /v1/actionname 和 0.023 响应时间
+ 首先我取出这两列 cat a.txt|awk -F &#39;&amp;quot;&#39; &#39;{print $(NF-1),$2}&#39;|awk -F &#39;?</description>
+    </item>
+    
+  </channel>
+</rss>

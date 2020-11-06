@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="filebeat7收集mysql慢日志到es">
+<meta itemprop="description" content="慢日志提供给开发查看, 采用elk统一提供,这里采用k8s环境搭建">
+<meta itemprop="datePublished" content="2019-10-30T16:56:37+00:00" />
+<meta itemprop="dateModified" content="2019-10-30T16:56:37+00:00" />
+<meta itemprop="wordCount" content="269">
+
+
+
+<meta itemprop="keywords" content="filebeat7,elk7,elk,k8s," />
+<meta property="og:title" content="filebeat7收集mysql慢日志到es" />
+<meta property="og:description" content="慢日志提供给开发查看, 采用elk统一提供,这里采用k8s环境搭建" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/24-filebeat7%E6%94%B6%E9%9B%86mysql%E6%85%A2%E6%97%A5%E5%BF%97%E5%88%B0es/" />
+<meta property="article:published_time" content="2019-10-30T16:56:37+00:00" />
+<meta property="article:modified_time" content="2019-10-30T16:56:37+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="filebeat7收集mysql慢日志到es"/>
+<meta name="twitter:description" content="慢日志提供给开发查看, 采用elk统一提供,这里采用k8s环境搭建"/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>filebeat7收集mysql慢日志到es</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/mysql45%E8%AE%B2%E4%B8%81%E5%A5%87/">Mysql45讲丁奇</a>
+					<a href="https://blog.k1s.club/posts/">文章</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Oct 30, 2019</span></div>
+				<h1>filebeat7收集mysql慢日志到es</h1>
+			</header>
+			<div class="content">
+				<p>慢日志提供给开发查看, 采用elk统一提供,这里采用k8s环境搭建</p>
+<p>原文: <a href="https://www.cnblogs.com/smail-bao/p/9528072.html">ELK收集mysql_slow.log</a>
+其他: <a href="https://blog.csdn.net/u012491646/article/details/90750571">filebeat （7.1.0）docker容器</a></p>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="slowlog内容分析">slowlog内容分析<a href="#slowlog内容分析" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>5.5 版本慢查询日志</li>
+</ul>
+<pre><code># Time: 191030 17:03:13
+# User@Host: myuser[myuser] @  [10.10.0.1]
+# Query_time: 3.329673  Lock_time: 0.000107 Rows_sent: 0  Rows_examined: 3971182
+SET timestamp=1572426193;
+select * from a where name = 1 limit 1;
+</code></pre><ul>
+<li>5.6 版本慢查询日志</li>
+</ul>
+<pre><code># Time: 191030 17:03:13
+# User@Host: myuser[myuser] @  [10.10.0.1] Id: 1111
+# Query_time: 3.329673  Lock_time: 0.000107 Rows_sent: 0  Rows_examined: 3971182
+use db_name;
+SET timestamp=1572426193;
+select * from a where name = 1 limit 1;
+</code></pre><ul>
+<li>5.7 版本慢查询日志</li>
+</ul>
+<pre><code># Time: 2019-10-06T13:25:38.703546+08:00
+# User@Host: myuser[myuser] @  [10.10.0.1] Id: 1111
+# Query_time: 3.329673  Lock_time: 0.000107 Rows_sent: 0  Rows_examined: 3971182
+SET timestamp=1572426193;
+select * from a where name = 1 limit 1;
+</code></pre><ul>
+<li>除以上格式以外,还需要注意慢查询代码块,可能并不是每次都有 # Time</li>
+</ul>
+<blockquote>
+<p>一条完整的日志：最终将以# User@Host: 开始的行，和以SQL语句结尾的行合并为一条完整的慢日志语句</p>
+</blockquote>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+<font color="blue" face="黑体" size=5> 开始部署filebeat7 </font>
+</center>
+<h3 id="准备镜像">准备镜像<a href="#准备镜像" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>docker pull store/elastic/filebeat:7.2.0
+</code></pre><h3 id="filebeat配置文件">filebeat配置文件<a href="#filebeat配置文件" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /opt/slow.log
+
+  exclude_lines: ['^\# Time']
+
+  multiline.pattern: '^\# Time|^\# User'
+  multiline.negate: true
+  multiline.match: after
+
+  tail_files: true
+
+output.elasticsearch:
+  enabled: true
+  hosts: [&quot;10.0.0.100:9200&quot;]
+  protocol: &quot;http&quot;
+  indices:
+    - index: &quot;es-index-name&quot;
+</code></pre><h3 id="k8s部署文件">k8s部署文件<a href="#k8s部署文件" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>k8s-filebeat-7.2.0.yml
+kind: Deployment
+apiVersion: apps/v1beta2
+metadata:
+  labels:
+    elastic-app: filebeat
+  name: filebeat
+  namespace: ns-elastic7
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      elastic-app: filebeat
+  template:
+    metadata:
+      labels:
+        elastic-app: filebeat
+    spec:
+      containers:
+        - name: filebeat
+          image: store/elastic/filebeat:7.2.0
+          volumeMounts:
+            - name: filebeat-config
+              mountPath: /usr/share/filebeat/filebeat.yml
+            - name: mysql-dev-252
+              mountPath: /opt/php-mysql-dev-0-slow.log
+      volumes:
+        - name: filebeat-config
+          hostPath:
+            path: /data/k8s-container/elk-7.2.0/filebeat-7.2.0/filebeat.yml
+        - name: mysql-dev-252
+          hostPath:
+            path: /data/k8s-container/mysql5.5/slow.log
+</code></pre><h3 id="logstash分析mysql日志">logstash分析mysql日志<a href="#logstash分析mysql日志" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>省略input的kafka 和ouput的es</p>
+</blockquote>
+<pre><code>    if [type] == &quot;showlog1&quot; or [type] == &quot;showlog2&quot; {
+        json {
+                source =&gt; &quot;message&quot;
+        }
+
+        mutate {
+                gsub =&gt; [ &quot;message&quot;, &quot;\n&quot;, &quot;&quot; ]
+        }
+        grok {
+                match =&gt; [&quot;message&quot;,&quot;(?m)^# User@Host: %{USER:user}\[[^\]]+\] @  \[%{IP:clientip}\]  Id: %{NUMBER:Id:int}# Query_time: %{NUMBER:query_time:float}\s+Lock_time: %{NUMBER:lock_time:float}\s+Rows_sent: %{NUMBER:rows_sent:int}\s+Rows_examined: %{NUMBER:rows_examined:int}(?&lt;dbnameall&gt;.*)SET\s+timestamp=%{NUMBER:timestamp_mysql:int};(?&lt;query&gt;.*)&quot;]
+        }
+        date {
+                match =&gt; [&quot;timestamp_mysql&quot;, &quot;UNIX&quot;]
+                target =&gt; &quot;@timestamp&quot;
+        }
+    }
+</code></pre>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/filebeat7">filebeat7</a></span><span class="tag"><a href="https://blog.k1s.club/tags/elk7">elk7</a></span><span class="tag"><a href="https://blog.k1s.club/tags/elk">elk</a></span><span class="tag"><a href="https://blog.k1s.club/tags/k8s">k8s</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>269 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-10-31 00:56 &#43;0800</p>
+			</footer>
+		</article>
+		<aside id="toc" class="show-toc">
+			<div class="toc-title">Table of Contents</div>
+			<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#slowlog内容分析">slowlog内容分析</a></li>
+        <li><a href="#准备镜像">准备镜像</a></li>
+        <li><a href="#filebeat配置文件">filebeat配置文件</a></li>
+        <li><a href="#k8s部署文件">k8s部署文件</a></li>
+        <li><a href="#logstash分析mysql日志">logstash分析mysql日志</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+		</aside>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/25-linux%E4%B8%80%E4%BA%9B%E8%84%9A%E6%9C%AC%E6%B1%87%E6%80%BB/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>Linux一些脚本汇总</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/23-mysql5-5%E4%B8%BB%E4%B8%8Emysql5-7%E4%BB%8E%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>mysql5.5主与mysql5.7从部署配置</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-180942795-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

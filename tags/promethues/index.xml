@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>promethues on zhangzw</title>
+    <link>https://blog.k1s.club/tags/promethues/</link>
+    <description>Recent content in promethues on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Thu, 14 May 2020 18:34:47 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/promethues/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>k8s安装promethues&#43;alertmanager&#43;grafana</title>
+      <link>https://blog.k1s.club/posts/47-k8s%E5%AE%89%E8%A3%85promethues-alertmanager-grafana/</link>
+      <pubDate>Thu, 14 May 2020 18:34:47 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/47-k8s%E5%AE%89%E8%A3%85promethues-alertmanager-grafana/</guid>
+      <description>本文主要是针对prometheus 简单部署 , 考虑到测试资源有限,为更精简自定义按照监控,减少多余资源占用, 也同时更了解prometheus的更多细节, 这里没有使用prometheus-operator
+ 1 K8s上部署原生的prometheus 2 prometheus-operator 方式部署 3 docker-compose快速搭建 Prometheus+Grafana监控系统 4 一套prometheus监控多个k8s集群,详细讲解配置 5 使用prometheus监控traefik、redis、k8s集群各节点、各节点kubelet 6 grafana 监控模板下载     搭建prometheus 创建ns tee ns.yml &amp;lt;&amp;lt;- EOF apiVersion: v1 kind: Namespace metadata: name: monitoring EOF kubectl apply -f ns.yml prometheus-clusterRole.yml tee prometheus-clusterRole.yml &amp;lt;&amp;lt;- EOF apiVersion: rbac.authorization.k8s.io/v1 kind: ClusterRole metadata: name: prometheus-k8s rules: - apiGroups: - &amp;quot;&amp;quot; resources: - nodes/metrics verbs: - get - nonResourceURLs: - /metrics verbs: - get EOF prometheus-clusterRoleBinding.</description>
+    </item>
+    
+  </channel>
+</rss>

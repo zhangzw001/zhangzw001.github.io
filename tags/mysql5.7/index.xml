@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>mysql5.7 on zhangzw</title>
+    <link>https://blog.k1s.club/tags/mysql5.7/</link>
+    <description>Recent content in mysql5.7 on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Tue, 29 Oct 2019 14:56:55 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/mysql5.7/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>mysql5.5主与mysql5.7从部署配置</title>
+      <link>https://blog.k1s.club/posts/23-mysql5-5%E4%B8%BB%E4%B8%8Emysql5-7%E4%BB%8E%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE/</link>
+      <pubDate>Tue, 29 Oct 2019 14:56:55 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/23-mysql5-5%E4%B8%BB%E4%B8%8Emysql5-7%E4%BB%8E%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE/</guid>
+      <description>由于需要将旧版mysql5.5的数据同步到新mysql5.7, 并且会对部分表分库
+参考教程: mysql从5.5直接升级到5.7
+ mysql5.5升级到mysql5.7   采用mysql5.5数据目录升级为mysql5.7 1 从mysql5.5的从库 copy /data数据 2 修改新的mysql5.7配置文件 my.cnf，添加datadir，指向5.5数据目录 3 新安装数据库执行(本次不需要执行) /usr/local/mysql57/bin/mysqld --defaults-file=/etc/my57.cnf --initialize-insecure --user=mysql --basedir=/usr/local/mysql --datadir=/disk/u01 4 启动mysql 5 此时数据目录还是5.5的，需要执行mysql_upgrade进行升级，在执行表修复前，需要确认一个参数innodb_file_per_table，mysql官网对该参数的解释如下 该参数在5.5版本默认为OFF，所有表和索引都导入一个共享文件中，名为ibdata1,但在5.6.7及以后版本，改参数被默认设置为ON，即每张表都有对应的表和索引存储文件，每个schema下，每个frm文件都有对应的ibd文件。 在执行mysql_upgrade时，会修复系统表，并且如果该参数在5.5和5.7版本均使用默认值，则会将之前共享表和索引的存储方式改为每张表单独存储表和索引的形式，故会出现拷贝复制的操作，如果数据量比较大，则用时就会很长， 使用nnodb_file_per_table=1，及表和索引单独存储的优缺点，可查看mysql官网介绍。 6 使用mysql_upgrade检测并修复表 /usr/local/mysql57/bin/mysql_upgrade -S /disk/u01/mysql.sock  以上已经完成对mysql5.5数据升级 在mysql5.7运行的功能
+  配置mysql5.5主与mysql5.7从   将msyql5.7作为mysql5.5的从库  # 从库执行, POS位置以 show master status\G 查询为准 stop slave; SET GLOBAL read_only=0; reset slave all; CHANGE MASTER TO MASTER_HOST=&#39;db_master.prod.zhangzw.com&#39;,MASTER_PORT=3306,MASTER_USER=&#39;xxx&#39;,MASTER_PASSWORD=&#39;xxx&#39;,MASTER_LOG_FILE=&#39;m1-master-bin.000001&#39;,MASTER_LOG_POS=107; start slave; 在主库测试创建表, 查看是否会同步到mysql5.7从库 create table tutorials_tbl( tutorial_id INT NOT NULL AUTO_INCREMENT, tutorial_title VARCHAR(100) NOT NULL, tutorial_author VARCHAR(40) NOT NULL, submission_date DATE, PRIMARY KEY ( tutorial_id ) );  修改mysql5.</description>
+    </item>
+    
+    <item>
+      <title>mysql5.7二进制部署</title>
+      <link>https://blog.k1s.club/posts/8-mysql5-7%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2/</link>
+      <pubDate>Thu, 26 Sep 2019 15:11:05 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/8-mysql5-7%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2/</guid>
+      <description>二进制方式部署mysql5.7
+ 下载glibc二进制包 #打开下载页面, 可能会有小版本更新(注意：选择操作系统时选Linux-Generic） https://dev.mysql.com/downloads/mysql/5.7.html#downloads # 最新的可能有小版本变化 wget https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz 安装配置 tar -xvf mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz mv mysql-5.7.24-linux-glibc2.12-x86_64 /usr/local/ cd /usr/local/ # 我的镜像是安装过5.5mysql, 所以需要mv一下 mv mysql mysql-5.5.37 # 由于以前安装过php指定了该mysq目录, 这可能导致以前安装的php缺少libmysqlclient.so.18 ln -s /usr/local/mysql-5.5.37/lib/libmysqlclient.so.18 /usr/local/mysql-5.7.24-linux-glibc2.12-x86_64/lib/libmysqlclient.so.18 ln -s mysql-5.7.24-linux-glibc2.12-x86_64 mysql # 添加启动文件 \cp mysql/support-files/mysql.server /etc/init.d/mysqld echo &amp;quot;PATH=$PATH:/usr/local/mysql/bin/&amp;quot; &amp;gt;&amp;gt;~/.bashrc # 可选 wget http://centos.mirrors.ucloud.cn/centos/6/os/x86_64/Packages/numactl-2.0.9-2.el6.x86_64.rpm yum localinstall numactl-2.0.9-2.el6.x86_64.rpm \rm numactl-2.0.9-2.el6.x86_64.rpm useradd mysql # 配置下mysql的数据目录 cd /data/ mkdir u01 mkdir u02 chown -R mysql.mysql u01 chown -R mysql.</description>
+    </item>
+    
+  </channel>
+</rss>

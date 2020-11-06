@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>fluentd on zhangzw</title>
+    <link>https://blog.k1s.club/tags/fluentd/</link>
+    <description>Recent content in fluentd on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Thu, 09 Apr 2020 17:40:58 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/fluentd/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>k8s部署fluentd&#43;kafka&#43;logstash&#43;es</title>
+      <link>https://blog.k1s.club/posts/44-k8s%E9%83%A8%E7%BD%B2fluentd-kafka-logstash-es/</link>
+      <pubDate>Thu, 09 Apr 2020 17:40:58 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/44-k8s%E9%83%A8%E7%BD%B2fluentd-kafka-logstash-es/</guid>
+      <description>客户端采集数据的软件比较多, 有logstash,flume,fluentd/fluent-bit,filebeat等,这里在k8s集群中部署fluentd开启UDP端口接收代码写入的json日志,并写入到kafka中
+  1. 一些服务版本 docker镜像: docker pull fluentd:v1.9.1-1.0 kafka: kafka-server-0.10.0+kafka2.1.0-1.2.1.0.p0.63.el6.noarch fluent-plugin-kafka: 0.5.7   2. fluentd 镜像安装kafka扩展 Dockerfile  由于fluent-plugin-kafka版本要求 我们的kafka是0.10, 所以高版本有问题, 安装了fluent-plugin-kafka 0.5.7 则正常
+ 官方文档: https://rubygems.org/gems/fluent-plugin-kafka/versions/0.5.7
+from fluentd:v1.9.1-1.0 MAINTAINER zhangzw &amp;lt;zhangzw@xxx.com&amp;gt; USER root RUN fluent-gem install fluent-plugin-kafka -v 0.5.7 USER fluent   3. fluentd配置文件 fluent-udp-to-kafka.conf  &amp;lt;source&amp;gt; @type udp @label @mainstream tag udplog # required &amp;lt;parse&amp;gt; @type regexp expression /^(?&amp;lt;message&amp;gt;.*)$/ &amp;lt;/parse&amp;gt; port 12301 # optional. 5160 by default bind 0.</description>
+    </item>
+    
+  </channel>
+</rss>

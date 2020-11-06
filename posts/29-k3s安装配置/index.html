@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="k3s安装配置">
+<meta itemprop="description" content="体验轻量级k8s集群,适用于低配个人开发测试使用
+ k3s, 5 less than k8s   详情参考官方: k3s github地址
+准备  1 selinux 关闭  getenforce # 本次关闭 setenforce 0 # 重启后关闭 sed -i &#39;/SELINUX=enforcing/s/enforcing/disabled/&#39; /etc/sysconfig/selinux  2 关闭swap(可选)  # 本次关闭 swapoff on # 重启后关闭 sed -i &#39;/swap/s@^/@#/@&#39; /etc/fstab  3 关闭firewalld(必须)  systemctl stop firewalld.service systemctl disable firewalld.service  4 在内核3.10,4.16,5.2,5.3 都正常运行  Step 1: 安装K3S集群 # 下载k3s 二进制文件打开各版本点击详情可以查询k3s版本对应的k8s版本(https://github.com/rancher/k3s/releases) wget https://github.com/rancher/k3s/releases/download/v1.0.0/k3s k3s v1.0.0 -&gt; k8s1.16.3 # https://github.">
+<meta itemprop="datePublished" content="2019-12-03T16:06:28+00:00" />
+<meta itemprop="dateModified" content="2019-12-03T16:06:28+00:00" />
+<meta itemprop="wordCount" content="262">
+
+
+
+<meta itemprop="keywords" content="k3s," />
+<meta property="og:title" content="k3s安装配置" />
+<meta property="og:description" content="体验轻量级k8s集群,适用于低配个人开发测试使用
+ k3s, 5 less than k8s   详情参考官方: k3s github地址
+准备  1 selinux 关闭  getenforce # 本次关闭 setenforce 0 # 重启后关闭 sed -i &#39;/SELINUX=enforcing/s/enforcing/disabled/&#39; /etc/sysconfig/selinux  2 关闭swap(可选)  # 本次关闭 swapoff on # 重启后关闭 sed -i &#39;/swap/s@^/@#/@&#39; /etc/fstab  3 关闭firewalld(必须)  systemctl stop firewalld.service systemctl disable firewalld.service  4 在内核3.10,4.16,5.2,5.3 都正常运行  Step 1: 安装K3S集群 # 下载k3s 二进制文件打开各版本点击详情可以查询k3s版本对应的k8s版本(https://github.com/rancher/k3s/releases) wget https://github.com/rancher/k3s/releases/download/v1.0.0/k3s k3s v1.0.0 -&gt; k8s1.16.3 # https://github." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/29-k3s%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/" />
+<meta property="article:published_time" content="2019-12-03T16:06:28+00:00" />
+<meta property="article:modified_time" content="2019-12-03T16:06:28+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="k3s安装配置"/>
+<meta name="twitter:description" content="体验轻量级k8s集群,适用于低配个人开发测试使用
+ k3s, 5 less than k8s   详情参考官方: k3s github地址
+准备  1 selinux 关闭  getenforce # 本次关闭 setenforce 0 # 重启后关闭 sed -i &#39;/SELINUX=enforcing/s/enforcing/disabled/&#39; /etc/sysconfig/selinux  2 关闭swap(可选)  # 本次关闭 swapoff on # 重启后关闭 sed -i &#39;/swap/s@^/@#/@&#39; /etc/fstab  3 关闭firewalld(必须)  systemctl stop firewalld.service systemctl disable firewalld.service  4 在内核3.10,4.16,5.2,5.3 都正常运行  Step 1: 安装K3S集群 # 下载k3s 二进制文件打开各版本点击详情可以查询k3s版本对应的k8s版本(https://github.com/rancher/k3s/releases) wget https://github.com/rancher/k3s/releases/download/v1.0.0/k3s k3s v1.0.0 -&gt; k8s1.16.3 # https://github."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>k3s安装配置</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/mysql45%E8%AE%B2%E4%B8%81%E5%A5%87/">Mysql45讲丁奇</a>
+					<a href="https://blog.k1s.club/posts/">文章</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Dec 3, 2019</span></div>
+				<h1>k3s安装配置</h1>
+			</header>
+			<div class="content">
+				<p>体验轻量级k8s集群,适用于低配个人开发测试使用</p>
+<!-- more -->
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+<font color="blue" face="黑体" size=5> k3s, 5 less than k8s </font>
+</center>
+<p>详情参考官方: <a href="https://github.com/rancher/k3s">k3s github地址</a></p>
+<h3 id="准备">准备<a href="#准备" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>1 selinux 关闭</li>
+</ul>
+<pre><code>getenforce
+# 本次关闭
+setenforce 0
+
+# 重启后关闭
+sed -i '/SELINUX=enforcing/s/enforcing/disabled/' /etc/sysconfig/selinux
+</code></pre><ul>
+<li>2 关闭swap(可选)</li>
+</ul>
+<pre><code># 本次关闭
+swapoff on
+# 重启后关闭
+sed -i '/swap/s@^/@#/@' /etc/fstab
+</code></pre><ul>
+<li>3 关闭firewalld(必须)</li>
+</ul>
+<pre><code>systemctl stop firewalld.service
+systemctl disable firewalld.service
+</code></pre><ul>
+<li>4 在内核3.10,4.16,5.2,5.3 都正常运行</li>
+</ul>
+<h3 id="step-1-安装k3s集群">Step 1: 安装K3S集群<a href="#step-1-安装k3s集群" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code># 下载k3s 二进制文件打开各版本点击详情可以查询k3s版本对应的k8s版本(https://github.com/rancher/k3s/releases)
+wget https://github.com/rancher/k3s/releases/download/v1.0.0/k3s
+k3s v1.0.0 -&gt; k8s1.16.3
+
+# https://github.com/rancher/k3s/tags
+k3s v0.9.0 -&gt; k8s1.15.4
+k3s v0.10.0 -&gt; k8s1.16.2
+
+我这里下载最新的k3s v1.0.0, 但是由于metrics-server好像对k8s1.16.3最新有点问题, 还是先等待metrics-server更新把
+测试了k3s v0.10.0 测试了下, 但遗憾的是默认好像没有安装metrics-server...
+
+mv k3s /usr/local/bin/k3s
+chmod +x /usr/local/bin/k3s
+
+#k3s --version
+k3s version v1.0.0 (18bd921c)
+
+# 下载pause镜像(这里举1,其他国内地址参考官方)
+docker pull registry.cn-beijing.aliyuncs.com/ilemonrain/pause-amd64:3.1
+docker tag registry.cn-beijing.aliyuncs.com/ilemonrain/pause-amd64:3.1 k8s.gcr.io/pause:3.1
+
+# 验证一下
+docker images | grep &quot;k8s.gcr.io/pause&quot;
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="step-2-安装k3s-server">Step 2: 安装k3s server<a href="#step-2-安装k3s-server" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code># centos官方安装
+curl -sfL https://get.k3s.io | sh -
+
+# 至此server已经安装完了,但由于k8s默认是用Containerd, 并非docker, 所以需要手工修改配置(当然如果你熟悉ctr 操作Containerd也没问题)
+# 修改ExecStart内容
+# 1: --docker 表示k3s server使用docker引擎
+# 2: --no-deploy traefik 表示不安装traefik
+vim /etc/systemd/system/multi-user.target.wants/k3s.service
+ExecStart=/usr/local/bin/k3s server --docker --no-deploy traefik
+
+# 启动服务
+systemctl daemon-reload
+service k3s restart
+
+# 验证
+k3s kubectl get node
+</code></pre><blockquote>
+<p>想去掉k3s命令? kubectl命令管理k3s</p>
+</blockquote>
+<pre><code># 简单做一个alias
+alias kubectl='k3s kubectl'
+
+# 或者
+rm -rf ~/.kube
+mkdir -p ~/.kube
+cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="step-3-客户端安装">Step 3: 客户端安装<a href="#step-3-客户端安装" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>参考官方文档 <a href="https://rancher.com/docs/k3s/latest/en/installation/install-options/">安装和配置选项</a></p>
+<pre><code># 同样下载二进制包
+wget https://github.com/rancher/k3s/releases/download/v1.0.0/k3s
+mv k3s /usr/local/bin/k3s
+chmod +x /usr/local/bin/k3s
+</code></pre><h3 id="加入到server有两种">加入到server有两种<a href="#加入到server有两种" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>手动加入 (其实上面我们已经拉取了image, 并且tag成官方地址了,所以这里也可以不用指定)</li>
+</ul>
+<pre><code>nohup k3s agent --docker   --pause-image registry.cn-beijing.aliyuncs.com/ilemonrain/pause-amd64:3.1 --server https://k3s-server:6443 --token ${NODE_TOKEN} &amp;
+nohup k3s agent --docker --server https://k3s-server:6443 --token ${NODE_TOKEN} &amp;
+</code></pre><ul>
+<li>脚本加入</li>
+</ul>
+<pre><code>curl -sfL https://get.k3s.io | K3S_URL=https://k3s-server:6443 K3S_TOKEN=${NODE_TOKEN} INSTALL_K3S_EXEC=&quot;agent --docker  --pause-image registry.cn-beijing.aliyuncs.com/ilemonrain/pause-amd64:3.1&quot; sh -s -
+curl -sfL https://get.k3s.io | K3S_URL=https://k3s-server:6443 K3S_TOKEN=${NODE_TOKEN} INSTALL_K3S_EXEC=&quot;agent --docker&quot; sh -s -
+
+# ps aux|grep k3s
+/usr/local/bin/k3s agent --docker --pause-image registry.cn-beijing.aliyuncs.com/ilemonrain/pause-amd64:3.1
+</code></pre><blockquote>
+<p>当然如下差别不大, 都是会启动一个k3s的进程</p>
+</blockquote>
+<h3 id="rancher-import">rancher import<a href="#rancher-import" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>curl --insecure -sfL https://rancher-dev.xxx.com/v3/import/x8jc277zmjkxjgcmc9f67pzn9f7ffsjpszlv9dxc79vhmndqcms4nr.yaml | k3s kubectl apply -f -
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="卸载">卸载<a href="#卸载" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>sh /usr/local/bin/k3s-uninstall.sh
+</code></pre>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/k3s">k3s</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>262 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-12-04 00:06 &#43;0800</p>
+			</footer>
+		</article>
+		<aside id="toc" class="show-toc">
+			<div class="toc-title">Table of Contents</div>
+			<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#准备">准备</a></li>
+        <li><a href="#step-1-安装k3s集群">Step 1: 安装K3S集群</a></li>
+        <li><a href="#step-2-安装k3s-server">Step 2: 安装k3s server</a></li>
+        <li><a href="#step-3-客户端安装">Step 3: 客户端安装</a></li>
+        <li><a href="#加入到server有两种">加入到server有两种</a></li>
+        <li><a href="#rancher-import">rancher import</a></li>
+        <li><a href="#卸载">卸载</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+		</aside>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>k8s一些命令总结</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>k3s1.16部署nginx&#43;php5.2.17</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-180942795-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

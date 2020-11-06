@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>shell on zhangzw</title>
+    <link>https://blog.k1s.club/tags/shell/</link>
+    <description>Recent content in shell on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Fri, 01 Nov 2019 17:50:26 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/shell/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Linux一些脚本汇总</title>
+      <link>https://blog.k1s.club/posts/25-linux%E4%B8%80%E4%BA%9B%E8%84%9A%E6%9C%AC%E6%B1%87%E6%80%BB/</link>
+      <pubDate>Fri, 01 Nov 2019 17:50:26 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/25-linux%E4%B8%80%E4%BA%9B%E8%84%9A%E6%9C%AC%E6%B1%87%E6%80%BB/</guid>
+      <description>记录一些shell脚本
+1 清理es几天前的索引脚本 2 从mysql导出表到clickhouse脚本
+ ###命令汇总
+生成字符串 tr -dc A-Za-z0-9_@$\%\^\/\+ &amp;lt; /dev/urandom|head -c 16|xargs grep需要转义的字符 grep &#39;&amp;quot;第一个转义\$第二个转义\[{&#39; a.txt 或者直接使用-F grep -F &#39;&amp;quot;$[{&#39; a.txt shell参数 while [ -n &amp;quot;$1&amp;quot; ] do case &amp;quot;$1&amp;quot; in -a) a=$2;shift 2;; -s) s=$2;shift 2;; *) ;; case done #%处理变量 tmpDir=/dir1/dir2/dir3/my.file.txt ${tmpDir#*/}	-&amp;gt; dir1/dir2/dir3/my.file.txt	(左)删除从左往右第一个 /以及左边的所有内容 ${tmpDir##*/}	-&amp;gt; my.file.txt	(左)删除从左往右最后一个/以及左边的所有内容 ${tmpDir%/*}	-&amp;gt; /dir1/dir2/dir3/	(右)删除从右往左第一个 /以及右边的所有内容 ${tmpDir%%/*}	-&amp;gt; 空	(右)删除从右往左最后一个/以及右边的所有内容 </description>
+    </item>
+    
+    <item>
+      <title>shell中gt和&gt;的区别</title>
+      <link>https://blog.k1s.club/posts/19-shell%E4%B8%ADgt%E5%92%8C%E7%9A%84%E5%8C%BA%E5%88%AB/</link>
+      <pubDate>Thu, 17 Oct 2019 11:48:22 +0000</pubDate>
+      
+      <guid>https://blog.k1s.club/posts/19-shell%E4%B8%ADgt%E5%92%8C%E7%9A%84%E5%8C%BA%E5%88%AB/</guid>
+      <description>shell中 gt 和 &amp;gt; 的一些相关问题介绍和测试
+ 以下是bash的测试, 注意如果你是zsh可能会不同喔😯
+  [[]] , [] 和test比较   [] 和test:	两者是一样的，在命令行里test expr和[ expr ]的效果相同。test中可用的比较运算符只有==和!=，两者都是用于字符串比较的，不可用于整数比较，整数比较只能使用-eq, -gt这种形式。 通过which [ 和which test 可以看到是命令
+ [] 和test 例子
+ [root@dk-centos6 ~]# a=&amp;quot;abcdef&amp;quot; [root@dk-centos6 ~]# test &amp;quot;$a&amp;quot; = &amp;quot;abcdef&amp;quot; [root@dk-centos6 ~]# echo $? 0 [root@dk-centos6 ~]# [ &amp;quot;$a&amp;quot; = &amp;quot;abcdef&amp;quot; ] [root@dk-centos6 ~]# echo $? 0 [[ ]]具体功能:
+  [[是 bash 程序语言的关键字。并不是一个命令，[] 结构比结构更加通用。在[[和]]之间所有的字符都不会发生文件名扩展或者单词分割，但是会发生参数扩展和命令替换。
+  支持字符串的模式匹配（使用=~操作符时甚至支持shell的正则表达 式）,右边的字符串不加双引号的情况,可以把右边作为模式.</description>
+    </item>
+    
+  </channel>
+</rss>

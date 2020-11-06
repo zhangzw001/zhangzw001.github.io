@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="ceph安装部署">
+<meta itemprop="description" content="Ceph是一个统一的分布式存储系统，设计初衷是提供较好的性能、可靠性和可扩展性。
+简单了解什么是块存储/对象存储/文件系统存储？ ceph 目前提供对象存储（RADOSGW）、块存储RDB以及 CephFS 文件系统这 3 种功能。对于这3种功能介绍，分别如下：
+  对象存储，也就是通常意义的键值存储，其接口就是简单的GET、PUT、DEL 和其他扩展，代表主要有 Swift 、S3 以及 Gluster 等；
+  块存储，这种接口通常以 QEMU Driver 或者 Kernel Module 的方式存在，这种接口需要实现 Linux 的 Block Device 的接口或者 QEMU 提供的 Block Driver 接口，如 Sheepdog，AWS 的 EBS，青云的云硬盘和阿里云的盘古系统，还有 Ceph 的 RBD（RBD是Ceph面向块存储的接口）。在常见的存储中 DAS、SAN 提供的也是块存储；
+  文件存储，通常意义是支持 POSIX 接口，它跟传统的文件系统如 Ext4 是一个类型的，但区别在于分布式存储提供了并行化的能力，如 Ceph 的 CephFS (CephFS是Ceph面向文件存储的接口)，但是有时候又会把 GlusterFS ，HDFS 这种非POSIX接口的类文件存储接口归入此类。当然 NFS、NAS也是属于文件系统存储；
+  参考教程 Kubernetes 集成 Ceph 后端存储教程 centos7安装ceph集群
+准备 配置源 cat &gt;/etc/yum.">
+<meta itemprop="datePublished" content="2019-09-26T11:13:40+00:00" />
+<meta itemprop="dateModified" content="2019-09-26T11:13:40+00:00" />
+<meta itemprop="wordCount" content="579">
+
+
+
+<meta itemprop="keywords" content="ceph,cephfs,k8s,k8s存储," />
+<meta property="og:title" content="ceph安装部署" />
+<meta property="og:description" content="Ceph是一个统一的分布式存储系统，设计初衷是提供较好的性能、可靠性和可扩展性。
+简单了解什么是块存储/对象存储/文件系统存储？ ceph 目前提供对象存储（RADOSGW）、块存储RDB以及 CephFS 文件系统这 3 种功能。对于这3种功能介绍，分别如下：
+  对象存储，也就是通常意义的键值存储，其接口就是简单的GET、PUT、DEL 和其他扩展，代表主要有 Swift 、S3 以及 Gluster 等；
+  块存储，这种接口通常以 QEMU Driver 或者 Kernel Module 的方式存在，这种接口需要实现 Linux 的 Block Device 的接口或者 QEMU 提供的 Block Driver 接口，如 Sheepdog，AWS 的 EBS，青云的云硬盘和阿里云的盘古系统，还有 Ceph 的 RBD（RBD是Ceph面向块存储的接口）。在常见的存储中 DAS、SAN 提供的也是块存储；
+  文件存储，通常意义是支持 POSIX 接口，它跟传统的文件系统如 Ext4 是一个类型的，但区别在于分布式存储提供了并行化的能力，如 Ceph 的 CephFS (CephFS是Ceph面向文件存储的接口)，但是有时候又会把 GlusterFS ，HDFS 这种非POSIX接口的类文件存储接口归入此类。当然 NFS、NAS也是属于文件系统存储；
+  参考教程 Kubernetes 集成 Ceph 后端存储教程 centos7安装ceph集群
+准备 配置源 cat &gt;/etc/yum." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/6-ceph%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/" />
+<meta property="article:published_time" content="2019-09-26T11:13:40+00:00" />
+<meta property="article:modified_time" content="2019-09-26T11:13:40+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="ceph安装部署"/>
+<meta name="twitter:description" content="Ceph是一个统一的分布式存储系统，设计初衷是提供较好的性能、可靠性和可扩展性。
+简单了解什么是块存储/对象存储/文件系统存储？ ceph 目前提供对象存储（RADOSGW）、块存储RDB以及 CephFS 文件系统这 3 种功能。对于这3种功能介绍，分别如下：
+  对象存储，也就是通常意义的键值存储，其接口就是简单的GET、PUT、DEL 和其他扩展，代表主要有 Swift 、S3 以及 Gluster 等；
+  块存储，这种接口通常以 QEMU Driver 或者 Kernel Module 的方式存在，这种接口需要实现 Linux 的 Block Device 的接口或者 QEMU 提供的 Block Driver 接口，如 Sheepdog，AWS 的 EBS，青云的云硬盘和阿里云的盘古系统，还有 Ceph 的 RBD（RBD是Ceph面向块存储的接口）。在常见的存储中 DAS、SAN 提供的也是块存储；
+  文件存储，通常意义是支持 POSIX 接口，它跟传统的文件系统如 Ext4 是一个类型的，但区别在于分布式存储提供了并行化的能力，如 Ceph 的 CephFS (CephFS是Ceph面向文件存储的接口)，但是有时候又会把 GlusterFS ，HDFS 这种非POSIX接口的类文件存储接口归入此类。当然 NFS、NAS也是属于文件系统存储；
+  参考教程 Kubernetes 集成 Ceph 后端存储教程 centos7安装ceph集群
+准备 配置源 cat &gt;/etc/yum."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>ceph安装部署</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/mysql45%E8%AE%B2%E4%B8%81%E5%A5%87/">Mysql45讲丁奇</a>
+					<a href="https://blog.k1s.club/posts/">文章</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Sep 26, 2019</span></div>
+				<h1>ceph安装部署</h1>
+			</header>
+			<div class="content">
+				<p>Ceph是一个统一的分布式存储系统，设计初衷是提供较好的性能、可靠性和可扩展性。</p>
+<!-- more-->
+<h3 id="简单了解什么是块存储对象存储文件系统存储">简单了解什么是块存储/对象存储/文件系统存储？<a href="#简单了解什么是块存储对象存储文件系统存储" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>ceph 目前提供对象存储（RADOSGW）、块存储RDB以及 CephFS 文件系统这 3 种功能。对于这3种功能介绍，分别如下：</p>
+<ol>
+<li>
+<p>对象存储，也就是通常意义的键值存储，其接口就是简单的GET、PUT、DEL 和其他扩展，代表主要有 Swift 、S3 以及 Gluster 等；</p>
+</li>
+<li>
+<p>块存储，这种接口通常以 QEMU Driver 或者 Kernel Module 的方式存在，这种接口需要实现 Linux 的 Block Device 的接口或者 QEMU 提供的 Block Driver 接口，如 Sheepdog，AWS 的 EBS，青云的云硬盘和阿里云的盘古系统，还有 Ceph 的 RBD（RBD是Ceph面向块存储的接口）。在常见的存储中 DAS、SAN 提供的也是块存储；</p>
+</li>
+<li>
+<p>文件存储，通常意义是支持 POSIX 接口，它跟传统的文件系统如 Ext4 是一个类型的，但区别在于分布式存储提供了并行化的能力，如 Ceph 的 CephFS (CephFS是Ceph面向文件存储的接口)，但是有时候又会把 GlusterFS ，HDFS 这种非POSIX接口的类文件存储接口归入此类。当然 NFS、NAS也是属于文件系统存储；</p>
+</li>
+</ol>
+<h3 id="参考教程">参考教程<a href="#参考教程" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p><a href="https://blog.csdn.net/shida_csdn/article/details/78579043">Kubernetes 集成 Ceph 后端存储教程</a>
+<a href="https://blog.csdn.net/zcc_heu/article/details/79017624">centos7安装ceph集群</a></p>
+<h3 id="准备">准备<a href="#准备" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="配置源">配置源<a href="#配置源" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>cat &gt;/etc/yum.repos.d/ceph.repo&lt;&lt;EOF
+[ceph]
+name=ceph
+baseurl=http://mirrors.aliyun.com/ceph/rpm-jewel/el7/x86_64/
+gpgcheck=0
+priority=1
+
+[ceph-noarch]
+name=cephnoarch
+baseurl=http://mirrors.aliyun.com/ceph/rpm-jewel/el7/noarch/
+gpgcheck=0
+priority=1
+
+[ceph-source]
+name=Ceph source packages
+baseurl=http://mirrors.163.com/ceph/rpm-jewel/el7/SRPMS
+enabled=0
+gpgcheck=1
+type=rpm-md
+gpgkey=http://mirrors.163.com/ceph/keys/release.asc
+priority=1
+EOF
+
+</code></pre><h4 id="安装过卸载">安装过卸载<a href="#安装过卸载" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>ceph-deploy purge dk1-t dk2-t
+ceph-deploy purgedata dk1-t dk2-t
+ceph-deploy forgetkeys
+
+</code></pre><h3 id="在dk2-t节点创建集群-mon模块">在dk2-t节点创建集群 mon模块<a href="#在dk2-t节点创建集群-mon模块" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>yum install ceph-deploy -y
+ceph-deploy --version
+
+mkdir /data/ceph
+cd /data/ceph
+ceph-deploy new dk2-t
+
+# 查看配置文件
+ls -l
+
+# 配置ceph.conf
+[global]
+...
+# 如果有多个网卡，应该配置如下选项，
+# public network是公共网络，负责集群对外提供服务的流量
+# cluster network是集群网络，负载集群中数据复制传输通信等
+# 本次实验使用同一块网卡，生境环境建议分别使用一块网卡
+public network = 192.168.0.0/22
+cluster network = 192.168.0.0/22
+osd pool default size = 2
+
+
+# 安装 ceph 包
+# 如果按照官方文档安装方法 会重新配置安装官方ceph源
+# 由于网络问题，安装可能会出错，需要多次执行
+# ceph-deploy install 其实只是会安装 ceph ceph-radosgw 两个包
+# ceph-deploy install lab1 lab2 lab3
+# 推荐使用阿里源安装，因为使用ceph-deploy安装会很慢
+# 使用如下命令手动安装包，替代官方的 ceph-deploy install 命令
+# 如下操作在所有node节点上执行
+export CEPH_DEPLOY_REPO_URL=http://mirrors.163.com/ceph/rpm-luminous/el7
+export CEPH_DEPLOY_GPG_URL=http://mirrors.163.com/ceph/keys/release.asc
+
+# 先执行是因为 ceph-deploy install太慢
+yum install -y ceph ceph-radosgw
+ceph-deploy install dk2-t
+
+
+# 部署monitor和生成keys
+ceph-deploy mon create-initial
+ls -l *.keyring
+
+# 复制文件到node节点
+ceph-deploy dk1-t dk2-t
+
+# 额外mon节点，mon节点也需要高可用
+ceph-deploy mon add dk1-t
+</code></pre><h3 id="在dk2-t节点创建集群-mgr模块">在dk2-t节点创建集群 mgr模块<a href="#在dk2-t节点创建集群-mgr模块" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code># 部署manager （luminous+）12及以后的版本需要部署
+# 本次部署 jewel 版本 ，不需要执行如下命令
+ ceph-deploy mgr create dk2-t
+</code></pre><h3 id="在dk2-t节点创建集群-osd模块">在dk2-t节点创建集群 osd模块<a href="#在dk2-t节点创建集群-osd模块" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code># 12的版本(这里挂载一个 10G的磁盘 /dev/sdb)
+# create 命令一次完成准备 OSD 、部署到 OSD 节点、并激活它。 create 命令是依次执行 prepare 和 activate 命令的捷径。
+ceph-deploy osd create --data /dev/sdb dk2-t
+ceph-deploy osd create --data /dev/sdc dk1-t
+</code></pre><h3 id="如何卸载osd">如何卸载osd<a href="#如何卸载osd" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code># 查看
+ceph osd tree
+
+# 节点状态标记为out
+ceph osd out osd.0
+
+# 从crush中移除节点
+ceph osd crush remove osd.0
+
+# 删除节点
+ceph osd rm osd.0
+
+# 删除节点认证（不删除编号会占住）
+ceph auth del osd.0
+</code></pre><h4 id="查看-mon-信息">查看 mon 信息<a href="#查看-mon-信息" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>ceph mon dump
+
+dumped monmap epoch 1
+epoch 1
+fsid 4620d0c7-4458-4ff9-9296-d1318058bafc
+last_changed 2019-06-19 14:44:41.361005
+created 2019-06-19 14:44:41.361005
+0: 192.168.0.134:6789/0 mon.dk2-t
+</code></pre><h4 id="配置文件内容-etccephcephconf">配置文件内容 /etc/ceph/ceph.conf<a href="#配置文件内容-etccephcephconf" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>[global]
+public network = 192.168.0.0/22
+cluster network = 192.168.0.0/22
+osd pool default size = 2
+fsid = 4620d0c7-4458-4ff9-9296-d1318058bafc
+mon_initial_members = dk2-t
+mon_host = 192.168.0.134
+auth_cluster_required = cephx
+auth_service_required = cephx
+auth_client_required = cephx
+mon_max_pg_per_osd = 1000
+</code></pre><h3 id="ceph-一些测试命令">ceph 一些测试命令<a href="#ceph-一些测试命令" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="创建-rbd-pool名字叫做-kube">创建 rbd pool，名字叫做 kube<a href="#创建-rbd-pool名字叫做-kube" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>ceph osd pool create kube 256 256
+</code></pre><h4 id="如何取得admin的密钥">如何取得admin的密钥<a href="#如何取得admin的密钥" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>ceph auth get client.admin 2&gt;&amp;1 |grep &quot;key = &quot; |awk '{print  $3}'
+AQAn/19bbb21GBAA1kc0HRWoGjeoPTRQziA03A==
+</code></pre><h4 id="测试ceph是否正常">测试ceph是否正常<a href="#测试ceph是否正常" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>rbd create kube/test --size 1024 --image-format 2
+rbd ls kube
+rbd map kube/test
+    # 如果报错, 警用
+    rbd info kube/test
+    rbd feature disable kube/test exclusive-lock object-map fast-diff deep-flatten
+
+rbd map kube/test
+rbd showmapped
+mkfs.ext4 /dev/rbd0
+mkdir /data/rbd0
+mount /dev/rbd0 /data/rbd0
+cd /data/rbd0 &amp;&amp; echo test &gt; test.txt
+
+</code></pre><hr>
+<h3 id="在k8s-手动创建存储类">在k8s 手动创建存储类<a href="#在k8s-手动创建存储类" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="创建ceph-pg">创建ceph pg<a href="#创建ceph-pg" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code># Total PGs = (Total_number_of_OSD * 100) / max_replication_count
+# pg = 1 * 100 /2 ~ 64(取2的次方数)
+
+# 这里准备创建2个pool, 每个pool
+ceph osd pool create rbd-k8s 16
+
+# 查看
+ceph osd lspools
+
+# 创建image
+rbd create rbd-k8s/cephimageredis --size 500M
+
+# 查看list
+rbd list rbd-k8s
+
+# 处理新特性
+# 查看info
+rbd info rbd-k8s/cephimageredis
+
+# 关闭exclusive-lock object-map fast-diff deep-flatten 这些特性
+rbd feature disable  rbd-k8s/cephimageredis exclusive-lock object-map fast-diff deep-flatten
+</code></pre><h4 id="首先创建secret">首先创建secret<a href="#首先创建secret" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>#获取key
+grep key /etc/ceph/ceph.client.admin.keyring |awk '{printf &quot;%s&quot;, $NF}'|base64
+</code></pre><ul>
+<li><strong>ceph-secret.yaml</strong></li>
+</ul>
+<pre><code>apiVersion: v1
+kind: Secret
+metadata:
+  name: ceph-secret
+type: &quot;kubernetes.io/rbd&quot;
+data:
+  key: QVFCTFo2dGNGNXFLRnhBQXBGTXJEdm5CY2k2UGtwZmZrN0JSVEE9PQ==
+</code></pre><h4 id="其次创建pv-pv是没有namespace概念的">其次创建pv, pv是没有namespace概念的<a href="#其次创建pv-pv是没有namespace概念的" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<blockquote>
+<p>persistentVolumeReclaimPolicy是清理规则 (retain: 不清理, Recycle: 回收)</p>
+</blockquote>
+<ul>
+<li><strong>redis-ceph-pv.yml</strong></li>
+</ul>
+<pre><code>apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis2-ceph-rbd-pv
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  rbd:
+    monitors:
+      - '192.168.0.134:6789'
+    pool: rbd-k8s
+    image: cephimageredis
+    user: admin
+    secretRef:
+      name: ceph-secret
+    fsType: ext4
+    readOnly: false
+  persistentVolumeReclaimPolicy: Recycle
+</code></pre><ul>
+<li><strong>执行部署pv</strong></li>
+</ul>
+<pre><code>kubectl create -f redis-ceph-pv.yml
+</code></pre><h4 id="然后创建pvc">然后创建pvc<a href="#然后创建pvc" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<ul>
+<li><strong>redis-ceph-pvc.yml</strong></li>
+</ul>
+<pre><code>apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis2-ceph-rbd-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+</code></pre><ul>
+<li><strong>执行部署pvc</strong></li>
+</ul>
+<pre><code>kubectl create -f redis-ceph-pvc.yml
+</code></pre><h4 id="最后在rancher上选择挂载rbd">最后在rancher上选择挂载rbd<a href="#最后在rancher上选择挂载rbd" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<p><img src="https://zhangzw001.github.io/images/blog6/rancher-pv.png" alt="rancher-pv"></p>
+<hr>
+
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/ceph">ceph</a></span><span class="tag"><a href="https://blog.k1s.club/tags/cephfs">cephfs</a></span><span class="tag"><a href="https://blog.k1s.club/tags/k8s">k8s</a></span><span class="tag"><a href="https://blog.k1s.club/tags/k8s%E5%AD%98%E5%82%A8">k8s存储</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>579 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-09-26 19:13 &#43;0800</p>
+			</footer>
+		</article>
+		<aside id="toc" class="show-toc">
+			<div class="toc-title">Table of Contents</div>
+			<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#简单了解什么是块存储对象存储文件系统存储">简单了解什么是块存储/对象存储/文件系统存储？</a></li>
+        <li><a href="#参考教程">参考教程</a></li>
+        <li><a href="#准备">准备</a></li>
+        <li><a href="#在dk2-t节点创建集群-mon模块">在dk2-t节点创建集群 mon模块</a></li>
+        <li><a href="#在dk2-t节点创建集群-mgr模块">在dk2-t节点创建集群 mgr模块</a></li>
+        <li><a href="#在dk2-t节点创建集群-osd模块">在dk2-t节点创建集群 osd模块</a></li>
+        <li><a href="#如何卸载osd">如何卸载osd</a></li>
+        <li><a href="#ceph-一些测试命令">ceph 一些测试命令</a></li>
+        <li><a href="#在k8s-手动创建存储类">在k8s 手动创建存储类</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+		</aside>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/7-k8s%E9%83%A8%E7%BD%B2storageclass%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BApv-nfs-rbd/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>k8s部署storageclass动态创建pv(nfs&amp;rbd)</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/5-hexo%E6%B7%BB%E5%8A%A0%E7%9C%8B%E6%9D%BF%E5%A8%98/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>hexo添加看板娘</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-180942795-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

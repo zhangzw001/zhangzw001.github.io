@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="hexo鼠标移动和鼠标点击特效">
+<meta itemprop="description" content="hexo6 鼠标添加点击出现桃心的特效 来自: Next主题个性化
+所需要的js文件  未压缩  ! function(e, t, a) { function n() { c( &quot;.heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: &#39;&#39;;width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}&quot;), o(), r() } function r() { for (var e = 0; e &lt; d.length; e&#43;&#43;) d[e].alpha &lt;= 0 ? (t.body.removeChild(d[e].el), d.splice(e, 1)) : (d[e].y--, d[e].scale &#43;= .004, d[e].alpha -= .013, d[e].el.style.cssText = &quot;left:&quot; &#43; d[e].x &#43; &quot;px;top:&quot; &#43; d[e].">
+<meta itemprop="datePublished" content="2019-09-24T16:34:36+00:00" />
+<meta itemprop="dateModified" content="2019-09-24T16:34:36+00:00" />
+<meta itemprop="wordCount" content="624">
+
+
+
+<meta itemprop="keywords" content="hexo6,特效," />
+<meta property="og:title" content="hexo鼠标移动和鼠标点击特效" />
+<meta property="og:description" content="hexo6 鼠标添加点击出现桃心的特效 来自: Next主题个性化
+所需要的js文件  未压缩  ! function(e, t, a) { function n() { c( &quot;.heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: &#39;&#39;;width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}&quot;), o(), r() } function r() { for (var e = 0; e &lt; d.length; e&#43;&#43;) d[e].alpha &lt;= 0 ? (t.body.removeChild(d[e].el), d.splice(e, 1)) : (d[e].y--, d[e].scale &#43;= .004, d[e].alpha -= .013, d[e].el.style.cssText = &quot;left:&quot; &#43; d[e].x &#43; &quot;px;top:&quot; &#43; d[e]." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/4-hexo%E9%BC%A0%E6%A0%87%E7%A7%BB%E5%8A%A8%E5%92%8C%E9%BC%A0%E6%A0%87%E7%82%B9%E5%87%BB%E7%89%B9%E6%95%88/" />
+<meta property="article:published_time" content="2019-09-24T16:34:36+00:00" />
+<meta property="article:modified_time" content="2019-09-24T16:34:36+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="hexo鼠标移动和鼠标点击特效"/>
+<meta name="twitter:description" content="hexo6 鼠标添加点击出现桃心的特效 来自: Next主题个性化
+所需要的js文件  未压缩  ! function(e, t, a) { function n() { c( &quot;.heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: &#39;&#39;;width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}&quot;), o(), r() } function r() { for (var e = 0; e &lt; d.length; e&#43;&#43;) d[e].alpha &lt;= 0 ? (t.body.removeChild(d[e].el), d.splice(e, 1)) : (d[e].y--, d[e].scale &#43;= .004, d[e].alpha -= .013, d[e].el.style.cssText = &quot;left:&quot; &#43; d[e].x &#43; &quot;px;top:&quot; &#43; d[e]."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>hexo鼠标移动和鼠标点击特效</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/mysql45%E8%AE%B2%E4%B8%81%E5%A5%87/">Mysql45讲丁奇</a>
+					<a href="https://blog.k1s.club/posts/">文章</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Sep 24, 2019</span></div>
+				<h1>hexo鼠标移动和鼠标点击特效</h1>
+			</header>
+			<div class="content">
+				<h3 id="hexo6-鼠标添加点击出现桃心的特效">hexo6 鼠标添加点击出现桃心的特效<a href="#hexo6-鼠标添加点击出现桃心的特效" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+ <!-- more -->
+<p>来自: <a href="https://www.writebug.site/2019/01/02/Next%E4%B8%BB%E9%A2%98%E4%B8%AA%E6%80%A7%E5%8C%96/">Next主题个性化</a></p>
+<h4 id="所需要的js文件">所需要的js文件<a href="#所需要的js文件" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<ul>
+<li>未压缩</li>
+</ul>
+<pre><code>! function(e, t, a) {
+    function n() {
+        c(
+            &quot;.heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}&quot;), o(), r()
+    }
+    
+    function r() {
+        for (var e = 0; e &lt; d.length; e++) d[e].alpha &lt;= 0 ? (t.body.removeChild(d[e].el), d.splice(e, 1)) : (d[e].y--, d[e].scale += .004, d[e].alpha -= .013, d[e].el.style.cssText = &quot;left:&quot; + d[e].x + &quot;px;top:&quot; + d[e].y + &quot;px;opacity:&quot; + d[e].alpha + &quot;;transform:scale(&quot; + d[e].scale + &quot;,&quot; + d[e].scale + &quot;) rotate(45deg);background:&quot; + d[e].color + &quot;;z-index:99999&quot;);
+        requestAnimationFrame(r)
+    }
+    
+    function o() {
+        var t = &quot;function&quot; == typeof e.onclick &amp;&amp; e.onclick;
+        e.onclick = function(e) {
+            t &amp;&amp; t(), i(e)
+        }
+    }
+    
+    function i(e) {
+        var a = t.createElement(&quot;div&quot;);
+        a.className = &quot;heart&quot;, d.push({
+            el: a,
+            x: e.clientX - 5,
+            y: e.clientY - 5,
+            scale: 1,
+            alpha: 1,
+            color: s()
+        }), t.body.appendChild(a)
+    }
+
+    function c(e) {
+        var a = t.createElement(&quot;style&quot;);
+        a.type = &quot;text/css&quot;;
+        try {
+            a.appendChild(t.createTextNode(e))
+        } catch (t) {
+            a.styleSheet.cssText = e
+        }
+        t.getElementsByTagName(&quot;head&quot;)[0].appendChild(a)
+    }
+
+    function s() {
+        return &quot;rgb(&quot; + ~~(255 * Math.random()) + &quot;,&quot; + ~~(255 * Math.random()) + &quot;,&quot; + ~~(255 * Math.random()) + &quot;)&quot;
+    }
+    var d = [];
+    e.requestAnimationFrame = function() {
+        return e.requestAnimationFrame || e.webkitRequestAnimationFrame || e.mozRequestAnimationFrame || e.oRequestAnimationFrame || e.msRequestAnimationFrame || function(e) {
+            setTimeout(e, 1e3 / 60)
+        }
+    }(), n()
+}(window, document);
+</code></pre><ul>
+<li>压缩后</li>
+</ul>
+<pre><code>!function(e,t,a){function n(){c(&quot;.heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}&quot;),o(),r()}function r(){for(var e=0;e&lt;d.length;e++)d[e].alpha&lt;=0?(t.body.removeChild(d[e].el),d.splice(e,1)):(d[e].y--,d[e].scale+=.004,d[e].alpha-=.013,d[e].el.style.cssText=&quot;left:&quot;+d[e].x+&quot;px;top:&quot;+d[e].y+&quot;px;opacity:&quot;+d[e].alpha+&quot;;transform:scale(&quot;+d[e].scale+&quot;,&quot;+d[e].scale+&quot;) rotate(45deg);background:&quot;+d[e].color+&quot;;z-index:99999&quot;);requestAnimationFrame(r)}function o(){var t=&quot;function&quot;==typeof e.onclick&amp;&amp;e.onclick;e.onclick=function(e){t&amp;&amp;t(),i(e)}}function i(e){var a=t.createElement(&quot;div&quot;);a.className=&quot;heart&quot;,d.push({el:a,x:e.clientX-5,y:e.clientY-5,scale:1,alpha:1,color:s()}),t.body.appendChild(a)}function c(e){var a=t.createElement(&quot;style&quot;);a.type=&quot;text/css&quot;;try{a.appendChild(t.createTextNode(e))}catch(t){a.styleSheet.cssText=e}t.getElementsByTagName(&quot;head&quot;)[0].appendChild(a)}function s(){return&quot;rgb(&quot;+~~(255*Math.random())+&quot;,&quot;+~~(255*Math.random())+&quot;,&quot;+~~(255*Math.random())+&quot;)&quot;}var d=[];e.requestAnimationFrame=function(){return e.requestAnimationFrame||e.webkitRequestAnimationFrame||e.mozRequestAnimationFrame||e.oRequestAnimationFrame||e.msRequestAnimationFrame||function(e){setTimeout(e,1e3/60)}}(),n()}(window,document);
+</code></pre><h4 id="将上面的内容贴到新增的themesnextv6sourcejssrclovejs-文件中">将上面的内容贴到新增的themes/nextv6/source/js/src/love.js 文件中<a href="#将上面的内容贴到新增的themesnextv6sourcejssrclovejs-文件中" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<h4 id="修改themesnextv6layout_layoutswig文件-末尾添加如下内容">修改themes/nextv6/layout/_layout.swig文件, 末尾添加如下内容<a href="#修改themesnextv6layout_layoutswig文件-末尾添加如下内容" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>&lt;!-- 鼠标桃心动画 --&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;/js/src/love.js&quot;&gt;&lt;/script&gt;
+</code></pre><h3 id="hexo6-鼠标移动添加星星特效">hexo6 鼠标移动添加星星特效<a href="#hexo6-鼠标移动添加星星特效" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>来自: <a href="https://blog.csdn.net/a201577F0546/article/details/89060017">愚人节鼠标跟随特效</a></p>
+<h4 id="新增js文件-themesnextv6sourcejssrclove2js">新增js文件 themes/nextv6/source/js/src/love2.js<a href="#新增js文件-themesnextv6sourcejssrclove2js" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>
+/*!
+ * Fairy Dust Cursor.js
+ * - 90's cursors collection
+ * -- https://github.com/tholman/90s-cursor-effects
+ * -- http://codepen.io/tholman/full/jWmZxZ/
+ */
+
+(function fairyDustCursor() {
+  
+  var possibleColors = [&quot;#D61C59&quot;, &quot;#E7D84B&quot;, &quot;#1B8798&quot;]
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+  var cursor = {x: width/2, y: width/2};
+  var particles = [];
+  
+  function init() {
+    bindEvents();
+    loop();
+  }
+  
+  // Bind events that are needed
+  function bindEvents() {
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('touchmove', onTouchMove);
+    document.addEventListener('touchstart', onTouchMove);
+    
+    window.addEventListener('resize', onWindowResize);
+  }
+  
+  function onWindowResize(e) {
+    width = window.innerWidth;
+    height = window.innerHeight;
+  }
+  
+  function onTouchMove(e) {
+    if( e.touches.length &gt; 0 ) {
+      for( var i = 0; i &lt; e.touches.length; i++ ) {
+        addParticle( e.touches[i].clientX, e.touches[i].clientY, possibleColors[Math.floor(Math.random()*possibleColors.length)]);
+      }
+    }
+  }
+  
+  function onMouseMove(e) {    
+    cursor.x = e.clientX;
+    cursor.y = e.clientY;
+    
+    addParticle( cursor.x, cursor.y, possibleColors[Math.floor(Math.random()*possibleColors.length)]);
+  }
+  
+  function addParticle(x, y, color) {
+    var particle = new Particle();
+    particle.init(x, y, color);
+    particles.push(particle);
+  }
+  
+  function updateParticles() {
+    
+    // Updated
+    for( var i = 0; i &lt; particles.length; i++ ) {
+      particles[i].update();
+    }
+    
+    // Remove dead particles
+    for( var i = particles.length -1; i &gt;= 0; i-- ) {
+      if( particles[i].lifeSpan &lt; 0 ) {
+        particles[i].die();
+        particles.splice(i, 1);
+      }
+    }
+    
+  }
+  
+  function loop() {
+    requestAnimationFrame(loop);
+    updateParticles();
+  }
+  
+  /**
+   * Particles
+   */
+  
+  function Particle() {
+
+    this.character = &quot;*&quot;;
+    this.lifeSpan = 120; //ms
+    this.initialStyles ={
+      &quot;position&quot;: &quot;fixed&quot;,
+      &quot;top&quot;: &quot;0&quot;, //必须加
+      &quot;display&quot;: &quot;block&quot;,
+      &quot;pointerEvents&quot;: &quot;none&quot;,
+      &quot;z-index&quot;: &quot;10000000&quot;,
+      &quot;fontSize&quot;: &quot;20px&quot;,
+      &quot;will-change&quot;: &quot;transform&quot;
+    };
+
+    // Init, and set properties
+    this.init = function(x, y, color) {
+
+      this.velocity = {
+        x:  (Math.random() &lt; 0.5 ? -1 : 1) * (Math.random() / 2),
+        y: 1
+      };
+      
+      this.position = {x: x - 10, y: y - 20};
+      this.initialStyles.color = color;
+      console.log(color);
+
+      this.element = document.createElement('span');
+      this.element.innerHTML = this.character;
+      applyProperties(this.element, this.initialStyles);
+      this.update();
+      
+      document.body.appendChild(this.element);
+    };
+    
+    this.update = function() {
+      this.position.x += this.velocity.x;
+      this.position.y += this.velocity.y;
+      this.lifeSpan--;
+      
+      this.element.style.transform = &quot;translate3d(&quot; + this.position.x + &quot;px,&quot; + this.position.y + &quot;px,0) scale(&quot; + (this.lifeSpan / 120) + &quot;)&quot;;
+    }
+    
+    this.die = function() {
+      this.element.parentNode.removeChild(this.element);
+    }
+    
+  }
+  
+  /**
+   * Utils
+   */
+  
+  // Applies css `properties` to an element.
+  function applyProperties( target, properties ) {
+    for( var key in properties ) {
+      target.style[ key ] = properties[ key ];
+    }
+  }
+  
+  init();
+})();
+</code></pre><h4 id="修改themesnextv6layout_layoutswig文件-末尾添加如下内容-1">修改themes/nextv6/layout/_layout.swig文件, 末尾添加如下内容<a href="#修改themesnextv6layout_layoutswig文件-末尾添加如下内容-1" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>&lt;!-- 鼠标移动星星特效 --&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;/js/src/love2.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/hexo6">hexo6</a></span><span class="tag"><a href="https://blog.k1s.club/tags/%E7%89%B9%E6%95%88">特效</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>624 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-09-25 00:34 &#43;0800</p>
+			</footer>
+		</article>
+		<aside id="toc" class="show-toc">
+			<div class="toc-title">Table of Contents</div>
+			<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#hexo6-鼠标添加点击出现桃心的特效">hexo6 鼠标添加点击出现桃心的特效</a></li>
+        <li><a href="#hexo6-鼠标移动添加星星特效">hexo6 鼠标移动添加星星特效</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+		</aside>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/5-hexo%E6%B7%BB%E5%8A%A0%E7%9C%8B%E6%9D%BF%E5%A8%98/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>hexo添加看板娘</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>k8s遇到的一些问题统计总结</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-180942795-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

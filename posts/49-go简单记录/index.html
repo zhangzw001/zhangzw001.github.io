@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="go简单记录">
+<meta itemprop="description" content="go的一些简单记录">
+<meta itemprop="datePublished" content="2020-05-27T17:25:31+00:00" />
+<meta itemprop="dateModified" content="2020-05-27T17:25:31+00:00" />
+<meta itemprop="wordCount" content="962">
+
+
+
+<meta itemprop="keywords" content="go," />
+<meta property="og:title" content="go简单记录" />
+<meta property="og:description" content="go的一些简单记录" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/49-go%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/" />
+<meta property="article:published_time" content="2020-05-27T17:25:31+00:00" />
+<meta property="article:modified_time" content="2020-05-27T17:25:31+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="go简单记录"/>
+<meta name="twitter:description" content="go的一些简单记录"/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>go简单记录</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/mysql45%E8%AE%B2%E4%B8%81%E5%A5%87/">Mysql45讲丁奇</a>
+					<a href="https://blog.k1s.club/posts/">文章</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>May 27, 2020</span></div>
+				<h1>go简单记录</h1>
+			</header>
+			<div class="content">
+				<p>go的一些简单记录</p>
+<h3 id="1-go中的用法">1. go中'&hellip;&lsquo;的用法<a href="#1-go中的用法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>第一个用法: 用于函数有多个不定参数的情况,可以接受多个不确定个数参数, 将多个参数作为slice传递了</li>
+<li>第二个用法: 用于slice打散进行传递</li>
+</ul>
+<h4 id="例一">例一<a href="#例一" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">sum</span><span class="p">(</span><span class="nx">nums</span> <span class="o">...</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">nums</span><span class="p">)</span>
+ <span class="nx">totols</span> <span class="o">:=</span><span class="mi">0</span>
+ <span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">num</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">nums</span><span class="p">{</span>
+  <span class="nx">totols</span> <span class="o">+=</span><span class="nx">num</span>
+ <span class="p">}</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">totols</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+ <span class="nx">slice1</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">}</span>
+ <span class="c1">//切片被打散传入
+</span><span class="c1"></span> <span class="nf">sum</span><span class="p">(</span><span class="nx">slice1</span><span class="o">...</span><span class="p">)</span>
+ <span class="nx">slice2</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+ <span class="c1">//元素被打散一个个append
+</span><span class="c1"></span> <span class="nx">slice2</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">slice2</span><span class="p">,</span><span class="nx">slice1</span><span class="o">...</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div><hr>
+<h3 id="2-golang中引用类型-slice切片map字典channel管道">2. golang中引用类型 slice(切片)、map(字典)、channel(管道)<a href="#2-golang中引用类型-slice切片map字典channel管道" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>int类型的零值是0,string类型的零值是&quot;&quot;，引用类型的零值是nil</p>
+</blockquote>
+<ul>
+<li>值类型</li>
+</ul>
+<blockquote>
+<p>这里a数组是值类型, 赋值给b,修改b不会导致a改变</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">a</span> <span class="o">:=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="kt">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}</span>
+<span class="nx">b</span> <span class="o">:=</span> <span class="nx">a</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">)</span>
+<span class="nx">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">=</span> <span class="mi">4</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">)</span>
+</code></pre></div><ul>
+<li>引用类型</li>
+</ul>
+<blockquote>
+<p>这里a是个slice引用类型,修改b会改变a, slice的复制是引用类型</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"> <span class="nx">a</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}</span>
+ <span class="nx">b</span> <span class="o">:=</span> <span class="nx">a</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%v:\t%p,%v:\t%p\n&#34;</span><span class="p">,</span><span class="nx">a</span><span class="p">,</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">,</span><span class="nx">b</span><span class="p">)</span>	<span class="c1">//[1 2 3]:        0xc000090020,[1 2 3]:   0xc000090020
+</span><span class="c1"></span> <span class="nx">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">=</span> <span class="mi">4</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%v:\t%p,%v:\t%p\n&#34;</span><span class="p">,</span><span class="nx">a</span><span class="p">,</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">,</span><span class="nx">b</span><span class="p">)</span>	<span class="c1">//[1 2 4]:        0xc000090020,[1 2 4]:   0xc000090020
+</span><span class="c1"></span> <span class="nx">c</span> <span class="o">:=</span> <span class="nx">a</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%v:\t%p,%v:\t%p\n&#34;</span><span class="p">,</span><span class="nx">a</span><span class="p">,</span><span class="nx">a</span><span class="p">,</span><span class="nx">c</span><span class="p">,</span><span class="nx">c</span><span class="p">)</span>	<span class="c1">//[1 2 4]:        0xc000090020,[2 4]:     0xc000090028
+</span><span class="c1"></span>
+</code></pre></div><hr>
+<h3 id="3-golang查看变量类型">3. golang查看变量类型<a href="#3-golang查看变量类型" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>第一种</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">arr</span> <span class="o">:=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="kt">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}</span>
+<span class="nx">sli</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%T,%T\n&#34;</span><span class="p">,</span><span class="nx">arr</span><span class="p">,</span><span class="nx">sli</span><span class="p">)</span>  <span class="c1">//[3]int,[]int
+</span></code></pre></div><blockquote>
+<p>显示的结果可以看到, 一个是数组, 一个是切片</p>
+</blockquote>
+<ul>
+<li>第二种</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"> <span class="nx">arr</span> <span class="o">:=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="kt">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}</span>
+ <span class="nx">sli</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;type:&#34;</span><span class="p">,</span><span class="nx">reflect</span><span class="p">.</span><span class="nf">TypeOf</span><span class="p">(</span><span class="nx">arr</span><span class="p">)</span> <span class="p">)</span>  <span class="c1">//type: [3]int
+</span><span class="c1"></span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;type:&#34;</span><span class="p">,</span><span class="nx">reflect</span><span class="p">.</span><span class="nf">TypeOf</span><span class="p">(</span><span class="nx">sli</span><span class="p">)</span> <span class="p">)</span>  <span class="c1">//type: []int
+</span></code></pre></div><h3 id="4-go中内置分配内存函数new和make的用法">4. go中内置分配内存函数new和make的用法<a href="#4-go中内置分配内存函数new和make的用法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>原文: <a href="https://www.cnblogs.com/xhhgo/p/10916254.html">go语言值类型与引用类型理解</a></p>
+<ul>
+<li>make 仅用于 slice, map, channel, 返回类型是本身</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nb">make</span><span class="p">(</span><span class="nx">t</span> <span class="nx">Type</span><span class="p">,</span> <span class="nx">size</span> <span class="o">...</span><span class="nx">IntegerType</span><span class="p">)</span> <span class="nx">Type</span>
+</code></pre></div><ul>
+<li>new 返回类型是指针(引用类型)</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// The new built-in function allocates memory. The first argument is a type,
+</span><span class="c1">// not a value, and the value returned is a pointer to a newly
+</span><span class="c1">// allocated zero value of that type.
+</span><span class="c1"></span><span class="kd">func</span> <span class="nb">new</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="o">*</span><span class="nx">Type</span>
+<span class="c1">//它只接受一个参数，这个参数是一个类型，分配好内存后，返回一个指向该类型内存地址的指针。同时请注意它同时把分配的内存置为零，也就是类型的零值。
+</span></code></pre></div><h3 id="5-查看slice的长度和容量">5. 查看slice的长度和容量<a href="#5-查看slice的长度和容量" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"> <span class="c1">// 初始化一个3个0的slice,分配内容的容量是10个int
+</span><span class="c1"></span> <span class="nx">s3</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">s3</span><span class="p">)</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">s3</span><span class="p">))</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nb">cap</span><span class="p">(</span><span class="nx">s3</span><span class="p">))</span>
+</code></pre></div><h3 id="6-闭包的说明">6. 闭包的说明<a href="#6-闭包的说明" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>原文: <a href="https://www.jianshu.com/p/faf7ef7fbcf8">闭包与匿名函数</a></p>
+<h4 id="闭包与外部函数的生命周期">闭包与外部函数的生命周期<a href="#闭包与外部函数的生命周期" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<blockquote>
+<p>内函数对外函数的修改 是对变量的引用, 所以内函数结束后变量不会释放, 变量的内存地址不变</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">A</span><span class="p">(</span><span class="nx">n</span> <span class="kt">int</span><span class="p">)</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">n</span><span class="o">++</span>
+    <span class="k">return</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">B</span><span class="p">(</span><span class="nx">n</span> <span class="kt">int</span><span class="p">)</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">n</span><span class="o">++</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">A1</span><span class="o">:=</span><span class="nf">A</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">A1</span><span class="p">)</span>  <span class="c1">//0x48e3d0  在这儿已经定义了n=20 ，然后执行++ 操作，所以是21 。
+</span><span class="c1"></span>    <span class="nf">A1</span><span class="p">()</span>     <span class="c1">//21 后面对闭包的调用，没有对n执行加一操作，所以一直是21
+</span><span class="c1"></span>    <span class="nf">A1</span><span class="p">()</span>     <span class="c1">//21
+</span><span class="c1"></span>
+    <span class="nx">B1</span><span class="o">:=</span><span class="nf">B</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">B1</span><span class="p">)</span>  <span class="c1">//0x48e340   这儿定义了n 为10
+</span><span class="c1"></span>    <span class="nf">B1</span><span class="p">()</span>       <span class="c1">//11  后面对闭包的调用，每次都对n进行加1操作。
+</span><span class="c1"></span>    <span class="nf">B1</span><span class="p">()</span>       <span class="c1">//12
+</span><span class="c1"></span>
+<span class="p">}</span>
+</code></pre></div><h3 id="7-反引号">7. 反引号<a href="#7-反引号" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>反引号会原样输出, 不能使用转义, \n也会原样输出</li>
+<li>\r 类似python里面的 \r ，每次都覆盖上一次输出的内容</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">spinner</span><span class="p">(</span><span class="nx">delay</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="p">{</span>
+ <span class="k">for</span> <span class="p">{</span>
+  <span class="c1">//for _, r := range `-\|/` {
+</span><span class="c1"></span>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">r</span> <span class="o">:=</span> <span class="k">range</span> <span class="s">&#34;-\\|/&#34;</span> <span class="p">{</span>
+   <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;\r%c&#34;</span><span class="p">,</span><span class="nx">r</span><span class="p">)</span>
+   <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">delay</span><span class="p">)</span>
+  <span class="p">}</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><hr>
+<h3 id="8-编译不同平台可执行文件">8. 编译不同平台可执行文件<a href="#8-编译不同平台可执行文件" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="1mac下编译linux-windows平台的64位可执行程序">1、Mac下编译Linux, Windows平台的64位可执行程序：<a href="#1mac下编译linux-windows平台的64位可执行程序" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">CGO_ENABLED</span><span class="p">=</span><span class="mi">0</span> <span class="nx">GOOS</span><span class="p">=</span><span class="nx">linux</span> <span class="nx">GOARCH</span><span class="p">=</span><span class="nx">amd64</span> <span class="k">go</span> <span class="nx">build</span> <span class="nx">test</span><span class="p">.</span><span class="k">go</span>
+<span class="nx">CGO_ENABLED</span><span class="p">=</span><span class="mi">0</span> <span class="nx">GOOS</span><span class="p">=</span><span class="nx">windows</span> <span class="nx">GOARCH</span><span class="p">=</span><span class="nx">amd64</span> <span class="k">go</span> <span class="nx">build</span> <span class="nx">test</span><span class="p">.</span><span class="k">go</span>
+</code></pre></div><h4 id="2linux下编译mac-windows平台的64位可执行程序">2、Linux下编译Mac, Windows平台的64位可执行程序：<a href="#2linux下编译mac-windows平台的64位可执行程序" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">CGO_ENABLED</span><span class="p">=</span><span class="mi">0</span> <span class="nx">GOOS</span><span class="p">=</span><span class="nx">darwin</span> <span class="nx">GOARCH</span><span class="p">=</span><span class="nx">amd64</span> <span class="k">go</span> <span class="nx">build</span> <span class="nx">test</span><span class="p">.</span><span class="k">go</span>
+<span class="nx">CGO_ENABLED</span><span class="p">=</span><span class="mi">0</span> <span class="nx">GOOS</span><span class="p">=</span><span class="nx">windows</span> <span class="nx">GOARCH</span><span class="p">=</span><span class="nx">amd64</span> <span class="k">go</span> <span class="nx">build</span> <span class="nx">test</span><span class="p">.</span><span class="k">go</span>
+</code></pre></div><h4 id="3windows下编译mac-linux平台的64位可执行程序">3、Windows下编译Mac, Linux平台的64位可执行程序：<a href="#3windows下编译mac-linux平台的64位可执行程序" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">SET</span> <span class="nx">CGO_ENABLED</span><span class="p">=</span><span class="mi">0</span><span class="nx">SET</span> <span class="nx">GOOS</span><span class="p">=</span><span class="nx">darwin3</span> <span class="nx">SET</span> <span class="nx">GOARCH</span><span class="p">=</span><span class="nx">amd64</span> <span class="k">go</span> <span class="nx">build</span> <span class="nx">test</span><span class="p">.</span><span class="k">go</span>
+<span class="nx">SET</span> <span class="nx">CGO_ENABLED</span><span class="p">=</span><span class="mi">0</span> <span class="nx">SET</span> <span class="nx">GOOS</span><span class="p">=</span><span class="nx">linux</span> <span class="nx">SET</span> <span class="nx">GOARCH</span><span class="p">=</span><span class="nx">amd64</span> <span class="k">go</span> <span class="nx">build</span>  <span class="nx">test</span><span class="p">.</span><span class="k">go</span>
+</code></pre></div><hr>
+<h3 id="9-斐波那契数列">9. 斐波那契数列<a href="#9-斐波那契数列" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="1-递归写法n-越大-就贼慢">1 递归写法(n 越大 就贼慢)<a href="#1-递归写法n-越大-就贼慢" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">Fib</span><span class="p">(</span><span class="nx">n</span> <span class="kt">int</span> <span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">n</span> <span class="o">&lt;=</span><span class="mi">1</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">1</span> <span class="p">}</span>
+	<span class="k">return</span> <span class="nf">fib</span><span class="p">(</span><span class="nx">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="nf">fib</span><span class="p">(</span><span class="nx">n</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div><h4 id="2-循环的写法">2 循环的写法<a href="#2-循环的写法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">Fib2</span><span class="p">(</span><span class="nx">n</span> <span class="kt">int</span> <span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+	<span class="nx">f</span> <span class="o">:=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="kt">int</span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">}</span>
+	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">2</span> <span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">n</span> <span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">f</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">=</span> <span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nx">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">=</span> <span class="nx">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="nx">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">=</span> <span class="nx">f</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">f</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="p">}</span>
+</code></pre></div><h4 id="3-匿名函数写法">3 匿名函数写法<a href="#3-匿名函数写法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">Fib3</span><span class="p">()</span> <span class="kd">func</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+ <span class="kd">var</span> <span class="nx">n</span><span class="p">,</span><span class="nx">m</span> <span class="kt">int</span>
+ <span class="k">return</span> <span class="kd">func</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="nx">n</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="p">{</span>
+   <span class="nx">n</span> <span class="p">=</span> <span class="mi">1</span>
+  <span class="p">}</span>
+  <span class="nx">n</span><span class="p">,</span><span class="nx">m</span> <span class="p">=</span> <span class="nx">n</span><span class="o">+</span><span class="nx">m</span><span class="p">,</span><span class="nx">n</span>
+  <span class="k">return</span> <span class="nx">m</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h3 id="10-string方法">10. String()方法<a href="#10-string方法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>go中如果类型A实现了String()方法(string() 不行),那么在输出A的时候,会自动调用String() 方法</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">A</span> <span class="kd">struct</span> <span class="p">{</span>
+  <span class="kt">string</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">a</span> <span class="nx">A</span><span class="p">)</span> <span class="nf">String</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;this is String() : %v\n&#34;</span><span class="p">,</span><span class="nx">a</span><span class="p">.</span><span class="kt">string</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">a</span> <span class="o">:=</span> <span class="nx">A</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">}</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>  <span class="c1">//this is String() : test
+</span><span class="c1"></span>
+<span class="p">}</span>
+
+</code></pre></div><h3 id="11-printf用法">11. Printf用法<a href="#11-printf用法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">//第一, 通常Printf格式化字符串包含多个%参数时将会包含对应相同数量的额外操作数，但是%之后的[1]副词告诉Printf函数再次使用第一个操作数。
+</span><span class="c1">//第二, %后的#副词告诉Printf在用%o、%x或%X输出时生成0、0x或0X前缀。
+</span><span class="c1"></span><span class="nx">o</span> <span class="o">:=</span> <span class="mo">0666</span>
+<span class="nx">x</span> <span class="o">:=</span> <span class="nb">int64</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%d %[1]o %#[1]o , %d %[2]x %#[2]x %#[2]X\n&#34;</span><span class="p">,</span> <span class="nx">o</span><span class="p">,</span><span class="nx">x</span><span class="p">)</span> <span class="c1">// &#34;438 666 0666 , 3735928559 deadbeef 0xdeadbeef 0XDEADBEEF&#34;
+</span><span class="c1"></span>
+</code></pre></div><h3 id="12-fmtprintf">12. fmt.Printf<a href="#12-fmtprintf" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="o">%</span><span class="nx">p</span>	<span class="o">-</span><span class="p">&gt;</span> <span class="nx">内存地址</span>
+<span class="o">%</span><span class="nx">q</span>	<span class="o">-</span><span class="p">&gt;</span> <span class="nx">该值对应的单引号括起来的go语法字符字面值</span><span class="err">，</span><span class="nx">必要时会采用安全的转义表示</span>
+<span class="o">%+</span><span class="nx">v</span>	<span class="o">-</span><span class="p">&gt;</span> <span class="nx">输出结构体时</span><span class="p">,</span> <span class="nx">会打印字段名称</span>
+</code></pre></div><ul>
+<li>%+v 例子</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">info</span> <span class="kd">struct</span> <span class="p">{</span>
+  <span class="nx">Name</span> <span class="kt">string</span> <span class="s">`json:&#34;name&#34;`</span>
+  <span class="nx">Age</span>  <span class="kt">int</span>    <span class="s">`json:&#34;age&#34;`</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">i</span> <span class="o">:=</span> <span class="nx">info</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span><span class="mi">11</span><span class="p">}</span>
+	<span class="nx">j</span> <span class="p">,</span><span class="nx">_</span> <span class="o">:=</span> <span class="nx">json</span><span class="p">.</span><span class="nf">Marshal</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%v, %+v, %v \n&#34;</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nb">string</span><span class="p">(</span><span class="nx">j</span><span class="p">))</span> 
+	<span class="c1">//{test 11}, {Name:test Age:11}, {&#34;name&#34;:&#34;test&#34;,&#34;age&#34;:11} 
+</span><span class="c1"></span>
+<span class="p">}</span>
+</code></pre></div><h3 id="13-类型断言">13. 类型断言<a href="#13-类型断言" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>转<a href="https://blog.csdn.net/cbmljs/article/details/82966907">Go-类型断言 问题</a></li>
+<li>转<a href="https://www.cnblogs.com/believepd/p/10945700.html">Go-类型断言 最佳实践</a></li>
+</ul>
+<blockquote>
+<p>类型断言：由于接口是一般类型，不知道具体类型，如果要转成具体类型，就需要使用类型断言。</p>
+</blockquote>
+<blockquote>
+<p>struct 是相同的属性, interface 是相同的方法</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+ <span class="s">&#34;fmt&#34;</span>
+<span class="p">)</span>
+
+<span class="kd">type</span> <span class="nx">Usb</span> <span class="kd">interface</span> <span class="p">{</span>
+ <span class="nf">Connect</span><span class="p">()</span>
+ <span class="nf">Disconnect</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">Phone</span> <span class="kd">struct</span><span class="p">{</span> <span class="nx">Name</span> <span class="kt">string</span> <span class="p">}</span>
+<span class="kd">type</span> <span class="nx">Camera</span> <span class="kd">struct</span><span class="p">{</span> <span class="nx">Name</span> <span class="kt">string</span> <span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="nx">Phone</span><span class="p">)</span> <span class="nf">Connect</span><span class="p">()</span>     <span class="p">{</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%s连接中...\n&#34;</span><span class="p">,</span> <span class="nx">p</span><span class="p">.</span><span class="nx">Name</span><span class="p">)</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="nx">Phone</span><span class="p">)</span> <span class="nf">Disconnect</span><span class="p">()</span>  <span class="p">{</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%s断开连接中...\n&#34;</span><span class="p">,</span> <span class="nx">p</span><span class="p">.</span><span class="nx">Name</span><span class="p">)</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="nx">Camera</span><span class="p">)</span> <span class="nf">Connect</span><span class="p">()</span>    <span class="p">{</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%s连接中...\n&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Name</span><span class="p">)</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="nx">Camera</span><span class="p">)</span> <span class="nf">Disconnect</span><span class="p">()</span> <span class="p">{</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%s断开连接中...\n&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Name</span><span class="p">)</span> <span class="p">}</span>
+
+<span class="c1">// Phone结构体特有的方法Call
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="nx">Phone</span><span class="p">)</span> <span class="nf">Call</span><span class="p">()</span> <span class="p">{</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;正在使用%s打电话...\n&#34;</span><span class="p">,</span> <span class="nx">p</span><span class="p">.</span><span class="nx">Name</span><span class="p">)</span> <span class="p">}</span>
+<span class="c1">// Camera
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="nx">Camera</span><span class="p">)</span> <span class="nf">Photograph</span><span class="p">()</span> <span class="p">{</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;正在使用%s拍照...\n&#34;</span><span class="p">,</span><span class="nx">c</span><span class="p">.</span><span class="nx">Name</span><span class="p">)}</span>
+<span class="kd">type</span> <span class="nx">Computer</span> <span class="kd">struct</span><span class="p">{}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="nx">Computer</span><span class="p">)</span> <span class="nf">Working</span><span class="p">(</span><span class="nx">usb</span> <span class="nx">Usb</span><span class="p">)</span> <span class="p">{</span>
+ <span class="nx">usb</span><span class="p">.</span><span class="nf">Connect</span><span class="p">()</span>
+ <span class="nx">usb</span><span class="p">.</span><span class="nf">Disconnect</span><span class="p">()</span>
+ <span class="c1">// 如果 usb 是指向 Phone 结构体变量，则还需要调用 Call 方法
+</span><span class="c1"></span> <span class="c1">//phone, ok := usb.(Phone) // 类型断言
+</span><span class="c1"></span> <span class="c1">//if ok {
+</span><span class="c1"></span> <span class="c1">// phone.Call()
+</span><span class="c1"></span> <span class="c1">//}
+</span><span class="c1"></span> <span class="k">switch</span> <span class="nx">v</span> <span class="o">:=</span> <span class="nx">usb</span><span class="p">.(</span><span class="kd">type</span><span class="p">){</span>
+ <span class="k">case</span> <span class="nx">Phone</span><span class="p">:</span>
+  <span class="nx">v</span><span class="p">.</span><span class="nf">Call</span><span class="p">()</span>
+ <span class="k">case</span> <span class="nx">Camera</span><span class="p">:</span>
+  <span class="nx">v</span><span class="p">.</span><span class="nf">Photograph</span><span class="p">()</span>
+ <span class="k">default</span><span class="p">:</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;不支持的设备&#34;</span><span class="p">)</span>
+
+ <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+ <span class="c1">// 定义一个 Usb 接口数组，可以存放 Phone 和 Camera 结构体的实例
+</span><span class="c1"></span> <span class="kd">var</span> <span class="nx">usbArr</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="nx">Usb</span>
+ <span class="nx">usbArr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">=</span> <span class="nx">Phone</span><span class="p">{</span><span class="s">&#34;苹果&#34;</span><span class="p">}</span>
+ <span class="nx">usbArr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">=</span> <span class="nx">Camera</span><span class="p">{</span><span class="s">&#34;尼康&#34;</span><span class="p">}</span>
+ <span class="kd">var</span> <span class="nx">computer</span> <span class="nx">Computer</span>
+ <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">usbArr</span> <span class="p">{</span>
+  <span class="nx">computer</span><span class="p">.</span><span class="nf">Working</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>
+ <span class="p">}</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">()</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">usbArr</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div><h3 id="14-select-和switch">14 select 和switch<a href="#14-select-和switch" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>select 操作语句只能是【IO 操作】,一般用于channel</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+ <span class="nx">timeout</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
+
+ <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+  <span class="nx">timeout</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
+ <span class="p">}()</span>
+
+ <span class="nx">ch</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Tick</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+ <span class="k">for</span> <span class="p">{</span>
+  <span class="k">select</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="o">&lt;-</span><span class="nx">ch</span><span class="p">:</span>
+   <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="o">&lt;-</span><span class="nx">ch</span><span class="p">)</span>
+  <span class="k">case</span> <span class="o">&lt;-</span><span class="nx">timeout</span><span class="p">:</span>
+   <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;timeout!&#34;</span><span class="p">)</span>
+   <span class="k">return</span>
+  <span class="p">}</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h3 id="15-channel简单例子">15 channel简单例子<a href="#15-channel简单例子" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+ <span class="c1">// 设置一个超时时间
+</span><span class="c1"></span> <span class="nx">timeout</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
+ <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+  <span class="nx">timeout</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
+ <span class="p">}()</span>
+
+ <span class="c1">// 设置一个脚本, 如果运行超过timeout时间,则中断(这里模拟程序执行时间)
+</span><span class="c1"></span> <span class="nx">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span> <span class="kd">chan</span> <span class="kd">struct</span> <span class="p">{}</span> <span class="p">)</span>
+ <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;ch 的子进程开始...&#34;</span><span class="p">)</span>
+  <span class="nx">rand</span><span class="p">.</span><span class="nf">Seed</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">Unix</span><span class="p">())</span>
+  <span class="nx">r</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Intn</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;模拟延迟 %ds\n&#34;</span><span class="p">,</span><span class="nx">r</span><span class="p">)</span>
+  <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;ch 的子进程结束...&#34;</span><span class="p">)</span>
+  <span class="nx">ch</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
+ <span class="p">}()</span>
+
+ <span class="k">for</span> <span class="p">{</span>
+  <span class="k">select</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="o">&lt;-</span><span class="nx">ch</span><span class="p">:</span>
+   <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;任务正常结束&#34;</span><span class="p">)</span>
+   <span class="nb">close</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span>
+   <span class="k">return</span>
+  <span class="k">case</span> <span class="o">&lt;-</span><span class="nx">timeout</span><span class="p">:</span>
+   <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;timeout!&#34;</span><span class="p">)</span>
+   <span class="nb">close</span><span class="p">(</span><span class="nx">timeout</span><span class="p">)</span>
+   <span class="k">return</span>
+  <span class="p">}</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div><h3 id="16-syncwaitgroup-使用">16 sync.WaitGroup 使用<a href="#16-syncwaitgroup-使用" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+ <span class="nx">wg</span> <span class="o">:=</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span><span class="p">{}</span>
+ <span class="nx">wg</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+ <span class="k">go</span> <span class="nf">fun1</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">wg</span><span class="p">)</span>
+ <span class="k">go</span> <span class="nf">fun2</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">wg</span><span class="p">)</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;main 等待子程序执行完毕, 等待中...&#34;</span><span class="p">)</span>
+ <span class="nx">wg</span><span class="p">.</span><span class="nf">Wait</span><span class="p">()</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;子程序全部执行完毕&#34;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">//
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">fun1</span><span class="p">(</span><span class="nx">wg</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span><span class="p">)</span> <span class="p">{</span>
+ <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span> <span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">5</span> <span class="p">;</span> <span class="nx">i</span> <span class="o">++</span> <span class="p">{</span>
+  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;func1 : %d\n&#34;</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span>
+  <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+ <span class="p">}</span>
+ <span class="nx">wg</span><span class="p">.</span><span class="nf">Done</span><span class="p">()</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="nf">fun2</span><span class="p">(</span><span class="nx">wg</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span><span class="p">)</span> <span class="p">{</span>
+ <span class="k">defer</span> <span class="nx">wg</span><span class="p">.</span><span class="nf">Done</span><span class="p">()</span>
+ <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span> <span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">2</span> <span class="p">;</span> <span class="nx">i</span> <span class="o">++</span> <span class="p">{</span>
+  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;func2 : %d\n&#34;</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span>
+  <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h3 id="17-包导入的几点说明">17 包导入的几点说明<a href="#17-包导入的几点说明" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>详情见<a href="http://shouce.jb51.net/gopl-zh/ch10/ch10-03.html">go圣经</a></p>
+</blockquote>
+<ul>
+<li>导入路径名的约定</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">关于默认包名一般采用导入路径名的最后一段的约定也有三种例外情况。
+1. 第一个例外，包对应一个可执行程序，也就是main包，这时候main包本身的导入路径是无关紧要的。名字为main的包是给go build构建命令一个信息，这个包编译完之后必须调用连接器生成一个可执行程序。
+
+2. 第二个例外，包所在的目录中可能有一些文件名是以_test.go为后缀的Go源文件（译注：前面必须有其它的字符，因为以_或.开头的源文件会被构建工具忽略），并且这些源文件声明的包名也是以_test为后缀名的。这种目录可以包含两种包：一种是普通包，另一种则是测试的外部扩展包。
+所有以_test为后缀包名的测试外部扩展包都由go test命令独立编译，普通包和测试的外部扩展包是相互独立的。测试的外部扩展包一般用来避免测试代码中的循环导入依赖
+
+3. 第三个例外，一些依赖版本号的管理工具会在导入路径后追加版本号信息，例如<span class="s2">&#34;gopkg.in/yaml.v2&#34;</span>。这种情况下包的名字并不包含版本号后缀，而是yaml。
+</code></pre></div><ul>
+<li>匿名导入</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="nx">_</span> <span class="s">&#34;image/png&#34;</span> <span class="c1">// register PNG decoder
+</span></code></pre></div><ul>
+<li>构建包(go doc go/build)</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">1. 如果一个文件名包含了一个操作系统或处理器类型名字，例如net_linux.go或asm_amd64.s，Go语言的构建工具将只在对应的平台编译这些文件
+
+2. 如果文件中可能包含下面的注释：
+  // +build linux darwin	//只在编译程序对应的目标操作系统是Linux或Mac OS X时才编译这个文件
+  // +build ignore		//不编译
+</code></pre></div><ul>
+<li>一些坑</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">1. 导入包如果是大写开头导致go mod tidy，go mod download等命令无法使用。例如: github.com/Unknwon/com, 可以replace为github.com/unknwon/com,目前直接使用go get github.com/unknwon/com 即可
+</code></pre></div><h3 id="18-go-get-超时的错误">18 go get 超时的错误<a href="#18-go-get-超时的错误" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>如果遇到超时错误&quot;https fetch: Get &hellip; connect: connection timed out&quot;, 请设置代理后重试，详见 <a href="https://www.bfe-networks.net/zh_cn/faq/installation/">安装常见问题</a></p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">go env -w <span class="nv">GO111MODULE</span><span class="o">=</span>on
+go env -w <span class="nv">GOPROXY</span><span class="o">=</span>https://goproxy.cn,direct
+</code></pre></div>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/go">go</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>962 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-05-28 01:25 &#43;0800</p>
+			</footer>
+		</article>
+		<aside id="toc" class="show-toc">
+			<div class="toc-title">Table of Contents</div>
+			<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#1-go中的用法">1. go中'&hellip;&lsquo;的用法</a></li>
+        <li><a href="#2-golang中引用类型-slice切片map字典channel管道">2. golang中引用类型 slice(切片)、map(字典)、channel(管道)</a></li>
+        <li><a href="#3-golang查看变量类型">3. golang查看变量类型</a></li>
+        <li><a href="#4-go中内置分配内存函数new和make的用法">4. go中内置分配内存函数new和make的用法</a></li>
+        <li><a href="#5-查看slice的长度和容量">5. 查看slice的长度和容量</a></li>
+        <li><a href="#6-闭包的说明">6. 闭包的说明</a></li>
+        <li><a href="#7-反引号">7. 反引号</a></li>
+        <li><a href="#8-编译不同平台可执行文件">8. 编译不同平台可执行文件</a></li>
+        <li><a href="#9-斐波那契数列">9. 斐波那契数列</a></li>
+        <li><a href="#10-string方法">10. String()方法</a></li>
+        <li><a href="#11-printf用法">11. Printf用法</a></li>
+        <li><a href="#12-fmtprintf">12. fmt.Printf</a></li>
+        <li><a href="#13-类型断言">13. 类型断言</a></li>
+        <li><a href="#14-select-和switch">14 select 和switch</a></li>
+        <li><a href="#15-channel简单例子">15 channel简单例子</a></li>
+        <li><a href="#16-syncwaitgroup-使用">16 sync.WaitGroup 使用</a></li>
+        <li><a href="#17-包导入的几点说明">17 包导入的几点说明</a></li>
+        <li><a href="#18-go-get-超时的错误">18 go get 超时的错误</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+		</aside>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/50-%E8%AE%B0%E4%B8%80%E6%AC%A1windows%E5%AE%89%E8%A3%85openssh%E9%97%AE%E9%A2%98/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>记一次windows安装OpenSSH问题</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/48-k8s%E5%8D%87%E7%BA%A7-1-10-1-15/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>k8s升级(1.10-&gt;1.15)</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-180942795-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

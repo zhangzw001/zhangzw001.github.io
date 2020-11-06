@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="部署elk7.2.0">
+<meta itemprop="description" content="本文主要是单机版部署elk7, 非高可用部署. 部分安装步骤省略. 主要是记录yml配置文件, 仅供参考. &lt;br&gt;详细内容请点击下方阅读全文, 非常感谢!">
+<meta itemprop="datePublished" content="2019-09-19T17:59:53+00:00" />
+<meta itemprop="dateModified" content="2019-09-19T17:59:53+00:00" />
+<meta itemprop="wordCount" content="819">
+
+
+
+<meta itemprop="keywords" content="k8s,elk,elk7,elasticsearch7," />
+<meta property="og:title" content="部署elk7.2.0" />
+<meta property="og:description" content="本文主要是单机版部署elk7, 非高可用部署. 部分安装步骤省略. 主要是记录yml配置文件, 仅供参考. &lt;br&gt;详细内容请点击下方阅读全文, 非常感谢!" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://blog.k1s.club/posts/2-%E9%83%A8%E7%BD%B2elk7-2-0/" />
+<meta property="article:published_time" content="2019-09-19T17:59:53+00:00" />
+<meta property="article:modified_time" content="2019-09-19T17:59:53+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="部署elk7.2.0"/>
+<meta name="twitter:description" content="本文主要是单机版部署elk7, 非高可用部署. 部分安装步骤省略. 主要是记录yml配置文件, 仅供参考. &lt;br&gt;详细内容请点击下方阅读全文, 非常感谢!"/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>部署elk7.2.0</title>
+	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://blog.k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://blog.k1s.club/mysql45%E8%AE%B2%E4%B8%81%E5%A5%87/">Mysql45讲丁奇</a>
+					<a href="https://blog.k1s.club/posts/">文章</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
+			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
+			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Sep 19, 2019</span></div>
+				<h1>部署elk7.2.0</h1>
+			</header>
+			<div class="content">
+				<blockquote>
+<p>说明:</p>
+</blockquote>
+<pre><code>1 单台k8s,本机目录挂载(未配置cephfs)
+2 如果replicas大于1, 就会出现多个es挂载同一个目录,会出现报错(uuid block)
+</code></pre><h3 id="1-es配置本地挂载-k8s-es-720yml">1. es配置本地挂载 k8s-es-7.2.0.yml<a href="#1-es配置本地挂载-k8s-es-720yml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ labels:
+   app: elasticsearch
+ name: elasticsearch7-admin
+ namespace: ns-elastic7
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+ name: elasticsearch7-admin
+ labels:
+   app: elasticsearch
+roleRef:
+ apiGroup: rbac.authorization.k8s.io
+ kind: ClusterRole
+ name: cluster-admin
+subjects:
+ - kind: ServiceAccount
+   name: elasticsearch7-admin
+   namespace: ns-elastic7
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: elasticsearch
+    role: master
+  name: elasticsearch-master
+  namespace: ns-elastic7
+spec:
+  replicas: 1
+  serviceName: elasticsearch-master
+  selector:
+    matchLabels:
+      app: elasticsearch
+      role: master
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+        role: master
+    spec:
+      serviceAccountName: elasticsearch7-admin
+      restartPolicy: Always
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: elasticsearch-master
+          image: hub.zhangzw.com/bq/elasticsearch:7.2.0
+          command: [&quot;bash&quot;, &quot;-c&quot;, &quot;ulimit -l unlimited &amp;&amp; sysctl -w vm.max_map_count=262144 &amp;&amp; chown -R elasticsearch:elasticsearch /usr/share/elasticsearch/data &amp;&amp; exec su elasticsearch docker-entrypoint.sh&quot;]
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: 9200
+              protocol: TCP
+            - containerPort: 9300
+              protocol: TCP
+          resources:
+            requests:
+              cpu: &quot;50m&quot;
+            limits:
+              cpu: &quot;800m&quot;
+          env:
+            - name: cluster.name
+              value: &quot;es_cluster&quot;
+            - name: node.master
+              value: &quot;true&quot;
+            - name: node.data
+              value: &quot;true&quot;
+            - name: cluster.initial_master_nodes
+              value: &quot;elasticsearch-master-0&quot; # 根据副本数和name配置
+            - name: discovery.zen.ping_timeout
+              value: &quot;5s&quot;
+            - name: node.ingest
+              value: &quot;false&quot;
+            - name: ES_JAVA_OPTS
+              value: &quot;-Xms1g -Xmx1g&quot;
+            - name: &quot;discovery.zen.ping.unicast.hosts&quot;
+              value: &quot;elasticsearch-discovery&quot; # Disvocery Service
+            - name: &quot;http.cors.enabled&quot;
+              value: &quot;true&quot;
+            - name: &quot;http.cors.allow-origin&quot;
+              value: &quot;*&quot;
+          volumeMounts:
+            - name: elasticsearch-data-volume
+              mountPath: /usr/share/elasticsearch/data
+      volumes:
+        - name: elasticsearch-data-volume
+          hostPath:
+            path: /data/k8s-container/elk-7.2.0/es-7.2.0/data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: elasticsearch
+  name: elasticsearch-discovery
+  namespace: ns-elastic7
+spec:
+  publishNotReadyAddresses: true
+  ports:
+  - name: transport
+    port: 9300
+    targetPort: 9300
+  selector:
+    app: elasticsearch
+    role: master
+---
+kind: Service
+apiVersion: v1
+metadata:
+ labels:
+   app: elasticsearch
+ name: elasticsearch-service
+ namespace: ns-elastic7
+spec:
+ type: NodePort
+ ports:
+   - port: 9200
+     targetPort: 9200
+     nodePort: 19230
+     protocol: TCP
+ selector:
+   app: elasticsearch
+</code></pre><h3 id="2-es配置nfs动态挂载-k8s-es-720-nfsyml">2. es配置nfs动态挂载 k8s-es-7.2.0-nfs.yml<a href="#2-es配置nfs动态挂载-k8s-es-720-nfsyml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ labels:
+   app: elasticsearch
+ name: elasticsearch-admin
+ namespace: ns-elastic
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+ name: elasticsearch-admin
+ labels:
+   app: elasticsearch
+roleRef:
+ apiGroup: rbac.authorization.k8s.io
+ kind: ClusterRole
+ name: cluster-admin
+subjects:
+ - kind: ServiceAccount
+   name: elasticsearch-admin
+   namespace: ns-elastic
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: elasticsearch
+    role: master
+  name: elasticsearch-master
+  namespace: ns-elastic
+spec:
+  replicas: 2
+  volumeClaimTemplates:
+  - metadata:
+      name: elasticsearch-data-nfs
+      annotations:
+        volume.beta.kubernetes.io/storage-class: &quot;nfs&quot;
+    spec:
+      accessModes: [ &quot;ReadWriteOnce&quot; ]
+      resources:
+        requests:
+          storage: 2Gi
+  serviceName: elasticsearch-master
+  selector:
+    matchLabels:
+      app: elasticsearch
+      role: master
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+        role: master
+    spec:
+      serviceAccountName: elasticsearch-admin
+      restartPolicy: Always
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: elasticsearch-master
+          image: elasticsearch:7.2.0
+          command: [&quot;bash&quot;, &quot;-c&quot;, &quot;ulimit -l unlimited &amp;&amp; sysctl -w vm.max_map_count=262144 &amp;&amp; chown -R elasticsearch:elasticsearch /usr/share/elasticsearch/data &amp;&amp; exec su elasticsearch docker-entrypoint.sh&quot;]
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - name: elasticsearch-data-nfs
+            mountPath: /usr/share/elasticsearch/data
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: 9200
+              protocol: TCP
+            - containerPort: 9300
+              protocol: TCP
+          env:
+            - name: cluster.name
+              value: &quot;es_cluster&quot;
+            - name: node.master
+              value: &quot;true&quot;
+            - name: node.data
+              value: &quot;true&quot;
+            - name: cluster.initial_master_nodes
+              value: &quot;elasticsearch-master-0,elasticsearch-master-1&quot; # 根据副本数和name配置
+            - name: discovery.zen.ping_timeout
+              value: &quot;5s&quot;
+            - name: node.ingest
+              value: &quot;false&quot;
+            - name: ES_JAVA_OPTS
+              value: &quot;-Xms1g -Xmx1g&quot;
+            - name: &quot;discovery.zen.ping.unicast.hosts&quot;
+              value: &quot;elasticsearch-discovery&quot; # Disvocery Service
+            - name: &quot;http.cors.enabled&quot;
+              value: &quot;true&quot;
+            - name: &quot;http.cors.allow-origin&quot;
+              value: &quot;*&quot;
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: elasticsearch
+  name: elasticsearch-discovery
+  namespace: ns-elastic
+spec:
+  publishNotReadyAddresses: true
+  ports:
+  - name: transport
+    port: 9300
+    targetPort: 9300
+  selector:
+    app: elasticsearch
+    role: master
+---
+kind: Service
+apiVersion: v1
+metadata:
+ labels:
+   app: elasticsearch
+ name: elasticsearch-service
+ namespace: ns-elastic
+spec:
+ type: NodePort
+ ports:
+   - port: 9200
+     targetPort: 9200
+     nodePort: 19220
+     protocol: TCP
+ selector:
+   app: elasticsearch
+</code></pre><h3 id="3-kibana配置k8s-kibana-720yml">3. kibana配置k8s-kibana-7.2.0.yml<a href="#3-kibana配置k8s-kibana-720yml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kibana-config
+  namespace: ns-elastic7
+  labels:
+    elastic-app: kibana
+data:
+  kibana.yml: |
+    server.name: kibana
+    server.host: &quot;0&quot;
+    elasticsearch.hosts: [ &quot;http://elasticsearch-service:9200&quot; ]
+    xpack.monitoring.ui.container.elasticsearch.enabled: true
+---
+kind: Deployment
+apiVersion: apps/v1beta2
+metadata:
+  labels:
+    elastic-app: kibana
+  name: kibana
+  namespace: ns-elastic7
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      elastic-app: kibana
+  template:
+    metadata:
+      labels:
+        elastic-app: kibana
+    spec:
+      containers:
+        - name: kibana
+          image: hub.zhangzw.com/bq/kibana:7.2.0
+          ports:
+            - containerPort: 5601
+              protocol: TCP
+          resources:
+            requests:
+              cpu: &quot;50m&quot;
+            limits:
+              cpu: &quot;800m&quot;
+          volumeMounts:
+            - name: kibana-config
+              mountPath: /usr/share/kibana/config
+      volumes:
+        - name: kibana-config
+          configMap:
+            name: kibana-config
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    elastic-app: kibana
+  name: kibana-service
+  namespace: ns-elastic7
+spec:
+  ports:
+    - port: 5601
+      targetPort: 5601
+  selector:
+    elastic-app: kibana
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+ labels:
+   elastic-app: kibana
+ name: kibana-ingress
+ namespace: ns-elastic7
+spec:
+ rules:
+   - host: elk-kibana-dev.zhangzw.com
+     http:
+       paths:
+         - backend:
+             serviceName: kibana-service
+             servicePort: 5601
+</code></pre><h3 id="4-logstash配置-本地挂载-k8s-logstash-720yml">4. logstash配置 本地挂载 k8s-logstash-7.2.0.yml<a href="#4-logstash配置-本地挂载-k8s-logstash-720yml" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>4.1 config/pipelines.yml</li>
+</ul>
+<pre><code>- pipeline.id: main
+  path.config: &quot;/usr/share/logstash/config/pipeline/*.conf&quot;
+</code></pre><ul>
+<li>4.2 首先配置grok规则 config/pipeline/logstash.conf</li>
+</ul>
+<pre><code>input {
+    udp {
+        port =&gt; &quot;10000&quot;
+        }
+    }
+
+ filter {
+      grok {
+          match =&gt; {
+            &quot;message&quot; =&gt; &quot;\{\&quot;id\&quot;:\&quot;(?&lt;id&gt;(.)*)\&quot;,\&quot;tag\&quot;:\&quot;(?&lt;tag&gt;(.)*)\&quot;,\&quot;title\&quot;:\&quot;%{GREEDYDATA:title}(?&lt;title&gt;(.|\r|\n)*)\&quot;,\&quot;value\&quot;:\&quot;%{GREEDYDATA:value}(?&lt;value&gt;(.|\r|\n)*)\&quot;,\&quot;createdAt\&quot;:\&quot;(?&lt;createdAt&gt;\S+ \S+)\&quot;,\&quot;Telephone\&quot;:\&quot;(?&lt;Telephone&gt;(.)*)\&quot;,\&quot;uid\&quot;:\&quot;(?&lt;uid&gt;(.)*)\&quot;,\&quot;updateTime\&quot;:\&quot;(?&lt;updateTime&gt;(.)*)\&quot;,\&quot;appVersion\&quot;:\&quot;(?&lt;appVersion&gt;(.)*)\&quot;,\&quot;mobileModel\&quot;:\&quot;(?&lt;mobileModel&gt;(.)*)\&quot;,\&quot;osVersion\&quot;:\&quot;(?&lt;osVersion&gt;(.)*)\&quot;,\&quot;channel\&quot;:\&quot;(?&lt;channel&gt;(.)*)\&quot;,\&quot;UDID\&quot;:\&quot;(?&lt;UDID&gt;(.)*)\&quot;\}&quot;
+              }
+            }
+ }
+
+output {
+    elasticsearch {
+        hosts =&gt;  [ &quot;http://elasticsearch-service:9200&quot; ]
+        index =&gt; &quot;k8s2-dev-%{+YYYY.MM.dd}&quot;
+
+        }
+
+    }
+</code></pre><ul>
+<li>4.3 配置文件 k8s-logstash-7.2.0.yml</li>
+</ul>
+<pre><code>---
+kind: Deployment
+apiVersion: apps/v1beta2
+metadata:
+  labels:
+    elastic-app: logstash
+  name: logstash
+  namespace: ns-elastic
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      elastic-app: logstash
+  template:
+    metadata:
+      labels:
+        elastic-app: logstash
+    spec:
+      containers:
+        - name: logstash
+          image: hub.zhangzw.com/bq/logstash:7.2.0
+          ports:
+            - containerPort: 10000
+              protocol: UDP
+          volumeMounts:
+            - name: logstash-config
+              mountPath: /usr/share/logstash/config
+      volumes:
+        - name: logstash-config
+          hostPath:
+            path: /data/k8s-pod/elk-7.2.0/logstash-7.2.0/config
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    elastic-app: logstash
+  name: logstash-service
+  namespace: ns-elastic
+spec:
+  type: NodePort
+  ports:
+    - port: 10000
+      targetPort: 10000
+      nodePort: 10000
+      protocol: UDP
+  selector:
+    elastic-app: logstash
+  type: NodePort
+---
+</code></pre>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/k8s">k8s</a></span><span class="tag"><a href="https://blog.k1s.club/tags/elk">elk</a></span><span class="tag"><a href="https://blog.k1s.club/tags/elk7">elk7</a></span><span class="tag"><a href="https://blog.k1s.club/tags/elasticsearch7">elasticsearch7</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>819 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-09-20 01:59 &#43;0800</p>
+			</footer>
+		</article>
+		<aside id="toc" class="show-toc">
+			<div class="toc-title">Table of Contents</div>
+			<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#1-es配置本地挂载-k8s-es-720yml">1. es配置本地挂载 k8s-es-7.2.0.yml</a></li>
+        <li><a href="#2-es配置nfs动态挂载-k8s-es-720-nfsyml">2. es配置nfs动态挂载 k8s-es-7.2.0-nfs.yml</a></li>
+        <li><a href="#3-kibana配置k8s-kibana-720yml">3. kibana配置k8s-kibana-7.2.0.yml</a></li>
+        <li><a href="#4-logstash配置-本地挂载-k8s-logstash-720yml">4. logstash配置 本地挂载 k8s-logstash-7.2.0.yml</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+		</aside>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://blog.k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>k8s遇到的一些问题统计总结</span>
+			</a>
+			<a class="prev-post" href="https://blog.k1s.club/posts/%E9%A6%96%E6%AC%A1%E6%90%AD%E5%BB%BAhexo%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>首次搭建hexo博客系统</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-180942795-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>
