@@ -34,15 +34,6 @@
     </item>
     
     <item>
-      <title>Mysql45讲丁奇</title>
-      <link>https://k1s.club/mysql45%E8%AE%B2%E4%B8%81%E5%A5%87/</link>
-      <pubDate>Fri, 06 Nov 2020 15:51:55 +0800</pubDate>
-      
-      <guid>https://k1s.club/mysql45%E8%AE%B2%E4%B8%81%E5%A5%87/</guid>
-      <description> 开篇词讲这一次，让我们一起来搞懂MySQL.html 01讲基础架构：一条SQL查询语句是如何执行的.html 02讲日志系统：一条SQL更新语句是如何执行的.html 03讲事务隔离：为什么你改了我还看不见.html 04讲深入浅出索引（上）.html 05讲深入浅出索引（下）.html 06讲全局锁和表锁：给表加个字段怎么有这么多阻碍.html 07讲行锁功过：怎么减少行锁对性能的影响.html 08讲事务到底是隔离的还是不隔离的.html 09讲普通索引和唯一索引，应该怎么选择.html 10讲MySQL为什么有时候会选错索引.html 11讲怎么给字符串字段加索引.html 12讲为什么我的MySQL会“抖”一下.html 13讲为什么表数据删掉一半，表文件大小不变.html 14讲count这么慢，我该怎么办.html 15讲答疑文章（一）：日志和索引相关问题.html 16讲“orderby”是怎么工作的.html 17讲如何正确地显示随机消息.html 18讲为什么这些SQL语句逻辑相同，性能却差异巨大.html 19讲为什么我只查一行的语句，也执行这么慢.html 20讲幻读是什么，幻读有什么问题.html 21讲为什么我只改一行的语句，锁这么多.html 22讲MySQL有哪些“饮鸩止渴”提高性能的方法.html 23讲MySQL是怎么保证数据不丢的.html 24讲MySQL是怎么保证主备一致的.html 25讲MySQL是怎么保证高可用的.html 26讲备库为什么会延迟好几个小时.html 27讲主库出问题了，从库怎么办.html 28讲读写分离有哪些坑.html 29讲如何判断一个数据库是不是出问题了.html 30讲答疑文章（二）：用动态的观点看加锁.html 31讲误删数据后除了跑路，还能怎么办.html 32讲为什么还有kill不掉的语句.html 33讲我查这么多数据，会不会把数据库内存打爆.html 34讲到底可不可以使用join.html 35讲join语句怎么优化.html 36讲为什么临时表可以重名.html 37讲什么时候会使用内部临时表.html 38讲都说InnoDB好，那还要不要使用Memory引擎.html 39讲自增主键为什么不是连续的.html 40讲insert语句的锁为什么这么多.html 41讲怎么最快地复制一张表.html 42讲grant之后要跟着flushprivileges吗.html 43讲要不要使用分区表.html 44讲答疑文章（三）：说一说这些好问题.html 直播回顾讲林晓斌：我的MySQL心路历程.html  </description>
-    </item>
-    
-    <item>
       <title>Kubectl命令简单熟悉</title>
       <link>https://k1s.club/posts/61-kubectl%E5%91%BD%E4%BB%A4%E7%AE%80%E5%8D%95%E7%86%9F%E6%82%89/</link>
       <pubDate>Thu, 29 Oct 2020 11:15:58 +0800</pubDate>
@@ -105,6 +96,15 @@
       <guid>https://k1s.club/posts/55-helm%E9%83%A8%E7%BD%B2metabase%E7%AE%80%E4%BB%8B/</guid>
       <description>helm 简单部署metabase
 版本统计 1. k8s: 1.15.11 2. metabase: v0.36.3 3. mysql: 5.7.24 首先从charts拉取最新的模板 # 首先search查看一下 helm search metabase NAME CHART VERSION APP VERSION DESCRIPTION stable/metabase 0.3.2 v0.27.2 The easy, open source way for everyone in your company to... # 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本 所以这里我从helm官方克隆了charts git clone https://github.com/helm/charts.git cd charts/stable/metabase # 拉取配置 docker pull metabase/metabase:v0.36.3 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3 docker push xxx.com/metabase:v0.36.3 修改values.yaml配置 # 这里改成私有镜像 image: repository: xxx.com/metabase # 修改数据库配置 database: type: mysql host: k8s-db-t.</description>
+    </item>
+    
+    <item>
+      <title>go单元测试和性能测试</title>
+      <link>https://k1s.club/posts/54-go%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/</link>
+      <pubDate>Wed, 12 Aug 2020 16:44:10 +0000</pubDate>
+      
+      <guid>https://k1s.club/posts/54-go%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/</guid>
+      <description>&lt;p&gt;简单记录一下单元测试 和性能测试的例子&lt;/p&gt;</description>
     </item>
     
   </channel>
