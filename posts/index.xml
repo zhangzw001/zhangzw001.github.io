@@ -6,8 +6,213 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Thu, 29 Oct 2020 11:15:58 +0800</lastBuildDate>
+		<lastBuildDate>Tue, 10 Nov 2020 14:06:41 +0000</lastBuildDate>
 		<atom:link href="https://blog.k1s.club/posts/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>k8s遇到的一些问题统计总结</title>
+			<link>https://blog.k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
+			<pubDate>Tue, 10 Nov 2020 14:06:41 +0000</pubDate>
+			
+			<guid>https://blog.k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
+			<description>不定时更新,文章可能比较散乱,&amp;gt;_&amp;lt;
+  1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
+  deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
+ # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从hub.</description>
+			<content type="html"><![CDATA[<p>不定时更新,文章可能比较散乱,&gt;_&lt;</p>
+<!-- more -->
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="1-单机版k8s-pod一直是pending的问题">1. 单机版k8s pod一直是pending的问题</h3>
+<blockquote>
+<p>describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate.
+这是因为master上存在污点,pod不会再改节点上创建
+两种办法:</p>
+</blockquote>
+<ul>
+<li>deploy 的时候加上 容忍该污点</li>
+<li>直接取消master上的污点</li>
+</ul>
+<pre><code># 取消master上污点
+  kubectl taint nodes --all node-role.kubernetes.io/master-
+
+# 查看taint
+kubectl describe node node1
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="2-修改service-node-port-range">2. 修改service-node-port-range</h3>
+<blockquote>
+<p>由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口</p>
+</blockquote>
+<pre><code># kubeadm 1.14 配置
+apiServer:
+  extraArgs:
+    authorization-mode: Node,RBAC
+    service-node-port-range: 79-33000
+
+# kubeadm 1.10配置
+apiServerExtraArgs:
+  service-node-port-range: 79-33000
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="3-traefik断电后重新启动报错-command-traefik-error-field-not-found-node-redirect">3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect</h3>
+<pre><code>看到这个错误猜测可能是用的latest镜像问题, 从hub.docker.com 查看更新了v2.0+的版本
+
+将traefik的deployment配置中 image改成 traefik:1.7
+
+重新部署后 问题解
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="4-查看当前集群的customresourcedefinition">4. 查看当前集群的(CustomResourceDefinition)</h3>
+<pre><code># 查看k8s有哪些api
+kubectl api-versions
+
+# 查看当前crd
+kubectl get crd
+
+# 其次查看该api是什么版本
+kubectl describe crd destinationrules.networking.istio.io
+
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="5-启用自动轮换kubelet-证书证书未过期">5. 启用自动轮换kubelet 证书(证书未过期)</h3>
+<p>参考: <a href="https://www.cnblogs.com/skymyyang/p/11093686.html">Kubeadm证书过期时间调整</a></p>
+<p>kubelet证书分为server和client两种， k8s 1.9默认启用了client证书的自动轮换，但server证书自动轮换需要用户开启</p>
+<p>增加 kubelet 参数</p>
+<pre><code># 在/etc/systemd/system/kubelet.service.d/10-kubeadm.conf 增加如下参数
+
+Environment=&quot;KUBELET_EXTRA_ARGS=--feature-gates=RotateKubeletServerCertificate=true&quot;
+</code></pre><p>增加 controller-manager 参数</p>
+<pre><code># 在/etc/kubernetes/manifests/kube-controller-manager.yaml 添加如下参数
+  - command:
+    - kube-controller-manager
+    - --experimental-cluster-signing-duration=87600h0m0s
+    - --feature-gates=RotateKubeletServerCertificate=true
+    - ....
+</code></pre><p>创建 rbac 对象
+创建 rbac对象，允许节点轮换kubelet server证书：</p>
+<pre><code>cat &gt; ca-update.yaml &lt;&lt; EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: &quot;true&quot;
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: system:certificates.k8s.io:certificatesigningrequests:selfnodeserver
+rules:
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests/selfnodeserver
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubeadm:node-autoapprove-certificate-server
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:certificates.k8s.io:certificatesigningrequests:selfnodeserver
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: system:nodes
+EOF
+
+kubectl create –f ca-update.yaml
+</code></pre><p>重新启动kubelet</p>
+<pre><code>systemctl daemon-reload
+systemctl enable kubelet
+systemctl restart kubelet
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="6-hpa的一个cpu-percent百分比问题">6. hpa的一个cpu-percent百分比问题</h3>
+<pre><code>kubectl autoscale deployment php-admintest-nginx-dev --cpu-percent=80 --min=1 --max=2 -n php-dev
+</code></pre><p>例如以上,我希望在平均cpu超过80%时,pod能自动调整为2个</p>
+<p>em&hellip;这没啥问题</p>
+<p>但我做简单ab压测发现, 我把cpu压到了100000% &hellip;</p>
+<p>我的deployment 配置中是这样限制cpu的</p>
+<pre><code>        resources:
+          requests:
+            cpu: &quot;1m&quot;
+          limits:
+            cpu: &quot;1000m&quot;
+</code></pre><p>显然我的pod可以使用1个核cpu, 那这个平均cpu是等于啥呢?</p>
+<p>cpu-percent = 1000m/resources.request.cpu =&gt; 1000m/1m =100000%</p>
+<p>-_-!!!</p>
+<p>稍微解释下,为啥我要设置request.cpu=1m:
+比如单机4核k8s,我启动了1个pod,limit是4cpu,那么我request.cpu其实默认也是1, 所以集群就已经预留了4cpu, 此时如果在启动pod, 在配置limit的时候就无法成功启动pod,因为核心不够了,都给那什么玩意了&hellip;(当然这样改动也的确会出现过度分配)</p>
+<blockquote>
+<p>因此建议 修改requests.cpu=500m,  &ndash;cpu-percent可设范围: 0~200% ,或者低一些 250m -&gt; 0~400%</p>
+</blockquote>
+<p>总结:
+request.cpu 必须设置, 这个是对比的对象</p>
+<p>另外:
+对于扩容而言，这个时间段为3分钟，缩容为5分钟(可以通过 &ndash;horizontal-pod-autoscaler-downscale-delay ， &ndash;horizontal-pod-autoscaler-upscale-delay 进行调整)。</p>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="7-k8s1162metrics-v035-deployment重启之后hpa就失效无法获取到数据">7 k8s1.16.2+metrics v0.3.5 deployment重启之后hpa就失效,无法获取到数据</h3>
+<pre><code>The HPA was unable to compute the replica count: unable to get metrics for resource cpu: no metrics returned from resource metrics API 
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="8-k8s机器进程数达到500多的时候-ssh连接到服务报错-shell-request-failed-on-channel-0">8 k8s机器进程数达到500多的时候, ssh连接到服务报错 shell request failed on channel 0</h3>
+<pre><code>原因：目标主机的系统进程数太小，导致不能连接
+
+解决：需要修改/etc/security/limits.d/20-nproc.conf文件中的值，把4096改大一点，如 65535
+
+#cat /etc/security/limits.d/20-nproc.conf
+*          soft    nproc     4096
+root       soft    nproc     unlimited
+
+重新ssh，即可。
+
+</code></pre><h3 id="centos8安装k8s118flannel-pod间不通">centos8安装k8s1.18+flannel pod间不通</h3>
+<p>在查看到<a href="https://zhangguanzhang.github.io/">馆长</a>的<a href="https://zhangguanzhang.github.io/2020/10/20/kylin-v10-k8s-overlay-error/">银河麒麟arm64系统上k8s集群跨节点不通的一次排查</a>问题, 发下我的flannel网络同样是 <code>lo</code> 也的确启用了 <code>NetworkManager</code>, 不过重启并未有效果</p>
+<blockquote>
+<p>配置如下:</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ ip route get <span class="k">$(</span>ip a s flannel.1 <span class="p">|</span>grep -w inet<span class="p">|</span>awk -F <span class="s1">&#39;inet|/&#39;</span> <span class="s1">&#39;{print $2}&#39;</span><span class="k">)</span>
+<span class="nb">local</span> 10.244.0.0 dev lo src 10.244.0.0 uid <span class="m">0</span>
+    cache &lt;local&gt;
+
+$ route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         10.23.0.1       0.0.0.0         UG    <span class="m">100</span>    <span class="m">0</span>        <span class="m">0</span> eth0
+10.5.27.0       0.0.0.0         255.255.255.0   U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> docker0
+10.23.0.0       0.0.0.0         255.255.0.0     U     <span class="m">100</span>    <span class="m">0</span>        <span class="m">0</span> eth0
+10.244.0.0      0.0.0.0         255.255.255.0   U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> cni0
+10.244.1.0      10.244.1.0      255.255.255.0   UG    <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> flannel.1
+192.168.212.64  0.0.0.0         255.255.255.192 U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> *
+
+</code></pre></div><p>于是我重启</p>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">$ systemctl restart NetworkManager
+
+$ docker restart <span class="k">$(</span>docker ps <span class="p">|</span>grep flanneld<span class="p">|</span>awk <span class="s1">&#39;{print $1}&#39;</span><span class="k">)</span>
+
+$ ip route get <span class="k">$(</span>ip a s flannel.1 <span class="p">|</span>grep -w inet<span class="p">|</span>awk -F <span class="s1">&#39;inet|/&#39;</span> <span class="s1">&#39;{print $2}&#39;</span><span class="k">)</span>
+broadcast 10.244.0.0 dev cni0 src 10.244.0.1 uid <span class="m">0</span>
+    cache &lt;local,brd&gt;
+</code></pre></div><p>但最终我的现象是, master重启后从<code>lo</code>变成了<code>cni0</code>, 但是另外一台node一直无效, 重启容器后又变成<code>lo</code>, 至此<code>pod</code>间网络依然不通</p>
+<p>按照文章<a href="https://zhuanlan.zhihu.com/p/112834020">Centos8.1部署kubernetes1.17 问题 使用iptables打通网络</a> 中描述查看了<code>iptables</code>, 果然<code>Chain FORWARD (policy DROP)</code>, 通过<code>iptables -P FORWARD ACCEPT</code>的确解决了问题, 但显然这并不安全.</p>
+<p>其他链接:</p>
+<ul>
+<li>docker在 1.13 版本之后，将系统iptables 中 FORWARD 链的默认策略设置为 DROP: <a href="https://github.com/moby/moby/issues/14041">https://github.com/moby/moby/issues/14041</a></li>
+<li>docker&amp;k8s填坑记 nodeport 无法访问: <a href="https://www.cnblogs.com/tylerzhou/p/10975062.html">https://www.cnblogs.com/tylerzhou/p/10975062.html</a></li>
+</ul>
+]]></content>
+		</item>
 		
 		<item>
 			<title>Kubectl命令简单熟悉</title>
@@ -11325,211 +11530,6 @@ live2d:
 <pre><code>&lt;!-- 鼠标移动星星特效 --&gt;
 &lt;script type=&quot;text/javascript&quot; src=&quot;/js/src/love2.js&quot;&gt;&lt;/script&gt;
 </code></pre>]]></content>
-		</item>
-		
-		<item>
-			<title>k8s遇到的一些问题统计总结</title>
-			<link>https://blog.k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
-			<pubDate>Fri, 20 Sep 2019 09:20:39 +0000</pubDate>
-			
-			<guid>https://blog.k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
-			<description>不定时更新,文章可能比较散乱,&amp;gt;_&amp;lt;
-  1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
-  deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
- # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从hub.</description>
-			<content type="html"><![CDATA[<p>不定时更新,文章可能比较散乱,&gt;_&lt;</p>
-<!-- more -->
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="1-单机版k8s-pod一直是pending的问题">1. 单机版k8s pod一直是pending的问题</h3>
-<blockquote>
-<p>describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate.
-这是因为master上存在污点,pod不会再改节点上创建
-两种办法:</p>
-</blockquote>
-<ul>
-<li>deploy 的时候加上 容忍该污点</li>
-<li>直接取消master上的污点</li>
-</ul>
-<pre><code># 取消master上污点
-  kubectl taint nodes --all node-role.kubernetes.io/master-
-
-# 查看taint
-kubectl describe node node1
-</code></pre><center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="2-修改service-node-port-range">2. 修改service-node-port-range</h3>
-<blockquote>
-<p>由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口</p>
-</blockquote>
-<pre><code># kubeadm 1.14 配置
-apiServer:
-  extraArgs:
-    authorization-mode: Node,RBAC
-    service-node-port-range: 79-33000
-
-# kubeadm 1.10配置
-apiServerExtraArgs:
-  service-node-port-range: 79-33000
-</code></pre><center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="3-traefik断电后重新启动报错-command-traefik-error-field-not-found-node-redirect">3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect</h3>
-<pre><code>看到这个错误猜测可能是用的latest镜像问题, 从hub.docker.com 查看更新了v2.0+的版本
-
-将traefik的deployment配置中 image改成 traefik:1.7
-
-重新部署后 问题解
-</code></pre><center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="4-查看当前集群的customresourcedefinition">4. 查看当前集群的(CustomResourceDefinition)</h3>
-<pre><code># 查看k8s有哪些api
-kubectl api-versions
-
-# 查看当前crd
-kubectl get crd
-
-# 其次查看该api是什么版本
-kubectl describe crd destinationrules.networking.istio.io
-
-</code></pre><center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="5-启用自动轮换kubelet-证书证书未过期">5. 启用自动轮换kubelet 证书(证书未过期)</h3>
-<p>参考: <a href="https://www.cnblogs.com/skymyyang/p/11093686.html">Kubeadm证书过期时间调整</a></p>
-<p>kubelet证书分为server和client两种， k8s 1.9默认启用了client证书的自动轮换，但server证书自动轮换需要用户开启</p>
-<p>增加 kubelet 参数</p>
-<pre><code># 在/etc/systemd/system/kubelet.service.d/10-kubeadm.conf 增加如下参数
-
-Environment=&quot;KUBELET_EXTRA_ARGS=--feature-gates=RotateKubeletServerCertificate=true&quot;
-</code></pre><p>增加 controller-manager 参数</p>
-<pre><code># 在/etc/kubernetes/manifests/kube-controller-manager.yaml 添加如下参数
-  - command:
-    - kube-controller-manager
-    - --experimental-cluster-signing-duration=87600h0m0s
-    - --feature-gates=RotateKubeletServerCertificate=true
-    - ....
-</code></pre><p>创建 rbac 对象
-创建 rbac对象，允许节点轮换kubelet server证书：</p>
-<pre><code>cat &gt; ca-update.yaml &lt;&lt; EOF
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  annotations:
-    rbac.authorization.kubernetes.io/autoupdate: &quot;true&quot;
-  labels:
-    kubernetes.io/bootstrapping: rbac-defaults
-  name: system:certificates.k8s.io:certificatesigningrequests:selfnodeserver
-rules:
-- apiGroups:
-  - certificates.k8s.io
-  resources:
-  - certificatesigningrequests/selfnodeserver
-  verbs:
-  - create
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: kubeadm:node-autoapprove-certificate-server
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: system:certificates.k8s.io:certificatesigningrequests:selfnodeserver
-subjects:
-- apiGroup: rbac.authorization.k8s.io
-  kind: Group
-  name: system:nodes
-EOF
-
-kubectl create –f ca-update.yaml
-</code></pre><p>重新启动kubelet</p>
-<pre><code>systemctl daemon-reload
-systemctl enable kubelet
-systemctl restart kubelet
-</code></pre><center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="6-hpa的一个cpu-percent百分比问题">6. hpa的一个cpu-percent百分比问题</h3>
-<pre><code>kubectl autoscale deployment php-admintest-nginx-dev --cpu-percent=80 --min=1 --max=2 -n php-dev
-</code></pre><p>例如以上,我希望在平均cpu超过80%时,pod能自动调整为2个</p>
-<p>em&hellip;这没啥问题</p>
-<p>但我做简单ab压测发现, 我把cpu压到了100000% &hellip;</p>
-<p>我的deployment 配置中是这样限制cpu的</p>
-<pre><code>        resources:
-          requests:
-            cpu: &quot;1m&quot;
-          limits:
-            cpu: &quot;1000m&quot;
-</code></pre><p>显然我的pod可以使用1个核cpu, 那这个平均cpu是等于啥呢?</p>
-<p>cpu-percent = 1000m/resources.request.cpu =&gt; 1000m/1m =100000%</p>
-<p>-_-!!!</p>
-<p>稍微解释下,为啥我要设置request.cpu=1m:
-比如单机4核k8s,我启动了1个pod,limit是4cpu,那么我request.cpu其实默认也是1, 所以集群就已经预留了4cpu, 此时如果在启动pod, 在配置limit的时候就无法成功启动pod,因为核心不够了,都给那什么玩意了&hellip;(当然这样改动也的确会出现过度分配)</p>
-<blockquote>
-<p>因此建议 修改requests.cpu=500m,  &ndash;cpu-percent可设范围: 0~200% ,或者低一些 250m -&gt; 0~400%</p>
-</blockquote>
-<p>总结:
-request.cpu 必须设置, 这个是对比的对象</p>
-<p>另外:
-对于扩容而言，这个时间段为3分钟，缩容为5分钟(可以通过 &ndash;horizontal-pod-autoscaler-downscale-delay ， &ndash;horizontal-pod-autoscaler-upscale-delay 进行调整)。</p>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="7-k8s1162metrics-v035-deployment重启之后hpa就失效无法获取到数据">7 k8s1.16.2+metrics v0.3.5 deployment重启之后hpa就失效,无法获取到数据</h3>
-<pre><code>The HPA was unable to compute the replica count: unable to get metrics for resource cpu: no metrics returned from resource metrics API 
-</code></pre><center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="8-k8s机器进程数达到500多的时候-ssh连接到服务报错-shell-request-failed-on-channel-0">8 k8s机器进程数达到500多的时候, ssh连接到服务报错 shell request failed on channel 0</h3>
-<pre><code>原因：目标主机的系统进程数太小，导致不能连接
-
-解决：需要修改/etc/security/limits.d/20-nproc.conf文件中的值，把4096改大一点，如 65535
-
-#cat /etc/security/limits.d/20-nproc.conf
-*          soft    nproc     4096
-root       soft    nproc     unlimited
-
-重新ssh，即可。
-
-</code></pre><h3 id="centos8安装k8s118flannel-pod间不通">centos8安装k8s1.18+flannel pod间不通</h3>
-<p>在查看到<a href="https://zhangguanzhang.github.io/">馆长</a>的<a href="https://zhangguanzhang.github.io/2020/10/20/kylin-v10-k8s-overlay-error/">银河麒麟arm64系统上k8s集群跨节点不通的一次排查</a>问题, 发下我的flannel网络同样是 <code>lo</code> 也的确启用了 <code>NetworkManager</code>, 不过重启并未有效果</p>
-<blockquote>
-<p>配置如下:</p>
-</blockquote>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ ip route get <span class="k">$(</span>ip a s flannel.1 <span class="p">|</span>grep -w inet<span class="p">|</span>awk -F <span class="s1">&#39;inet|/&#39;</span> <span class="s1">&#39;{print $2}&#39;</span><span class="k">)</span>
-<span class="nb">local</span> 10.244.0.0 dev lo src 10.244.0.0 uid <span class="m">0</span>
-    cache &lt;local&gt;
-
-$ route -n
-Kernel IP routing table
-Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-0.0.0.0         10.23.0.1       0.0.0.0         UG    <span class="m">100</span>    <span class="m">0</span>        <span class="m">0</span> eth0
-10.5.27.0       0.0.0.0         255.255.255.0   U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> docker0
-10.23.0.0       0.0.0.0         255.255.0.0     U     <span class="m">100</span>    <span class="m">0</span>        <span class="m">0</span> eth0
-10.244.0.0      0.0.0.0         255.255.255.0   U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> cni0
-10.244.1.0      10.244.1.0      255.255.255.0   UG    <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> flannel.1
-192.168.212.64  0.0.0.0         255.255.255.192 U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> *
-
-</code></pre></div><p>于是我重启</p>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">$ systemctl restart NetworkManager
-
-$ docker restart <span class="k">$(</span>docker ps <span class="p">|</span>grep flanneld<span class="p">|</span>awk <span class="s1">&#39;{print $1}&#39;</span><span class="k">)</span>
-
-$ ip route get <span class="k">$(</span>ip a s flannel.1 <span class="p">|</span>grep -w inet<span class="p">|</span>awk -F <span class="s1">&#39;inet|/&#39;</span> <span class="s1">&#39;{print $2}&#39;</span><span class="k">)</span>
-broadcast 10.244.0.0 dev cni0 src 10.244.0.1 uid <span class="m">0</span>
-    cache &lt;local,brd&gt;
-</code></pre></div><p>但最终我的现象是, master重启后从<code>lo</code>变成了<code>cni0</code>, 但是另外一台node一直无效, 重启容器后又变成<code>lo</code>, 至此<code>pod</code>间网络依然不通</p>
-<p>按照文章<a href="https://zhuanlan.zhihu.com/p/112834020">Centos8.1部署kubernetes1.17 问题 使用iptables打通网络</a> 中描述查看了<code>iptables</code>, 果然<code>Chain FORWARD (policy DROP)</code>, 通过<code>iptables -P FORWARD ACCEPT</code>的确解决了问题, 但显然这并不安全.</p>
-<p>其他链接:</p>
-<ul>
-<li>docker在 1.13 版本之后，将系统iptables 中 FORWARD 链的默认策略设置为 DROP: <a href="https://github.com/moby/moby/issues/14041">https://github.com/moby/moby/issues/14041</a></li>
-<li>docker&amp;k8s填坑记 nodeport 无法访问: <a href="https://www.cnblogs.com/tylerzhou/p/10975062.html">https://www.cnblogs.com/tylerzhou/p/10975062.html</a></li>
-</ul>
-]]></content>
 		</item>
 		
 		<item>
