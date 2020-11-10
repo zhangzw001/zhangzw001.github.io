@@ -2832,6 +2832,19 @@ net stop sshd
 </blockquote>
 <div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">go env -w <span class="nv">GO111MODULE</span><span class="o">=</span>on
 go env -w <span class="nv">GOPROXY</span><span class="o">=</span>https://goproxy.cn,direct
+</code></pre></div><h3 id="19-bitcount的代码解析">19 bitCount的代码解析</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 每次 &amp; 操作都会消耗一个二进制的1
+</span><span class="c1">// 10110 &amp; 10101 = 10100   消耗了第四个的1
+</span><span class="c1">// 10100 &amp; 10011 = 10000   消耗了第三个的1
+</span><span class="c1">// 10000 &amp; 01111 = 0       消耗了第一个的1
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">getCount</span><span class="p">(</span><span class="nx">a</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span>  <span class="p">{</span>
+ <span class="nx">t</span> <span class="o">:=</span> <span class="mi">0</span>
+ <span class="k">for</span> <span class="nx">a</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+  <span class="nx">a</span> <span class="o">&amp;=</span> <span class="nx">a</span><span class="o">-</span><span class="mi">1</span>
+  <span class="nx">t</span><span class="o">++</span>
+ <span class="p">}</span>
+ <span class="k">return</span> <span class="nx">t</span>
+<span class="p">}</span>
 </code></pre></div>]]></content>
 		</item>
 		
@@ -11482,7 +11495,41 @@ root       soft    nproc     unlimited
 
 重新ssh，即可。
 
-</code></pre>]]></content>
+</code></pre><h3 id="centos8安装k8s118flannel-pod间不通">centos8安装k8s1.18+flannel pod间不通</h3>
+<p>在查看到<a href="https://zhangguanzhang.github.io/">馆长</a>的<a href="https://zhangguanzhang.github.io/2020/10/20/kylin-v10-k8s-overlay-error/">银河麒麟arm64系统上k8s集群跨节点不通的一次排查</a>问题, 发下我的flannel网络同样是 <code>lo</code> 也的确启用了 <code>NetworkManager</code>, 不过重启并未有效果</p>
+<blockquote>
+<p>配置如下:</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ ip route get <span class="k">$(</span>ip a s flannel.1 <span class="p">|</span>grep -w inet<span class="p">|</span>awk -F <span class="s1">&#39;inet|/&#39;</span> <span class="s1">&#39;{print $2}&#39;</span><span class="k">)</span>
+<span class="nb">local</span> 10.244.0.0 dev lo src 10.244.0.0 uid <span class="m">0</span>
+    cache &lt;local&gt;
+
+$ route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         10.23.0.1       0.0.0.0         UG    <span class="m">100</span>    <span class="m">0</span>        <span class="m">0</span> eth0
+10.5.27.0       0.0.0.0         255.255.255.0   U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> docker0
+10.23.0.0       0.0.0.0         255.255.0.0     U     <span class="m">100</span>    <span class="m">0</span>        <span class="m">0</span> eth0
+10.244.0.0      0.0.0.0         255.255.255.0   U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> cni0
+10.244.1.0      10.244.1.0      255.255.255.0   UG    <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> flannel.1
+192.168.212.64  0.0.0.0         255.255.255.192 U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> *
+
+</code></pre></div><p>于是我重启</p>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">$ systemctl restart NetworkManager
+
+$ docker restart <span class="k">$(</span>docker ps <span class="p">|</span>grep flanneld<span class="p">|</span>awk <span class="s1">&#39;{print $1}&#39;</span><span class="k">)</span>
+
+$ ip route get <span class="k">$(</span>ip a s flannel.1 <span class="p">|</span>grep -w inet<span class="p">|</span>awk -F <span class="s1">&#39;inet|/&#39;</span> <span class="s1">&#39;{print $2}&#39;</span><span class="k">)</span>
+broadcast 10.244.0.0 dev cni0 src 10.244.0.1 uid <span class="m">0</span>
+    cache &lt;local,brd&gt;
+</code></pre></div><p>但最终我的现象是, master重启后从<code>lo</code>变成了<code>cni0</code>, 但是另外一台node一直无效, 重启容器后又变成<code>lo</code>, 至此<code>pod</code>间网络依然不通</p>
+<p>按照文章<a href="https://zhuanlan.zhihu.com/p/112834020">Centos8.1部署kubernetes1.17 问题 使用iptables打通网络</a> 中描述查看了<code>iptables</code>, 果然<code>Chain FORWARD (policy DROP)</code>, 通过<code>iptables -P FORWARD ACCEPT</code>的确解决了问题, 但显然这并不安全.</p>
+<p>其他链接:</p>
+<ul>
+<li>docker在 1.13 版本之后，将系统iptables 中 FORWARD 链的默认策略设置为 DROP: <a href="https://github.com/moby/moby/issues/14041">https://github.com/moby/moby/issues/14041</a></li>
+<li>docker&amp;k8s填坑记 nodeport 无法访问: <a href="https://www.cnblogs.com/tylerzhou/p/10975062.html">https://www.cnblogs.com/tylerzhou/p/10975062.html</a></li>
+</ul>
+]]></content>
 		</item>
 		
 		<item>
