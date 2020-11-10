@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>php on zhangzw</title>
-    <link>https://blog.k1s.club/tags/php/</link>
+    <link>https://k1s.club/tags/php/</link>
     <description>Recent content in php on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Mon, 02 Dec 2019 17:45:01 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/php/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 02 Dec 2019 17:45:01 +0000</lastBuildDate><atom:link href="https://k1s.club/tags/php/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>php错误502问题总结</title>
-      <link>https://blog.k1s.club/posts/32-php%E9%94%99%E8%AF%AF502%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/</link>
+      <link>https://k1s.club/posts/32-php%E9%94%99%E8%AF%AF502%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/</link>
       <pubDate>Mon, 02 Dec 2019 17:45:01 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/32-php%E9%94%99%E8%AF%AF502%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/</guid>
+      <guid>https://k1s.club/posts/32-php%E9%94%99%E8%AF%AF502%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/</guid>
       <description>&lt;p&gt;近期一次 502报错, 但是没有达到timeout的值,特此记录&lt;/p&gt;</description>
     </item>
     

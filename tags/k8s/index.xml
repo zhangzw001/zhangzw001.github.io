@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>k8s on zhangzw</title>
-    <link>https://blog.k1s.club/tags/k8s/</link>
+    <link>https://k1s.club/tags/k8s/</link>
     <description>Recent content in k8s on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 10 Nov 2020 14:06:41 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/k8s/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 10 Nov 2020 14:06:41 +0000</lastBuildDate><atom:link href="https://k1s.club/tags/k8s/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>k8s遇到的一些问题统计总结</title>
-      <link>https://blog.k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
+      <link>https://k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
       <pubDate>Tue, 10 Nov 2020 14:06:41 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
+      <guid>https://k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
       <description>不定时更新,文章可能比较散乱,&amp;gt;_&amp;lt;
   1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
   deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
@@ -22,19 +22,19 @@
     
     <item>
       <title>istio环境下配置nginx&#43;php</title>
-      <link>https://blog.k1s.club/posts/52-istio%E6%B5%8B%E8%AF%95nginx-php%E9%A1%B9%E7%9B%AE/</link>
+      <link>https://k1s.club/posts/52-istio%E6%B5%8B%E8%AF%95nginx-php%E9%A1%B9%E7%9B%AE/</link>
       <pubDate>Tue, 04 Aug 2020 16:22:10 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/52-istio%E6%B5%8B%E8%AF%95nginx-php%E9%A1%B9%E7%9B%AE/</guid>
+      <guid>https://k1s.club/posts/52-istio%E6%B5%8B%E8%AF%95nginx-php%E9%A1%B9%E7%9B%AE/</guid>
       <description>&lt;p&gt;将nginx+php的环境结合istio的智能路由功能做一个简单实践&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>k8s搭建radius</title>
-      <link>https://blog.k1s.club/posts/51-k8s%E6%90%AD%E5%BB%BAradius/</link>
+      <link>https://k1s.club/posts/51-k8s%E6%90%AD%E5%BB%BAradius/</link>
       <pubDate>Mon, 27 Jul 2020 10:19:25 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/51-k8s%E6%90%AD%E5%BB%BAradius/</guid>
+      <guid>https://k1s.club/posts/51-k8s%E6%90%AD%E5%BB%BAradius/</guid>
       <description>搭建lnmp+freeradius的账号认证服务
   一 记录 docker: 17.03.2-ce k8s: 1.15.11 php: 7.0.13 mysql: 5.6 freeraidus: 3.0.21 daloradius: 1.1-2 / 08 Aug 2019  配置修改简单说明:
  1. 数据库创建说明 create database radius; grant all on radius.* to radius@&#39;%&#39; identified by &#39;xxx&#39;; flush privileges; # 导入表结构 mysql -hk8s-db-t.xxx.com -P3326 -uradius -p &amp;lt; mods-config/sql/main/mysql/schema.sql mysql -hk8s-db-t.xxx.com -P3326 -uradius -p &amp;lt; daloradius-php/contrib/db/mysql-daloradius.sql mysql -hk8s-db-t.xxx.com -P3326 -uradius -p &amp;lt; daloradius-php/contrib/db/fr2-mysql-daloradius-and-freeradius.sql 2. 修改freeRADIUS配置 vim /etc/raddb/radiusd.conf # 这里我是配合nginx,php统一路径 logdir = /nginx_logs 3.</description>
@@ -42,29 +42,29 @@
     
     <item>
       <title>k8s升级(1.10-&gt;1.15)</title>
-      <link>https://blog.k1s.club/posts/48-k8s%E5%8D%87%E7%BA%A7-1-10-1-15/</link>
+      <link>https://k1s.club/posts/48-k8s%E5%8D%87%E7%BA%A7-1-10-1-15/</link>
       <pubDate>Mon, 18 May 2020 17:43:27 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/48-k8s%E5%8D%87%E7%BA%A7-1-10-1-15/</guid>
+      <guid>https://k1s.club/posts/48-k8s%E5%8D%87%E7%BA%A7-1-10-1-15/</guid>
       <description>&lt;p&gt;k8s升级一般不能跨版本升级, 所以这里间断介绍升级过程, 每次升级一个大版本&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>k8s安装promethues&#43;alertmanager&#43;grafana</title>
-      <link>https://blog.k1s.club/posts/47-k8s%E5%AE%89%E8%A3%85promethues-alertmanager-grafana/</link>
+      <link>https://k1s.club/posts/47-k8s%E5%AE%89%E8%A3%85promethues-alertmanager-grafana/</link>
       <pubDate>Thu, 14 May 2020 18:34:47 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/47-k8s%E5%AE%89%E8%A3%85promethues-alertmanager-grafana/</guid>
+      <guid>https://k1s.club/posts/47-k8s%E5%AE%89%E8%A3%85promethues-alertmanager-grafana/</guid>
       <description>本文主要是针对prometheus 简单部署 , 考虑到测试资源有限,为更精简自定义按照监控,减少多余资源占用, 也同时更了解prometheus的更多细节, 这里没有使用prometheus-operator
  1 K8s上部署原生的prometheus 2 prometheus-operator 方式部署 3 docker-compose快速搭建 Prometheus+Grafana监控系统 4 一套prometheus监控多个k8s集群,详细讲解配置 5 使用prometheus监控traefik、redis、k8s集群各节点、各节点kubelet 6 grafana 监控模板下载     搭建prometheus 创建ns tee ns.yml &amp;lt;&amp;lt;- EOF apiVersion: v1 kind: Namespace metadata: name: monitoring EOF kubectl apply -f ns.yml prometheus-clusterRole.yml tee prometheus-clusterRole.yml &amp;lt;&amp;lt;- EOF apiVersion: rbac.authorization.k8s.io/v1 kind: ClusterRole metadata: name: prometheus-k8s rules: - apiGroups: - &amp;quot;&amp;quot; resources: - nodes/metrics verbs: - get - nonResourceURLs: - /metrics verbs: - get EOF prometheus-clusterRoleBinding.</description>
     </item>
     
     <item>
       <title>gitlab-ci与k8s结合</title>
-      <link>https://blog.k1s.club/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/</link>
+      <link>https://k1s.club/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/</link>
       <pubDate>Thu, 23 Apr 2020 16:20:33 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/</guid>
+      <guid>https://k1s.club/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/</guid>
       <description>本文介绍如何通过gitlab-ci整合k8s实现流水线部署
   https://www.cnblogs.com/Sinte-Beuve/p/11739196.html https://www.qikqiak.com/post/gitlab-ci-k8s-cluster-feature/   环境版本统计 1 gitlab/gitlab-runner 0.15.0 2 helm 2.16 3 k8s 1.16.4 4 gitlab 11.5 5 CentOS Linux release 7.7 /kernel 5.2  小节
  1. gitlab 通过admin管理页面的runner配置, 安装gitlab-runner, 安装方式可以是二进制, docker 或k8s (这里是k8s) 2. gitlab 项目目录的 Operations -&amp;gt; kubernetes -&amp;gt; Add Kubernetes Cluster -&amp;gt; Add existing cluster 是结合k8s, 每个项目都需要设置一个k8s集群,k8s集群需要配置rbac权限 3. ci 在提交到私有harbor上是需要验证账号密码, 私有仓库拉取也需要验证  安装方法一   k8s yaml直接部署 gitlab-ci-token-secret.yaml  具体token值 请查看 gitlab的admin页面-&amp;gt; Overview -&amp;gt; Runners 查看, 然后base64加密</description>
@@ -72,10 +72,10 @@
     
     <item>
       <title>k8s的yaml配置名词解释(模板)</title>
-      <link>https://blog.k1s.club/posts/43-k8s%E7%9A%84yaml%E9%85%8D%E7%BD%AE%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A-%E6%A8%A1%E6%9D%BF/</link>
+      <link>https://k1s.club/posts/43-k8s%E7%9A%84yaml%E9%85%8D%E7%BD%AE%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A-%E6%A8%A1%E6%9D%BF/</link>
       <pubDate>Tue, 31 Mar 2020 17:21:23 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/43-k8s%E7%9A%84yaml%E9%85%8D%E7%BD%AE%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A-%E6%A8%A1%E6%9D%BF/</guid>
+      <guid>https://k1s.club/posts/43-k8s%E7%9A%84yaml%E9%85%8D%E7%BD%AE%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A-%E6%A8%A1%E6%9D%BF/</guid>
       <description>针对Deployment的yaml配置解释说明
    原文: K8s Deployment YAML 名词解释
  Deployment API 版本对照表 Kubernetes 版本 Deployment 版本 v1.5-v1.15 extensions/v1beta1 v1.7-v1.15 apps/v1beta1 v1.8-v1.15 apps/v1beta2 v1.9+ apps/v1 Deployment yaml 名词解释： apiVersion:apps/v1 # 指定api版本，此值必须在kubectl api-versions中 kind:Deployment # 指定创建资源的角色/类型 metadata:# 资源的元数据/属性name:demo # 资源的名字，在同一个namespace中必须唯一namespace:default# 部署在哪个namespace中labels:# 设定资源的标签app:demoversion:stablespec:# 资源规范字段replicas:1# 声明副本数目revisionHistoryLimit:3# 保留历史版本selector:# 选择器matchLabels:# 匹配标签app:demoversion:stablestrategy:# 策略rollingUpdate:# 滚动更新maxSurge:30%# 最大额外可以存在的副本数，可以为百分比，也可以为整数maxUnavailable:30%# 示在更新过程中能够进入不可用状态的 Pod 的最大值，可以为百分比，也可以为整数type:RollingUpdate# 滚动更新策略template:# 模版metadata:# 资源的元数据/属性annotations:# 自定义注解列表sidecar.istio.io/inject:&amp;#34;false&amp;#34;# 自定义注解名字labels:# 设定资源的标签app:demoversion:stablespec:# 资源规范字段containers:- name:demo# 容器的名字 image:demo:v1# 容器使用的镜像地址 imagePullPolicy:IfNotPresent# 每次Pod启动拉取镜像策略，三个选择 Always、Never、IfNotPresent# Always，每次都检查；Never，每次都不检查（不管本地是否有）；IfNotPresent，如果本地有就不检查，如果没有就拉取resources:# 资源管理limits:# 最大使用cpu:300m# CPU，1核心 = 1000mmemory:500Mi# 内存，1G = 1000Mirequests:# 容器运行时，最低资源需求，也就是说最少需要多少资源容器才能正常运行cpu:100mmemory:100MilivenessProbe:# pod 内部健康检查的设置httpGet:# 通过httpget检查健康，返回200-399之间，则认为容器正常path:/healthCheck# URI地址port:8080# 端口scheme:HTTP# 协议# host: 127.</description>
@@ -83,10 +83,10 @@
     
     <item>
       <title>kubeadm安装高可用k8s集群</title>
-      <link>https://blog.k1s.club/posts/42-kubeadm%E5%AE%89%E8%A3%85%E9%AB%98%E5%8F%AF%E7%94%A8k8s%E9%9B%86%E7%BE%A4/</link>
+      <link>https://k1s.club/posts/42-kubeadm%E5%AE%89%E8%A3%85%E9%AB%98%E5%8F%AF%E7%94%A8k8s%E9%9B%86%E7%BE%A4/</link>
       <pubDate>Tue, 24 Mar 2020 11:10:41 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/42-kubeadm%E5%AE%89%E8%A3%85%E9%AB%98%E5%8F%AF%E7%94%A8k8s%E9%9B%86%E7%BE%A4/</guid>
+      <guid>https://k1s.club/posts/42-kubeadm%E5%AE%89%E8%A3%85%E9%AB%98%E5%8F%AF%E7%94%A8k8s%E9%9B%86%E7%BE%A4/</guid>
       <description>简单记录kubeadm方式安装k8s1.16.4高可用集群,haproxy通过keepalived绑定的vip来负载均衡到三台master, 其中keepalived则反之单机故障,haproxy则让三台master可以同时提供服务.
  Centos7.6部署k8s v1.16.4高可用集群(主备模式) 使用kubeadm搭建高可用k8s v1.16.3集群(keepalived+haproxy)
    一、 安装准备  1.1 主机名  192.168.53.106 master01.k8s.io 192.168.53.107 master02.k8s.io 192.168.53.108 master03.k8s.io 192.168.53.137 master.k8s.io  1.2 同步时间, 设置时区  * * * * * /usr/sbin/ntpdate time.nist.gov timedatectl set-timezone Asia/Shanghai 或者 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime  1.3 关闭SElinux  setenforce 0 sed -i &amp;quot;s/^SELINUX=enforcing/SELINUX=disabled/g&amp;quot; /etc/sysconfig/selinux sed -i &amp;quot;s/^SELINUX=enforcing/SELINUX=disabled/g&amp;quot; /etc/selinux/config sed -i &amp;quot;s/^SELINUX=permissive/SELINUX=disabled/g&amp;quot; /etc/sysconfig/selinux sed -i &amp;quot;s/^SELINUX=permissive/SELINUX=disabled/g&amp;quot; /etc/selinux/config  1.4 关闭swap(否则kubeadm init或join会报错)  &amp;gt; swapoff -a &amp;amp;&amp;amp; sysctl -w vm.</description>
@@ -94,10 +94,10 @@
     
     <item>
       <title>k8s一些命令总结</title>
-      <link>https://blog.k1s.club/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</link>
+      <link>https://k1s.club/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</link>
       <pubDate>Thu, 05 Dec 2019 09:25:59 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</guid>
+      <guid>https://k1s.club/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</guid>
       <description>记录一些kubectl命令
 kubectl命令表
   常用命令 # 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111 kubectl proxy --address=&#39;192.168.1.111&#39; -p 10000 --accept-hosts=&#39;^172.*$&#39; # 查看api类型 kubectl api-versions # 让master也运行pod（默认master不运行pod,单机会用到） kubectl taint nodes --all node-role.kubernetes.io/master- # patch补丁, 强制更新 kubectl patch -f deployment.yaml -p &amp;quot;{\&amp;quot;spec\&amp;quot;:{\&amp;quot;template\&amp;quot;:{\&amp;quot;metadata\&amp;quot;:{\&amp;quot;annotations\&amp;quot;:{\&amp;quot;ci-last-updated\&amp;quot;:\&amp;quot;$(date +&#39;%s&#39;)\&amp;quot;}}}}}&amp;quot; # 端口转发 kubectl -n default port-forward service/prometheus-server 30080:80   scale 使用 # 通过将rc的副本数重新设置为0后，再将副本数设置为2，达到重启nginx的效果。 kubectl scale deployment bq-front1 --replicas=0 -n web kubectl scale deployment bq-front1 --replicas=2 -n web   metrics 相关 # 查看node 资源 kubectl top nodes # 查看pods 资源 kubectl top pods -n php-dev # 获取metrics接口所有数据 kubectl get --raw /metrics # patch强制更新(慎用) kubectl patch -f deployment.</description>
@@ -105,10 +105,10 @@ kubectl命令表
     
     <item>
       <title>k3s1.16部署nginx&#43;php5.2.17</title>
-      <link>https://blog.k1s.club/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</link>
+      <link>https://k1s.club/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</link>
       <pubDate>Tue, 03 Dec 2019 11:46:42 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</guid>
+      <guid>https://k1s.club/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</guid>
       <description>&lt;p&gt;老项目是用php5.2.17的,自己编译打包镜像简单部署&lt;/p&gt;</description>
     </item>
     

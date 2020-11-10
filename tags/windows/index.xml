@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>windows on zhangzw</title>
-    <link>https://blog.k1s.club/tags/windows/</link>
+    <link>https://k1s.club/tags/windows/</link>
     <description>Recent content in windows on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 12 Jun 2020 18:06:26 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/windows/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 12 Jun 2020 18:06:26 +0000</lastBuildDate><atom:link href="https://k1s.club/tags/windows/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>记一次windows安装OpenSSH问题</title>
-      <link>https://blog.k1s.club/posts/50-%E8%AE%B0%E4%B8%80%E6%AC%A1windows%E5%AE%89%E8%A3%85openssh%E9%97%AE%E9%A2%98/</link>
+      <link>https://k1s.club/posts/50-%E8%AE%B0%E4%B8%80%E6%AC%A1windows%E5%AE%89%E8%A3%85openssh%E9%97%AE%E9%A2%98/</link>
       <pubDate>Fri, 12 Jun 2020 18:06:26 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/50-%E8%AE%B0%E4%B8%80%E6%AC%A1windows%E5%AE%89%E8%A3%85openssh%E9%97%AE%E9%A2%98/</guid>
+      <guid>https://k1s.club/posts/50-%E8%AE%B0%E4%B8%80%E6%AC%A1windows%E5%AE%89%E8%A3%85openssh%E9%97%AE%E9%A2%98/</guid>
       <description>&lt;p&gt;windows一次安装openssh server问题&lt;/p&gt;</description>
     </item>
     

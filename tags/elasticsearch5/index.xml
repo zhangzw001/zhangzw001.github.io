@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>elasticsearch5 on zhangzw</title>
-    <link>https://blog.k1s.club/tags/elasticsearch5/</link>
+    <link>https://k1s.club/tags/elasticsearch5/</link>
     <description>Recent content in elasticsearch5 on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Thu, 19 Mar 2020 10:26:49 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/elasticsearch5/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 19 Mar 2020 10:26:49 +0000</lastBuildDate><atom:link href="https://k1s.club/tags/elasticsearch5/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>记一次es集群内存溢出的问题</title>
-      <link>https://blog.k1s.club/posts/41-%E8%AE%B0%E4%B8%80%E6%AC%A1es%E9%9B%86%E7%BE%A4%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E7%9A%84%E9%97%AE%E9%A2%98/</link>
+      <link>https://k1s.club/posts/41-%E8%AE%B0%E4%B8%80%E6%AC%A1es%E9%9B%86%E7%BE%A4%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E7%9A%84%E9%97%AE%E9%A2%98/</link>
       <pubDate>Thu, 19 Mar 2020 10:26:49 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/41-%E8%AE%B0%E4%B8%80%E6%AC%A1es%E9%9B%86%E7%BE%A4%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E7%9A%84%E9%97%AE%E9%A2%98/</guid>
+      <guid>https://k1s.club/posts/41-%E8%AE%B0%E4%B8%80%E6%AC%A1es%E9%9B%86%E7%BE%A4%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E7%9A%84%E9%97%AE%E9%A2%98/</guid>
       <description>es机器报警磁盘 / 空间不足,查看是生成了 .hprof 文件, 内存溢出的典型特征
   以上问题主要是两点
  由于elasticsearch用户家目录是/home/elasticsearch, 所以内存溢出时 写的.hprof文件会生成到家目录, 并且大小有6G+, 这会导致/目录磁盘空间不足报警, 是否可以设置该日志目录? 或者取巧设置elasticsearch家目录到/data挂载盘上? 内存溢出的问题, 是否可以优化并解决  问题1 我这里并未找到设置.hprof文件的生成目录路径设置, 所以我就将根目录做了一个链接 mv /home/elasticsearch /data/ ln -s /data/elasticsearch /home/elasticsearch 或者修改elasticsearch用户的家目录(不过需要用户没有在login中) lsof |grep elasticsearch usermod -d /data/elasticsearch elasticsearch 问题2 内存溢出的问题,我们设置 indices.fielddata.cache.size: 20%  elasticsearch2.x 限制内存使用
@@ -24,19 +24,19 @@
     
     <item>
       <title>k8s一条命令部署es5.2.0集群</title>
-      <link>https://blog.k1s.club/posts/27-k8s%E4%B8%80%E6%9D%A1%E5%91%BD%E4%BB%A4%E9%83%A8%E7%BD%B2es5-2-0%E9%9B%86%E7%BE%A4/</link>
+      <link>https://k1s.club/posts/27-k8s%E4%B8%80%E6%9D%A1%E5%91%BD%E4%BB%A4%E9%83%A8%E7%BD%B2es5-2-0%E9%9B%86%E7%BE%A4/</link>
       <pubDate>Thu, 21 Nov 2019 18:13:35 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/27-k8s%E4%B8%80%E6%9D%A1%E5%91%BD%E4%BB%A4%E9%83%A8%E7%BD%B2es5-2-0%E9%9B%86%E7%BE%A4/</guid>
+      <guid>https://k1s.club/posts/27-k8s%E4%B8%80%E6%9D%A1%E5%91%BD%E4%BB%A4%E9%83%A8%E7%BD%B2es5-2-0%E9%9B%86%E7%BE%A4/</guid>
       <description>&lt;p&gt;由于老项目是基于es5.2.0, 所以准备在k8s基于nfs存储搭建一套,下面简单介绍&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>es5集群磁盘扩容</title>
-      <link>https://blog.k1s.club/posts/22-es%E9%9B%86%E7%BE%A4%E7%A3%81%E7%9B%98%E6%89%A9%E5%AE%B9/</link>
+      <link>https://k1s.club/posts/22-es%E9%9B%86%E7%BE%A4%E7%A3%81%E7%9B%98%E6%89%A9%E5%AE%B9/</link>
       <pubDate>Mon, 28 Oct 2019 14:59:52 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/22-es%E9%9B%86%E7%BE%A4%E7%A3%81%E7%9B%98%E6%89%A9%E5%AE%B9/</guid>
+      <guid>https://k1s.club/posts/22-es%E9%9B%86%E7%BE%A4%E7%A3%81%E7%9B%98%E6%89%A9%E5%AE%B9/</guid>
       <description>es集群磁盘不足,对磁盘扩容遇到一些的问题
   重启集群前，先设置集群停止分片移动： curl -XPUT http://localhost:9200/_cluster/settings -d &#39;{ &amp;quot;transient&amp;quot; : { &amp;quot;cluster.routing.allocation.enable&amp;quot; : &amp;quot;none&amp;quot; } }&#39; 对磁盘进行扩容,每次操作一个节点 # 直接扩容磁盘到2T //针对ext4文件格式的操作系统（如CentOS6）：// umount /dev/vdb e2fsck -f /dev/vdb resize2fs /dev/vdb mount /dev/vdb /data # 或者新增 2T云盘/dev/vdc umount /data/ mkdir /data2 mount /dev/vdb /data2 mkfs.ext4 /dev/vdc mount /dev/vdc /data cp -ra /data2/* /data/ 重启之后，恢复分片自动分配： curl -XPUT http://localhost:9200/_cluster/settings -d &#39;{ &amp;quot;transient&amp;quot; : { &amp;quot;cluster.routing.allocation.enable&amp;quot; : &amp;quot;all&amp;quot; } }&#39;    如果需要下线其中的节点, 先将分片都转义到其他节点 # 执行以下命令会自动将10.</description>
     </item>

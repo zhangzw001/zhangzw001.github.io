@@ -23,7 +23,7 @@
    原文: K8s Deployment YAML 名词解释
  Deployment API 版本对照表 Kubernetes 版本 Deployment 版本 v1.5-v1.15 extensions/v1beta1 v1.7-v1.15 apps/v1beta1 v1.8-v1.15 apps/v1beta2 v1.9&#43; apps/v1 Deployment yaml 名词解释： apiVersion:apps/v1 # 指定api版本，此值必须在kubectl api-versions中 kind:Deployment # 指定创建资源的角色/类型 metadata:# 资源的元数据/属性name:demo # 资源的名字，在同一个namespace中必须唯一namespace:default# 部署在哪个namespace中labels:# 设定资源的标签app:demoversion:stablespec:# 资源规范字段replicas:1# 声明副本数目revisionHistoryLimit:3# 保留历史版本selector:# 选择器matchLabels:# 匹配标签app:demoversion:stablestrategy:# 策略rollingUpdate:# 滚动更新maxSurge:30%# 最大额外可以存在的副本数，可以为百分比，也可以为整数maxUnavailable:30%# 示在更新过程中能够进入不可用状态的 Pod 的最大值，可以为百分比，也可以为整数type:RollingUpdate# 滚动更新策略template:# 模版metadata:# 资源的元数据/属性annotations:# 自定义注解列表sidecar.istio.io/inject:&#34;false&#34;# 自定义注解名字labels:# 设定资源的标签app:demoversion:stablespec:# 资源规范字段containers:- name:demo# 容器的名字 image:demo:v1# 容器使用的镜像地址 imagePullPolicy:IfNotPresent# 每次Pod启动拉取镜像策略，三个选择 Always、Never、IfNotPresent# Always，每次都检查；Never，每次都不检查（不管本地是否有）；IfNotPresent，如果本地有就不检查，如果没有就拉取resources:# 资源管理limits:# 最大使用cpu:300m# CPU，1核心 = 1000mmemory:500Mi# 内存，1G = 1000Mirequests:# 容器运行时，最低资源需求，也就是说最少需要多少资源容器才能正常运行cpu:100mmemory:100MilivenessProbe:# pod 内部健康检查的设置httpGet:# 通过httpget检查健康，返回200-399之间，则认为容器正常path:/healthCheck# URI地址port:8080# 端口scheme:HTTP# 协议# host: 127." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://blog.k1s.club/posts/43-k8s%E7%9A%84yaml%E9%85%8D%E7%BD%AE%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A-%E6%A8%A1%E6%9D%BF/" />
+<meta property="og:url" content="https://k1s.club/posts/43-k8s%E7%9A%84yaml%E9%85%8D%E7%BD%AE%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A-%E6%A8%A1%E6%9D%BF/" />
 <meta property="article:published_time" content="2020-03-31T17:21:23+00:00" />
 <meta property="article:modified_time" content="2020-03-31T17:21:23+00:00" />
 <meta name="twitter:card" content="summary"/>
@@ -40,7 +40,7 @@
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>k8s的yaml配置名词解释(模板)</title>
-	<link rel="stylesheet" href="https://blog.k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	<link rel="stylesheet" href="https://k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
 	
 </head>
 
@@ -50,11 +50,11 @@
 		<div class="hdr-wrapper section-inner">
 			<div class="hdr-left">
 				<div class="site-branding">
-					<a href="https://blog.k1s.club">zhangzw</a>
+					<a href="https://k1s.club">zhangzw</a>
 				</div>
 				<nav class="site-nav hide-in-mobile">
-					<a href="https://blog.k1s.club/mysql45%E8%AE%B2%E4%B8%81%E5%A5%87/">Mysql45讲丁奇</a>
-					<a href="https://blog.k1s.club/posts/">文章</a>
+					<a href="https://k1s.club/mysql45%E8%AE%B2%E4%B8%81%E5%A5%87/">Mysql45讲丁奇</a>
+					<a href="https://k1s.club/posts/">文章</a>
 				</nav>
 			</div>
 			<div class="hdr-right hdr-icons">
@@ -64,9 +64,9 @@
 	</header>
 	<div id="mobile-menu" class="animated fast">
 		<ul>
-			<li><a href="https://blog.k1s.club/posts/">文章</a></li>
-			<li><a href="https://blog.k1s.club/tags/">标签</a></li>
-			<li><a href="https://blog.k1s.club/about/">关于</a></li>
+			<li><a href="https://k1s.club/posts/">文章</a></li>
+			<li><a href="https://k1s.club/tags/">标签</a></li>
+			<li><a href="https://k1s.club/about/">关于</a></li>
 		</ul>
 	</div>
 
@@ -203,7 +203,7 @@ v1.9+ apps/v1
 			<hr class="post-end">
 			<footer class="post-info">
 				<p>
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/k8s">k8s</a></span>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/k8s">k8s</a></span>
 				</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>144 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-04-01 01:21 &#43;0800</p>
@@ -224,10 +224,10 @@ v1.9+ apps/v1
 </nav>
 		</aside>
 		<div class="post-nav thin">
-			<a class="next-post" href="https://blog.k1s.club/posts/44-k8s%E9%83%A8%E7%BD%B2fluentd-kafka-logstash-es/">
+			<a class="next-post" href="https://k1s.club/posts/44-k8s%E9%83%A8%E7%BD%B2fluentd-kafka-logstash-es/">
 				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>k8s部署fluentd&#43;kafka&#43;logstash&#43;es</span>
 			</a>
-			<a class="prev-post" href="https://blog.k1s.club/posts/42-kubeadm%E5%AE%89%E8%A3%85%E9%AB%98%E5%8F%AF%E7%94%A8k8s%E9%9B%86%E7%BE%A4/">
+			<a class="prev-post" href="https://k1s.club/posts/42-kubeadm%E5%AE%89%E8%A3%85%E9%AB%98%E5%8F%AF%E7%94%A8k8s%E9%9B%86%E7%BE%A4/">
 				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>kubeadm安装高可用k8s集群</span>
 			</a>
 		</div>
@@ -244,14 +244,14 @@ v1.9+ apps/v1
 	</main>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2019 - 2020 <a href="https://blog.k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>&copy; 2019 - 2020 <a href="https://k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
 		<p>
-			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://blog.k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>
 	</footer>
 
 
-	<script src="https://blog.k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+	<script src="https://k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
 <script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {

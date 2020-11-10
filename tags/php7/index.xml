@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>php7 on zhangzw</title>
-    <link>https://blog.k1s.club/tags/php7/</link>
+    <link>https://k1s.club/tags/php7/</link>
     <description>Recent content in php7 on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 27 Sep 2019 14:39:07 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/php7/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 27 Sep 2019 14:39:07 +0000</lastBuildDate><atom:link href="https://k1s.club/tags/php7/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>centos6安装nginx1.16&#43;php7.2</title>
-      <link>https://blog.k1s.club/posts/10-centos6%E5%AE%89%E8%A3%85nginx1-16-php7-2/</link>
+      <link>https://k1s.club/posts/10-centos6%E5%AE%89%E8%A3%85nginx1-16-php7-2/</link>
       <pubDate>Fri, 27 Sep 2019 14:39:07 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/10-centos6%E5%AE%89%E8%A3%85nginx1-16-php7-2/</guid>
+      <guid>https://k1s.club/posts/10-centos6%E5%AE%89%E8%A3%85nginx1-16-php7-2/</guid>
       <description>记录简单的安装nginx和php的配置,仅供参考
 先准备环境 # 更新源 mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-6.repo yum clean all yum makecache yum install -y epel-release # 安装一些依赖包 yum -y install gcc make cmake ncurses-devel libxml2-devel libtool-ltdl-devel gcc-c++ autoconf automake bison zlib-devel openssl-devel pcre-devel libxml2 libxml2-devel libcurl libcurl-devel autoconf automake libtool-ltdl libtool-ltdl-devel libjpeg libjpeg-turbo-devel libmcrypt-devel libpng-devel centos6编译安装nginx #首先官网下载1.16 cd /usr/local/src/ wget http://nginx.org/download/nginx-1.16.0.tar.gz tar -xvf nginx-1.16.0.tar.gz # 编译简单的模块 ./configure --prefix=/usr/local/nginx/ --with-http_ssl_module --with-http_stub_status_module --with-http_stub_status_module make -j4 make install # 通过启动脚本启动 chmod +x /etc/init.</description>
     </item>

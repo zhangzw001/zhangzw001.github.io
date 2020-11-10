@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>mac on zhangzw</title>
-    <link>https://blog.k1s.club/tags/mac/</link>
+    <link>https://k1s.club/tags/mac/</link>
     <description>Recent content in mac on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 10 Mar 2020 17:39:36 +0000</lastBuildDate><atom:link href="https://blog.k1s.club/tags/mac/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 10 Mar 2020 17:39:36 +0000</lastBuildDate><atom:link href="https://k1s.club/tags/mac/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>mac一些常用命令</title>
-      <link>https://blog.k1s.club/posts/37-mac%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</link>
+      <link>https://k1s.club/posts/37-mac%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</link>
       <pubDate>Tue, 10 Mar 2020 17:39:36 +0000</pubDate>
       
-      <guid>https://blog.k1s.club/posts/37-mac%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</guid>
+      <guid>https://k1s.club/posts/37-mac%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</guid>
       <description>记录一些常用的mac工具和方法
  1. Item2     1.1 同时按住 option(alt) 键，可以以列选中，类似于 sublime3中 按住 alt的列选中 。 Command + option(alt) 
   1.2 剪贴板历史记录 Command + Shift + h

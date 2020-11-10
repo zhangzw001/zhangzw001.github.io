@@ -1,20 +1,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 	<channel>
 		<title>Posts on zhangzw</title>
-		<link>https://blog.k1s.club/posts/</link>
+		<link>https://k1s.club/posts/</link>
 		<description>Recent content in Posts on zhangzw</description>
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
 		<lastBuildDate>Tue, 10 Nov 2020 14:06:41 +0000</lastBuildDate>
-		<atom:link href="https://blog.k1s.club/posts/index.xml" rel="self" type="application/rss+xml" />
+		<atom:link href="https://k1s.club/posts/index.xml" rel="self" type="application/rss+xml" />
 		
 		<item>
 			<title>k8s遇到的一些问题统计总结</title>
-			<link>https://blog.k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
+			<link>https://k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
 			<pubDate>Tue, 10 Nov 2020 14:06:41 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
+			<guid>https://k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
 			<description>不定时更新,文章可能比较散乱,&amp;gt;_&amp;lt;
   1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
   deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
@@ -219,10 +219,10 @@ broadcast 10.244.0.0 dev cni0 src 10.244.0.1 uid <span class="m">0</span>
 		
 		<item>
 			<title>Kubectl命令简单熟悉</title>
-			<link>https://blog.k1s.club/posts/61-kubectl%E5%91%BD%E4%BB%A4%E7%AE%80%E5%8D%95%E7%86%9F%E6%82%89/</link>
+			<link>https://k1s.club/posts/61-kubectl%E5%91%BD%E4%BB%A4%E7%AE%80%E5%8D%95%E7%86%9F%E6%82%89/</link>
 			<pubDate>Thu, 29 Oct 2020 11:15:58 +0800</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/61-kubectl%E5%91%BD%E4%BB%A4%E7%AE%80%E5%8D%95%E7%86%9F%E6%82%89/</guid>
+			<guid>https://k1s.club/posts/61-kubectl%E5%91%BD%E4%BB%A4%E7%AE%80%E5%8D%95%E7%86%9F%E6%82%89/</guid>
 			<description>kubectl命令熟悉 # 创建namespace kubectl create ns test # 查看namespace kubectl get ns # 命令创建deployment kubectl create deployment my-nginx --image=nginx --replicas=1 -n test # 命令删除deployment kubectl delete deployments.apps my-nginx -n test # 容器执行命令 kubectl exec -ti deployments.apps/nginx -n test -- nginx -v nginx version: nginx/1.16.0 # 通过yaml创建deployment kubectl apply -f nginx.yaml --record # 通过新增或修改注释方式更新deployment kubectl patch -f nginx.yaml -p &amp;#34;{\&amp;#34;spec\&amp;#34;:{\&amp;#34;template\&amp;#34;:{\&amp;#34;metadata\&amp;#34;:{\&amp;#34;annotations\&amp;#34;:{\&amp;#34;test-last-updated\&amp;#34;:\&amp;#34;$(date +&amp;#39;%F %T&amp;#39;)\&amp;#34;}}}}}&amp;#34; # 修改image kubectl set image deployment/nginx nginx=nginx:1.16.0 -n test # 滚动升级 kubectl scale deployment nginx --replicas=2 -n test # 加上--record history就能看到变更信息(但感觉左右不大) kubectl rollout history deployment nginx -n test # describe 其实更详细 kubectl describe deployment nginx -n test # 查看yaml配置 kubectl get deployment.</description>
 			<content type="html"><![CDATA[<h3 id="kubectl命令熟悉">kubectl命令熟悉</h3>
 <div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># 创建namespace</span>
@@ -314,10 +314,10 @@ kubectl create service nodeport nginx --tcp<span class="o">=</span>31112:80 -n <
 		
 		<item>
 			<title>Goland快捷键记录</title>
-			<link>https://blog.k1s.club/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/</link>
+			<link>https://k1s.club/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/</link>
 			<pubDate>Tue, 20 Oct 2020 16:42:57 +0800</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/</guid>
+			<guid>https://k1s.club/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/</guid>
 			<description>1. 记录一些常见的goland快捷键(mac) 1. command + alt + ← | → // 回退|前进 到上次浏览的位置  2. command d | x // 复制行 |删除行  3. command b = command + 单击 // 快速打开光标处的类或方法  4. command alt l // 重新格式化代码  5. 代码折叠和展开 - command shift + / - // 代码全部展开 / 折叠 (项目所有go文件全部展开/折叠) - command alt + / - // 代码递归展开 / 折叠 (所选内容行内全部展开/折叠) - command + / - // 代码展开 / 折叠 (所选内容展开/折叠)  </description>
 			<content type="html"><![CDATA[<h3 id="1-记录一些常见的goland快捷键mac">1. 记录一些常见的goland快捷键(mac)</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="mf">1.</span> <span class="nx">command</span> <span class="o">+</span> <span class="nx">alt</span> <span class="o">+</span> <span class="err">←</span> <span class="p">|</span> <span class="err">→</span> 
@@ -345,10 +345,10 @@ kubectl create service nodeport nginx --tcp<span class="o">=</span>31112:80 -n <
 		
 		<item>
 			<title>Hugo博客使用记录</title>
-			<link>https://blog.k1s.club/posts/58-hugo%E5%8D%9A%E5%AE%A2%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/</link>
+			<link>https://k1s.club/posts/58-hugo%E5%8D%9A%E5%AE%A2%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/</link>
 			<pubDate>Fri, 16 Oct 2020 17:01:36 +0800</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/58-hugo%E5%8D%9A%E5%AE%A2%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/</guid>
+			<guid>https://k1s.club/posts/58-hugo%E5%8D%9A%E5%AE%A2%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/</guid>
 			<description>&lt;p&gt;由于hexo生成博客整的很慢, 而且很占cpu, 甚至导致老mac卡死了&amp;hellip; hugo真的很香&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>由于hexo生成博客整的很慢, 而且很占cpu, 甚至导致老mac卡死了&hellip; hugo真的很香</p>
 <h3 id="1-hugo中如何内嵌html">1. hugo中如何内嵌html</h3>
@@ -385,10 +385,10 @@ hugo serve --buildDrafts
 		
 		<item>
 			<title>gin记录说明</title>
-			<link>https://blog.k1s.club/posts/57-gin%E8%AE%B0%E5%BD%95%E8%AF%B4%E6%98%8E/</link>
+			<link>https://k1s.club/posts/57-gin%E8%AE%B0%E5%BD%95%E8%AF%B4%E6%98%8E/</link>
 			<pubDate>Thu, 15 Oct 2020 14:16:49 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/57-gin%E8%AE%B0%E5%BD%95%E8%AF%B4%E6%98%8E/</guid>
+			<guid>https://k1s.club/posts/57-gin%E8%AE%B0%E5%BD%95%E8%AF%B4%E6%98%8E/</guid>
 			<description>简单记录一些gin框架学习遇到的一些问题
  ### 1. unknown driver &#34;mysql&#34; (forgotten import?) ``` _ &#34;github.com/go-sql-driver/mysql&#34; ``` </description>
 			<content type="html"><![CDATA[<p>简单记录一些gin框架学习遇到的一些问题</p>
@@ -407,10 +407,10 @@ hugo serve --buildDrafts
 		
 		<item>
 			<title>centos8初体验</title>
-			<link>https://blog.k1s.club/posts/56-centos8%E5%88%9D%E4%BD%93%E9%AA%8C/</link>
+			<link>https://k1s.club/posts/56-centos8%E5%88%9D%E4%BD%93%E9%AA%8C/</link>
 			<pubDate>Fri, 25 Sep 2020 10:11:28 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/56-centos8%E5%88%9D%E4%BD%93%E9%AA%8C/</guid>
+			<guid>https://k1s.club/posts/56-centos8%E5%88%9D%E4%BD%93%E9%AA%8C/</guid>
 			<description>&lt;p&gt;简单记录下 centos8的一些新的内容&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>简单记录下 centos8的一些新的内容</p>
 <h3 id="1-时间同步通过chrony-支持">1. 时间同步通过chrony 支持</h3>
@@ -432,10 +432,10 @@ chronyc -a makestep
 		
 		<item>
 			<title>helm部署metabase简介</title>
-			<link>https://blog.k1s.club/posts/55-helm%E9%83%A8%E7%BD%B2metabase%E7%AE%80%E4%BB%8B/</link>
+			<link>https://k1s.club/posts/55-helm%E9%83%A8%E7%BD%B2metabase%E7%AE%80%E4%BB%8B/</link>
 			<pubDate>Wed, 16 Sep 2020 18:18:05 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/55-helm%E9%83%A8%E7%BD%B2metabase%E7%AE%80%E4%BB%8B/</guid>
+			<guid>https://k1s.club/posts/55-helm%E9%83%A8%E7%BD%B2metabase%E7%AE%80%E4%BB%8B/</guid>
 			<description>helm 简单部署metabase
 版本统计 1. k8s: 1.15.11 2. metabase: v0.36.3 3. mysql: 5.7.24 首先从charts拉取最新的模板 # 首先search查看一下 helm search metabase NAME CHART VERSION APP VERSION DESCRIPTION stable/metabase 0.3.2 v0.27.2 The easy, open source way for everyone in your company to... # 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本 所以这里我从helm官方克隆了charts git clone https://github.com/helm/charts.git cd charts/stable/metabase # 拉取配置 docker pull metabase/metabase:v0.36.3 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3 docker push xxx.com/metabase:v0.36.3 修改values.yaml配置 # 这里改成私有镜像 image: repository: xxx.com/metabase # 修改数据库配置 database: type: mysql host: k8s-db-t.</description>
 			<content type="html"><![CDATA[<p>helm 简单部署metabase</p>
@@ -780,10 +780,10 @@ spec:
 		
 		<item>
 			<title>go单元测试和性能测试</title>
-			<link>https://blog.k1s.club/posts/54-go%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/</link>
+			<link>https://k1s.club/posts/54-go%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/</link>
 			<pubDate>Wed, 12 Aug 2020 16:44:10 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/54-go%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/</guid>
+			<guid>https://k1s.club/posts/54-go%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/</guid>
 			<description>&lt;p&gt;简单记录一下单元测试 和性能测试的例子&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>简单记录一下单元测试 和性能测试的例子</p>
 <center>
@@ -955,10 +955,10 @@ ok
 		
 		<item>
 			<title>hexo部署到coding.net开启静态网站</title>
-			<link>https://blog.k1s.club/posts/53-hexo%E9%83%A8%E7%BD%B2%E5%88%B0coding-net%E5%BC%80%E5%90%AF%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</link>
+			<link>https://k1s.club/posts/53-hexo%E9%83%A8%E7%BD%B2%E5%88%B0coding-net%E5%BC%80%E5%90%AF%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</link>
 			<pubDate>Fri, 07 Aug 2020 16:00:08 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/53-hexo%E9%83%A8%E7%BD%B2%E5%88%B0coding-net%E5%BC%80%E5%90%AF%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</guid>
+			<guid>https://k1s.club/posts/53-hexo%E9%83%A8%E7%BD%B2%E5%88%B0coding-net%E5%BC%80%E5%90%AF%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</guid>
 			<description>&lt;p&gt;由于访问github会比较慢,百度抓取问题等, hexo同时部署到coding.net并开启静态网站&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>由于访问github会比较慢,百度抓取问题等, hexo同时部署到coding.net并开启静态网站</p>
 <center>
@@ -998,10 +998,10 @@ ok
 		
 		<item>
 			<title>istio环境下配置nginx&#43;php</title>
-			<link>https://blog.k1s.club/posts/52-istio%E6%B5%8B%E8%AF%95nginx-php%E9%A1%B9%E7%9B%AE/</link>
+			<link>https://k1s.club/posts/52-istio%E6%B5%8B%E8%AF%95nginx-php%E9%A1%B9%E7%9B%AE/</link>
 			<pubDate>Tue, 04 Aug 2020 16:22:10 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/52-istio%E6%B5%8B%E8%AF%95nginx-php%E9%A1%B9%E7%9B%AE/</guid>
+			<guid>https://k1s.club/posts/52-istio%E6%B5%8B%E8%AF%95nginx-php%E9%A1%B9%E7%9B%AE/</guid>
 			<description>&lt;p&gt;将nginx+php的环境结合istio的智能路由功能做一个简单实践&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>将nginx+php的环境结合istio的智能路由功能做一个简单实践</p>
 <ul>
@@ -1548,10 +1548,10 @@ udp
 		
 		<item>
 			<title>k8s搭建radius</title>
-			<link>https://blog.k1s.club/posts/51-k8s%E6%90%AD%E5%BB%BAradius/</link>
+			<link>https://k1s.club/posts/51-k8s%E6%90%AD%E5%BB%BAradius/</link>
 			<pubDate>Mon, 27 Jul 2020 10:19:25 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/51-k8s%E6%90%AD%E5%BB%BAradius/</guid>
+			<guid>https://k1s.club/posts/51-k8s%E6%90%AD%E5%BB%BAradius/</guid>
 			<description>搭建lnmp+freeradius的账号认证服务
   一 记录 docker: 17.03.2-ce k8s: 1.15.11 php: 7.0.13 mysql: 5.6 freeraidus: 3.0.21 daloradius: 1.1-2 / 08 Aug 2019  配置修改简单说明:
  1. 数据库创建说明 create database radius; grant all on radius.* to radius@&#39;%&#39; identified by &#39;xxx&#39;; flush privileges; # 导入表结构 mysql -hk8s-db-t.xxx.com -P3326 -uradius -p &amp;lt; mods-config/sql/main/mysql/schema.sql mysql -hk8s-db-t.xxx.com -P3326 -uradius -p &amp;lt; daloradius-php/contrib/db/mysql-daloradius.sql mysql -hk8s-db-t.xxx.com -P3326 -uradius -p &amp;lt; daloradius-php/contrib/db/fr2-mysql-daloradius-and-freeradius.sql 2. 修改freeRADIUS配置 vim /etc/raddb/radiusd.conf # 这里我是配合nginx,php统一路径 logdir = /nginx_logs 3.</description>
@@ -2574,10 +2574,10 @@ radtest xxx xxx 127.0.0.1 0 testing123
 		
 		<item>
 			<title>记一次windows安装OpenSSH问题</title>
-			<link>https://blog.k1s.club/posts/50-%E8%AE%B0%E4%B8%80%E6%AC%A1windows%E5%AE%89%E8%A3%85openssh%E9%97%AE%E9%A2%98/</link>
+			<link>https://k1s.club/posts/50-%E8%AE%B0%E4%B8%80%E6%AC%A1windows%E5%AE%89%E8%A3%85openssh%E9%97%AE%E9%A2%98/</link>
 			<pubDate>Fri, 12 Jun 2020 18:06:26 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/50-%E8%AE%B0%E4%B8%80%E6%AC%A1windows%E5%AE%89%E8%A3%85openssh%E9%97%AE%E9%A2%98/</guid>
+			<guid>https://k1s.club/posts/50-%E8%AE%B0%E4%B8%80%E6%AC%A1windows%E5%AE%89%E8%A3%85openssh%E9%97%AE%E9%A2%98/</guid>
 			<description>&lt;p&gt;windows一次安装openssh server问题&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>windows一次安装openssh server问题</p>
 <h3 id="首先是安装">首先是安装</h3>
@@ -2627,10 +2627,10 @@ net stop sshd
 		
 		<item>
 			<title>go简单记录</title>
-			<link>https://blog.k1s.club/posts/49-go%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</link>
+			<link>https://k1s.club/posts/49-go%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</link>
 			<pubDate>Wed, 27 May 2020 17:25:31 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/49-go%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</guid>
+			<guid>https://k1s.club/posts/49-go%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</guid>
 			<description>&lt;p&gt;go的一些简单记录&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>go的一些简单记录</p>
 <h3 id="1-go中的用法">1. go中'&hellip;&lsquo;的用法</h3>
@@ -3058,10 +3058,10 @@ go env -w <span class="nv">GOPROXY</span><span class="o">=</span>https://goproxy
 		
 		<item>
 			<title>k8s升级(1.10-&gt;1.15)</title>
-			<link>https://blog.k1s.club/posts/48-k8s%E5%8D%87%E7%BA%A7-1-10-1-15/</link>
+			<link>https://k1s.club/posts/48-k8s%E5%8D%87%E7%BA%A7-1-10-1-15/</link>
 			<pubDate>Mon, 18 May 2020 17:43:27 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/48-k8s%E5%8D%87%E7%BA%A7-1-10-1-15/</guid>
+			<guid>https://k1s.club/posts/48-k8s%E5%8D%87%E7%BA%A7-1-10-1-15/</guid>
 			<description>&lt;p&gt;k8s升级一般不能跨版本升级, 所以这里间断介绍升级过程, 每次升级一个大版本&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>k8s升级一般不能跨版本升级, 所以这里间断介绍升级过程, 每次升级一个大版本</p>
 <h3 id="k8s升级">k8s升级</h3>
@@ -3596,10 +3596,10 @@ yum install -y kubeadm-<span class="si">${</span><span class="nv">version</span>
 		
 		<item>
 			<title>k8s安装promethues&#43;alertmanager&#43;grafana</title>
-			<link>https://blog.k1s.club/posts/47-k8s%E5%AE%89%E8%A3%85promethues-alertmanager-grafana/</link>
+			<link>https://k1s.club/posts/47-k8s%E5%AE%89%E8%A3%85promethues-alertmanager-grafana/</link>
 			<pubDate>Thu, 14 May 2020 18:34:47 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/47-k8s%E5%AE%89%E8%A3%85promethues-alertmanager-grafana/</guid>
+			<guid>https://k1s.club/posts/47-k8s%E5%AE%89%E8%A3%85promethues-alertmanager-grafana/</guid>
 			<description>本文主要是针对prometheus 简单部署 , 考虑到测试资源有限,为更精简自定义按照监控,减少多余资源占用, 也同时更了解prometheus的更多细节, 这里没有使用prometheus-operator
  1 K8s上部署原生的prometheus 2 prometheus-operator 方式部署 3 docker-compose快速搭建 Prometheus+Grafana监控系统 4 一套prometheus监控多个k8s集群,详细讲解配置 5 使用prometheus监控traefik、redis、k8s集群各节点、各节点kubelet 6 grafana 监控模板下载     搭建prometheus 创建ns tee ns.yml &amp;lt;&amp;lt;- EOF apiVersion: v1 kind: Namespace metadata: name: monitoring EOF kubectl apply -f ns.yml prometheus-clusterRole.yml tee prometheus-clusterRole.yml &amp;lt;&amp;lt;- EOF apiVersion: rbac.authorization.k8s.io/v1 kind: ClusterRole metadata: name: prometheus-k8s rules: - apiGroups: - &amp;quot;&amp;quot; resources: - nodes/metrics verbs: - get - nonResourceURLs: - /metrics verbs: - get EOF prometheus-clusterRoleBinding.</description>
 			<content type="html"><![CDATA[<p>本文主要是针对prometheus 简单部署 , 考虑到测试资源有限,为更精简自定义按照监控,减少多余资源占用, 也同时更了解prometheus的更多细节, 这里没有使用prometheus-operator</p>
@@ -5106,10 +5106,10 @@ data:
 		
 		<item>
 			<title>docker安装nginx第三方模块</title>
-			<link>https://blog.k1s.club/posts/46-docker%E5%AE%89%E8%A3%85nginx%E7%AC%AC%E4%B8%89%E6%96%B9%E6%A8%A1%E5%9D%97/</link>
+			<link>https://k1s.club/posts/46-docker%E5%AE%89%E8%A3%85nginx%E7%AC%AC%E4%B8%89%E6%96%B9%E6%A8%A1%E5%9D%97/</link>
 			<pubDate>Wed, 13 May 2020 11:12:01 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/46-docker%E5%AE%89%E8%A3%85nginx%E7%AC%AC%E4%B8%89%E6%96%B9%E6%A8%A1%E5%9D%97/</guid>
+			<guid>https://k1s.club/posts/46-docker%E5%AE%89%E8%A3%85nginx%E7%AC%AC%E4%B8%89%E6%96%B9%E6%A8%A1%E5%9D%97/</guid>
 			<description>&lt;p&gt;由于hub.docker.com 官方的nginx 并不会包括第三方包, 这里简要说明如何安装nginx_upstream_check_module模块&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>由于hub.docker.com 官方的nginx 并不会包括第三方包, 这里简要说明如何安装nginx_upstream_check_module模块</p>
 <h3 id="健康检查">健康检查</h3>
@@ -5164,10 +5164,10 @@ CMD [&quot;/usr/sbin/nginx&quot;, &quot;-c&quot;, &quot;/etc/nginx/nginx.conf&qu
 		
 		<item>
 			<title>gitlab-ci与k8s结合</title>
-			<link>https://blog.k1s.club/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/</link>
+			<link>https://k1s.club/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/</link>
 			<pubDate>Thu, 23 Apr 2020 16:20:33 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/</guid>
+			<guid>https://k1s.club/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/</guid>
 			<description>本文介绍如何通过gitlab-ci整合k8s实现流水线部署
   https://www.cnblogs.com/Sinte-Beuve/p/11739196.html https://www.qikqiak.com/post/gitlab-ci-k8s-cluster-feature/   环境版本统计 1 gitlab/gitlab-runner 0.15.0 2 helm 2.16 3 k8s 1.16.4 4 gitlab 11.5 5 CentOS Linux release 7.7 /kernel 5.2  小节
  1. gitlab 通过admin管理页面的runner配置, 安装gitlab-runner, 安装方式可以是二进制, docker 或k8s (这里是k8s) 2. gitlab 项目目录的 Operations -&amp;gt; kubernetes -&amp;gt; Add Kubernetes Cluster -&amp;gt; Add existing cluster 是结合k8s, 每个项目都需要设置一个k8s集群,k8s集群需要配置rbac权限 3. ci 在提交到私有harbor上是需要验证账号密码, 私有仓库拉取也需要验证  安装方法一   k8s yaml直接部署 gitlab-ci-token-secret.yaml  具体token值 请查看 gitlab的admin页面-&amp;gt; Overview -&amp;gt; Runners 查看, 然后base64加密</description>
@@ -5786,10 +5786,10 @@ ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock 
 		
 		<item>
 			<title>k8s部署fluentd&#43;kafka&#43;logstash&#43;es</title>
-			<link>https://blog.k1s.club/posts/44-k8s%E9%83%A8%E7%BD%B2fluentd-kafka-logstash-es/</link>
+			<link>https://k1s.club/posts/44-k8s%E9%83%A8%E7%BD%B2fluentd-kafka-logstash-es/</link>
 			<pubDate>Thu, 09 Apr 2020 17:40:58 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/44-k8s%E9%83%A8%E7%BD%B2fluentd-kafka-logstash-es/</guid>
+			<guid>https://k1s.club/posts/44-k8s%E9%83%A8%E7%BD%B2fluentd-kafka-logstash-es/</guid>
 			<description>客户端采集数据的软件比较多, 有logstash,flume,fluentd/fluent-bit,filebeat等,这里在k8s集群中部署fluentd开启UDP端口接收代码写入的json日志,并写入到kafka中
   1. 一些服务版本 docker镜像: docker pull fluentd:v1.9.1-1.0 kafka: kafka-server-0.10.0+kafka2.1.0-1.2.1.0.p0.63.el6.noarch fluent-plugin-kafka: 0.5.7   2. fluentd 镜像安装kafka扩展 Dockerfile  由于fluent-plugin-kafka版本要求 我们的kafka是0.10, 所以高版本有问题, 安装了fluent-plugin-kafka 0.5.7 则正常
  官方文档: https://rubygems.org/gems/fluent-plugin-kafka/versions/0.5.7
@@ -6070,10 +6070,10 @@ spec:
 		
 		<item>
 			<title>k8s的yaml配置名词解释(模板)</title>
-			<link>https://blog.k1s.club/posts/43-k8s%E7%9A%84yaml%E9%85%8D%E7%BD%AE%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A-%E6%A8%A1%E6%9D%BF/</link>
+			<link>https://k1s.club/posts/43-k8s%E7%9A%84yaml%E9%85%8D%E7%BD%AE%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A-%E6%A8%A1%E6%9D%BF/</link>
 			<pubDate>Tue, 31 Mar 2020 17:21:23 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/43-k8s%E7%9A%84yaml%E9%85%8D%E7%BD%AE%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A-%E6%A8%A1%E6%9D%BF/</guid>
+			<guid>https://k1s.club/posts/43-k8s%E7%9A%84yaml%E9%85%8D%E7%BD%AE%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A-%E6%A8%A1%E6%9D%BF/</guid>
 			<description>针对Deployment的yaml配置解释说明
    原文: K8s Deployment YAML 名词解释
  Deployment API 版本对照表 Kubernetes 版本 Deployment 版本 v1.5-v1.15 extensions/v1beta1 v1.7-v1.15 apps/v1beta1 v1.8-v1.15 apps/v1beta2 v1.9+ apps/v1 Deployment yaml 名词解释： apiVersion:apps/v1 # 指定api版本，此值必须在kubectl api-versions中 kind:Deployment # 指定创建资源的角色/类型 metadata:# 资源的元数据/属性name:demo # 资源的名字，在同一个namespace中必须唯一namespace:default# 部署在哪个namespace中labels:# 设定资源的标签app:demoversion:stablespec:# 资源规范字段replicas:1# 声明副本数目revisionHistoryLimit:3# 保留历史版本selector:# 选择器matchLabels:# 匹配标签app:demoversion:stablestrategy:# 策略rollingUpdate:# 滚动更新maxSurge:30%# 最大额外可以存在的副本数，可以为百分比，也可以为整数maxUnavailable:30%# 示在更新过程中能够进入不可用状态的 Pod 的最大值，可以为百分比，也可以为整数type:RollingUpdate# 滚动更新策略template:# 模版metadata:# 资源的元数据/属性annotations:# 自定义注解列表sidecar.istio.io/inject:&amp;#34;false&amp;#34;# 自定义注解名字labels:# 设定资源的标签app:demoversion:stablespec:# 资源规范字段containers:- name:demo# 容器的名字 image:demo:v1# 容器使用的镜像地址 imagePullPolicy:IfNotPresent# 每次Pod启动拉取镜像策略，三个选择 Always、Never、IfNotPresent# Always，每次都检查；Never，每次都不检查（不管本地是否有）；IfNotPresent，如果本地有就不检查，如果没有就拉取resources:# 资源管理limits:# 最大使用cpu:300m# CPU，1核心 = 1000mmemory:500Mi# 内存，1G = 1000Mirequests:# 容器运行时，最低资源需求，也就是说最少需要多少资源容器才能正常运行cpu:100mmemory:100MilivenessProbe:# pod 内部健康检查的设置httpGet:# 通过httpget检查健康，返回200-399之间，则认为容器正常path:/healthCheck# URI地址port:8080# 端口scheme:HTTP# 协议# host: 127.</description>
@@ -6199,10 +6199,10 @@ v1.9+ apps/v1
 		
 		<item>
 			<title>kubeadm安装高可用k8s集群</title>
-			<link>https://blog.k1s.club/posts/42-kubeadm%E5%AE%89%E8%A3%85%E9%AB%98%E5%8F%AF%E7%94%A8k8s%E9%9B%86%E7%BE%A4/</link>
+			<link>https://k1s.club/posts/42-kubeadm%E5%AE%89%E8%A3%85%E9%AB%98%E5%8F%AF%E7%94%A8k8s%E9%9B%86%E7%BE%A4/</link>
 			<pubDate>Tue, 24 Mar 2020 11:10:41 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/42-kubeadm%E5%AE%89%E8%A3%85%E9%AB%98%E5%8F%AF%E7%94%A8k8s%E9%9B%86%E7%BE%A4/</guid>
+			<guid>https://k1s.club/posts/42-kubeadm%E5%AE%89%E8%A3%85%E9%AB%98%E5%8F%AF%E7%94%A8k8s%E9%9B%86%E7%BE%A4/</guid>
 			<description>简单记录kubeadm方式安装k8s1.16.4高可用集群,haproxy通过keepalived绑定的vip来负载均衡到三台master, 其中keepalived则反之单机故障,haproxy则让三台master可以同时提供服务.
  Centos7.6部署k8s v1.16.4高可用集群(主备模式) 使用kubeadm搭建高可用k8s v1.16.3集群(keepalived+haproxy)
    一、 安装准备  1.1 主机名  192.168.53.106 master01.k8s.io 192.168.53.107 master02.k8s.io 192.168.53.108 master03.k8s.io 192.168.53.137 master.k8s.io  1.2 同步时间, 设置时区  * * * * * /usr/sbin/ntpdate time.nist.gov timedatectl set-timezone Asia/Shanghai 或者 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime  1.3 关闭SElinux  setenforce 0 sed -i &amp;quot;s/^SELINUX=enforcing/SELINUX=disabled/g&amp;quot; /etc/sysconfig/selinux sed -i &amp;quot;s/^SELINUX=enforcing/SELINUX=disabled/g&amp;quot; /etc/selinux/config sed -i &amp;quot;s/^SELINUX=permissive/SELINUX=disabled/g&amp;quot; /etc/sysconfig/selinux sed -i &amp;quot;s/^SELINUX=permissive/SELINUX=disabled/g&amp;quot; /etc/selinux/config  1.4 关闭swap(否则kubeadm init或join会报错)  &amp;gt; swapoff -a &amp;amp;&amp;amp; sysctl -w vm.</description>
@@ -6825,10 +6825,10 @@ master03.k8s.io   Ready      master   11m   v1.16.4</p>
 		
 		<item>
 			<title>记一次es集群内存溢出的问题</title>
-			<link>https://blog.k1s.club/posts/41-%E8%AE%B0%E4%B8%80%E6%AC%A1es%E9%9B%86%E7%BE%A4%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E7%9A%84%E9%97%AE%E9%A2%98/</link>
+			<link>https://k1s.club/posts/41-%E8%AE%B0%E4%B8%80%E6%AC%A1es%E9%9B%86%E7%BE%A4%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E7%9A%84%E9%97%AE%E9%A2%98/</link>
 			<pubDate>Thu, 19 Mar 2020 10:26:49 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/41-%E8%AE%B0%E4%B8%80%E6%AC%A1es%E9%9B%86%E7%BE%A4%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E7%9A%84%E9%97%AE%E9%A2%98/</guid>
+			<guid>https://k1s.club/posts/41-%E8%AE%B0%E4%B8%80%E6%AC%A1es%E9%9B%86%E7%BE%A4%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E7%9A%84%E9%97%AE%E9%A2%98/</guid>
 			<description>es机器报警磁盘 / 空间不足,查看是生成了 .hprof 文件, 内存溢出的典型特征
   以上问题主要是两点
  由于elasticsearch用户家目录是/home/elasticsearch, 所以内存溢出时 写的.hprof文件会生成到家目录, 并且大小有6G+, 这会导致/目录磁盘空间不足报警, 是否可以设置该日志目录? 或者取巧设置elasticsearch家目录到/data挂载盘上? 内存溢出的问题, 是否可以优化并解决  问题1 我这里并未找到设置.hprof文件的生成目录路径设置, 所以我就将根目录做了一个链接 mv /home/elasticsearch /data/ ln -s /data/elasticsearch /home/elasticsearch 或者修改elasticsearch用户的家目录(不过需要用户没有在login中) lsof |grep elasticsearch usermod -d /data/elasticsearch elasticsearch 问题2 内存溢出的问题,我们设置 indices.fielddata.cache.size: 20%  elasticsearch2.x 限制内存使用
@@ -6907,10 +6907,10 @@ Lucene 能很好利用文件系统的缓存，它是通过系统内核管理的�
 		
 		<item>
 			<title>记一次跨域的nginx配置问题</title>
-			<link>https://blog.k1s.club/posts/40-%E8%AE%B0%E4%B8%80%E6%AC%A1%E8%B7%A8%E5%9F%9F%E7%9A%84nginx%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/</link>
+			<link>https://k1s.club/posts/40-%E8%AE%B0%E4%B8%80%E6%AC%A1%E8%B7%A8%E5%9F%9F%E7%9A%84nginx%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/</link>
 			<pubDate>Wed, 18 Mar 2020 18:26:35 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/40-%E8%AE%B0%E4%B8%80%E6%AC%A1%E8%B7%A8%E5%9F%9F%E7%9A%84nginx%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/</guid>
+			<guid>https://k1s.club/posts/40-%E8%AE%B0%E4%B8%80%E6%AC%A1%E8%B7%A8%E5%9F%9F%E7%9A%84nginx%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/</guid>
 			<description>&lt;p&gt;nginx跨域的Access-Control-Allow-Origin的配置 和多域名配置的问题&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>nginx跨域的Access-Control-Allow-Origin的配置 和多域名配置的问题</p>
 <center>
@@ -6960,10 +6960,10 @@ Lucene 能很好利用文件系统的缓存，它是通过系统内核管理的�
 		
 		<item>
 			<title>记一次nginx的request_time 和upstream_response_time差值很大问题</title>
-			<link>https://blog.k1s.club/posts/39-%E8%AE%B0%E4%B8%80%E6%AC%A1nginx%E7%9A%84request-time-%E5%92%8Cupstream-response-time%E5%B7%AE%E5%80%BC%E5%BE%88%E5%A4%A7%E9%97%AE%E9%A2%98/</link>
+			<link>https://k1s.club/posts/39-%E8%AE%B0%E4%B8%80%E6%AC%A1nginx%E7%9A%84request-time-%E5%92%8Cupstream-response-time%E5%B7%AE%E5%80%BC%E5%BE%88%E5%A4%A7%E9%97%AE%E9%A2%98/</link>
 			<pubDate>Wed, 18 Mar 2020 10:43:34 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/39-%E8%AE%B0%E4%B8%80%E6%AC%A1nginx%E7%9A%84request-time-%E5%92%8Cupstream-response-time%E5%B7%AE%E5%80%BC%E5%BE%88%E5%A4%A7%E9%97%AE%E9%A2%98/</guid>
+			<guid>https://k1s.club/posts/39-%E8%AE%B0%E4%B8%80%E6%AC%A1nginx%E7%9A%84request-time-%E5%92%8Cupstream-response-time%E5%B7%AE%E5%80%BC%E5%BE%88%E5%A4%A7%E9%97%AE%E9%A2%98/</guid>
 			<description>&lt;p&gt;遇到一个接口, 经过了nginx反向代理,request_time时间是60s+, upstream_response_time 在0.5s左右&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>遇到一个接口, 经过了nginx反向代理,request_time时间是60s+, upstream_response_time 在0.5s左右</p>
 <center>
@@ -6989,10 +6989,10 @@ Lucene 能很好利用文件系统的缓存，它是通过系统内核管理的�
 		
 		<item>
 			<title>mac一些常用命令</title>
-			<link>https://blog.k1s.club/posts/37-mac%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</link>
+			<link>https://k1s.club/posts/37-mac%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</link>
 			<pubDate>Tue, 10 Mar 2020 17:39:36 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/37-mac%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</guid>
+			<guid>https://k1s.club/posts/37-mac%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</guid>
 			<description>记录一些常用的mac工具和方法
  1. Item2     1.1 同时按住 option(alt) 键，可以以列选中，类似于 sublime3中 按住 alt的列选中 。 Command + option(alt) 
   1.2 剪贴板历史记录 Command + Shift + h
@@ -7034,10 +7034,10 @@ command + y
 		
 		<item>
 			<title>centos单网卡配置多ip的几种方法</title>
-			<link>https://blog.k1s.club/posts/36-centos%E5%8D%95%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE%E5%A4%9Aip%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95/</link>
+			<link>https://k1s.club/posts/36-centos%E5%8D%95%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE%E5%A4%9Aip%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95/</link>
 			<pubDate>Thu, 27 Feb 2020 11:48:51 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/36-centos%E5%8D%95%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE%E5%A4%9Aip%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95/</guid>
+			<guid>https://k1s.club/posts/36-centos%E5%8D%95%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE%E5%A4%9Aip%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95/</guid>
 			<description>centos单网卡配置多ip的几种方法
   方法一 新建IP别名  临时设置, 不需要重启
  ifconfig enp0s3:1 192.168.53.109/24 ifconfig enp0s3:1 down  配置文件设置, 需要重启
@@ -7096,10 +7096,10 @@ ip a
 		
 		<item>
 			<title>raid1盘数据迁移</title>
-			<link>https://blog.k1s.club/posts/35-raid1%E7%9B%98%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB/</link>
+			<link>https://k1s.club/posts/35-raid1%E7%9B%98%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB/</link>
 			<pubDate>Thu, 27 Feb 2020 09:54:38 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/35-raid1%E7%9B%98%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB/</guid>
+			<guid>https://k1s.club/posts/35-raid1%E7%9B%98%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB/</guid>
 			<description>dell PowerEdge 1950 服务器两块盘做raid1的linux操作系统, 开机后无限重启的一次数据迁移
    考虑到raid1数据是互为备份,直接取一块盘应该能够拿到所有数据
   首先对dell PowerEdge 1950 服务器 开机, 在提示ctrl +c的页面上进入sas页面, 进入选中磁盘后回车, 然后选择 SAS Topology页面, 可以看到是两块盘做的raid1   raid1 信息确认完毕
@@ -7139,10 +7139,10 @@ mount /data /dev/sdb3
 		
 		<item>
 			<title>k8s一些命令总结</title>
-			<link>https://blog.k1s.club/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</link>
+			<link>https://k1s.club/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</link>
 			<pubDate>Thu, 05 Dec 2019 09:25:59 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</guid>
+			<guid>https://k1s.club/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</guid>
 			<description>记录一些kubectl命令
 kubectl命令表
   常用命令 # 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111 kubectl proxy --address=&#39;192.168.1.111&#39; -p 10000 --accept-hosts=&#39;^172.*$&#39; # 查看api类型 kubectl api-versions # 让master也运行pod（默认master不运行pod,单机会用到） kubectl taint nodes --all node-role.kubernetes.io/master- # patch补丁, 强制更新 kubectl patch -f deployment.yaml -p &amp;quot;{\&amp;quot;spec\&amp;quot;:{\&amp;quot;template\&amp;quot;:{\&amp;quot;metadata\&amp;quot;:{\&amp;quot;annotations\&amp;quot;:{\&amp;quot;ci-last-updated\&amp;quot;:\&amp;quot;$(date +&#39;%s&#39;)\&amp;quot;}}}}}&amp;quot; # 端口转发 kubectl -n default port-forward service/prometheus-server 30080:80   scale 使用 # 通过将rc的副本数重新设置为0后，再将副本数设置为2，达到重启nginx的效果。 kubectl scale deployment bq-front1 --replicas=0 -n web kubectl scale deployment bq-front1 --replicas=2 -n web   metrics 相关 # 查看node 资源 kubectl top nodes # 查看pods 资源 kubectl top pods -n php-dev # 获取metrics接口所有数据 kubectl get --raw /metrics # patch强制更新(慎用) kubectl patch -f deployment.</description>
@@ -7210,10 +7210,10 @@ kubectl get ns --show-labels  # 查看标签,除了ns, 也可以是node,pod等
 		
 		<item>
 			<title>k3s安装配置</title>
-			<link>https://blog.k1s.club/posts/29-k3s%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</link>
+			<link>https://k1s.club/posts/29-k3s%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</link>
 			<pubDate>Tue, 03 Dec 2019 16:06:28 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/29-k3s%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</guid>
+			<guid>https://k1s.club/posts/29-k3s%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</guid>
 			<description>体验轻量级k8s集群,适用于低配个人开发测试使用
  k3s, 5 less than k8s   详情参考官方: k3s github地址
 准备  1 selinux 关闭  getenforce # 本次关闭 setenforce 0 # 重启后关闭 sed -i &#39;/SELINUX=enforcing/s/enforcing/disabled/&#39; /etc/sysconfig/selinux  2 关闭swap(可选)  # 本次关闭 swapoff on # 重启后关闭 sed -i &#39;/swap/s@^/@#/@&#39; /etc/fstab  3 关闭firewalld(必须)  systemctl stop firewalld.service systemctl disable firewalld.service  4 在内核3.10,4.16,5.2,5.3 都正常运行  Step 1: 安装K3S集群 # 下载k3s 二进制文件打开各版本点击详情可以查询k3s版本对应的k8s版本(https://github.com/rancher/k3s/releases) wget https://github.com/rancher/k3s/releases/download/v1.0.0/k3s k3s v1.0.0 -&amp;gt; k8s1.16.3 # https://github.</description>
@@ -7342,10 +7342,10 @@ curl -sfL https://get.k3s.io | K3S_URL=https://k3s-server:6443 K3S_TOKEN=${NODE_
 		
 		<item>
 			<title>k3s1.16部署nginx&#43;php5.2.17</title>
-			<link>https://blog.k1s.club/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</link>
+			<link>https://k1s.club/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</link>
 			<pubDate>Tue, 03 Dec 2019 11:46:42 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</guid>
+			<guid>https://k1s.club/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</guid>
 			<description>&lt;p&gt;老项目是用php5.2.17的,自己编译打包镜像简单部署&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>老项目是用php5.2.17的,自己编译打包镜像简单部署</p>
 <center>
@@ -7407,7 +7407,7 @@ run yum install -y wget \
             --enable-pcntl \
             --enable-sockets \
             --with-bz2 \
-            --with-curl=https://blog.k1s.club/usr/local/curl \
+            --with-curl=https://k1s.club/usr/local/curl \
             --with-curlwrappers \
             --enable-mbregex \
             --with-gd \
@@ -7632,10 +7632,10 @@ kubectl apply -f nginx/php-nginx-dev.yml
 		
 		<item>
 			<title>php错误502问题总结</title>
-			<link>https://blog.k1s.club/posts/32-php%E9%94%99%E8%AF%AF502%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/</link>
+			<link>https://k1s.club/posts/32-php%E9%94%99%E8%AF%AF502%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/</link>
 			<pubDate>Mon, 02 Dec 2019 17:45:01 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/32-php%E9%94%99%E8%AF%AF502%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/</guid>
+			<guid>https://k1s.club/posts/32-php%E9%94%99%E8%AF%AF502%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/</guid>
 			<description>&lt;p&gt;近期一次 502报错, 但是没有达到timeout的值,特此记录&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>近期一次 502报错, 但是没有达到timeout的值,特此记录</p>
 <h3 id="查看errorlog-内容-recv-failed-104-connection-reset-by-peer-while-reading-response-header-from-upstream">查看error.log 内容: recv() failed (104: Connection reset by peer) while reading response header from upstream</h3>
@@ -7658,10 +7658,10 @@ kubectl apply -f nginx/php-nginx-dev.yml
 		
 		<item>
 			<title>systemd一些命令</title>
-			<link>https://blog.k1s.club/posts/31-systemd%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4/</link>
+			<link>https://k1s.club/posts/31-systemd%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4/</link>
 			<pubDate>Tue, 26 Nov 2019 10:34:10 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/31-systemd%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4/</guid>
+			<guid>https://k1s.club/posts/31-systemd%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4/</guid>
 			<description>&lt;p&gt;记录一些需要systemd命令&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>记录一些需要systemd命令</p>
 <center>
@@ -7698,10 +7698,10 @@ kubectl apply -f nginx/php-nginx-dev.yml
 		
 		<item>
 			<title>k3s集群部署项目报挂载nfs错误</title>
-			<link>https://blog.k1s.club/posts/30-k3s%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E6%8A%A5%E6%8C%82%E8%BD%BDnfs%E9%94%99%E8%AF%AF/</link>
+			<link>https://k1s.club/posts/30-k3s%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E6%8A%A5%E6%8C%82%E8%BD%BDnfs%E9%94%99%E8%AF%AF/</link>
 			<pubDate>Mon, 25 Nov 2019 17:37:23 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/30-k3s%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E6%8A%A5%E6%8C%82%E8%BD%BDnfs%E9%94%99%E8%AF%AF/</guid>
+			<guid>https://k1s.club/posts/30-k3s%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E6%8A%A5%E6%8C%82%E8%BD%BDnfs%E9%94%99%E8%AF%AF/</guid>
 			<description>体验轻量级k8s集群遇到一些nfs问题
   部署服务器查看describe信息如下: Mounting command: systemd-run Mounting arguments: --description=Kubernetes transient mount for /var/lib/kubelet/pods/369daaef-1e90-446b-92ce-3d562f94b429/volumes/kubernetes.io~nfs/pvc-f462c606-5796-4c48-8928-7822f3fa0605 --scope -- mount -t nfs 192.168.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 /var/lib/kubelet/pods/369daaef-1e90-446b-92ce-3d562f94b429/volumes/kubernetes.io~nfs/pvc-f462c606-5796-4c48-8928-7822f3fa0605 Output: Running scope as unit run-14829.scope. mount: 文件系统类型错误、选项错误、192.168.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 上有坏超级块、 缺少代码页或助手程序，或其他错误 (对某些文件系统(如 nfs、cifs) 您可能需要 一款 /sbin/mount.&amp;lt;类型&amp;gt; 助手程序)   分析  猜测1 可能是nfs的系统格式和集群node节点文件格式不同  # 查看发现nfs是ext4, 然后集群中其他的磁盘都是xfs df -T|egrep -v &amp;quot;contai|var|overl&amp;quot; 所以新挂了块磁盘,格式化为xfs然后再次实验,发现错误同样...  猜测2 可能是客户端无法识别nfs格式  # 做个测试 mkdir /tmp/abc mount -t nfs 192.168.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 /tmp/abc # 果然报错 mount: wrong fs type, bad option, bad superblock on 192.</description>
 			<content type="html"><![CDATA[<p>体验轻量级k8s集群遇到一些nfs问题</p>
@@ -7751,10 +7751,10 @@ mount: wrong fs type, bad option, bad superblock on 192.168.x.x:/data-nfs/nfs/k3
 		
 		<item>
 			<title>k8s1.16使用旧yml部署配置问题</title>
-			<link>https://blog.k1s.club/posts/28-k8s1-16%E4%BD%BF%E7%94%A8%E6%97%A7yml%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/</link>
+			<link>https://k1s.club/posts/28-k8s1-16%E4%BD%BF%E7%94%A8%E6%97%A7yml%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/</link>
 			<pubDate>Mon, 25 Nov 2019 15:41:48 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/28-k8s1-16%E4%BD%BF%E7%94%A8%E6%97%A7yml%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/</guid>
+			<guid>https://k1s.club/posts/28-k8s1-16%E4%BD%BF%E7%94%A8%E6%97%A7yml%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/</guid>
 			<description>&lt;p&gt;使用k8s 1.16遇到的问题&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>使用k8s 1.16遇到的问题</p>
 <h3 id="1-appversion的改变">1 appversion的改变</h3>
@@ -7810,10 +7810,10 @@ EOF
 		
 		<item>
 			<title>k8s一条命令部署es5.2.0集群</title>
-			<link>https://blog.k1s.club/posts/27-k8s%E4%B8%80%E6%9D%A1%E5%91%BD%E4%BB%A4%E9%83%A8%E7%BD%B2es5-2-0%E9%9B%86%E7%BE%A4/</link>
+			<link>https://k1s.club/posts/27-k8s%E4%B8%80%E6%9D%A1%E5%91%BD%E4%BB%A4%E9%83%A8%E7%BD%B2es5-2-0%E9%9B%86%E7%BE%A4/</link>
 			<pubDate>Thu, 21 Nov 2019 18:13:35 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/27-k8s%E4%B8%80%E6%9D%A1%E5%91%BD%E4%BB%A4%E9%83%A8%E7%BD%B2es5-2-0%E9%9B%86%E7%BE%A4/</guid>
+			<guid>https://k1s.club/posts/27-k8s%E4%B8%80%E6%9D%A1%E5%91%BD%E4%BB%A4%E9%83%A8%E7%BD%B2es5-2-0%E9%9B%86%E7%BE%A4/</guid>
 			<description>&lt;p&gt;由于老项目是基于es5.2.0, 所以准备在k8s基于nfs存储搭建一套,下面简单介绍&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>由于老项目是基于es5.2.0, 所以准备在k8s基于nfs存储搭建一套,下面简单介绍</p>
 <h3 id="准备好环境和官方镜像">准备好环境和官方镜像</h3>
@@ -7989,10 +7989,10 @@ data:
 		
 		<item>
 			<title>logstash配置</title>
-			<link>https://blog.k1s.club/posts/26-logstash%E9%85%8D%E7%BD%AE/</link>
+			<link>https://k1s.club/posts/26-logstash%E9%85%8D%E7%BD%AE/</link>
 			<pubDate>Fri, 08 Nov 2019 17:28:26 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/26-logstash%E9%85%8D%E7%BD%AE/</guid>
+			<guid>https://k1s.club/posts/26-logstash%E9%85%8D%E7%BD%AE/</guid>
 			<description>记录一些logstash的配置问题
 想要排除某些信息 官方文档
 if &amp;quot;_grokparsefailure&amp;quot; not in [tags] { if [sqlDuring] &amp;lt; 5 { drop {} } } else { drop {} }  请务必注意 如果failure 可能会导致找不到 sqlDuring变量 而报错
@@ -8018,10 +8018,10 @@ else {
 		
 		<item>
 			<title>Linux一些脚本汇总</title>
-			<link>https://blog.k1s.club/posts/25-linux%E4%B8%80%E4%BA%9B%E8%84%9A%E6%9C%AC%E6%B1%87%E6%80%BB/</link>
+			<link>https://k1s.club/posts/25-linux%E4%B8%80%E4%BA%9B%E8%84%9A%E6%9C%AC%E6%B1%87%E6%80%BB/</link>
 			<pubDate>Fri, 01 Nov 2019 17:50:26 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/25-linux%E4%B8%80%E4%BA%9B%E8%84%9A%E6%9C%AC%E6%B1%87%E6%80%BB/</guid>
+			<guid>https://k1s.club/posts/25-linux%E4%B8%80%E4%BA%9B%E8%84%9A%E6%9C%AC%E6%B1%87%E6%80%BB/</guid>
 			<description>记录一些shell脚本
 1 清理es几天前的索引脚本 2 从mysql导出表到clickhouse脚本
  ###命令汇总
@@ -8059,10 +8059,10 @@ ${tmpDir%%/*}	-&gt; 空				(右)删除从右往左最后一个/以及右边的�
 		
 		<item>
 			<title>filebeat7收集mysql慢日志到es</title>
-			<link>https://blog.k1s.club/posts/24-filebeat7%E6%94%B6%E9%9B%86mysql%E6%85%A2%E6%97%A5%E5%BF%97%E5%88%B0es/</link>
+			<link>https://k1s.club/posts/24-filebeat7%E6%94%B6%E9%9B%86mysql%E6%85%A2%E6%97%A5%E5%BF%97%E5%88%B0es/</link>
 			<pubDate>Wed, 30 Oct 2019 16:56:37 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/24-filebeat7%E6%94%B6%E9%9B%86mysql%E6%85%A2%E6%97%A5%E5%BF%97%E5%88%B0es/</guid>
+			<guid>https://k1s.club/posts/24-filebeat7%E6%94%B6%E9%9B%86mysql%E6%85%A2%E6%97%A5%E5%BF%97%E5%88%B0es/</guid>
 			<description>&lt;p&gt;慢日志提供给开发查看, 采用elk统一提供,这里采用k8s环境搭建&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>慢日志提供给开发查看, 采用elk统一提供,这里采用k8s环境搭建</p>
 <p>原文: <a href="https://www.cnblogs.com/smail-bao/p/9528072.html">ELK收集mysql_slow.log</a>
@@ -8189,10 +8189,10 @@ spec:
 		
 		<item>
 			<title>mysql5.5主与mysql5.7从部署配置</title>
-			<link>https://blog.k1s.club/posts/23-mysql5-5%E4%B8%BB%E4%B8%8Emysql5-7%E4%BB%8E%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE/</link>
+			<link>https://k1s.club/posts/23-mysql5-5%E4%B8%BB%E4%B8%8Emysql5-7%E4%BB%8E%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE/</link>
 			<pubDate>Tue, 29 Oct 2019 14:56:55 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/23-mysql5-5%E4%B8%BB%E4%B8%8Emysql5-7%E4%BB%8E%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE/</guid>
+			<guid>https://k1s.club/posts/23-mysql5-5%E4%B8%BB%E4%B8%8Emysql5-7%E4%BB%8E%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE/</guid>
 			<description>由于需要将旧版mysql5.5的数据同步到新mysql5.7, 并且会对部分表分库
 参考教程: mysql从5.5直接升级到5.7
  mysql5.5升级到mysql5.7   采用mysql5.5数据目录升级为mysql5.7 1 从mysql5.5的从库 copy /data数据 2 修改新的mysql5.7配置文件 my.cnf，添加datadir，指向5.5数据目录 3 新安装数据库执行(本次不需要执行) /usr/local/mysql57/bin/mysqld --defaults-file=/etc/my57.cnf --initialize-insecure --user=mysql --basedir=/usr/local/mysql --datadir=/disk/u01 4 启动mysql 5 此时数据目录还是5.5的，需要执行mysql_upgrade进行升级，在执行表修复前，需要确认一个参数innodb_file_per_table，mysql官网对该参数的解释如下 该参数在5.5版本默认为OFF，所有表和索引都导入一个共享文件中，名为ibdata1,但在5.6.7及以后版本，改参数被默认设置为ON，即每张表都有对应的表和索引存储文件，每个schema下，每个frm文件都有对应的ibd文件。 在执行mysql_upgrade时，会修复系统表，并且如果该参数在5.5和5.7版本均使用默认值，则会将之前共享表和索引的存储方式改为每张表单独存储表和索引的形式，故会出现拷贝复制的操作，如果数据量比较大，则用时就会很长， 使用nnodb_file_per_table=1，及表和索引单独存储的优缺点，可查看mysql官网介绍。 6 使用mysql_upgrade检测并修复表 /usr/local/mysql57/bin/mysql_upgrade -S /disk/u01/mysql.sock  以上已经完成对mysql5.5数据升级 在mysql5.7运行的功能
@@ -8514,10 +8514,10 @@ max_allowed_packet = 32M
 		
 		<item>
 			<title>es5集群磁盘扩容</title>
-			<link>https://blog.k1s.club/posts/22-es%E9%9B%86%E7%BE%A4%E7%A3%81%E7%9B%98%E6%89%A9%E5%AE%B9/</link>
+			<link>https://k1s.club/posts/22-es%E9%9B%86%E7%BE%A4%E7%A3%81%E7%9B%98%E6%89%A9%E5%AE%B9/</link>
 			<pubDate>Mon, 28 Oct 2019 14:59:52 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/22-es%E9%9B%86%E7%BE%A4%E7%A3%81%E7%9B%98%E6%89%A9%E5%AE%B9/</guid>
+			<guid>https://k1s.club/posts/22-es%E9%9B%86%E7%BE%A4%E7%A3%81%E7%9B%98%E6%89%A9%E5%AE%B9/</guid>
 			<description>es集群磁盘不足,对磁盘扩容遇到一些的问题
   重启集群前，先设置集群停止分片移动： curl -XPUT http://localhost:9200/_cluster/settings -d &#39;{ &amp;quot;transient&amp;quot; : { &amp;quot;cluster.routing.allocation.enable&amp;quot; : &amp;quot;none&amp;quot; } }&#39; 对磁盘进行扩容,每次操作一个节点 # 直接扩容磁盘到2T //针对ext4文件格式的操作系统（如CentOS6）：// umount /dev/vdb e2fsck -f /dev/vdb resize2fs /dev/vdb mount /dev/vdb /data # 或者新增 2T云盘/dev/vdc umount /data/ mkdir /data2 mount /dev/vdb /data2 mkfs.ext4 /dev/vdc mount /dev/vdc /data cp -ra /data2/* /data/ 重启之后，恢复分片自动分配： curl -XPUT http://localhost:9200/_cluster/settings -d &#39;{ &amp;quot;transient&amp;quot; : { &amp;quot;cluster.routing.allocation.enable&amp;quot; : &amp;quot;all&amp;quot; } }&#39;    如果需要下线其中的节点, 先将分片都转义到其他节点 # 执行以下命令会自动将10.</description>
 			<content type="html"><![CDATA[<p>es集群磁盘不足,对磁盘扩容遇到一些的问题</p>
@@ -8595,10 +8595,10 @@ curl -XPUT 127.0.0.1:9200/_cluster/settings -d '{
 		
 		<item>
 			<title>流量复制工具gor</title>
-			<link>https://blog.k1s.club/posts/21-%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6%E5%B7%A5%E5%85%B7gor/</link>
+			<link>https://k1s.club/posts/21-%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6%E5%B7%A5%E5%85%B7gor/</link>
 			<pubDate>Mon, 28 Oct 2019 14:04:37 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/21-%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6%E5%B7%A5%E5%85%B7gor/</guid>
+			<guid>https://k1s.club/posts/21-%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6%E5%B7%A5%E5%85%B7gor/</guid>
 			<description>Gor 是一款go语言实现的简单的http流量复制工具，它的主要目的是使你的生产环境HTTP真实流量在测试环境和预发布环境重现
  流量复制工具   下载安装 github下载地址: https://github.com/buger/goreplay/releases
 tar -xvf gor_1.0.0_x64.tar.gz mv gor /usr/bin/ which gor 命令 1 保存请求到文件 # 将本机所有80请求保存到gor-20171120_0.log文件(注意会生成很多文件) gor --input-raw :80 --output-file gor-%Y%m%d.log # --output-file-append 会生成gor-20171120.log文件 gor --input-raw :80 --output-file gor-%Y%m%d.log --output-file-append 2 根据文件回放请求 # 镜像qps回放 gor --input-file gor-aaaa-20171120.log --output-http aaaa-dev.test.com # 两倍镜像qps回放 gor --input-file &amp;quot;gor-aaaa-20171120.log|200%&amp;quot; --output-http aaaa-dev.test.com 3 过滤url后保存请求到文件 # 排除s.test.com的请求 gor --input-raw :80 --output-file gor-%Y%m%d.log --output-file-append --http-disallow-header &amp;quot;Host: s.test.com&amp;quot; --http-disallow-header &amp;quot;Host: www.test.com&amp;quot; --http-disallow-header &amp;quot;Host: bbs.</description>
@@ -8687,10 +8687,10 @@ server {
 		
 		<item>
 			<title>k8s搭建mysql5.7.24主从</title>
-			<link>https://blog.k1s.club/posts/20-k8s%E6%90%AD%E5%BB%BAmysql5-7-24%E4%B8%BB%E4%BB%8E/</link>
+			<link>https://k1s.club/posts/20-k8s%E6%90%AD%E5%BB%BAmysql5-7-24%E4%B8%BB%E4%BB%8E/</link>
 			<pubDate>Thu, 24 Oct 2019 18:35:00 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/20-k8s%E6%90%AD%E5%BB%BAmysql5-7-24%E4%B8%BB%E4%BB%8E/</guid>
+			<guid>https://k1s.club/posts/20-k8s%E6%90%AD%E5%BB%BAmysql5-7-24%E4%B8%BB%E4%BB%8E/</guid>
 			<description>k8s上简单部署mysql5.7.24主从
  k8s搭建mysql5.7.24主从   参考文档 利用Kubernetes搭建mysql主从复制集群 官方dockerfile
 从hub.docker.com拉取官方镜像 docker pull mysql:5.7.24  build镜像   主库master的Dockerfile from mysql:5.7.24 run sed -i &#39;/\[mysqld\]/a server-id=1\nlog-bin&#39; /etc/mysql/mysql.conf.d/mysqld.cnf COPY docker-entrypoint.sh /usr/local/bin/ 主库的docker-entrypoint.sh  先从初始镜像取 或者从github对应版本上  docker run -dti mysql:5.7.24 /bin/bash docker cp 2bfa6209d120c23:/usr/local/bin/docker-entrypoint.sh .  修改docker-entrypoint.sh  fi # 添加以下内容 echo &amp;quot;CREATE USER &#39;$MYSQL_REPLICATION_USER&#39;@&#39;%&#39; IDENTIFIED BY &#39;$MYSQL_REPLICATION_PASSWORD&#39; ;&amp;quot; | &amp;quot;${mysql[@]}&amp;quot; echo &amp;quot;GRANT REPLICATION SLAVE ON *.* TO &#39;$MYSQL_REPLICATION_USER&#39;@&#39;%&#39; IDENTIFIED BY &#39;$MYSQL_REPLICATION_PASSWORD&#39; ;&amp;quot; | &amp;quot;${mysql[@]}&amp;quot; echo &amp;quot;FLUSH PRIVILEGES ;&amp;quot; | &amp;quot;${mysql[@]}&amp;quot; # 添加以上内容 echo ls /docker-entrypoint-initdb.</description>
@@ -8951,10 +8951,10 @@ default-character-set=utf8
 		
 		<item>
 			<title>shell中gt和&gt;的区别</title>
-			<link>https://blog.k1s.club/posts/19-shell%E4%B8%ADgt%E5%92%8C%E7%9A%84%E5%8C%BA%E5%88%AB/</link>
+			<link>https://k1s.club/posts/19-shell%E4%B8%ADgt%E5%92%8C%E7%9A%84%E5%8C%BA%E5%88%AB/</link>
 			<pubDate>Thu, 17 Oct 2019 11:48:22 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/19-shell%E4%B8%ADgt%E5%92%8C%E7%9A%84%E5%8C%BA%E5%88%AB/</guid>
+			<guid>https://k1s.club/posts/19-shell%E4%B8%ADgt%E5%92%8C%E7%9A%84%E5%8C%BA%E5%88%AB/</guid>
 			<description>shell中 gt 和 &amp;gt; 的一些相关问题介绍和测试
  以下是bash的测试, 注意如果你是zsh可能会不同喔😯
   [[]] , [] 和test比较   [] 和test:	两者是一样的，在命令行里test expr和[ expr ]的效果相同。test中可用的比较运算符只有==和!=，两者都是用于字符串比较的，不可用于整数比较，整数比较只能使用-eq, -gt这种形式。 通过which [ 和which test 可以看到是命令
@@ -9039,10 +9039,10 @@ default-character-set=utf8
 		
 		<item>
 			<title>收藏链接</title>
-			<link>https://blog.k1s.club/posts/18-%E6%94%B6%E8%97%8F%E9%93%BE%E6%8E%A5/</link>
+			<link>https://k1s.club/posts/18-%E6%94%B6%E8%97%8F%E9%93%BE%E6%8E%A5/</link>
 			<pubDate>Thu, 17 Oct 2019 11:19:42 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/18-%E6%94%B6%E8%97%8F%E9%93%BE%E6%8E%A5/</guid>
+			<guid>https://k1s.club/posts/18-%E6%94%B6%E8%97%8F%E9%93%BE%E6%8E%A5/</guid>
 			<description>记录一些好的网址
  容器    云原生图书编年史 云原生大佬博客汇总 (2000个) kubernetes 社群分享 QA 汇总 k8s CRD(CustomResourceDefinition)自定义controller sample k8s 集群部署运营实践总结 k8s 创建一个只读的用户权限 kubectl 创建 Pod 背后到底发生了什么？ 白话Kubernetes网络(推荐)   Linux服务    MySQL 5.6, 5.7, 8.0版本的新特性大全 nginx+lua实现灰度发布 计算机网络 根域名的知识 常见状态码   golang    go学习指南 go圣经 go-mod学习 go包   常用的工具网址    不用翻墙就能谷歌 deepl 比谷歌翻译好用的翻译 tableconvert 在线excel转markdown processon 免费在线作图 表情锅 自制表情动图 在线解析 子网掩码换算等   其他文章    Raft 为什么是更易理解的分布式一致性算法 Raft 一步步动态教你理解raft协议 Raft 更多形象化理解 Elasticsearch分布式一致性原理剖析(一)-节点篇   想看的书籍    金字塔原理  </description>
 			<content type="html"><![CDATA[<p>记录一些好的网址</p>
@@ -9116,10 +9116,10 @@ default-character-set=utf8
 		
 		<item>
 			<title>markdown一些写法记录</title>
-			<link>https://blog.k1s.club/posts/17-markdown%E4%B8%80%E4%BA%9B%E5%86%99%E6%B3%95%E8%AE%B0%E5%BD%95/</link>
+			<link>https://k1s.club/posts/17-markdown%E4%B8%80%E4%BA%9B%E5%86%99%E6%B3%95%E8%AE%B0%E5%BD%95/</link>
 			<pubDate>Wed, 16 Oct 2019 15:56:27 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/17-markdown%E4%B8%80%E4%BA%9B%E5%86%99%E6%B3%95%E8%AE%B0%E5%BD%95/</guid>
+			<guid>https://k1s.club/posts/17-markdown%E4%B8%80%E4%BA%9B%E5%86%99%E6%B3%95%E8%AE%B0%E5%BD%95/</guid>
 			<description>&lt;p&gt;记录一些需要注意的写法,markdown 是支持html语法的&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>记录一些需要注意的写法,markdown 是支持html语法的</p>
 <h3 id="这里想写一个居中的标题和图片">这里想写一个居中的标题和图片</h3>
@@ -9164,10 +9164,10 @@ default-character-set=utf8
 		
 		<item>
 			<title>Dockerfile介绍</title>
-			<link>https://blog.k1s.club/posts/16-dockerfile%E4%BB%8B%E7%BB%8D/</link>
+			<link>https://k1s.club/posts/16-dockerfile%E4%BB%8B%E7%BB%8D/</link>
 			<pubDate>Wed, 16 Oct 2019 15:33:17 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/16-dockerfile%E4%BB%8B%E7%BB%8D/</guid>
+			<guid>https://k1s.club/posts/16-dockerfile%E4%BB%8B%E7%BB%8D/</guid>
 			<description>Dockerfile   本文摘录于: 如何快速将容器云镜像大小精简98%？
 Dockerfile 文件有自己的书写格式和支持的命令，常用的Dockerfile 指令有：  FROM 指定基镜像。 MAINTAINER 设置镜像的作者信息，如作者姓名、邮箱等。 COPY 将文件从本地复制到镜像，拷贝前需要保证本地源文件存在。 ADD 与 COPY 类似，复制文件到镜像。不同的是，如果文件是归档文件（tar, zip, tgz, xz 等），会被自动解压。 ENV 设置环境变量，格式: ENV key=value或ENV key value，运行容器后，可直接在容器中使用。 EXPOSE 暴露容器中指定的端口，只是一个声明，主要用户了解应用监听的端口。 VOLUME 挂载卷到容器，需要注意的是，保存镜像时不会保存卷中的数据。 WORKDIR 设置当前工作目录，后续各层的当前目录都被指定。 RUN 在容器中运行指定的命令。 CMD 容器启动时运行的命令。Dockerfile 中可以有多个 CMD 指令，但只有最后一个生效。CMD 可以被 docker run 之后的参数替换。 ENTRYPOINT 设置容器启动时运行的命令。Dockerfile 中可以有多个 ENTRYPOINT 指令，但只有最后一个生效。CMD 或 docker run 之后的参数会被当做参数传递给 ENTRYPOINT，这个是与CMD的区别。   容器的原理   容器镜像中最重要的概念就是layers，即镜像层。
  容器的原理
@@ -9339,10 +9339,10 @@ ENV LANG zh_CN.utf8
 		
 		<item>
 			<title>docker简介和使用</title>
-			<link>https://blog.k1s.club/posts/15-docker%E7%AE%80%E4%BB%8B%E5%92%8C%E4%BD%BF%E7%94%A8/</link>
+			<link>https://k1s.club/posts/15-docker%E7%AE%80%E4%BB%8B%E5%92%8C%E4%BD%BF%E7%94%A8/</link>
 			<pubDate>Wed, 16 Oct 2019 15:31:08 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/15-docker%E7%AE%80%E4%BB%8B%E5%92%8C%E4%BD%BF%E7%94%A8/</guid>
+			<guid>https://k1s.club/posts/15-docker%E7%AE%80%E4%BB%8B%E5%92%8C%E4%BD%BF%E7%94%A8/</guid>
 			<description>简单介绍docker
 docker k8s支持的docker 版本查看 这里我们使用年份命名版本的docker-ce，假设我们要安装v1.16.3的k8s，我们去 https://github.com/kubernetes/kubernetes 里进对应版本的CHANGELOG-1.16.md里搜The list of validated docker versions remain查找支持的docker版本，docker版本不一定得在支持列表里，实际上19.03也能使用，这里我们使用docker官方的安装脚本安装docker(该脚本支持centos和ubuntu)
 export VERSION=19.03 curl -fsSL &amp;quot;https://get.docker.com/&amp;quot; | bash -s -- --mirror Aliyun </description>
@@ -9359,10 +9359,10 @@ curl -fsSL &quot;https://get.docker.com/&quot; | bash -s -- --mirror Aliyun
 		
 		<item>
 			<title>mysql5.5目录copy方式迁移</title>
-			<link>https://blog.k1s.club/posts/14-mysql%E7%9B%AE%E5%BD%95copy%E6%96%B9%E5%BC%8F%E8%BF%81%E7%A7%BB/</link>
+			<link>https://k1s.club/posts/14-mysql%E7%9B%AE%E5%BD%95copy%E6%96%B9%E5%BC%8F%E8%BF%81%E7%A7%BB/</link>
 			<pubDate>Tue, 15 Oct 2019 10:44:27 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/14-mysql%E7%9B%AE%E5%BD%95copy%E6%96%B9%E5%BC%8F%E8%BF%81%E7%A7%BB/</guid>
+			<guid>https://k1s.club/posts/14-mysql%E7%9B%AE%E5%BD%95copy%E6%96%B9%E5%BC%8F%E8%BF%81%E7%A7%BB/</guid>
 			<description>&lt;p&gt;从现有的一台 从库 全copy data目录到2台新机器上, 再配置mysql主从&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>从现有的一台 从库 全copy data目录到2台新机器上, 再配置mysql主从</p>
 <h3 id="目录copy方式迁移">目录copy方式迁移</h3>
@@ -9428,10 +9428,10 @@ $bindir/mysqld_safe --defaults-file=/etc/my57.cnf --pid-file=&quot;$mysqld_pid_f
 		
 		<item>
 			<title>云原生博客汇总</title>
-			<link>https://blog.k1s.club/posts/13-%E4%BA%91%E5%8E%9F%E7%94%9F%E5%8D%9A%E5%AE%A2%E6%B1%87%E6%80%BB/</link>
+			<link>https://k1s.club/posts/13-%E4%BA%91%E5%8E%9F%E7%94%9F%E5%8D%9A%E5%AE%A2%E6%B1%87%E6%80%BB/</link>
 			<pubDate>Sat, 12 Oct 2019 16:35:21 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/13-%E4%BA%91%E5%8E%9F%E7%94%9F%E5%8D%9A%E5%AE%A2%E6%B1%87%E6%80%BB/</guid>
+			<guid>https://k1s.club/posts/13-%E4%BA%91%E5%8E%9F%E7%94%9F%E5%8D%9A%E5%AE%A2%E6%B1%87%E6%80%BB/</guid>
 			<description>&lt;p&gt;记录一些云原生技术博客&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>记录一些云原生技术博客</p>
 <h3 id="来自servicemesher8-群">来自ServiceMesher[8] 群</h3>
@@ -9483,10 +9483,10 @@ $bindir/mysqld_safe --defaults-file=/etc/my57.cnf --pid-file=&quot;$mysqld_pid_f
 		
 		<item>
 			<title>awk简单记录</title>
-			<link>https://blog.k1s.club/posts/12-awk%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</link>
+			<link>https://k1s.club/posts/12-awk%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</link>
 			<pubDate>Fri, 11 Oct 2019 15:23:48 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/12-awk%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</guid>
+			<guid>https://k1s.club/posts/12-awk%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</guid>
 			<description>记录一些简单使用
 实例1: 计算nginx日志中某个接口的次数和平均响应时间 例如我的a.txt nginx日志格式如下 a.b.com 1.1.1.1 [08/Sep/2019:23:57:01 +0800] &amp;quot;GET /v1/actionname?xxxx HTTP/1.1&amp;quot; 200 386 &amp;quot;-&amp;quot; &amp;quot;Mozilla/5.0 (Linux; Android 9; V1831A Build/P00610; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36&amp;quot; &amp;quot;-&amp;quot; &amp;quot;0.023&amp;quot; a.b.com 1.1.1.1 [08/Sep/2019:23:57:01 +0800] &amp;quot;GET /v1/actionname2?xxxx HTTP/1.1&amp;quot; 200 386 &amp;quot;-&amp;quot; &amp;quot;Mozilla/5.0 (Linux; Android 9; V1831A Build/P00610; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36&amp;quot; &amp;quot;-&amp;quot; &amp;quot;0.016&amp;quot;  这里我只想取出接口名: /v1/actionname 和 0.023 响应时间
  首先我取出这两列 cat a.txt|awk -F &#39;&amp;quot;&#39; &#39;{print $(NF-1),$2}&#39;|awk -F &#39;?</description>
@@ -9530,10 +9530,10 @@ tail -1000 openapi.access.log |awk '{s[$17]+=$4} {m[$17]++} END {for(i in s) {pr
 		
 		<item>
 			<title>mysql简单记录</title>
-			<link>https://blog.k1s.club/posts/11-mysql%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</link>
+			<link>https://k1s.club/posts/11-mysql%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</link>
 			<pubDate>Thu, 10 Oct 2019 10:40:20 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/11-mysql%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</guid>
+			<guid>https://k1s.club/posts/11-mysql%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</guid>
 			<description>简单记录一些mysql知识点
   SQL 语句主要可以划分为以下 3 个类别 DDL（Data Definition Languages）语句：数据定义语言，这些语句定义了不同的数据段、数据库、表、列、索引等数据库对象的定义。常用的语句关键字主要包括 create、drop、alter等。 DML（Data Manipulation Language）语句：数据操纵语句，用于添加、删除、更新和查询数据库记录，并检查数据完整性，常用的语句关键字主要包括 insert、delete、udpate 和select 等。(增添改查） DCL（Data Control Language）语句：数据控制语句，用于控制不同数据段直接的许可和访问级别的语句。这些语句定义了数据库、表、字段、用户的访问权限和安全级别。主要的语句关键字包括 grant、revoke 等。   清空表 删除表信息的方式有两种 : truncate table table_name; delete * from table_name; 注 : truncate操作中的table可以省略，delete操作中的*可以省略 truncate、delete 清空表数据的区别 : 1&amp;gt; truncate 是整体删除 (速度较快)，delete是逐条删除 (速度较慢) 2&amp;gt; truncate 不写服务器 log，delete 写服务器 log，也就是 truncate 效率比 delete高的原因 3&amp;gt; truncate 不激活trigger (触发器)，但是会重置Identity (标识列、自增字段)，相当于自增列会被置为初始值，又重新从1开始记录，而不是接着原来的 ID数。而 delete 删除以后，identity 依旧是接着被删除的最近的那一条记录ID加1后进行记录。如果只需删除表中的部分记录，只能使用 DELETE语句配合 where条件   备份 # 全量锁表备份(不可写) mysqldump --lock-all-tables --all-databases &amp;gt; ALLDB.</description>
 			<content type="html"><![CDATA[<p>简单记录一些mysql知识点</p>
@@ -9684,10 +9684,10 @@ WHERE
 		
 		<item>
 			<title>centos6安装nginx1.16&#43;php7.2</title>
-			<link>https://blog.k1s.club/posts/10-centos6%E5%AE%89%E8%A3%85nginx1-16-php7-2/</link>
+			<link>https://k1s.club/posts/10-centos6%E5%AE%89%E8%A3%85nginx1-16-php7-2/</link>
 			<pubDate>Fri, 27 Sep 2019 14:39:07 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/10-centos6%E5%AE%89%E8%A3%85nginx1-16-php7-2/</guid>
+			<guid>https://k1s.club/posts/10-centos6%E5%AE%89%E8%A3%85nginx1-16-php7-2/</guid>
 			<description>记录简单的安装nginx和php的配置,仅供参考
 先准备环境 # 更新源 mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-6.repo yum clean all yum makecache yum install -y epel-release # 安装一些依赖包 yum -y install gcc make cmake ncurses-devel libxml2-devel libtool-ltdl-devel gcc-c++ autoconf automake bison zlib-devel openssl-devel pcre-devel libxml2 libxml2-devel libcurl libcurl-devel autoconf automake libtool-ltdl libtool-ltdl-devel libjpeg libjpeg-turbo-devel libmcrypt-devel libpng-devel centos6编译安装nginx #首先官网下载1.16 cd /usr/local/src/ wget http://nginx.org/download/nginx-1.16.0.tar.gz tar -xvf nginx-1.16.0.tar.gz # 编译简单的模块 ./configure --prefix=/usr/local/nginx/ --with-http_ssl_module --with-http_stub_status_module --with-http_stub_status_module make -j4 make install # 通过启动脚本启动 chmod +x /etc/init.</description>
 			<content type="html"><![CDATA[<p>记录简单的安装nginx和php的配置,仅供参考</p>
@@ -9931,10 +9931,10 @@ chkconfig php-fpm on
 		
 		<item>
 			<title>linux遇到一些问题统计</title>
-			<link>https://blog.k1s.club/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
+			<link>https://k1s.club/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
 			<pubDate>Thu, 26 Sep 2019 17:33:38 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
+			<guid>https://k1s.club/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
 			<description>记录一些Linux,nginx或其他服务一些问题
   分布式问题: 分布式算法 Basic paxos 算法 1. 获取一个Proposal ID n，为了保证Proposal ID唯一，可采用时间戳+Server ID生成； 2. Proposer向所有Acceptors广播Prepare(n)请求； 3. Acceptor比较n和minProposal，如果n&amp;gt;minProposal，minProposal=n，并且将 acceptedProposal 和 acceptedValue 返回； 4. Proposer接收到过半数回复后，如果发现有acceptedValue返回，将所有回复中acceptedProposal最大的acceptedValue作为本次提案的value，否则可以任意决定本次提案的value； 5. 到这里可以进入第二阶段，广播Accept (n,value) 到所有节点； 6. Acceptor比较n和minProposal，如果n&amp;gt;=minProposal，则acceptedProposal=minProposal=n，acceptedValue=value，本地持久化后，返回；否则，返回minProposal。 7. 提议者接收到过半数请求后，如果发现有返回值result &amp;gt;n，表示有更新的提议，跳转到1；否则value达成一致。 Multi-Paxos 算法  为了解决实际应用中连续多值传输的高效性,改进了Basix Paxos为Multi-Paxos:
  1. 针对每一个要确定的值，运行一次Paxos算法实例（Instance），形成决议。每一个Paxos实例使用唯一的Instance ID标识。 2. 在所有Proposers中选举一个Leader，由Leader唯一地提交Proposal给Acceptors进行表决。这样没有Proposer竞争，解决了活锁问题。在系统中仅有一个Leader进行Value提交的情况下，Prepare阶段就可以跳过，从而将两阶段变为一阶段，提高效率。 raft  为了更简便理解和实现,改进了Multi-Paxos 为raft
@@ -10317,10 +10317,10 @@ vim /etc/fstab
 		
 		<item>
 			<title>mysql5.7二进制部署</title>
-			<link>https://blog.k1s.club/posts/8-mysql5-7%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2/</link>
+			<link>https://k1s.club/posts/8-mysql5-7%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2/</link>
 			<pubDate>Thu, 26 Sep 2019 15:11:05 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/8-mysql5-7%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2/</guid>
+			<guid>https://k1s.club/posts/8-mysql5-7%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2/</guid>
 			<description>二进制方式部署mysql5.7
  下载glibc二进制包 #打开下载页面, 可能会有小版本更新(注意：选择操作系统时选Linux-Generic） https://dev.mysql.com/downloads/mysql/5.7.html#downloads # 最新的可能有小版本变化 wget https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz 安装配置 tar -xvf mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz mv mysql-5.7.24-linux-glibc2.12-x86_64 /usr/local/ cd /usr/local/ # 我的镜像是安装过5.5mysql, 所以需要mv一下 mv mysql mysql-5.5.37 # 由于以前安装过php指定了该mysq目录, 这可能导致以前安装的php缺少libmysqlclient.so.18 ln -s /usr/local/mysql-5.5.37/lib/libmysqlclient.so.18 /usr/local/mysql-5.7.24-linux-glibc2.12-x86_64/lib/libmysqlclient.so.18 ln -s mysql-5.7.24-linux-glibc2.12-x86_64 mysql # 添加启动文件 \cp mysql/support-files/mysql.server /etc/init.d/mysqld echo &amp;quot;PATH=$PATH:/usr/local/mysql/bin/&amp;quot; &amp;gt;&amp;gt;~/.bashrc # 可选 wget http://centos.mirrors.ucloud.cn/centos/6/os/x86_64/Packages/numactl-2.0.9-2.el6.x86_64.rpm yum localinstall numactl-2.0.9-2.el6.x86_64.rpm \rm numactl-2.0.9-2.el6.x86_64.rpm useradd mysql # 配置下mysql的数据目录 cd /data/ mkdir u01 mkdir u02 chown -R mysql.mysql u01 chown -R mysql.</description>
 			<content type="html"><![CDATA[<blockquote>
@@ -10553,10 +10553,10 @@ max_allowed_packet = 32M
 		
 		<item>
 			<title>k8s部署storageclass动态创建pv(nfs&amp;rbd)</title>
-			<link>https://blog.k1s.club/posts/7-k8s%E9%83%A8%E7%BD%B2storageclass%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BApv-nfs-rbd/</link>
+			<link>https://k1s.club/posts/7-k8s%E9%83%A8%E7%BD%B2storageclass%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BApv-nfs-rbd/</link>
 			<pubDate>Thu, 26 Sep 2019 14:12:49 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/7-k8s%E9%83%A8%E7%BD%B2storageclass%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BApv-nfs-rbd/</guid>
+			<guid>https://k1s.club/posts/7-k8s%E9%83%A8%E7%BD%B2storageclass%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BApv-nfs-rbd/</guid>
 			<description>考虑到k8s存储的问题, 本机目录挂载存在太大局限性, 多node多pod的服务存储急迫需要共享存储, 这里简单应用k8s storageclass nfs和rbd存储
 第一部分 nfs 这里单节点简单配置nfs(高并发可采用nfs+rsync+inotify或Sersync)  高并发参考
  NFS高可用(NFS+keepalive+Sersync) inotify+rsync实时备份总结
@@ -10986,10 +10986,10 @@ parameters:
 		
 		<item>
 			<title>ceph安装部署</title>
-			<link>https://blog.k1s.club/posts/6-ceph%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/</link>
+			<link>https://k1s.club/posts/6-ceph%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/</link>
 			<pubDate>Thu, 26 Sep 2019 11:13:40 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/6-ceph%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/</guid>
+			<guid>https://k1s.club/posts/6-ceph%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/</guid>
 			<description>Ceph是一个统一的分布式存储系统，设计初衷是提供较好的性能、可靠性和可扩展性。
 简单了解什么是块存储/对象存储/文件系统存储？ ceph 目前提供对象存储（RADOSGW）、块存储RDB以及 CephFS 文件系统这 3 种功能。对于这3种功能介绍，分别如下：
   对象存储，也就是通常意义的键值存储，其接口就是简单的GET、PUT、DEL 和其他扩展，代表主要有 Swift 、S3 以及 Gluster 等；
@@ -11253,10 +11253,10 @@ spec:
 		
 		<item>
 			<title>hexo添加看板娘</title>
-			<link>https://blog.k1s.club/posts/5-hexo%E6%B7%BB%E5%8A%A0%E7%9C%8B%E6%9D%BF%E5%A8%98/</link>
+			<link>https://k1s.club/posts/5-hexo%E6%B7%BB%E5%8A%A0%E7%9C%8B%E6%9D%BF%E5%A8%98/</link>
 			<pubDate>Tue, 24 Sep 2019 17:46:17 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/5-hexo%E6%B7%BB%E5%8A%A0%E7%9C%8B%E6%9D%BF%E5%A8%98/</guid>
+			<guid>https://k1s.club/posts/5-hexo%E6%B7%BB%E5%8A%A0%E7%9C%8B%E6%9D%BF%E5%A8%98/</guid>
 			<description>&lt;h3 id=&#34;hexo6-左下角添加看板娘&#34;&gt;hexo6 左下角添加看板娘&lt;/h3&gt;</description>
 			<content type="html"><![CDATA[<h3 id="hexo6-左下角添加看板娘">hexo6 左下角添加看板娘</h3>
 <p>github地址: <a href="https://github.com/stevenjoezhang/live2d-widget">张书樵大神</a></p>
@@ -11311,10 +11311,10 @@ live2d:
 		
 		<item>
 			<title>hexo鼠标移动和鼠标点击特效</title>
-			<link>https://blog.k1s.club/posts/4-hexo%E9%BC%A0%E6%A0%87%E7%A7%BB%E5%8A%A8%E5%92%8C%E9%BC%A0%E6%A0%87%E7%82%B9%E5%87%BB%E7%89%B9%E6%95%88/</link>
+			<link>https://k1s.club/posts/4-hexo%E9%BC%A0%E6%A0%87%E7%A7%BB%E5%8A%A8%E5%92%8C%E9%BC%A0%E6%A0%87%E7%82%B9%E5%87%BB%E7%89%B9%E6%95%88/</link>
 			<pubDate>Tue, 24 Sep 2019 16:34:36 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/4-hexo%E9%BC%A0%E6%A0%87%E7%A7%BB%E5%8A%A8%E5%92%8C%E9%BC%A0%E6%A0%87%E7%82%B9%E5%87%BB%E7%89%B9%E6%95%88/</guid>
+			<guid>https://k1s.club/posts/4-hexo%E9%BC%A0%E6%A0%87%E7%A7%BB%E5%8A%A8%E5%92%8C%E9%BC%A0%E6%A0%87%E7%82%B9%E5%87%BB%E7%89%B9%E6%95%88/</guid>
 			<description>hexo6 鼠标添加点击出现桃心的特效 来自: Next主题个性化
 所需要的js文件  未压缩  ! function(e, t, a) { function n() { c( &amp;quot;.heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: &#39;&#39;;width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}&amp;quot;), o(), r() } function r() { for (var e = 0; e &amp;lt; d.length; e++) d[e].alpha &amp;lt;= 0 ? (t.body.removeChild(d[e].el), d.splice(e, 1)) : (d[e].y--, d[e].scale += .004, d[e].alpha -= .013, d[e].el.style.cssText = &amp;quot;left:&amp;quot; + d[e].x + &amp;quot;px;top:&amp;quot; + d[e].</description>
 			<content type="html"><![CDATA[<h3 id="hexo6-鼠标添加点击出现桃心的特效">hexo6 鼠标添加点击出现桃心的特效</h3>
@@ -11537,10 +11537,10 @@ live2d:
 		
 		<item>
 			<title>部署elk7.2.0</title>
-			<link>https://blog.k1s.club/posts/2-%E9%83%A8%E7%BD%B2elk7-2-0/</link>
+			<link>https://k1s.club/posts/2-%E9%83%A8%E7%BD%B2elk7-2-0/</link>
 			<pubDate>Thu, 19 Sep 2019 17:59:53 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/2-%E9%83%A8%E7%BD%B2elk7-2-0/</guid>
+			<guid>https://k1s.club/posts/2-%E9%83%A8%E7%BD%B2elk7-2-0/</guid>
 			<description>说明:
  1 单台k8s,本机目录挂载(未配置cephfs) 2 如果replicas大于1, 就会出现多个es挂载同一个目录,会出现报错(uuid block) 1. es配置本地挂载 k8s-es-7.2.0.yml --- apiVersion: v1 kind: ServiceAccount metadata: labels: app: elasticsearch name: elasticsearch7-admin namespace: ns-elastic7 --- apiVersion: rbac.authorization.k8s.io/v1 kind: ClusterRoleBinding metadata: name: elasticsearch7-admin labels: app: elasticsearch roleRef: apiGroup: rbac.authorization.k8s.io kind: ClusterRole name: cluster-admin subjects: - kind: ServiceAccount name: elasticsearch7-admin namespace: ns-elastic7 --- apiVersion: apps/v1 kind: StatefulSet metadata: labels: app: elasticsearch role: master name: elasticsearch-master namespace: ns-elastic7 spec: replicas: 1 serviceName: elasticsearch-master selector: matchLabels: app: elasticsearch role: master template: metadata: labels: app: elasticsearch role: master spec: serviceAccountName: elasticsearch7-admin restartPolicy: Always securityContext: fsGroup: 1000 containers: - name: elasticsearch-master image: hub.</description>
 			<content type="html"><![CDATA[<blockquote>
@@ -11987,10 +11987,10 @@ spec:
 		
 		<item>
 			<title>首次搭建hexo博客系统</title>
-			<link>https://blog.k1s.club/posts/%E9%A6%96%E6%AC%A1%E6%90%AD%E5%BB%BAhexo%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/</link>
+			<link>https://k1s.club/posts/%E9%A6%96%E6%AC%A1%E6%90%AD%E5%BB%BAhexo%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/</link>
 			<pubDate>Thu, 19 Sep 2019 17:24:53 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/%E9%A6%96%E6%AC%A1%E6%90%AD%E5%BB%BAhexo%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/</guid>
+			<guid>https://k1s.club/posts/%E9%A6%96%E6%AC%A1%E6%90%AD%E5%BB%BAhexo%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/</guid>
 			<description>&lt;p&gt;首次搭建hexo博客系统, 简单记录一下一些用法和注意事项&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>首次搭建hexo博客系统, 简单记录一下一些用法和注意事项</p>
 <h3 id="1-安装hexo">1 安装hexo</h3>
@@ -12334,10 +12334,10 @@ skip_render:
 		
 		<item>
 			<title></title>
-			<link>https://blog.k1s.club/posts/38-es%E9%9B%86%E7%BE%A4%E8%8A%82%E7%82%B9%E5%87%BA%E7%8E%B0overhead%E8%84%B1%E6%9C%BA%E7%9A%84%E9%97%AE%E9%A2%98/</link>
+			<link>https://k1s.club/posts/38-es%E9%9B%86%E7%BE%A4%E8%8A%82%E7%82%B9%E5%87%BA%E7%8E%B0overhead%E8%84%B1%E6%9C%BA%E7%9A%84%E9%97%AE%E9%A2%98/</link>
 			<pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
 			
-			<guid>https://blog.k1s.club/posts/38-es%E9%9B%86%E7%BE%A4%E8%8A%82%E7%82%B9%E5%87%BA%E7%8E%B0overhead%E8%84%B1%E6%9C%BA%E7%9A%84%E9%97%AE%E9%A2%98/</guid>
+			<guid>https://k1s.club/posts/38-es%E9%9B%86%E7%BE%A4%E8%8A%82%E7%82%B9%E5%87%BA%E7%8E%B0overhead%E8%84%B1%E6%9C%BA%E7%9A%84%E9%97%AE%E9%A2%98/</guid>
 			<description>title: es集群节点出现overhead脱机的问题 copyright: true toc: true date: 2020-03-12 15:23:35 tags:
  elasticsearch5 categories: [elk,elasticsearch5]   elasticsearch 日志提示 overhead, 导致集群出现问题
  问题说明   elasticsearch 日志提示 overhead [2020-03-12T14:38:03,565][WARN ][o.e.m.j.JvmGcMonitorService] [es7-u] [gc][old][3008939][256208] duration [18.4s], collections [1]/[18.9s], total [18.4s]/[5.7h], memory [7.3gb]-&amp;gt;[7.3gb]/[7.9gb], all_pools {[young] [17.5mb]-&amp;gt;[3.3mb]/[532.5mb]}{[survivor] [0b]-&amp;gt;[0b]/[66.5mb]}{[old] [7.3gb]-&amp;gt;[7.3gb]/[7.3gb]} [2020-03-12T14:38:03,593][WARN ][o.e.m.j.JvmGcMonitorService] [es7-u] [gc][3008939] overhead, spent [18.4s] collecting in the last [18.9s] [2020-03-12T14:37:44,632][WARN ][o.e.m.j.JvmGcMonitorService] [es7-u] [gc][old][3008938][256207] duration [24.8s], collections [1]/[25.5s], total [24.8s]/[5.7h], memory [7.3gb]-&amp;gt;[7.3gb]/[7.9gb], all_pools {[young] [8.</description>
