@@ -3053,7 +3053,73 @@ go env -w <span class="nv">GOPROXY</span><span class="o">=</span>https://goproxy
  <span class="p">}</span>
  <span class="k">return</span> <span class="nx">t</span>
 <span class="p">}</span>
-</code></pre></div>]]></content>
+</code></pre></div><h3 id="20-简单介绍接口的实现">20 简单介绍接口的实现</h3>
+<p><a href="https://blog.csdn.net/think2me/article/details/108149326">go中实现接口的几种方式</a></p>
+<p>举个简单例子说明</p>
+<pre><code>//定义一个接口,存在Value方法
+type emptyInterface interface {
+ Value(key interface{}) interface{}
+}
+
+// 定义一个empty类型
+type empty int
+
+// 定义empty类型的Value方法,实现emptyInterface
+func (e *empty) Value(key interface{}) interface{} {
+ return key
+}
+
+
+func main() {
+ // 定义一个empty类型结构体
+ e := new(empty)
+ // 定义一个emptyInterface类型接口
+ var eIface emptyInterface
+ // 接口赋值,完成方法的重写
+ eIface = e
+ // 对接口进行调用
+ fmt.Println(eIface.Value(1))
+ // 显然通过结构体也能调用, 但是一般我们不这么做
+ fmt.Println(e.Value(1))
+}
+
+</code></pre><p>拿个context例子说明, 首先Context接口有四个方法</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Context</span> <span class="kd">interface</span> <span class="p">{</span>
+ <span class="nf">Deadline</span><span class="p">()</span> <span class="p">(</span><span class="nx">deadline</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span> <span class="nx">ok</span> <span class="kt">bool</span><span class="p">)</span>
+ <span class="nf">Done</span><span class="p">()</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}</span>
+ <span class="nf">Err</span><span class="p">()</span> <span class="kt">error</span>
+ <span class="nf">Value</span><span class="p">(</span><span class="nx">key</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kd">interface</span><span class="p">{}</span>
+<span class="p">}</span>
+</code></pre></div><p>并且emptyCtx类型实现了Context接口</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">emptyCtx</span> <span class="kt">int</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="o">*</span><span class="nx">emptyCtx</span><span class="p">)</span> <span class="nf">Deadline</span><span class="p">()</span> <span class="p">(</span><span class="nx">deadline</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span> <span class="nx">ok</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+ <span class="k">return</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="o">*</span><span class="nx">emptyCtx</span><span class="p">)</span> <span class="nf">Done</span><span class="p">()</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}</span> <span class="p">{</span>
+ <span class="k">return</span> <span class="kc">nil</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="o">*</span><span class="nx">emptyCtx</span><span class="p">)</span> <span class="nf">Err</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+ <span class="k">return</span> <span class="kc">nil</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="o">*</span><span class="nx">emptyCtx</span><span class="p">)</span> <span class="nf">Value</span><span class="p">(</span><span class="nx">key</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kd">interface</span><span class="p">{}</span> <span class="p">{</span>
+ <span class="k">return</span> <span class="kc">nil</span>
+<span class="p">}</span>
+
+</code></pre></div><p>那么我们就说emptyCtx 实现了Context 接口, 那实现了这个接口具体要怎么做呢?</p>
+<p>比如我们可以像上面的例子一样, 赋值, 但这里使用的函数返回:</p>
+<pre><code>var (
+ background = new(emptyCtx)
+)
+
+func Background() Context {
+ return background
+}
+
+</code></pre>]]></content>
 		</item>
 		
 		<item>
