@@ -11,10 +11,10 @@
 <meta itemprop="description" content="不定时更新,文章可能比较散乱,&gt;_&lt;
   1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
   deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
- # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从hub.">
+ # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从`hub.">
 <meta itemprop="datePublished" content="2020-11-10T14:06:41+00:00" />
 <meta itemprop="dateModified" content="2020-11-10T14:06:41+00:00" />
-<meta itemprop="wordCount" content="465">
+<meta itemprop="wordCount" content="466">
 
 
 
@@ -23,7 +23,7 @@
 <meta property="og:description" content="不定时更新,文章可能比较散乱,&gt;_&lt;
   1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
   deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
- # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从hub." />
+ # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从`hub." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://blog.k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/" />
 <meta property="article:published_time" content="2020-11-10T14:06:41+00:00" />
@@ -33,7 +33,7 @@
 <meta name="twitter:description" content="不定时更新,文章可能比较散乱,&gt;_&lt;
   1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
   deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
- # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从hub."/>
+ # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从`hub."/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -122,9 +122,9 @@ apiServerExtraArgs:
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 </center>
 <h3 id="3-traefik断电后重新启动报错-command-traefik-error-field-not-found-node-redirect">3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect<a href="#3-traefik断电后重新启动报错-command-traefik-error-field-not-found-node-redirect" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-<pre><code>看到这个错误猜测可能是用的latest镜像问题, 从hub.docker.com 查看更新了v2.0+的版本
+<pre><code>看到这个错误猜测可能是用的latest镜像问题, 从`hub.docker.com` 查看更新了v2.0+的版本
 
-将traefik的deployment配置中 image改成 traefik:1.7
+将`traefik`的`deployment`配置中 image改成 `traefik:1.7`
 
 重新部署后 问题解
 </code></pre><center>
@@ -145,7 +145,7 @@ kubectl describe crd destinationrules.networking.istio.io
 </center>
 <h3 id="5-启用自动轮换kubelet-证书证书未过期">5. 启用自动轮换kubelet 证书(证书未过期)<a href="#5-启用自动轮换kubelet-证书证书未过期" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <p>参考: <a href="https://www.cnblogs.com/skymyyang/p/11093686.html">Kubeadm证书过期时间调整</a></p>
-<p>kubelet证书分为server和client两种， k8s 1.9默认启用了client证书的自动轮换，但server证书自动轮换需要用户开启</p>
+<p><code>kubelet</code>证书分为server和client两种， k8s 1.9默认启用了client证书的自动轮换，但server证书自动轮换需要用户开启</p>
 <p>增加 kubelet 参数</p>
 <pre><code># 在/etc/systemd/system/kubelet.service.d/10-kubeadm.conf 增加如下参数
 
@@ -220,7 +220,7 @@ systemctl restart kubelet
 <p>总结:
 request.cpu 必须设置, 这个是对比的对象</p>
 <p>另外:
-对于扩容而言，这个时间段为3分钟，缩容为5分钟(可以通过 &ndash;horizontal-pod-autoscaler-downscale-delay ， &ndash;horizontal-pod-autoscaler-upscale-delay 进行调整)。</p>
+对于扩容而言，这个时间段为3分钟，缩容为5分钟(可以通过 <code>--horizontal-pod-autoscaler-downscale-delay</code> ， <code>--horizontal-pod-autoscaler-upscale-delay 进行调整</code>)。</p>
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 </center>
@@ -240,7 +240,10 @@ root       soft    nproc     unlimited
 
 重新ssh，即可。
 
-</code></pre><h3 id="centos8安装k8s118flannel-pod间不通">centos8安装k8s1.18+flannel pod间不通<a href="#centos8安装k8s118flannel-pod间不通" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="9-centos8安装k8s118flannel-pod间不通">9 centos8安装k8s1.18+flannel pod间不通<a href="#9-centos8安装k8s118flannel-pod间不通" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <p>在查看到<a href="https://zhangguanzhang.github.io/">馆长</a>的<a href="https://zhangguanzhang.github.io/2020/10/20/kylin-v10-k8s-overlay-error/">银河麒麟arm64系统上k8s集群跨节点不通的一次排查</a>问题, 发下我的flannel网络同样是 <code>lo</code> 也的确启用了 <code>NetworkManager</code>, 不过重启并未有效果</p>
 <blockquote>
 <p>配置如下:</p>
@@ -283,7 +286,7 @@ broadcast 10.244.0.0 dev cni0 src 10.244.0.1 uid <span class="m">0</span>
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://blog.k1s.club/tags/k8s">k8s</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>465 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>466 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-11-10 22:06 &#43;0800</p>
 			</footer>
 		</article>
@@ -301,7 +304,7 @@ broadcast 10.244.0.0 dev cni0 src 10.244.0.1 uid <span class="m">0</span>
         <li><a href="#6-hpa的一个cpu-percent百分比问题">6. hpa的一个cpu-percent百分比问题</a></li>
         <li><a href="#7-k8s1162metrics-v035-deployment重启之后hpa就失效无法获取到数据">7 k8s1.16.2+metrics v0.3.5 deployment重启之后hpa就失效,无法获取到数据</a></li>
         <li><a href="#8-k8s机器进程数达到500多的时候-ssh连接到服务报错-shell-request-failed-on-channel-0">8 k8s机器进程数达到500多的时候, ssh连接到服务报错 shell request failed on channel 0</a></li>
-        <li><a href="#centos8安装k8s118flannel-pod间不通">centos8安装k8s1.18+flannel pod间不通</a></li>
+        <li><a href="#9-centos8安装k8s118flannel-pod间不通">9 centos8安装k8s1.18+flannel pod间不通</a></li>
       </ul>
     </li>
   </ul>
