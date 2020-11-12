@@ -12,7 +12,7 @@
 版本统计 1. k8s: 1.15.11 2. metabase: v0.36.3 3. mysql: 5.7.24 首先从charts拉取最新的模板 # 首先search查看一下 helm search metabase NAME CHART VERSION APP VERSION DESCRIPTION stable/metabase 0.3.2 v0.27.2 The easy, open source way for everyone in your company to... # 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本 所以这里我从helm官方克隆了charts git clone https://github.com/helm/charts.git cd charts/stable/metabase # 拉取配置 docker pull metabase/metabase:v0.36.3 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3 docker push xxx.com/metabase:v0.36.3 修改values.yaml配置 # 这里改成私有镜像image:repository:xxx.com/metabase# 修改数据库配置database:type:mysqlhost:k8s-db-t.xxx.comport:3336dbname:metabaseusername:metabasepassword:metabase.123# 修改时区timeZone:Asia/Shanghai# 修改nodeportservice:name:metabasetype:NodePortexternalPort:80internalPort:3000# Used to fix NodePort when service.">
 <meta itemprop="datePublished" content="2020-09-16T18:18:05+00:00" />
 <meta itemprop="dateModified" content="2020-09-16T18:18:05+00:00" />
-<meta itemprop="wordCount" content="617">
+<meta itemprop="wordCount" content="499">
 
 
 
@@ -151,268 +151,268 @@ helm upgrade android-metabase-dev --namespace android .
 <ul>
 <li>k8s-android-metabase-mysql-dev-configmap.yml</li>
 </ul>
-<pre><code>---
-kind: ConfigMap
-metadata:
-  name: android-metabase-mysql-dev
-  labels:
-    app: android-metabase-mysql-dev
-  namespace: db
-apiVersion: v1
-data:
-  my.cnf: |
-    [client]
-    port = 3306
-    socket = /data/mysql.sock
-
-    [mysql]
-    no-auto-rehash
-
-    [mysqld]
-    #关闭合并索引
-    optimizer_switch=&quot;index_merge_intersection=off&quot;
-    #skip-slave-start
-    sql_mode='ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,ALLOW_INVALID_DATES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'
-
-    binlog-ignore-db=information_schema
-    binlog-ignore-db=mysql
-    binlog-ignore-db=performance_schema
-    binlog-ignore-db=test
-
-
-    user = mysql
-    port = 3306
-    basedir = /usr/local/mysql
-    datadir = /data/
-    socket = /data/mysql.sock
-    pid-file = /data/metabase.pid
-    tmpdir = /data/
-    server-id = 0
-    character-set-server = utf8
-    skip_name_resolve = 1
-    innodb_file_per_table = 1
-    explicit_defaults_for_timestamp = 0
-    read_only = 0
-
-    # buffer&amp;cache
-    table_open_cache = 100
-    table_definition_cache = 400
-    table_open_cache_instances = 64
-    sort_buffer_size = 4M
-    join_buffer_size = 4M
-    read_buffer_size = 8M
-    read_rnd_buffer_size = 4M
-
-    # thread&amp;connection
-    thread_stack = 256K
-    thread_cache_size = 768
-    back_log = 1024
-    max_connections = 3000
-    max_connect_errors = 1000000
-
-    # temptable
-    tmp_table_size = 32M
-    max_heap_table_size = 32M
-
-    # network
-    max_allowed_packet = 32M
-    #lock_wait_timeout = 3600
-    #interactive_timeout = 600
-    #wait_timeout = 600
-
-    # query cache
-    query_cache_size = 0
-    query_cache_type = 0
-
-    # 设置errorlog、slowlog和generallog的时区，默认UTC
-    log_timestamps = SYSTEM
-
-    # error-log
-    log_error = /data/mysqld.log
-
-    # slow-log
-    slow_query_log = 1
-    slow_query_log_file = /data/metabase_slow.log
-    long_query_time = 1
-    log_queries_not_using_indexes =1
-    log_throttle_queries_not_using_indexes = 60
-    min_examined_row_limit = 100
-    log_slow_admin_statements = 1
-    log_slow_slave_statements = 1
-
-    # general log
-    #general-log = 1
-    general_log_file=/data/query.log
-
-    # binlog
-    binlog_format = row
-    binlog_checksum = 1
-    log-bin = /data/metabase-bin
-    log-bin-index = /data/metabase-bin.index
-    sync_binlog = 0
-    binlog_cache_size = 4M
-    max_binlog_size = 512M
-    expire_logs_days = 15
-
-    # GTID
-    gtid_mode = off
-    enforce_gtid_consistency = 1
-    log_slave_updates
-
-    # Replication
-    master_info_repository = TABLE
-    relay_log_info_repository = TABLE
-    slave-rows-search-algorithms = 'INDEX_SCAN,HASH_SCAN'
-    relay_log_recovery = 1
-    relay_log_purge = 1
-    relay-log=/data/metabase-relay-bin
-    relay-log-index=/data/metabase-relay-bin.index
-
-    # innodb-buffer&amp;cache
-    innodb_buffer_pool_size = 1G
-    innodb_buffer_pool_instances = 4
-    #innodb_additional_mem_pool_size = 16M
-    innodb_max_dirty_pages_pct = 50
-
-    # innodb log
-    innodb_data_file_path = ibdata1:512M:autoextend
-    innodb_log_file_size = 512M
-    innodb_log_files_in_group = 2
-    innodb_flush_log_at_trx_commit = 2
-    innodb_log_buffer_size = 32M
-    #innodb_max_undo_log_size = 4G
-    #innodb_undo_directory = undolog
-    innodb_undo_tablespaces = 0
-
-    # innodb-io
-    innodb_flush_method = O_DIRECT
-    innodb_io_capacity = 600
-    innodb_io_capacity_max = 2000
-    innodb_flush_sync = 0
-    innodb_flush_neighbors = 0
-    #innodb_lru_scan_depth = 4000
-    innodb_write_io_threads = 8
-    innodb_read_io_threads = 8
-    innodb_purge_threads = 4
-    innodb_page_cleaners = 4
-
-    # transaction,lock
-    #innodb_sync_spin_loops = 100
-    #innodb_spin_wait_delay = 30
-    innodb_lock_wait_timeout = 10
-    innodb_print_all_deadlocks = 1
-    innodb_rollback_on_timeout = 1
-
-    innodb_open_files = 65535
-
-    innodb_online_alter_log_max_size = 1G
-
-    # innodb status
-    innodb_status_file = 1
-    # 注意: 开启 innodb_status_output &amp; innodb_status_output_locks 后, 可能会导致log-error文件增长较快
-    innodb_status_output = 0
-    innodb_status_output_locks = 0
-
-    #performance_schema
-    performance_schema = 1
-    performance_schema_instrument = '%=on'
-
-    #innodb monitor
-    innodb_monitor_enable=&quot;module_innodb&quot;
-    innodb_monitor_enable=&quot;module_server&quot;
-    innodb_monitor_enable=&quot;module_dml&quot;
-    innodb_monitor_enable=&quot;module_ddl&quot;
-    innodb_monitor_enable=&quot;module_trx&quot;
-    innodb_monitor_enable=&quot;module_os&quot;
-    innodb_monitor_enable=&quot;module_purge&quot;
-    innodb_monitor_enable=&quot;module_log&quot;
-    innodb_monitor_enable=&quot;module_lock&quot;
-    innodb_monitor_enable=&quot;module_buffer&quot;
-    innodb_monitor_enable=&quot;module_index&quot;
-    innodb_monitor_enable=&quot;module_ibuf_system&quot;
-    innodb_monitor_enable=&quot;module_buffer_page&quot;
-    innodb_monitor_enable=&quot;module_adaptive_hash&quot;
-
-    # MyISAM
-    key_buffer_size = 4G
-    bulk_insert_buffer_size = 64M
-    myisam_sort_buffer_size = 256M
-    myisam_repair_threads = 1
-
-
-    [mysqldump]
-    quick
-    max_allowed_packet = 32M
-</code></pre><h3 id="部署mysql">部署mysql<a href="#部署mysql" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nn">---</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ConfigMap</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev</span><span class="w">
+</span><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">db</span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">data</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">my.cnf</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span><span class="sd">    [client]
+</span><span class="sd">    port = 3306
+</span><span class="sd">    socket = /data/mysql.sock
+</span><span class="sd">
+</span><span class="sd">    [mysql]
+</span><span class="sd">    no-auto-rehash
+</span><span class="sd">
+</span><span class="sd">    [mysqld]
+</span><span class="sd">    #关闭合并索引
+</span><span class="sd">    optimizer_switch=&#34;index_merge_intersection=off&#34;
+</span><span class="sd">    #skip-slave-start
+</span><span class="sd">    sql_mode=&#39;ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,ALLOW_INVALID_DATES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION&#39;
+</span><span class="sd">
+</span><span class="sd">    binlog-ignore-db=information_schema
+</span><span class="sd">    binlog-ignore-db=mysql
+</span><span class="sd">    binlog-ignore-db=performance_schema
+</span><span class="sd">    binlog-ignore-db=test
+</span><span class="sd">
+</span><span class="sd">
+</span><span class="sd">    user = mysql
+</span><span class="sd">    port = 3306
+</span><span class="sd">    basedir = /usr/local/mysql
+</span><span class="sd">    datadir = /data/
+</span><span class="sd">    socket = /data/mysql.sock
+</span><span class="sd">    pid-file = /data/metabase.pid
+</span><span class="sd">    tmpdir = /data/
+</span><span class="sd">    server-id = 0
+</span><span class="sd">    character-set-server = utf8
+</span><span class="sd">    skip_name_resolve = 1
+</span><span class="sd">    innodb_file_per_table = 1
+</span><span class="sd">    explicit_defaults_for_timestamp = 0
+</span><span class="sd">    read_only = 0
+</span><span class="sd">
+</span><span class="sd">    # buffer&amp;cache
+</span><span class="sd">    table_open_cache = 100
+</span><span class="sd">    table_definition_cache = 400
+</span><span class="sd">    table_open_cache_instances = 64
+</span><span class="sd">    sort_buffer_size = 4M
+</span><span class="sd">    join_buffer_size = 4M
+</span><span class="sd">    read_buffer_size = 8M
+</span><span class="sd">    read_rnd_buffer_size = 4M
+</span><span class="sd">
+</span><span class="sd">    # thread&amp;connection
+</span><span class="sd">    thread_stack = 256K
+</span><span class="sd">    thread_cache_size = 768
+</span><span class="sd">    back_log = 1024
+</span><span class="sd">    max_connections = 3000
+</span><span class="sd">    max_connect_errors = 1000000
+</span><span class="sd">
+</span><span class="sd">    # temptable
+</span><span class="sd">    tmp_table_size = 32M
+</span><span class="sd">    max_heap_table_size = 32M
+</span><span class="sd">
+</span><span class="sd">    # network
+</span><span class="sd">    max_allowed_packet = 32M
+</span><span class="sd">    #lock_wait_timeout = 3600
+</span><span class="sd">    #interactive_timeout = 600
+</span><span class="sd">    #wait_timeout = 600
+</span><span class="sd">
+</span><span class="sd">    # query cache
+</span><span class="sd">    query_cache_size = 0
+</span><span class="sd">    query_cache_type = 0
+</span><span class="sd">
+</span><span class="sd">    # 设置errorlog、slowlog和generallog的时区，默认UTC
+</span><span class="sd">    log_timestamps = SYSTEM
+</span><span class="sd">
+</span><span class="sd">    # error-log
+</span><span class="sd">    log_error = /data/mysqld.log
+</span><span class="sd">
+</span><span class="sd">    # slow-log
+</span><span class="sd">    slow_query_log = 1
+</span><span class="sd">    slow_query_log_file = /data/metabase_slow.log
+</span><span class="sd">    long_query_time = 1
+</span><span class="sd">    log_queries_not_using_indexes =1
+</span><span class="sd">    log_throttle_queries_not_using_indexes = 60
+</span><span class="sd">    min_examined_row_limit = 100
+</span><span class="sd">    log_slow_admin_statements = 1
+</span><span class="sd">    log_slow_slave_statements = 1
+</span><span class="sd">
+</span><span class="sd">    # general log
+</span><span class="sd">    #general-log = 1
+</span><span class="sd">    general_log_file=/data/query.log
+</span><span class="sd">
+</span><span class="sd">    # binlog
+</span><span class="sd">    binlog_format = row
+</span><span class="sd">    binlog_checksum = 1
+</span><span class="sd">    log-bin = /data/metabase-bin
+</span><span class="sd">    log-bin-index = /data/metabase-bin.index
+</span><span class="sd">    sync_binlog = 0
+</span><span class="sd">    binlog_cache_size = 4M
+</span><span class="sd">    max_binlog_size = 512M
+</span><span class="sd">    expire_logs_days = 15
+</span><span class="sd">
+</span><span class="sd">    # GTID
+</span><span class="sd">    gtid_mode = off
+</span><span class="sd">    enforce_gtid_consistency = 1
+</span><span class="sd">    log_slave_updates
+</span><span class="sd">
+</span><span class="sd">    # Replication
+</span><span class="sd">    master_info_repository = TABLE
+</span><span class="sd">    relay_log_info_repository = TABLE
+</span><span class="sd">    slave-rows-search-algorithms = &#39;INDEX_SCAN,HASH_SCAN&#39;
+</span><span class="sd">    relay_log_recovery = 1
+</span><span class="sd">    relay_log_purge = 1
+</span><span class="sd">    relay-log=/data/metabase-relay-bin
+</span><span class="sd">    relay-log-index=/data/metabase-relay-bin.index
+</span><span class="sd">
+</span><span class="sd">    # innodb-buffer&amp;cache
+</span><span class="sd">    innodb_buffer_pool_size = 1G
+</span><span class="sd">    innodb_buffer_pool_instances = 4
+</span><span class="sd">    #innodb_additional_mem_pool_size = 16M
+</span><span class="sd">    innodb_max_dirty_pages_pct = 50
+</span><span class="sd">
+</span><span class="sd">    # innodb log
+</span><span class="sd">    innodb_data_file_path = ibdata1:512M:autoextend
+</span><span class="sd">    innodb_log_file_size = 512M
+</span><span class="sd">    innodb_log_files_in_group = 2
+</span><span class="sd">    innodb_flush_log_at_trx_commit = 2
+</span><span class="sd">    innodb_log_buffer_size = 32M
+</span><span class="sd">    #innodb_max_undo_log_size = 4G
+</span><span class="sd">    #innodb_undo_directory = undolog
+</span><span class="sd">    innodb_undo_tablespaces = 0
+</span><span class="sd">
+</span><span class="sd">    # innodb-io
+</span><span class="sd">    innodb_flush_method = O_DIRECT
+</span><span class="sd">    innodb_io_capacity = 600
+</span><span class="sd">    innodb_io_capacity_max = 2000
+</span><span class="sd">    innodb_flush_sync = 0
+</span><span class="sd">    innodb_flush_neighbors = 0
+</span><span class="sd">    #innodb_lru_scan_depth = 4000
+</span><span class="sd">    innodb_write_io_threads = 8
+</span><span class="sd">    innodb_read_io_threads = 8
+</span><span class="sd">    innodb_purge_threads = 4
+</span><span class="sd">    innodb_page_cleaners = 4
+</span><span class="sd">
+</span><span class="sd">    # transaction,lock
+</span><span class="sd">    #innodb_sync_spin_loops = 100
+</span><span class="sd">    #innodb_spin_wait_delay = 30
+</span><span class="sd">    innodb_lock_wait_timeout = 10
+</span><span class="sd">    innodb_print_all_deadlocks = 1
+</span><span class="sd">    innodb_rollback_on_timeout = 1
+</span><span class="sd">
+</span><span class="sd">    innodb_open_files = 65535
+</span><span class="sd">
+</span><span class="sd">    innodb_online_alter_log_max_size = 1G
+</span><span class="sd">
+</span><span class="sd">    # innodb status
+</span><span class="sd">    innodb_status_file = 1
+</span><span class="sd">    # 注意: 开启 innodb_status_output &amp; innodb_status_output_locks 后, 可能会导致log-error文件增长较快
+</span><span class="sd">    innodb_status_output = 0
+</span><span class="sd">    innodb_status_output_locks = 0
+</span><span class="sd">
+</span><span class="sd">    #performance_schema
+</span><span class="sd">    performance_schema = 1
+</span><span class="sd">    performance_schema_instrument = &#39;%=on&#39;
+</span><span class="sd">
+</span><span class="sd">    #innodb monitor
+</span><span class="sd">    innodb_monitor_enable=&#34;module_innodb&#34;
+</span><span class="sd">    innodb_monitor_enable=&#34;module_server&#34;
+</span><span class="sd">    innodb_monitor_enable=&#34;module_dml&#34;
+</span><span class="sd">    innodb_monitor_enable=&#34;module_ddl&#34;
+</span><span class="sd">    innodb_monitor_enable=&#34;module_trx&#34;
+</span><span class="sd">    innodb_monitor_enable=&#34;module_os&#34;
+</span><span class="sd">    innodb_monitor_enable=&#34;module_purge&#34;
+</span><span class="sd">    innodb_monitor_enable=&#34;module_log&#34;
+</span><span class="sd">    innodb_monitor_enable=&#34;module_lock&#34;
+</span><span class="sd">    innodb_monitor_enable=&#34;module_buffer&#34;
+</span><span class="sd">    innodb_monitor_enable=&#34;module_index&#34;
+</span><span class="sd">    innodb_monitor_enable=&#34;module_ibuf_system&#34;
+</span><span class="sd">    innodb_monitor_enable=&#34;module_buffer_page&#34;
+</span><span class="sd">    innodb_monitor_enable=&#34;module_adaptive_hash&#34;
+</span><span class="sd">
+</span><span class="sd">    # MyISAM
+</span><span class="sd">    key_buffer_size = 4G
+</span><span class="sd">    bulk_insert_buffer_size = 64M
+</span><span class="sd">    myisam_sort_buffer_size = 256M
+</span><span class="sd">    myisam_repair_threads = 1
+</span><span class="sd">
+</span><span class="sd">
+</span><span class="sd">    [mysqldump]
+</span><span class="sd">    quick
+</span><span class="sd">    max_allowed_packet = 32M</span><span class="w">    
+</span></code></pre></div><h3 id="部署mysql">部署mysql<a href="#部署mysql" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <ul>
 <li>k8s-android-metabase-mysql-dev.yml</li>
 </ul>
-<pre><code>---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: android-metabase-mysql-dev
-  name: android-metabase-mysql-dev
-  namespace: db
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: android-metabase-mysql-dev
-  template:
-    metadata:
-      labels:
-        app: android-metabase-mysql-dev
-    spec:
-      containers:
-       - name: android-metabase-mysql-dev
-         image: xxx.com/mysql:5.7.24
-         ports:
-         - containerPort: 3306
-           name: db-port
-         resources:
-           requests:
-             cpu: &quot;50m&quot;
-           limits:
-             cpu: &quot;1000m&quot;
-         env:
-         - name: MYSQL_ROOT_PASSWORD
-           value: &quot;xxx.123&quot;
-         volumeMounts:
-         - name: android-metabase-mysql-dev-data
-           mountPath: /data
-         - name: android-metabase-mysql-dev-conf
-           mountPath: /etc/mysql/my.cnf
-           subPath: my.cnf
-      volumes:
-        - name: android-metabase-mysql-dev-data
-          nfs:
-            server: xxx.xxx.xxx.194
-            path: /disk/k8s-nfs-data/k8s-db-t/android-metabase-mysql-dev
-        - name: android-metabase-mysql-dev-conf
-          configMap:
-            name: android-metabase-mysql-dev
-
----
-kind: Service
-apiVersion: v1
-metadata:
-  labels:
-    app: android-metabase-mysql-dev
-  name: android-metabase-mysql-dev
-  namespace: db
-spec:
-  type: NodePort
-  ports:
-    - port: 3306
-      name: db-port
-      targetPort: 3306
-      nodePort: 3336
-      protocol: TCP
-  selector:
-    app: android-metabase-mysql-dev
-</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nn">---</span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">apps/v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Deployment</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">db</span><span class="w">
+</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev</span><span class="w">
+</span><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev</span><span class="w">
+</span><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span><span class="w">       </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev</span><span class="w">
+</span><span class="w">         </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">xxx.com/mysql:5.7.24</span><span class="w">
+</span><span class="w">         </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span><span class="w">         </span>- <span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">3306</span><span class="w">
+</span><span class="w">           </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">db-port</span><span class="w">
+</span><span class="w">         </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span><span class="w">           </span><span class="nt">requests</span><span class="p">:</span><span class="w">
+</span><span class="w">             </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;50m&#34;</span><span class="w">
+</span><span class="w">           </span><span class="nt">limits</span><span class="p">:</span><span class="w">
+</span><span class="w">             </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1000m&#34;</span><span class="w">
+</span><span class="w">         </span><span class="nt">env</span><span class="p">:</span><span class="w">
+</span><span class="w">         </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">MYSQL_ROOT_PASSWORD</span><span class="w">
+</span><span class="w">           </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;xxx.123&#34;</span><span class="w">
+</span><span class="w">         </span><span class="nt">volumeMounts</span><span class="p">:</span><span class="w">
+</span><span class="w">         </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev-data</span><span class="w">
+</span><span class="w">           </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/data</span><span class="w">
+</span><span class="w">         </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev-conf</span><span class="w">
+</span><span class="w">           </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/etc/mysql/my.cnf</span><span class="w">
+</span><span class="w">           </span><span class="nt">subPath</span><span class="p">:</span><span class="w"> </span><span class="l">my.cnf</span><span class="w">
+</span><span class="w">      </span><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev-data</span><span class="w">
+</span><span class="w">          </span><span class="nt">nfs</span><span class="p">:</span><span class="w">
+</span><span class="w">            </span><span class="nt">server</span><span class="p">:</span><span class="w"> </span><span class="l">xxx.xxx.xxx.194</span><span class="w">
+</span><span class="w">            </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/disk/k8s-nfs-data/k8s-db-t/android-metabase-mysql-dev</span><span class="w">
+</span><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev-conf</span><span class="w">
+</span><span class="w">          </span><span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span><span class="w">            </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nn">---</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Service</span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">db</span><span class="w">
+</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">NodePort</span><span class="w">
+</span><span class="w">  </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">3306</span><span class="w">
+</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">db-port</span><span class="w">
+</span><span class="w">      </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="m">3306</span><span class="w">
+</span><span class="w">      </span><span class="nt">nodePort</span><span class="p">:</span><span class="w"> </span><span class="m">3336</span><span class="w">
+</span><span class="w">      </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l">TCP</span><span class="w">
+</span><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">android-metabase-mysql-dev</span><span class="w">
+</span></code></pre></div>
 			</div>
    
 
@@ -421,7 +421,7 @@ spec:
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/helm">helm</a></span><span class="tag"><a href="https://k1s.club/tags/metabase">metabase</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>617 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>499 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-09-17 02:18 &#43;0800</p>
 			</footer>
 		</article>
