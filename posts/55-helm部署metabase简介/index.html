@@ -9,17 +9,17 @@
 	<meta name="msapplication-TileColor" content="#494f5c">
 <meta itemprop="name" content="helm部署metabase简介">
 <meta itemprop="description" content="helm 简单部署metabase
-版本统计 1. k8s: 1.15.11 2. metabase: v0.36.3 3. mysql: 5.7.24 首先从charts拉取最新的模板 # 首先search查看一下 helm search metabase NAME CHART VERSION APP VERSION DESCRIPTION stable/metabase 0.3.2 v0.27.2 The easy, open source way for everyone in your company to... # 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本 所以这里我从helm官方克隆了charts git clone https://github.com/helm/charts.git cd charts/stable/metabase # 拉取配置 docker pull metabase/metabase:v0.36.3 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3 docker push xxx.com/metabase:v0.36.3 修改values.yaml配置 # 这里改成私有镜像 image: repository: xxx.com/metabase # 修改数据库配置 database: type: mysql host: k8s-db-t.">
+版本统计 1. k8s: 1.15.11 2. metabase: v0.36.3 3. mysql: 5.7.24 首先从charts拉取最新的模板 # 首先search查看一下 helm search metabase NAME CHART VERSION APP VERSION DESCRIPTION stable/metabase 0.3.2 v0.27.2 The easy, open source way for everyone in your company to... # 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本 所以这里我从helm官方克隆了charts git clone https://github.com/helm/charts.git cd charts/stable/metabase # 拉取配置 docker pull metabase/metabase:v0.36.3 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3 docker push xxx.com/metabase:v0.36.3 修改values.yaml配置 # 这里改成私有镜像image:repository:xxx.com/metabase# 修改数据库配置database:type:mysqlhost:k8s-db-t.xxx.comport:3336dbname:metabaseusername:metabasepassword:metabase.123# 修改时区timeZone:Asia/Shanghai# 修改nodeportservice:name:metabasetype:NodePortexternalPort:80internalPort:3000# Used to fix NodePort when service.">
 <meta itemprop="datePublished" content="2020-09-16T18:18:05+00:00" />
 <meta itemprop="dateModified" content="2020-09-16T18:18:05+00:00" />
-<meta itemprop="wordCount" content="670">
+<meta itemprop="wordCount" content="617">
 
 
 
 <meta itemprop="keywords" content="helm,metabase," />
 <meta property="og:title" content="helm部署metabase简介" />
 <meta property="og:description" content="helm 简单部署metabase
-版本统计 1. k8s: 1.15.11 2. metabase: v0.36.3 3. mysql: 5.7.24 首先从charts拉取最新的模板 # 首先search查看一下 helm search metabase NAME CHART VERSION APP VERSION DESCRIPTION stable/metabase 0.3.2 v0.27.2 The easy, open source way for everyone in your company to... # 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本 所以这里我从helm官方克隆了charts git clone https://github.com/helm/charts.git cd charts/stable/metabase # 拉取配置 docker pull metabase/metabase:v0.36.3 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3 docker push xxx.com/metabase:v0.36.3 修改values.yaml配置 # 这里改成私有镜像 image: repository: xxx.com/metabase # 修改数据库配置 database: type: mysql host: k8s-db-t." />
+版本统计 1. k8s: 1.15.11 2. metabase: v0.36.3 3. mysql: 5.7.24 首先从charts拉取最新的模板 # 首先search查看一下 helm search metabase NAME CHART VERSION APP VERSION DESCRIPTION stable/metabase 0.3.2 v0.27.2 The easy, open source way for everyone in your company to... # 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本 所以这里我从helm官方克隆了charts git clone https://github.com/helm/charts.git cd charts/stable/metabase # 拉取配置 docker pull metabase/metabase:v0.36.3 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3 docker push xxx.com/metabase:v0.36.3 修改values.yaml配置 # 这里改成私有镜像image:repository:xxx.com/metabase# 修改数据库配置database:type:mysqlhost:k8s-db-t.xxx.comport:3336dbname:metabaseusername:metabasepassword:metabase.123# 修改时区timeZone:Asia/Shanghai# 修改nodeportservice:name:metabasetype:NodePortexternalPort:80internalPort:3000# Used to fix NodePort when service." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://k1s.club/posts/55-helm%E9%83%A8%E7%BD%B2metabase%E7%AE%80%E4%BB%8B/" />
 <meta property="article:published_time" content="2020-09-16T18:18:05+00:00" />
@@ -27,7 +27,7 @@
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="helm部署metabase简介"/>
 <meta name="twitter:description" content="helm 简单部署metabase
-版本统计 1. k8s: 1.15.11 2. metabase: v0.36.3 3. mysql: 5.7.24 首先从charts拉取最新的模板 # 首先search查看一下 helm search metabase NAME CHART VERSION APP VERSION DESCRIPTION stable/metabase 0.3.2 v0.27.2 The easy, open source way for everyone in your company to... # 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本 所以这里我从helm官方克隆了charts git clone https://github.com/helm/charts.git cd charts/stable/metabase # 拉取配置 docker pull metabase/metabase:v0.36.3 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3 docker push xxx.com/metabase:v0.36.3 修改values.yaml配置 # 这里改成私有镜像 image: repository: xxx.com/metabase # 修改数据库配置 database: type: mysql host: k8s-db-t."/>
+版本统计 1. k8s: 1.15.11 2. metabase: v0.36.3 3. mysql: 5.7.24 首先从charts拉取最新的模板 # 首先search查看一下 helm search metabase NAME CHART VERSION APP VERSION DESCRIPTION stable/metabase 0.3.2 v0.27.2 The easy, open source way for everyone in your company to... # 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本 所以这里我从helm官方克隆了charts git clone https://github.com/helm/charts.git cd charts/stable/metabase # 拉取配置 docker pull metabase/metabase:v0.36.3 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3 docker push xxx.com/metabase:v0.36.3 修改values.yaml配置 # 这里改成私有镜像image:repository:xxx.com/metabase# 修改数据库配置database:type:mysqlhost:k8s-db-t.xxx.comport:3336dbname:metabaseusername:metabasepassword:metabase.123# 修改时区timeZone:Asia/Shanghai# 修改nodeportservice:name:metabasetype:NodePortexternalPort:80internalPort:3000# Used to fix NodePort when service."/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -82,72 +82,72 @@
 2. metabase:  v0.36.3
 3. mysql:  5.7.24
 </code></pre><h3 id="首先从charts拉取最新的模板">首先从charts拉取最新的模板<a href="#首先从charts拉取最新的模板" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-<pre><code># 首先search查看一下
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># 首先search查看一下</span>
 helm search metabase
 NAME            CHART VERSION APP VERSION DESCRIPTION
-stable/metabase 0.3.2         v0.27.2     The easy, open source way for everyone in your company to...
+stable/metabase 0.3.2         v0.27.2     The easy, open <span class="nb">source</span> way <span class="k">for</span> everyone in your company to...
 
-# 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本
+<span class="c1"># 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本</span>
 所以这里我从helm官方克隆了charts
 git clone https://github.com/helm/charts.git
 
-cd charts/stable/metabase
+<span class="nb">cd</span> charts/stable/metabase
 
-# 拉取配置
+<span class="c1"># 拉取配置</span>
 docker pull metabase/metabase:v0.36.3
 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3
 docker push xxx.com/metabase:v0.36.3
-</code></pre><h3 id="修改valuesyaml配置">修改values.yaml配置<a href="#修改valuesyaml配置" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-<pre><code># 这里改成私有镜像
-image:
-  repository: xxx.com/metabase
+</code></pre></div><h3 id="修改valuesyaml配置">修改values.yaml配置<a href="#修改valuesyaml配置" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="c"># 这里改成私有镜像</span><span class="w">
+</span><span class="w"></span><span class="nt">image</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l">xxx.com/metabase</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="c"># 修改数据库配置</span><span class="w">
+</span><span class="w"></span><span class="nt">database</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">mysql</span><span class="w">
+</span><span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-db-t.xxx.com</span><span class="w">
+</span><span class="w">  </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">3336</span><span class="w">
+</span><span class="w">  </span><span class="nt">dbname</span><span class="p">:</span><span class="w"> </span><span class="l">metabase</span><span class="w">
+</span><span class="w">  </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l">metabase</span><span class="w">
+</span><span class="w">  </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l">metabase.123</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="c"># 修改时区</span><span class="w">
+</span><span class="w"></span><span class="nt">timeZone</span><span class="p">:</span><span class="w"> </span><span class="l">Asia/Shanghai</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="c"># 修改nodeport</span><span class="w">
+</span><span class="w"></span><span class="nt">service</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">metabase</span><span class="w">
+</span><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">NodePort</span><span class="w">
+</span><span class="w">  </span><span class="nt">externalPort</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span><span class="w">  </span><span class="nt">internalPort</span><span class="p">:</span><span class="w"> </span><span class="m">3000</span><span class="w">
+</span><span class="w">  </span><span class="c"># Used to fix NodePort when service.type: NodePort.</span><span class="w">
+</span><span class="w">  </span><span class="nt">nodePort</span><span class="p">:</span><span class="w"> </span><span class="m">33000</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="c"># 这里也同时开启了ingress,</span><span class="w">
+</span><span class="w"></span><span class="nt">ingress</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="w">  </span><span class="c"># Used to create Ingress record (should used with service.type: ClusterIP).</span><span class="w">
+</span><span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="l">metabase-dev.xxx.com</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="c"># 设置资源限制</span><span class="w">
+</span><span class="w"></span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">limits</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l">1000m</span><span class="w">
+</span><span class="w">    </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l">4096Mi</span><span class="w">
+</span><span class="w">  </span><span class="nt">requests</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l">100m</span><span class="w">
+</span><span class="w">    </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l">256Mi</span><span class="w">
+</span></code></pre></div><h3 id="k8s-db-t上部署metabase">k8s-db-t上部署metabase<a href="#k8s-db-t上部署metabase" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh"><span class="nb">cd</span> /data/k8s-config/helm/charts/stable/metabase
 
-# 修改数据库配置
-database:
-  type: mysql
-  host: k8s-db-t.xxx.com
-  port: 3336
-  dbname: metabase
-  username: metabase
-  password: metabase.123
-
-# 修改时区
-timeZone: Asia/Shanghai
-
-# 修改nodeport
-service:
-  name: metabase
-  type: NodePort
-  externalPort: 80
-  internalPort: 3000
-  # Used to fix NodePort when service.type: NodePort.
-  nodePort: 33000
-
-# 这里也同时开启了ingress,
-ingress:
-  enabled: true
-  # Used to create Ingress record (should used with service.type: ClusterIP).
-  hosts:
-    - metabase-dev.xxx.com
-
-# 设置资源限制
-resources:
-  limits:
-    cpu: 1000m
-    memory: 4096Mi
-  requests:
-    cpu: 100m
-    memory: 256Mi
-</code></pre><h3 id="k8s-db-t上部署metabase">k8s-db-t上部署metabase<a href="#k8s-db-t上部署metabase" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-<pre><code>cd /data/k8s-config/helm/charts/stable/metabase
-
-## 首次安装
+<span class="c1">## 首次安装</span>
 helm install --name android-metabase-dev --namespace android .
 
-## 更新
+<span class="c1">## 更新</span>
 helm upgrade android-metabase-dev --namespace android .
 
-</code></pre><h3 id="部署mysql-configmap">部署mysql-configmap<a href="#部署mysql-configmap" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+</code></pre></div><h3 id="部署mysql-configmap">部署mysql-configmap<a href="#部署mysql-configmap" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <ul>
 <li>k8s-android-metabase-mysql-dev-configmap.yml</li>
 </ul>
@@ -421,7 +421,7 @@ spec:
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/helm">helm</a></span><span class="tag"><a href="https://k1s.club/tags/metabase">metabase</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>670 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>617 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-09-17 02:18 &#43;0800</p>
 			</footer>
 		</article>

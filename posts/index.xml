@@ -832,7 +832,7 @@ chronyc -a makestep
 			
 			<guid>https://k1s.club/posts/55-helm%E9%83%A8%E7%BD%B2metabase%E7%AE%80%E4%BB%8B/</guid>
 			<description>helm 简单部署metabase
-版本统计 1. k8s: 1.15.11 2. metabase: v0.36.3 3. mysql: 5.7.24 首先从charts拉取最新的模板 # 首先search查看一下 helm search metabase NAME CHART VERSION APP VERSION DESCRIPTION stable/metabase 0.3.2 v0.27.2 The easy, open source way for everyone in your company to... # 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本 所以这里我从helm官方克隆了charts git clone https://github.com/helm/charts.git cd charts/stable/metabase # 拉取配置 docker pull metabase/metabase:v0.36.3 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3 docker push xxx.com/metabase:v0.36.3 修改values.yaml配置 # 这里改成私有镜像 image: repository: xxx.com/metabase # 修改数据库配置 database: type: mysql host: k8s-db-t.</description>
+版本统计 1. k8s: 1.15.11 2. metabase: v0.36.3 3. mysql: 5.7.24 首先从charts拉取最新的模板 # 首先search查看一下 helm search metabase NAME CHART VERSION APP VERSION DESCRIPTION stable/metabase 0.3.2 v0.27.2 The easy, open source way for everyone in your company to... # 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本 所以这里我从helm官方克隆了charts git clone https://github.com/helm/charts.git cd charts/stable/metabase # 拉取配置 docker pull metabase/metabase:v0.36.3 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3 docker push xxx.com/metabase:v0.36.3 修改values.yaml配置 # 这里改成私有镜像image:repository:xxx.com/metabase# 修改数据库配置database:type:mysqlhost:k8s-db-t.xxx.comport:3336dbname:metabaseusername:metabasepassword:metabase.123# 修改时区timeZone:Asia/Shanghai# 修改nodeportservice:name:metabasetype:NodePortexternalPort:80internalPort:3000# Used to fix NodePort when service.</description>
 			<content type="html"><![CDATA[<p>helm 简单部署metabase</p>
 <!-- more-->
 <h3 id="版本统计">版本统计</h3>
@@ -840,72 +840,72 @@ chronyc -a makestep
 2. metabase:  v0.36.3
 3. mysql:  5.7.24
 </code></pre><h3 id="首先从charts拉取最新的模板">首先从charts拉取最新的模板</h3>
-<pre><code># 首先search查看一下
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># 首先search查看一下</span>
 helm search metabase
 NAME            CHART VERSION APP VERSION DESCRIPTION
-stable/metabase 0.3.2         v0.27.2     The easy, open source way for everyone in your company to...
+stable/metabase 0.3.2         v0.27.2     The easy, open <span class="nb">source</span> way <span class="k">for</span> everyone in your company to...
 
-# 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本
+<span class="c1"># 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本</span>
 所以这里我从helm官方克隆了charts
 git clone https://github.com/helm/charts.git
 
-cd charts/stable/metabase
+<span class="nb">cd</span> charts/stable/metabase
 
-# 拉取配置
+<span class="c1"># 拉取配置</span>
 docker pull metabase/metabase:v0.36.3
 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3
 docker push xxx.com/metabase:v0.36.3
-</code></pre><h3 id="修改valuesyaml配置">修改values.yaml配置</h3>
-<pre><code># 这里改成私有镜像
-image:
-  repository: xxx.com/metabase
+</code></pre></div><h3 id="修改valuesyaml配置">修改values.yaml配置</h3>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="c"># 这里改成私有镜像</span><span class="w">
+</span><span class="w"></span><span class="nt">image</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l">xxx.com/metabase</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="c"># 修改数据库配置</span><span class="w">
+</span><span class="w"></span><span class="nt">database</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">mysql</span><span class="w">
+</span><span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-db-t.xxx.com</span><span class="w">
+</span><span class="w">  </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">3336</span><span class="w">
+</span><span class="w">  </span><span class="nt">dbname</span><span class="p">:</span><span class="w"> </span><span class="l">metabase</span><span class="w">
+</span><span class="w">  </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l">metabase</span><span class="w">
+</span><span class="w">  </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l">metabase.123</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="c"># 修改时区</span><span class="w">
+</span><span class="w"></span><span class="nt">timeZone</span><span class="p">:</span><span class="w"> </span><span class="l">Asia/Shanghai</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="c"># 修改nodeport</span><span class="w">
+</span><span class="w"></span><span class="nt">service</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">metabase</span><span class="w">
+</span><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">NodePort</span><span class="w">
+</span><span class="w">  </span><span class="nt">externalPort</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span><span class="w">  </span><span class="nt">internalPort</span><span class="p">:</span><span class="w"> </span><span class="m">3000</span><span class="w">
+</span><span class="w">  </span><span class="c"># Used to fix NodePort when service.type: NodePort.</span><span class="w">
+</span><span class="w">  </span><span class="nt">nodePort</span><span class="p">:</span><span class="w"> </span><span class="m">33000</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="c"># 这里也同时开启了ingress,</span><span class="w">
+</span><span class="w"></span><span class="nt">ingress</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="w">  </span><span class="c"># Used to create Ingress record (should used with service.type: ClusterIP).</span><span class="w">
+</span><span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="l">metabase-dev.xxx.com</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="c"># 设置资源限制</span><span class="w">
+</span><span class="w"></span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">limits</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l">1000m</span><span class="w">
+</span><span class="w">    </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l">4096Mi</span><span class="w">
+</span><span class="w">  </span><span class="nt">requests</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l">100m</span><span class="w">
+</span><span class="w">    </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l">256Mi</span><span class="w">
+</span></code></pre></div><h3 id="k8s-db-t上部署metabase">k8s-db-t上部署metabase</h3>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh"><span class="nb">cd</span> /data/k8s-config/helm/charts/stable/metabase
 
-# 修改数据库配置
-database:
-  type: mysql
-  host: k8s-db-t.xxx.com
-  port: 3336
-  dbname: metabase
-  username: metabase
-  password: metabase.123
-
-# 修改时区
-timeZone: Asia/Shanghai
-
-# 修改nodeport
-service:
-  name: metabase
-  type: NodePort
-  externalPort: 80
-  internalPort: 3000
-  # Used to fix NodePort when service.type: NodePort.
-  nodePort: 33000
-
-# 这里也同时开启了ingress,
-ingress:
-  enabled: true
-  # Used to create Ingress record (should used with service.type: ClusterIP).
-  hosts:
-    - metabase-dev.xxx.com
-
-# 设置资源限制
-resources:
-  limits:
-    cpu: 1000m
-    memory: 4096Mi
-  requests:
-    cpu: 100m
-    memory: 256Mi
-</code></pre><h3 id="k8s-db-t上部署metabase">k8s-db-t上部署metabase</h3>
-<pre><code>cd /data/k8s-config/helm/charts/stable/metabase
-
-## 首次安装
+<span class="c1">## 首次安装</span>
 helm install --name android-metabase-dev --namespace android .
 
-## 更新
+<span class="c1">## 更新</span>
 helm upgrade android-metabase-dev --namespace android .
 
-</code></pre><h3 id="部署mysql-configmap">部署mysql-configmap</h3>
+</code></pre></div><h3 id="部署mysql-configmap">部署mysql-configmap</h3>
 <ul>
 <li>k8s-android-metabase-mysql-dev-configmap.yml</li>
 </ul>

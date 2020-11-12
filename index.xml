@@ -107,7 +107,7 @@
       
       <guid>https://k1s.club/posts/55-helm%E9%83%A8%E7%BD%B2metabase%E7%AE%80%E4%BB%8B/</guid>
       <description>helm 简单部署metabase
-版本统计 1. k8s: 1.15.11 2. metabase: v0.36.3 3. mysql: 5.7.24 首先从charts拉取最新的模板 # 首先search查看一下 helm search metabase NAME CHART VERSION APP VERSION DESCRIPTION stable/metabase 0.3.2 v0.27.2 The easy, open source way for everyone in your company to... # 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本 所以这里我从helm官方克隆了charts git clone https://github.com/helm/charts.git cd charts/stable/metabase # 拉取配置 docker pull metabase/metabase:v0.36.3 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3 docker push xxx.com/metabase:v0.36.3 修改values.yaml配置 # 这里改成私有镜像 image: repository: xxx.com/metabase # 修改数据库配置 database: type: mysql host: k8s-db-t.</description>
+版本统计 1. k8s: 1.15.11 2. metabase: v0.36.3 3. mysql: 5.7.24 首先从charts拉取最新的模板 # 首先search查看一下 helm search metabase NAME CHART VERSION APP VERSION DESCRIPTION stable/metabase 0.3.2 v0.27.2 The easy, open source way for everyone in your company to... # 这里直接通过helm安装只有 v0.27.2的版本, 我们想要安装最新的版本 所以这里我从helm官方克隆了charts git clone https://github.com/helm/charts.git cd charts/stable/metabase # 拉取配置 docker pull metabase/metabase:v0.36.3 docker tag metabase/metabase:v0.36.3 xxx.com/metabase:v0.36.3 docker push xxx.com/metabase:v0.36.3 修改values.yaml配置 # 这里改成私有镜像image:repository:xxx.com/metabase# 修改数据库配置database:type:mysqlhost:k8s-db-t.xxx.comport:3336dbname:metabaseusername:metabasepassword:metabase.123# 修改时区timeZone:Asia/Shanghai# 修改nodeportservice:name:metabasetype:NodePortexternalPort:80internalPort:3000# Used to fix NodePort when service.</description>
     </item>
     
   </channel>
