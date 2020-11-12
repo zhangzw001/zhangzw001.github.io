@@ -12,8 +12,8 @@
   分布式问题: 分布式算法 Basic paxos 算法 1. 获取一个Proposal ID n，为了保证Proposal ID唯一，可采用时间戳&#43;Server ID生成； 2. Proposer向所有Acceptors广播Prepare(n)请求； 3. Acceptor比较n和minProposal，如果n&gt;minProposal，minProposal=n，并且将 acceptedProposal 和 acceptedValue 返回； 4. Proposer接收到过半数回复后，如果发现有acceptedValue返回，将所有回复中acceptedProposal最大的acceptedValue作为本次提案的value，否则可以任意决定本次提案的value； 5. 到这里可以进入第二阶段，广播Accept (n,value) 到所有节点； 6. Acceptor比较n和minProposal，如果n&gt;=minProposal，则acceptedProposal=minProposal=n，acceptedValue=value，本地持久化后，返回；否则，返回minProposal。 7. 提议者接收到过半数请求后，如果发现有返回值result &gt;n，表示有更新的提议，跳转到1；否则value达成一致。 Multi-Paxos 算法  为了解决实际应用中连续多值传输的高效性,改进了Basix Paxos为Multi-Paxos:
  1. 针对每一个要确定的值，运行一次Paxos算法实例（Instance），形成决议。每一个Paxos实例使用唯一的Instance ID标识。 2. 在所有Proposers中选举一个Leader，由Leader唯一地提交Proposal给Acceptors进行表决。这样没有Proposer竞争，解决了活锁问题。在系统中仅有一个Leader进行Value提交的情况下，Prepare阶段就可以跳过，从而将两阶段变为一阶段，提高效率。 raft  为了更简便理解和实现,改进了Multi-Paxos 为raft
  1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的) 2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选. 而multi-paxos 是随意的 所以raft 可以看成是简化版本的multi paxos(这里multi-paxos 因为允许并发的写log, 因此不存在一个最新, 最全的日志节点, 因此只能这么做.">
-<meta itemprop="datePublished" content="2019-09-26T17:33:38+00:00" />
-<meta itemprop="dateModified" content="2019-09-26T17:33:38+00:00" />
+<meta itemprop="datePublished" content="2020-11-12T10:33:32+00:00" />
+<meta itemprop="dateModified" content="2020-11-12T10:33:32+00:00" />
 <meta itemprop="wordCount" content="952">
 
 
@@ -26,8 +26,8 @@
  1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的) 2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选. 而multi-paxos 是随意的 所以raft 可以看成是简化版本的multi paxos(这里multi-paxos 因为允许并发的写log, 因此不存在一个最新, 最全的日志节点, 因此只能这么做." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://k1s.club/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/" />
-<meta property="article:published_time" content="2019-09-26T17:33:38+00:00" />
-<meta property="article:modified_time" content="2019-09-26T17:33:38+00:00" />
+<meta property="article:published_time" content="2020-11-12T10:33:32+00:00" />
+<meta property="article:modified_time" content="2020-11-12T10:33:32+00:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="linux遇到一些问题统计"/>
 <meta name="twitter:description" content="记录一些Linux,nginx或其他服务一些问题
@@ -77,7 +77,7 @@
 	<main class="site-main section-inner animated fadeIn faster">
 		<article class="thin">
 			<header class="post-header">
-				<div class="post-meta"><span>Sep 26, 2019</span></div>
+				<div class="post-meta"><span>Nov 12, 2020</span></div>
 				<h1>linux遇到一些问题统计</h1>
 			</header>
 			<div class="content">
@@ -473,7 +473,7 @@ vim /etc/fstab
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/linux">linux</a></span>
 				</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>952 Words</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-09-27 01:33 &#43;0800</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-11-12 18:33 &#43;0800</p>
 			</footer>
 		</article>
 		<aside id="toc" class="show-toc">
@@ -508,11 +508,8 @@ vim /etc/fstab
 </nav>
 		</aside>
 		<div class="post-nav thin">
-			<a class="next-post" href="https://k1s.club/posts/10-centos6%E5%AE%89%E8%A3%85nginx1-16-php7-2/">
-				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>centos6安装nginx1.16&#43;php7.2</span>
-			</a>
-			<a class="prev-post" href="https://k1s.club/posts/8-mysql5-7%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2/">
-				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>mysql5.7二进制部署</span>
+			<a class="prev-post" href="https://k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>k8s遇到的一些问题统计总结</span>
 			</a>
 		</div>
 		<div id="comments" class="thin">
