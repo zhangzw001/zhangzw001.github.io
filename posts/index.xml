@@ -46,30 +46,30 @@ listening on enp0s3, link-type EN10MB <span class="o">(</span>Ethernet<span clas
 
 
 <span class="c1"># 三次握手包</span>
-15:35:23.254118 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>S<span class="o">]</span>, seq 2358640817, win 29200, options <span class="o">[</span>mss 1460,sackOK,TS val <span class="m">1164279598</span> ecr 0,nop,wscale 7<span class="o">]</span>, length <span class="m">0</span>
-15:35:23.262005 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>S.<span class="o">]</span>, seq 1212165121, ack 2358640818, win 8192, options <span class="o">[</span>mss 1452,sackOK,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,wscale 5<span class="o">]</span>, length <span class="m">0</span>
-15:35:23.262068 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212165122, win 229, length <span class="m">0</span>
+15:35:23.254118 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>S<span class="o">]</span>, seq 2358640817, win 29200, options <span class="o">[</span>mss 1460,sackOK,TS val <span class="m">1164279598</span> ecr 0,nop,wscale 7<span class="o">]</span>, length <span class="m">0</span>
+15:35:23.262005 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>S.<span class="o">]</span>, seq 1212165121, ack 2358640818, win 8192, options <span class="o">[</span>mss 1452,sackOK,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,wscale 5<span class="o">]</span>, length <span class="m">0</span>
+15:35:23.262068 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212165122, win 229, length <span class="m">0</span>
 
 <span class="c1"># 数据传输包</span>
-15:35:23.262260 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 2358640818:2358640895, ack 1212165122, win 229, length 77: HTTP: GET / HTTP/1.1
-15:35:23.272385 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640895, win 908, length <span class="m">0</span>
-15:35:23.273343 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 1212165122:1212167903, ack 2358640895, win 908, length 2781: HTTP: HTTP/1.1 <span class="m">200</span> OK
-15:35:23.273403 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167903, win 272, length <span class="m">0</span>
+15:35:23.262260 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 2358640818:2358640895, ack 1212165122, win 229, length 77: HTTP: GET / HTTP/1.1
+15:35:23.272385 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640895, win 908, length <span class="m">0</span>
+15:35:23.273343 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 1212165122:1212167903, ack 2358640895, win 908, length 2781: HTTP: HTTP/1.1 <span class="m">200</span> OK
+15:35:23.273403 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167903, win 272, length <span class="m">0</span>
 
 <span class="c1"># 四次挥手包</span>
-15:35:23.273657 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 2358640895, ack 1212167903, win 272, length <span class="m">0</span>
-15:35:23.282240 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640896, win 908, length <span class="m">0</span>
-15:35:23.282290 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 1212167903, ack 2358640896, win 908, length <span class="m">0</span>
-15:35:23.282322 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167904, win 272, length <span class="m">0</span>
+15:35:23.273657 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 2358640895, ack 1212167903, win 272, length <span class="m">0</span>
+15:35:23.282240 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640896, win 908, length <span class="m">0</span>
+15:35:23.282290 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 1212167903, ack 2358640896, win 908, length <span class="m">0</span>
+15:35:23.282322 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167904, win 272, length <span class="m">0</span>
 
 <span class="c1"># RST包</span>
-15:35:26.295824 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>R<span class="o">]</span>, seq 1212167904, win 0, length <span class="m">0</span>
+15:35:26.295824 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>R<span class="o">]</span>, seq 1212167904, win 0, length <span class="m">0</span>
 
 </code></pre></div><p><img src="/images/tcp_open_close.jpg" alt=""></p>
 <h4 id="分析三次握手包">分析三次握手包</h4>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.254118 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>S<span class="o">]</span>, seq 2358640817, win 29200, options <span class="o">[</span>mss 1460,sackOK,TS val <span class="m">1164279598</span> ecr 0,nop,wscale 7<span class="o">]</span>, length <span class="m">0</span>
-15:35:23.262005 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>S.<span class="o">]</span>, seq 1212165121, ack 2358640818, win 8192, options <span class="o">[</span>mss 1452,sackOK,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,wscale 5<span class="o">]</span>, length <span class="m">0</span>
-15:35:23.262068 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212165122, win 229, length <span class="m">0</span>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.254118 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>S<span class="o">]</span>, seq 2358640817, win 29200, options <span class="o">[</span>mss 1460,sackOK,TS val <span class="m">1164279598</span> ecr 0,nop,wscale 7<span class="o">]</span>, length <span class="m">0</span>
+15:35:23.262005 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>S.<span class="o">]</span>, seq 1212165121, ack 2358640818, win 8192, options <span class="o">[</span>mss 1452,sackOK,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,wscale 5<span class="o">]</span>, length <span class="m">0</span>
+15:35:23.262068 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212165122, win 229, length <span class="m">0</span>
 </code></pre></div><ul>
 <li>
 <ol>
@@ -88,10 +88,10 @@ listening on enp0s3, link-type EN10MB <span class="o">(</span>Ethernet<span clas
 </li>
 </ul>
 <h4 id="分析数据传输包">分析数据传输包</h4>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.262260 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 2358640818:2358640895, ack 1212165122, win 229, length 77: HTTP: GET / HTTP/1.1
-15:35:23.272385 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640895, win 908, length <span class="m">0</span>
-15:35:23.273343 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 1212165122:1212167903, ack 2358640895, win 908, length 2781: HTTP: HTTP/1.1 <span class="m">200</span> OK
-15:35:23.273403 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167903, win 272, length <span class="m">0</span>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.262260 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 2358640818:2358640895, ack 1212165122, win 229, length 77: HTTP: GET / HTTP/1.1
+15:35:23.272385 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640895, win 908, length <span class="m">0</span>
+15:35:23.273343 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 1212165122:1212167903, ack 2358640895, win 908, length 2781: HTTP: HTTP/1.1 <span class="m">200</span> OK
+15:35:23.273403 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167903, win 272, length <span class="m">0</span>
 
 </code></pre></div><ul>
 <li>
@@ -116,10 +116,10 @@ listening on enp0s3, link-type EN10MB <span class="o">(</span>Ethernet<span clas
 </li>
 </ul>
 <h4 id="四次挥手包">四次挥手包</h4>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.273657 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 2358640895, ack 1212167903, win 272, length <span class="m">0</span>
-15:35:23.282240 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640896, win 908, length <span class="m">0</span>
-15:35:23.282290 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 1212167903, ack 2358640896, win 908, length <span class="m">0</span>
-15:35:23.282322 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167904, win 272, length <span class="m">0</span>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.273657 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 2358640895, ack 1212167903, win 272, length <span class="m">0</span>
+15:35:23.282240 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640896, win 908, length <span class="m">0</span>
+15:35:23.282290 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 1212167903, ack 2358640896, win 908, length <span class="m">0</span>
+15:35:23.282322 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167904, win 272, length <span class="m">0</span>
 </code></pre></div><ul>
 <li>
 <ol>
