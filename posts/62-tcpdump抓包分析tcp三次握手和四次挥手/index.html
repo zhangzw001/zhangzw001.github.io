@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="Tcpdump抓包分析tcp三次握手和四次挥手">
+<meta itemprop="description" content="抓包命令解析 命令参数说明  -n 主机名域名显示成ip -S 用绝对而非相对数值列出TCP关联数。 -i 接口名,指定网卡名 host 请求地址: www.baidu.com tcp 请求端口: tcp:80  标志说明  Flags [S]: 请求连接(SYN) Flags [S.]: sync&#43;ack(SYN&#43;ACK) Flags [.]: ack(ACK) Flags [P.]: 发送数据包(PUSH) Flags [F]: 发送方没有更多包发送了(FIN) Flags [R]: 表明packet的发送方马上就要断开当前连接了(RST)   参考官方手册
+ 本次测试抓取的结果,通过curl http://www.baiu.com得到 # 抓取 enp0s3 网卡请求 http://www.baidu.com 的包并显示ip和实际发送seq和ack tcpdump -n -S -i enp0s3 host www.baidu.com and tcp port 80 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes # 三次握手包 15:35:23.">
+<meta itemprop="datePublished" content="2020-11-13T17:28:38+08:00" />
+<meta itemprop="dateModified" content="2020-11-13T17:28:38+08:00" />
+<meta itemprop="wordCount" content="509">
+
+
+
+<meta itemprop="keywords" content="tcpdump,tcp," />
+<meta property="og:title" content="Tcpdump抓包分析tcp三次握手和四次挥手" />
+<meta property="og:description" content="抓包命令解析 命令参数说明  -n 主机名域名显示成ip -S 用绝对而非相对数值列出TCP关联数。 -i 接口名,指定网卡名 host 请求地址: www.baidu.com tcp 请求端口: tcp:80  标志说明  Flags [S]: 请求连接(SYN) Flags [S.]: sync&#43;ack(SYN&#43;ACK) Flags [.]: ack(ACK) Flags [P.]: 发送数据包(PUSH) Flags [F]: 发送方没有更多包发送了(FIN) Flags [R]: 表明packet的发送方马上就要断开当前连接了(RST)   参考官方手册
+ 本次测试抓取的结果,通过curl http://www.baiu.com得到 # 抓取 enp0s3 网卡请求 http://www.baidu.com 的包并显示ip和实际发送seq和ack tcpdump -n -S -i enp0s3 host www.baidu.com and tcp port 80 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes # 三次握手包 15:35:23." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://k1s.club/posts/62-tcpdump%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/" />
+<meta property="article:published_time" content="2020-11-13T17:28:38+08:00" />
+<meta property="article:modified_time" content="2020-11-13T17:28:38+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Tcpdump抓包分析tcp三次握手和四次挥手"/>
+<meta name="twitter:description" content="抓包命令解析 命令参数说明  -n 主机名域名显示成ip -S 用绝对而非相对数值列出TCP关联数。 -i 接口名,指定网卡名 host 请求地址: www.baidu.com tcp 请求端口: tcp:80  标志说明  Flags [S]: 请求连接(SYN) Flags [S.]: sync&#43;ack(SYN&#43;ACK) Flags [.]: ack(ACK) Flags [P.]: 发送数据包(PUSH) Flags [F]: 发送方没有更多包发送了(FIN) Flags [R]: 表明packet的发送方马上就要断开当前连接了(RST)   参考官方手册
+ 本次测试抓取的结果,通过curl http://www.baiu.com得到 # 抓取 enp0s3 网卡请求 http://www.baidu.com 的包并显示ip和实际发送seq和ack tcpdump -n -S -i enp0s3 host www.baidu.com and tcp port 80 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes # 三次握手包 15:35:23."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>Tcpdump抓包分析tcp三次握手和四次挥手</title>
+	<link rel="stylesheet" href="https://k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://k1s.club/posts/">文章</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://k1s.club/posts/">文章</a></li>
+			<li><a href="https://k1s.club/tags/">标签</a></li>
+			<li><a href="https://k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Nov 13, 2020</span></div>
+				<h1>Tcpdump抓包分析tcp三次握手和四次挥手</h1>
+			</header>
+			<div class="content">
+				<h3 id="抓包命令解析">抓包命令解析<a href="#抓包命令解析" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="命令参数说明">命令参数说明<a href="#命令参数说明" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<ul>
+<li>-n 主机名域名显示成ip</li>
+<li>-S 用绝对而非相对数值列出TCP关联数。</li>
+<li>-i 接口名,指定网卡名</li>
+<li>host 请求地址: <a href="http://www.baidu.com">www.baidu.com</a></li>
+<li>tcp  请求端口: tcp:80</li>
+</ul>
+<h4 id="标志说明">标志说明<a href="#标志说明" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<ul>
+<li>Flags [S]: 请求连接(SYN)</li>
+<li>Flags [S.]: sync+ack(SYN+ACK)</li>
+<li>Flags [.]: ack(ACK)</li>
+<li>Flags [P.]: 发送数据包(PUSH)</li>
+<li>Flags [F]: 发送方没有更多包发送了(FIN)</li>
+<li>Flags [R]: 表明packet的发送方马上就要断开当前连接了(RST)</li>
+</ul>
+<blockquote>
+<p>参考<a href="http://www.tcpdump.org/manpages/tcpdump.1.html">官方手册</a></p>
+</blockquote>
+<h4 id="本次测试抓取的结果通过curl-httpwwwbaiucom得到">本次测试抓取的结果,通过curl <a href="http://www.baiu.com">http://www.baiu.com</a>得到<a href="#本次测试抓取的结果通过curl-httpwwwbaiucom得到" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># 抓取 enp0s3 网卡请求 http://www.baidu.com 的包并显示ip和实际发送seq和ack</span>
+tcpdump -n -S -i enp0s3 host www.baidu.com and tcp port <span class="m">80</span>
+tcpdump: verbose output suppressed, use -v or -vv <span class="k">for</span> full protocol decode
+listening on enp0s3, link-type EN10MB <span class="o">(</span>Ethernet<span class="o">)</span>, capture size <span class="m">262144</span> bytes
+
+
+<span class="c1"># 三次握手包</span>
+15:35:23.254118 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>S<span class="o">]</span>, seq 2358640817, win 29200, options <span class="o">[</span>mss 1460,sackOK,TS val <span class="m">1164279598</span> ecr 0,nop,wscale 7<span class="o">]</span>, length <span class="m">0</span>
+15:35:23.262005 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>S.<span class="o">]</span>, seq 1212165121, ack 2358640818, win 8192, options <span class="o">[</span>mss 1452,sackOK,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,wscale 5<span class="o">]</span>, length <span class="m">0</span>
+15:35:23.262068 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212165122, win 229, length <span class="m">0</span>
+
+<span class="c1"># 数据传输包</span>
+15:35:23.262260 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 2358640818:2358640895, ack 1212165122, win 229, length 77: HTTP: GET / HTTP/1.1
+15:35:23.272385 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640895, win 908, length <span class="m">0</span>
+15:35:23.273343 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 1212165122:1212167903, ack 2358640895, win 908, length 2781: HTTP: HTTP/1.1 <span class="m">200</span> OK
+15:35:23.273403 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167903, win 272, length <span class="m">0</span>
+
+<span class="c1"># 四次挥手包</span>
+15:35:23.273657 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 2358640895, ack 1212167903, win 272, length <span class="m">0</span>
+15:35:23.282240 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640896, win 908, length <span class="m">0</span>
+15:35:23.282290 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 1212167903, ack 2358640896, win 908, length <span class="m">0</span>
+15:35:23.282322 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167904, win 272, length <span class="m">0</span>
+
+<span class="c1"># RST包</span>
+15:35:26.295824 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>R<span class="o">]</span>, seq 1212167904, win 0, length <span class="m">0</span>
+
+</code></pre></div><p><img src="/images/tcp_open_close.jpg" alt=""></p>
+<h4 id="分析三次握手包">分析三次握手包<a href="#分析三次握手包" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.254118 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>S<span class="o">]</span>, seq 2358640817, win 29200, options <span class="o">[</span>mss 1460,sackOK,TS val <span class="m">1164279598</span> ecr 0,nop,wscale 7<span class="o">]</span>, length <span class="m">0</span>
+15:35:23.262005 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>S.<span class="o">]</span>, seq 1212165121, ack 2358640818, win 8192, options <span class="o">[</span>mss 1452,sackOK,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,wscale 5<span class="o">]</span>, length <span class="m">0</span>
+15:35:23.262068 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212165122, win 229, length <span class="m">0</span>
+</code></pre></div><ul>
+<li>
+<ol>
+<li>客户端发起关闭,发送SYN包,   <code>Flags [S]</code> 代表<code>syn</code>标志,  发送随机数<code>seq=2358640817</code>, <code>win=29200</code>, 发送数据<code>length=0</code></li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>服务端回复确认包并且发送SYN包, <code>Flags [S.]</code>中的. 代表<code>ack</code>, 这里<code>ack=2358640817+1</code>, 新的服务端发送随机数<code>seq=2358640817</code>, <code>win=8192</code>,</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>客户端回复SYN确认包,    回复<code>ack=1212165121+1</code></li>
+</ol>
+</li>
+</ul>
+<h4 id="分析数据传输包">分析数据传输包<a href="#分析数据传输包" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.262260 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 2358640818:2358640895, ack 1212165122, win 229, length 77: HTTP: GET / HTTP/1.1
+15:35:23.272385 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640895, win 908, length <span class="m">0</span>
+15:35:23.273343 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 1212165122:1212167903, ack 2358640895, win 908, length 2781: HTTP: HTTP/1.1 <span class="m">200</span> OK
+15:35:23.273403 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167903, win 272, length <span class="m">0</span>
+
+</code></pre></div><ul>
+<li>
+<ol>
+<li><code>Flags [P.]</code>  <code>P</code>表示发送数据, <code>.</code>表示ack回复, 这里seq中 <code>2358640895=2358640818+77</code>(数据长度) 2358640818就是上次的<code>ack</code>值, <code>ack=1212165122</code></li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li><code>Flags [.]</code>   <code>.</code>表示<code>ack 2358640895=2358640818+77</code></li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li><code>Flags [P.]</code>  P表示发送数据, .表示ack回复, 这里seq中 <code>1212167903=1212165122+2781</code>(数据长度), <code>ack=2358640895</code></li>
+</ol>
+</li>
+<li>
+<ol start="4">
+<li><code>Flags [.]</code>   <code>.</code>表示<code>ack 1212167903=1212165122+2781</code></li>
+</ol>
+</li>
+</ul>
+<h4 id="四次挥手包">四次挥手包<a href="#四次挥手包" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.273657 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 2358640895, ack 1212167903, win 272, length <span class="m">0</span>
+15:35:23.282240 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640896, win 908, length <span class="m">0</span>
+15:35:23.282290 IP 180.101.49.11.http &gt; 172.16.56.116.54646: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 1212167903, ack 2358640896, win 908, length <span class="m">0</span>
+15:35:23.282322 IP 172.16.56.116.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167904, win 272, length <span class="m">0</span>
+</code></pre></div><ul>
+<li>
+<ol>
+<li><code>Flags [F.]</code>  客户端发起fin包,  <code>F</code>表示发起挥手FIN,<code>.</code>表示<code>ack</code>, <code>seq=2358640895</code>就是上次的<code>ack</code>值, <code>ack=1212167903</code></li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li><code>Flags [.]</code>   服务端回复确认包, <code>.</code>表示<code>ack</code>,<code>ack=2358640895+1</code>,</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li><code>Flags [F.]</code>  服务端发起fin包, <code>F</code>表示发起挥手FIN,<code>.</code>表示<code>ack</code>,  <code>seq=1212167903</code>是上次的<code>ack</code>值,, <code>ack=2358640895+1</code></li>
+</ol>
+</li>
+<li>
+<ol start="4">
+<li><code>Flags [.]</code>   客户端回复确认包, <code>.</code>表示<code>ack=1212167903+1</code>,</li>
+</ol>
+</li>
+</ul>
+<h3 id="其他文章">其他文章<a href="#其他文章" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li><a href="https://www.cnblogs.com/nzbbody/p/8622497.html">什么是win</a></li>
+<li><a href="https://blog.csdn.net/Mr_rsq/article/details/81082127">TCP三次握手四次断开及11种状态转变</a></li>
+<li><a href="https://testerhome.com/topics/22107">Tcpdump 结果说明</a></li>
+</ul>
+
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/tcpdump">tcpdump</a></span><span class="tag"><a href="https://k1s.club/tags/tcp">tcp</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>509 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-11-13 17:28 &#43;0800</p>
+			</footer>
+		</article>
+		<aside id="toc" class="show-toc">
+			<div class="toc-title">Table of Contents</div>
+			<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#抓包命令解析">抓包命令解析</a></li>
+        <li><a href="#其他文章">其他文章</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+		</aside>
+		<div class="post-nav thin">
+			<a class="prev-post" href="https://k1s.club/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>linux遇到一些问题统计</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-180942795-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>
