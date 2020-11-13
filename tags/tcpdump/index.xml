@@ -15,7 +15,8 @@
       
       <guid>https://k1s.club/posts/62-tcpdump%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/</guid>
       <description>命令参数说明  -n 主机名域名显示成ip -S 用绝对而非相对数值列出TCP关联数。 -i 接口名,指定网卡名 host 请求地址: www.baidu.com tcp 请求端口: tcp:80  标志说明  Flags [S]: 请求连接(SYN) Flags [S.]: sync+ack(SYN+ACK) Flags [.]: ack(ACK) Flags [P.]: 发送数据包(PUSH) Flags [F]: 发送方没有更多包发送了(FIN) Flags [R]: 表明packet的发送方马上就要断开当前连接了(RST)   参考官方手册
- 本次测试抓取的结果,通过curl http://www.baiu.com得到 # 抓取 enp0s3 网卡请求 http://www.baidu.com 的包并显示ip和实际发送seq和ack tcpdump -n -S -i enp0s3 host www.baidu.com and tcp port 80 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes # 三次握手包 15:35:23.</description>
+ 本次抓取的结果  通过curl http://www.baiu.com得到
+ # 抓取 enp0s3 网卡请求 http://www.baidu.com 的包并显示ip和实际发送seq和ack tcpdump -n -S -i enp0s3 host www.baidu.com and tcp port 80 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes # 三次握手包 15:35:23.</description>
     </item>
     
   </channel>
