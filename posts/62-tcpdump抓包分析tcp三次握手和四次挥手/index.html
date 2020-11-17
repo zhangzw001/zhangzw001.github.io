@@ -13,7 +13,7 @@
  # 抓取 enp0s3 网卡请求 http://www.baidu.com 的包并显示ip和实际发送seq和ack tcpdump -n -S -i enp0s3 host www.baidu.com and tcp port 80 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes # 三次握手包 15:35:23.">
 <meta itemprop="datePublished" content="2020-11-13T17:28:38+08:00" />
 <meta itemprop="dateModified" content="2020-11-13T17:28:38+08:00" />
-<meta itemprop="wordCount" content="509">
+<meta itemprop="wordCount" content="606">
 
 
 
@@ -129,7 +129,22 @@ listening on enp0s3, link-type EN10MB <span class="o">(</span>Ethernet<span clas
 15:35:26.295824 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>R<span class="o">]</span>, seq 1212167904, win 0, length <span class="m">0</span>
 
 </code></pre></div><p><img src="/images/tcp_open_close.jpg" alt=""></p>
-<h3 id="分析三次握手包">分析三次握手包<a href="#分析三次握手包" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>说明: 这边write()传输数据为0的时候,默认+1,否则进入死循环,seq=ack就同一个值在校验了,所以seq=x+1,ACK=y+1是没问题的, 我这边请求百度的数据发送是: 77,后面百度服务端回复的数据长度是: 2781, 所以如果length不为空的时候,seq=x+len</p>
+</blockquote>
+<blockquote>
+<p>这里我<code>telnet 80</code> 端口测试连接 并发送数据<code>1</code>,结果当然nginx会给<code>400</code>, 可以看到这边<code>length=3</code></p>
+<p>为啥是3呢?</p>
+<p>(猜测哈)&hellip; 首先回车应该也算了一个字节,数据<code>1</code>算一个字节, 现在就两个字节了, 还有一个应该是每次ack的<code>+1</code>吧? 但好像有点牵强&hellip;</p>
+</blockquote>
+<p>参考: <a href="http://c.biancheng.net/view/2352.html">详细分析TCP数据的传输过程</a></p>
+<blockquote>
+<p>所以: 1669015475 = 1669015472 + 2(发送字节数) +1 ???  那为啥 length要记成3呢&hellip; 记录成2更合理吧,感觉还是有点问题</p>
+</blockquote>
+<pre><code>17:44:35.874189 IP 172.xx.xx.xx.58623 &gt; 172.16.56.116.http: Flags [P.], seq 1669015472:1669015475, ack 2645576909, win 4117, options [nop,nop,TS val 531802073 ecr 1306189625], length 3: HTTP
+17:44:35.874291 IP 172.16.56.116.http &gt; 172.xx.xx.xx.58623: Flags [.], ack 1669015475, win 227, options [nop,nop,TS val 1306191841 ecr 531802073], length 0
+17:44:35.874869 IP 172.16.56.116.http &gt; 172.xx.xx.xx.58623: Flags [P.], seq 2645576909:2645577234, ack 1669015475, win 227, options [nop,nop,TS val 1306191842 ecr 531802073], length 325: HTTP: HTTP/1.1 400 Bad Request
+</code></pre><h3 id="分析三次握手包">分析三次握手包<a href="#分析三次握手包" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.254118 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>S<span class="o">]</span>, seq 2358640817, win 29200, options <span class="o">[</span>mss 1460,sackOK,TS val <span class="m">1164279598</span> ecr 0,nop,wscale 7<span class="o">]</span>, length <span class="m">0</span>
 15:35:23.262005 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>S.<span class="o">]</span>, seq 1212165121, ack 2358640818, win 8192, options <span class="o">[</span>mss 1452,sackOK,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,wscale 5<span class="o">]</span>, length <span class="m">0</span>
 15:35:23.262068 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212165122, win 229, length <span class="m">0</span>
@@ -220,7 +235,7 @@ listening on enp0s3, link-type EN10MB <span class="o">(</span>Ethernet<span clas
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/tcpdump">tcpdump</a></span><span class="tag"><a href="https://k1s.club/tags/tcp">tcp</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>509 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>606 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-11-13 17:28 &#43;0800</p>
 			</footer>
 		</article>

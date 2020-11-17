@@ -69,7 +69,22 @@ listening on enp0s3, link-type EN10MB <span class="o">(</span>Ethernet<span clas
 15:35:26.295824 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>R<span class="o">]</span>, seq 1212167904, win 0, length <span class="m">0</span>
 
 </code></pre></div><p><img src="/images/tcp_open_close.jpg" alt=""></p>
-<h3 id="分析三次握手包">分析三次握手包</h3>
+<blockquote>
+<p>说明: 这边write()传输数据为0的时候,默认+1,否则进入死循环,seq=ack就同一个值在校验了,所以seq=x+1,ACK=y+1是没问题的, 我这边请求百度的数据发送是: 77,后面百度服务端回复的数据长度是: 2781, 所以如果length不为空的时候,seq=x+len</p>
+</blockquote>
+<blockquote>
+<p>这里我<code>telnet 80</code> 端口测试连接 并发送数据<code>1</code>,结果当然nginx会给<code>400</code>, 可以看到这边<code>length=3</code></p>
+<p>为啥是3呢?</p>
+<p>(猜测哈)&hellip; 首先回车应该也算了一个字节,数据<code>1</code>算一个字节, 现在就两个字节了, 还有一个应该是每次ack的<code>+1</code>吧? 但好像有点牵强&hellip;</p>
+</blockquote>
+<p>参考: <a href="http://c.biancheng.net/view/2352.html">详细分析TCP数据的传输过程</a></p>
+<blockquote>
+<p>所以: 1669015475 = 1669015472 + 2(发送字节数) +1 ???  那为啥 length要记成3呢&hellip; 记录成2更合理吧,感觉还是有点问题</p>
+</blockquote>
+<pre><code>17:44:35.874189 IP 172.xx.xx.xx.58623 &gt; 172.16.56.116.http: Flags [P.], seq 1669015472:1669015475, ack 2645576909, win 4117, options [nop,nop,TS val 531802073 ecr 1306189625], length 3: HTTP
+17:44:35.874291 IP 172.16.56.116.http &gt; 172.xx.xx.xx.58623: Flags [.], ack 1669015475, win 227, options [nop,nop,TS val 1306191841 ecr 531802073], length 0
+17:44:35.874869 IP 172.16.56.116.http &gt; 172.xx.xx.xx.58623: Flags [P.], seq 2645576909:2645577234, ack 1669015475, win 227, options [nop,nop,TS val 1306191842 ecr 531802073], length 325: HTTP: HTTP/1.1 400 Bad Request
+</code></pre><h3 id="分析三次握手包">分析三次握手包</h3>
 <div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.254118 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>S<span class="o">]</span>, seq 2358640817, win 29200, options <span class="o">[</span>mss 1460,sackOK,TS val <span class="m">1164279598</span> ecr 0,nop,wscale 7<span class="o">]</span>, length <span class="m">0</span>
 15:35:23.262005 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>S.<span class="o">]</span>, seq 1212165121, ack 2358640818, win 8192, options <span class="o">[</span>mss 1452,sackOK,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,wscale 5<span class="o">]</span>, length <span class="m">0</span>
 15:35:23.262068 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212165122, win 229, length <span class="m">0</span>
@@ -371,6 +386,34 @@ net.ipv4.icmp_echo_ignore_all=1
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 </center>
+### nginx问题: http_x_real_ip问题
+<p>nginx的反向代理服务器一般都需要加上 <code>proxy_set_header X-Real-IP $remote_addr;</code>, 为啥需要加上这个呢?</p>
+<p>比如我有如下架构代理:
+<a href="http://www.test.com">www.test.com</a>(clientip: 1.1.1.1) -&gt; proxy1(2.1.1.1) -&gt; proxy2(2.1.1.2) -&gt; real server(2.1.1.3)</p>
+<p>因为不加的话<code>$http_x_real_ip</code> 会一直是空, 并且在反向代理服务器后端的real server 同样是空
+这一点和<code>$http_x_forwarded_for</code> 不同,比如在<code>proxy1</code>上为空, 但是在<code>proxy2</code>之后的服务器上不为空</p>
+<p>加了之后就是真实客户端ip了吗?</p>
+<p>如</p>
+<ul>
+<li>proxy1服务器: (2.1.1.1)</li>
+</ul>
+<pre><code>1. $remote_addr = 1.1.1.1
+2. $http_x_real_ip = 空
+3. $http_x_forwarded_for = 空
+</code></pre><ul>
+<li>proxy2服务器: (2.1.1.2)</li>
+</ul>
+<pre><code>1. $remote_addr = 2.1.1.1
+2. $http_x_real_ip = 1.1.1.1
+3. $http_x_forwarded_for = 1.1.1.1
+</code></pre><ul>
+<li>real server服务器: (2.1.1.3)</li>
+</ul>
+<pre><code>1. $remote_addr = 2.1.1.2
+2. $http_x_real_ip = 2.1.1.1
+3. $http_x_forwarded_for = 1.1.1.1,2.1.1.1
+</code></pre><p>如此看来假如我们反向代理只有一层, 没有proxy2, 那代码中获取<code>$http_x_real_ip</code> 和<code>$http_x_forwarded_for</code>是一样的</p>
+<p>但显然即便我们反向代理只有一层,  在proxy1之前可能还有反向代理, 例如经过cdn之后, 例如他人代理 都将隐藏真实ip.</p>
 <h3 id="nginx问题-nginx-if条件的实现">nginx问题: nginx if条件&amp;&amp;的实现</h3>
 <ul>
 <li>1 允许所有人访问 a.php|b.php|c.php|d.php|e.php</li>
@@ -520,6 +563,13 @@ server {
 		try_files $uri $uri/ /index.php?$query_string;
 	}
 }
+</code></pre><hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="网络问题-转发正代和反代">网络问题: 转发,正代和反代</h3>
+<pre><code>1. 正代: 内网客户端172.16.88.88想要访问google,通过浏览器配置代理服务器ip(172.16.88.2:1080) 去访问google, 代理服务器和客户端在同一个局域网
+2. 反代: 内网服务端10.10.88.88上有http服务,通过配置代理服务器(10.10.88.2:80 外网地址:1.1.1.1:80)绑定域名www.googoo.com对外提供服务, 代理服务器和服务端在同一个局域网
 </code></pre><hr>
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
