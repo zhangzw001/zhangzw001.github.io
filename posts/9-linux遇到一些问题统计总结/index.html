@@ -14,7 +14,7 @@
  1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的) 2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选. 而multi-paxos 是随意的 所以raft 可以看成是简化版本的multi paxos(这里multi-paxos 因为允许并发的写log, 因此不存在一个最新, 最全的日志节点, 因此只能这么做.">
 <meta itemprop="datePublished" content="2020-11-12T10:33:32+00:00" />
 <meta itemprop="dateModified" content="2020-11-12T10:33:32+00:00" />
-<meta itemprop="wordCount" content="1047">
+<meta itemprop="wordCount" content="1049">
 
 
 
@@ -313,9 +313,9 @@ net.ipv4.icmp_echo_ignore_all=1
 <pre><code>1. $remote_addr = 2.1.1.2
 2. $http_x_real_ip = 2.1.1.1
 3. $http_x_forwarded_for = 1.1.1.1,2.1.1.1
-</code></pre><p>一般来说 当有多个代理时候，可以在第一个反向代理上配置<code>proxy_set_header X-Real-IP $remote_addr</code> 获取真实客户端IP；</p>
-<p>如此看来假如我们反向代理只有一层, 没有proxy2, 那代码中获取<code>$http_x_real_ip</code> 和<code>$http_x_forwarded_for</code>是一样的</p>
-<p>但显然即便我们反向代理只有一层,  在proxy1之前可能还有反向代理, 例如经过cdn之后, 例如他人代理 都将隐藏真实ip.</p>
+</code></pre><p>一般来说 当有多个代理时候，可以在第一个反向代理上配置<code>proxy_set_header X-Real-IP $remote_addr</code> 获取真实客户端IP</p>
+<p>如此看来假如整个请求,反向代理只有一层, 没有proxy2, real server获取<code>$http_x_real_ip</code> 和<code>$http_x_forwarded_for</code>是一样的, 就是真实客户端ip</p>
+<p>但显然即便我们反向代理只有一层,  在proxy1之前,互联网中可能还有反向代理, 例如经过cdn之后, 例如他人代理 都将隐藏真实ip.</p>
 <h3 id="nginx问题-nginx-if条件的实现">nginx问题: nginx if条件&amp;&amp;的实现<a href="#nginx问题-nginx-if条件的实现" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <ul>
 <li>1 允许所有人访问 a.php|b.php|c.php|d.php|e.php</li>
@@ -507,7 +507,7 @@ vim /etc/fstab
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/linux">linux</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1047 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1049 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-11-12 18:33 &#43;0800</p>
 			</footer>
 		</article>

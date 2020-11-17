@@ -411,9 +411,9 @@ net.ipv4.icmp_echo_ignore_all=1
 <pre><code>1. $remote_addr = 2.1.1.2
 2. $http_x_real_ip = 2.1.1.1
 3. $http_x_forwarded_for = 1.1.1.1,2.1.1.1
-</code></pre><p>一般来说 当有多个代理时候，可以在第一个反向代理上配置<code>proxy_set_header X-Real-IP $remote_addr</code> 获取真实客户端IP；</p>
-<p>如此看来假如我们反向代理只有一层, 没有proxy2, 那代码中获取<code>$http_x_real_ip</code> 和<code>$http_x_forwarded_for</code>是一样的</p>
-<p>但显然即便我们反向代理只有一层,  在proxy1之前可能还有反向代理, 例如经过cdn之后, 例如他人代理 都将隐藏真实ip.</p>
+</code></pre><p>一般来说 当有多个代理时候，可以在第一个反向代理上配置<code>proxy_set_header X-Real-IP $remote_addr</code> 获取真实客户端IP</p>
+<p>如此看来假如整个请求,反向代理只有一层, 没有proxy2, real server获取<code>$http_x_real_ip</code> 和<code>$http_x_forwarded_for</code>是一样的, 就是真实客户端ip</p>
+<p>但显然即便我们反向代理只有一层,  在proxy1之前,互联网中可能还有反向代理, 例如经过cdn之后, 例如他人代理 都将隐藏真实ip.</p>
 <h3 id="nginx问题-nginx-if条件的实现">nginx问题: nginx if条件&amp;&amp;的实现</h3>
 <ul>
 <li>1 允许所有人访问 a.php|b.php|c.php|d.php|e.php</li>
