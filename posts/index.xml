@@ -914,7 +914,7 @@ kubectl create service nodeport nginx --tcp<span class="o">=</span>31112:80 -n <
 			<pubDate>Tue, 20 Oct 2020 16:42:57 +0800</pubDate>
 			
 			<guid>https://k1s.club/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/</guid>
-			<description>1. 记录一些常见的goland快捷键(mac) 1. command + alt + ← | → // 回退|前进 到上次浏览的位置  2. command d | x // 复制行 |删除行  3. command b = command + 单击 // 快速打开光标处的类或方法  4. command alt l // 重新格式化代码  5. 代码折叠和展开 - command shift + / - // 代码全部展开 / 折叠 (项目所有go文件全部展开/折叠) - command alt + / - // 代码递归展开 / 折叠 (所选内容行内全部展开/折叠) - command + / - // 代码展开 / 折叠 (所选内容展开/折叠)  </description>
+			<description>1. 记录一些常见的goland快捷键(mac) 1. command + alt + ← | → // 回退|前进 到上次浏览的位置  2. command d | x // 复制行 |删除行  3. command b = command + 单击 // 快速打开光标处的类或方法  4. command alt l // 重新格式化代码  5. 代码折叠和展开 - command shift + / - // 代码全部展开 / 折叠 (项目所有go文件全部展开/折叠) - command alt + / - // 代码递归展开 / 折叠 (所选内容行内全部展开/折叠) - command + / - // 代码展开 / 折叠 (所选内容展开/折叠)  6.</description>
 			<content type="html"><![CDATA[<h3 id="1-记录一些常见的goland快捷键mac">1. 记录一些常见的goland快捷键(mac)</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="mf">1.</span> <span class="nx">command</span> <span class="o">+</span> <span class="nx">alt</span> <span class="o">+</span> <span class="err">←</span> <span class="p">|</span> <span class="err">→</span> 
 <span class="c1">//  回退|前进 到上次浏览的位置
@@ -936,6 +936,9 @@ kubectl create service nodeport nginx --tcp<span class="o">=</span>31112:80 -n <
 </span><span class="c1"></span><span class="o">-</span> <span class="nx">command</span> <span class="o">+</span> <span class="o">/</span> <span class="o">-</span>
 <span class="c1">// 代码展开 / 折叠 (所选内容展开/折叠)
 </span><span class="c1"></span>
+<span class="mf">6.</span> <span class="nx">列操作</span>
+<span class="s">`Shift + option(alt) + 鼠标左键选择`</span>
+
 </code></pre></div>]]></content>
 		</item>
 		
@@ -7674,7 +7677,7 @@ Lucene 能很好利用文件系统的缓存，它是通过系统内核管理的�
  1. Item2     1.1 同时按住 option(alt) 键，可以以列选中，类似于 sublime3中 按住 alt的列选中 。 Command + option(alt) 
   1.2 剪贴板历史记录 Command + Shift + h
   1.3 将文本内容复制到剪切板 pbcopy &amp;lt; a.txt
-   2. 其他    2.1 前进的快捷键  1. sublime3 command + shift + z (比后退 command + z 多一个shift) 或者 command + y  2.2 从linux生成的.csv文件到mac上乱码  iconv -f UTF8 -t GB18030 2020-12-02.</description>
+   N. 其他    n.1 前进的快捷键  1. sublime3 command + shift + z (比后退 command + z 多一个shift) 或者 command + y  n.2 从linux生成的.csv文件到mac上乱码  iconv -f UTF8 -t GB18030 2020-12-02.</description>
 			<content type="html"><![CDATA[<p>记录一些常用的mac工具和方法</p>
 <!-- more-->
 <center>
@@ -7697,17 +7700,17 @@ Lucene 能很好利用文件系统的缓存，它是通过系统内核管理的�
 </ul>
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-<font color="blue" face="黑体" size=5> 2. 其他 </font>
+<font color="blue" face="黑体" size=5> N. 其他 </font>
 </center>
 <ul>
-<li>2.1 前进的快捷键</li>
+<li>n.1 前进的快捷键</li>
 </ul>
 <pre><code>1. sublime3
 command + shift + z   (比后退 command + z 多一个shift)
 或者
 command + y
 </code></pre><ul>
-<li>2.2 从linux生成的.csv文件到mac上乱码</li>
+<li>n.2 从linux生成的.csv文件到mac上乱码</li>
 </ul>
 <pre><code>iconv -f UTF8 -t GB18030 2020-12-02.csv &gt; 2020-12-02-2.csv
 </code></pre>]]></content>
@@ -9725,12 +9728,7 @@ default-character-set=utf8
 			
 			<guid>https://k1s.club/posts/18-%E6%94%B6%E8%97%8F%E9%93%BE%E6%8E%A5/</guid>
 			<description>记录一些好的网址
- 容器    云原生图书编年史 云原生大佬博客汇总 (2000个) kubernetes 社群分享 QA 汇总 k8s CRD(CustomResourceDefinition)自定义controller sample k8s 集群部署运营实践总结 k8s 创建一个只读的用户权限 kubectl 创建 Pod 背后到底发生了什么？ 白话Kubernetes网络(推荐)   Linux服务    MySQL 5.6, 5.7, 8.0版本的新特性大全 nginx+lua实现灰度发布 计算机网络 根域名的知识 常见状态码   golang     go学习指南
-  go圣经
-  go-mod学习
-  go包
-  go相关源码
- 《Go 语言编程之旅：一起用 Go 做项目》 vue+go 利用go优越的性能-设计与实现高性能企业级微服务网关     常用的工具网址    不用翻墙就能谷歌 deepl 比谷歌翻译好用的翻译 tableconvert 在线excel转markdown processon 免费在线作图 表情锅 自制表情动图 在线解析 子网掩码换算等   其他文章    Raft 为什么是更易理解的分布式一致性算法 Raft 一步步动态教你理解raft协议 Raft 更多形象化理解 Elasticsearch分布式一致性原理剖析(一)-节点篇   想看的书籍    金字塔原理  </description>
+ 容器    云原生图书编年史 云原生大佬博客汇总 (2000个) kubernetes 社群分享 QA 汇总 k8s CRD(CustomResourceDefinition)自定义controller sample k8s 集群部署运营实践总结 k8s 创建一个只读的用户权限 kubectl 创建 Pod 背后到底发生了什么？ 白话Kubernetes网络(推荐)   Linux服务    MySQL 5.6, 5.7, 8.0版本的新特性大全 nginx+lua实现灰度发布 计算机网络 根域名的知识 常见状态码   golang    go学习指南 go圣经 go-mod学习 go包 go相关源码  《Go 语言编程之旅：一起用 Go 做项目》 vue+go 利用go优越的性能-设计与实现高性能企业级微服务网关     常用的工具网址    不用翻墙就能谷歌 deepl 比谷歌翻译好用的翻译 tableconvert 在线excel转markdown processon 免费在线作图 表情锅 自制表情动图 在线解析 子网掩码换算等   其他文章    Raft 为什么是更易理解的分布式一致性算法 Raft 一步步动态教你理解raft协议 Raft 更多形象化理解 Elasticsearch分布式一致性原理剖析(一)-节点篇   想看的书籍    金字塔原理  </description>
 			<content type="html"><![CDATA[<p>记录一些好的网址</p>
 <!-- more -->
 <center>
@@ -9763,20 +9761,11 @@ default-character-set=utf8
 <font color="blue" face="黑体" size=5> golang </font>
 </center>
 <ul>
-<li>
-<p><a href="https://www.zhihu.com/question/30461290">go学习指南</a></p>
-</li>
-<li>
-<p><a href="http://shouce.jb51.net/gopl-zh/">go圣经</a></p>
-</li>
-<li>
-<p><a href="https://zhangguanzhang.github.io/2020/03/10/go-mod-base-use/">go-mod学习</a></p>
-</li>
-<li>
-<p><a href="https://godoc.org/">go包</a></p>
-</li>
-<li>
-<p>go相关源码</p>
+<li><a href="https://www.zhihu.com/question/30461290">go学习指南</a></li>
+<li><a href="http://shouce.jb51.net/gopl-zh/">go圣经</a></li>
+<li><a href="https://zhangguanzhang.github.io/2020/03/10/go-mod-base-use/">go-mod学习</a></li>
+<li><a href="https://godoc.org/">go包</a></li>
+<li>go相关源码
 <ul>
 <li><a href="https://github.com/go-programming-tour-book">《Go 语言编程之旅：一起用 Go 做项目》</a></li>
 <li><a href="https://github.com/e421083458">vue+go 利用go优越的性能-设计与实现高性能企业级微服务网关</a></li>

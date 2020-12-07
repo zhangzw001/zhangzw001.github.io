@@ -14,7 +14,7 @@
       <pubDate>Tue, 20 Oct 2020 16:42:57 +0800</pubDate>
       
       <guid>https://k1s.club/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/</guid>
-      <description>1. 记录一些常见的goland快捷键(mac) 1. command + alt + ← | → // 回退|前进 到上次浏览的位置  2. command d | x // 复制行 |删除行  3. command b = command + 单击 // 快速打开光标处的类或方法  4. command alt l // 重新格式化代码  5. 代码折叠和展开 - command shift + / - // 代码全部展开 / 折叠 (项目所有go文件全部展开/折叠) - command alt + / - // 代码递归展开 / 折叠 (所选内容行内全部展开/折叠) - command + / - // 代码展开 / 折叠 (所选内容展开/折叠)  </description>
+      <description>1. 记录一些常见的goland快捷键(mac) 1. command + alt + ← | → // 回退|前进 到上次浏览的位置  2. command d | x // 复制行 |删除行  3. command b = command + 单击 // 快速打开光标处的类或方法  4. command alt l // 重新格式化代码  5. 代码折叠和展开 - command shift + / - // 代码全部展开 / 折叠 (项目所有go文件全部展开/折叠) - command alt + / - // 代码递归展开 / 折叠 (所选内容行内全部展开/折叠) - command + / - // 代码展开 / 折叠 (所选内容展开/折叠)  6.</description>
     </item>
     
   </channel>
