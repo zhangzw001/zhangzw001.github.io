@@ -570,6 +570,7 @@ server {
 <h3 id="网络问题-转发正代和反代">网络问题: 转发,正代和反代</h3>
 <pre><code>1. 正代: 内网客户端172.16.88.88想要访问google,通过浏览器配置代理服务器ip(172.16.88.2:1080) 去访问google, 代理服务器和客户端在同一个局域网
 2. 反代: 内网服务端10.10.88.88上有http服务,通过配置代理服务器(10.10.88.2:80 外网地址:1.1.1.1:80)绑定域名www.googoo.com对外提供服务, 代理服务器和服务端在同一个局域网
+3. 转发: 只是数据转发, 不会重新建立tcp连接,代理是需要与上游和下游都建立tcp连接
 </code></pre><hr>
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
@@ -596,7 +597,12 @@ vim /etc/fstab
 <div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">vim /var/lib/pgsql/9.4/data/postgresql.conf
 <span class="nv">log_timezone</span> <span class="o">=</span> <span class="s1">&#39;PRC&#39;</span>
 <span class="nv">timezone</span> <span class="o">=</span> <span class="s1">&#39;PRC&#39;</span>
-</code></pre></div>]]></content>
+</code></pre></div><h3 id="其他问题-kafka和rocketmq比较">其他问题: kafka和rocketMQ比较</h3>
+<ul>
+<li><a href="https://blog.csdn.net/lppl010_/article/details/86662346">阿里 RocketMQ 优势对比</a></li>
+</ul>
+<p>RocketMQ 是对kafka的一种优化, kafka中的每个topic的每个分区都会对应一个物理文件, 但topic数量越多时, 分区分散更明显,就会导致磁盘IO成为瓶颈, 而rocketMQ所有的消息是保存在同一个物理文件中, topic和分区数对rocketMQ只是逻辑上的概念, 因此随着topic增加, kafka性能急剧下降, rocketMQ影响不大</p>
+]]></content>
 		</item>
 		
 		<item>
@@ -3709,7 +3715,22 @@ go env -w <span class="nv">GOPROXY</span><span class="o">=</span>https://goproxy
  <span class="k">return</span> <span class="nx">background</span>
 <span class="p">}</span>
 
-</code></pre></div>]]></content>
+</code></pre></div><h3 id="21-swagger本地测试的一个问题">21. swagger本地测试的一个问题</h3>
+<blockquote>
+<p>在执行try it out 的时候报错: TypeError: Failed to fetch</p>
+</blockquote>
+<p>原因是swagger的配置中 <code>host=&quot;localhost:8880&quot;</code> , 而我浏览器打开的是 <code>127.0.0.1:8880</code> , 从日志也能看到是不同的请求</p>
+<pre><code># TypeError: Failed to fetch 错误的请求日志:
+[GIN] 2020/12/01 - 16:12:49 | 404 |         790ns |             ::1 | OPTIONS  &quot;/admin_login/login&quot;
+
+# 正常的请求日志:
+[GIN] 2020/12/01 - 16:15:24 | 200 |     452.808µs |             ::1 | POST     &quot;/admin_login/login&quot;
+</code></pre><p>所以只要保持一致即可, 配置的是<code>localhost</code>请求就不要用<code>127.0.0.1</code></p>
+<h3 id="22-gorm">22. gorm.</h3>
+<p><a href="https://segmentfault.com/a/1190000021363996">GORM之ErrRecordNotFound采坑记录</a></p>
+<blockquote>
+<p>gorm.DB 的Find或First等方法, 在传入struc的时候 , 可能返回ErrRecordNotFound, 在传入list的时候, 可能返回nil</p>
+</blockquote>]]></content>
 		</item>
 		
 		<item>
@@ -7653,7 +7674,7 @@ Lucene 能很好利用文件系统的缓存，它是通过系统内核管理的�
  1. Item2     1.1 同时按住 option(alt) 键，可以以列选中，类似于 sublime3中 按住 alt的列选中 。 Command + option(alt) 
   1.2 剪贴板历史记录 Command + Shift + h
   1.3 将文本内容复制到剪切板 pbcopy &amp;lt; a.txt
-   2. 其他    1.4 前进的快捷键  1. sublime3 command + shift + z (比后退 command + z 多一个shift) 或者 command + y </description>
+   2. 其他    2.1 前进的快捷键  1. sublime3 command + shift + z (比后退 command + z 多一个shift) 或者 command + y  2.2 从linux生成的.csv文件到mac上乱码  iconv -f UTF8 -t GB18030 2020-12-02.</description>
 			<content type="html"><![CDATA[<p>记录一些常用的mac工具和方法</p>
 <!-- more-->
 <center>
@@ -7679,12 +7700,16 @@ Lucene 能很好利用文件系统的缓存，它是通过系统内核管理的�
 <font color="blue" face="黑体" size=5> 2. 其他 </font>
 </center>
 <ul>
-<li>1.4 前进的快捷键</li>
+<li>2.1 前进的快捷键</li>
 </ul>
 <pre><code>1. sublime3
 command + shift + z   (比后退 command + z 多一个shift)
 或者
 command + y
+</code></pre><ul>
+<li>2.2 从linux生成的.csv文件到mac上乱码</li>
+</ul>
+<pre><code>iconv -f UTF8 -t GB18030 2020-12-02.csv &gt; 2020-12-02-2.csv
 </code></pre>]]></content>
 		</item>
 		
@@ -9700,7 +9725,12 @@ default-character-set=utf8
 			
 			<guid>https://k1s.club/posts/18-%E6%94%B6%E8%97%8F%E9%93%BE%E6%8E%A5/</guid>
 			<description>记录一些好的网址
- 容器    云原生图书编年史 云原生大佬博客汇总 (2000个) kubernetes 社群分享 QA 汇总 k8s CRD(CustomResourceDefinition)自定义controller sample k8s 集群部署运营实践总结 k8s 创建一个只读的用户权限 kubectl 创建 Pod 背后到底发生了什么？ 白话Kubernetes网络(推荐)   Linux服务    MySQL 5.6, 5.7, 8.0版本的新特性大全 nginx+lua实现灰度发布 计算机网络 根域名的知识 常见状态码   golang    go学习指南 go圣经 go-mod学习 go包   常用的工具网址    不用翻墙就能谷歌 deepl 比谷歌翻译好用的翻译 tableconvert 在线excel转markdown processon 免费在线作图 表情锅 自制表情动图 在线解析 子网掩码换算等   其他文章    Raft 为什么是更易理解的分布式一致性算法 Raft 一步步动态教你理解raft协议 Raft 更多形象化理解 Elasticsearch分布式一致性原理剖析(一)-节点篇   想看的书籍    金字塔原理  </description>
+ 容器    云原生图书编年史 云原生大佬博客汇总 (2000个) kubernetes 社群分享 QA 汇总 k8s CRD(CustomResourceDefinition)自定义controller sample k8s 集群部署运营实践总结 k8s 创建一个只读的用户权限 kubectl 创建 Pod 背后到底发生了什么？ 白话Kubernetes网络(推荐)   Linux服务    MySQL 5.6, 5.7, 8.0版本的新特性大全 nginx+lua实现灰度发布 计算机网络 根域名的知识 常见状态码   golang     go学习指南
+  go圣经
+  go-mod学习
+  go包
+  go相关源码
+ 《Go 语言编程之旅：一起用 Go 做项目》 vue+go 利用go优越的性能-设计与实现高性能企业级微服务网关     常用的工具网址    不用翻墙就能谷歌 deepl 比谷歌翻译好用的翻译 tableconvert 在线excel转markdown processon 免费在线作图 表情锅 自制表情动图 在线解析 子网掩码换算等   其他文章    Raft 为什么是更易理解的分布式一致性算法 Raft 一步步动态教你理解raft协议 Raft 更多形象化理解 Elasticsearch分布式一致性原理剖析(一)-节点篇   想看的书籍    金字塔原理  </description>
 			<content type="html"><![CDATA[<p>记录一些好的网址</p>
 <!-- more -->
 <center>
@@ -9733,10 +9763,25 @@ default-character-set=utf8
 <font color="blue" face="黑体" size=5> golang </font>
 </center>
 <ul>
-<li><a href="https://www.zhihu.com/question/30461290">go学习指南</a></li>
-<li><a href="http://shouce.jb51.net/gopl-zh/">go圣经</a></li>
-<li><a href="https://zhangguanzhang.github.io/2020/03/10/go-mod-base-use/">go-mod学习</a></li>
-<li><a href="https://godoc.org/">go包</a></li>
+<li>
+<p><a href="https://www.zhihu.com/question/30461290">go学习指南</a></p>
+</li>
+<li>
+<p><a href="http://shouce.jb51.net/gopl-zh/">go圣经</a></p>
+</li>
+<li>
+<p><a href="https://zhangguanzhang.github.io/2020/03/10/go-mod-base-use/">go-mod学习</a></p>
+</li>
+<li>
+<p><a href="https://godoc.org/">go包</a></p>
+</li>
+<li>
+<p>go相关源码</p>
+<ul>
+<li><a href="https://github.com/go-programming-tour-book">《Go 语言编程之旅：一起用 Go 做项目》</a></li>
+<li><a href="https://github.com/e421083458">vue+go 利用go优越的性能-设计与实现高性能企业级微服务网关</a></li>
+</ul>
+</li>
 </ul>
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
@@ -10191,9 +10236,16 @@ tail -1000 openapi.access.log |awk '{s[$17]+=$4} {m[$17]++} END {for(i in s) {pr
 			
 			<guid>https://k1s.club/posts/11-mysql%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</guid>
 			<description>简单记录一些mysql知识点
-  SQL 语句主要可以划分为以下 3 个类别 DDL（Data Definition Languages）语句：数据定义语言，这些语句定义了不同的数据段、数据库、表、列、索引等数据库对象的定义。常用的语句关键字主要包括 create、drop、alter等。 DML（Data Manipulation Language）语句：数据操纵语句，用于添加、删除、更新和查询数据库记录，并检查数据完整性，常用的语句关键字主要包括 insert、delete、udpate 和select 等。(增添改查） DCL（Data Control Language）语句：数据控制语句，用于控制不同数据段直接的许可和访问级别的语句。这些语句定义了数据库、表、字段、用户的访问权限和安全级别。主要的语句关键字包括 grant、revoke 等。   清空表 删除表信息的方式有两种 : truncate table table_name; delete * from table_name; 注 : truncate操作中的table可以省略，delete操作中的*可以省略 truncate、delete 清空表数据的区别 : 1&amp;gt; truncate 是整体删除 (速度较快)，delete是逐条删除 (速度较慢) 2&amp;gt; truncate 不写服务器 log，delete 写服务器 log，也就是 truncate 效率比 delete高的原因 3&amp;gt; truncate 不激活trigger (触发器)，但是会重置Identity (标识列、自增字段)，相当于自增列会被置为初始值，又重新从1开始记录，而不是接着原来的 ID数。而 delete 删除以后，identity 依旧是接着被删除的最近的那一条记录ID加1后进行记录。如果只需删除表中的部分记录，只能使用 DELETE语句配合 where条件   备份 # 全量锁表备份(不可写) mysqldump --lock-all-tables --all-databases &amp;gt; ALLDB.</description>
+  ### 三大范式 - 列不可再分: 服务名,服务描述 - 属性完全依赖主键:	服务名依赖于服务ID - 属性直接依赖主键: HTTP,TCP,GRPC 规则各为一张表   SQL 语句主要可以划分为以下 3 个类别 DDL（Data Definition Languages）语句：数据定义语言，这些语句定义了不同的数据段、数据库、表、列、索引等数据库对象的定义。常用的语句关键字主要包括 create、drop、alter等。 DML（Data Manipulation Language）语句：数据操纵语句，用于添加、删除、更新和查询数据库记录，并检查数据完整性，常用的语句关键字主要包括 insert、delete、udpate 和select 等。(增添改查） DCL（Data Control Language）语句：数据控制语句，用于控制不同数据段直接的许可和访问级别的语句。这些语句定义了数据库、表、字段、用户的访问权限和安全级别。主要的语句关键字包括 grant、revoke 等。   清空表 删除表信息的方式有两种 : truncate table table_name; delete * from table_name; 注 : truncate操作中的table可以省略，delete操作中的*可以省略 truncate、delete 清空表数据的区别 : 1&amp;gt; truncate 是整体删除 (速度较快)，delete是逐条删除 (速度较慢) 2&amp;gt; truncate 不写服务器 log，delete 写服务器 log，也就是 truncate 效率比 delete高的原因 3&amp;gt; truncate 不激活trigger (触发器)，但是会重置Identity (标识列、自增字段)，相当于自增列会被置为初始值，又重新从1开始记录，而不是接着原来的 ID数。而 delete 删除以后，identity 依旧是接着被删除的最近的那一条记录ID加1后进行记录。如果只需删除表中的部分记录，只能使用 DELETE语句配合 where条件   备份 # 全量锁表备份(不可写) mysqldump --lock-all-tables --all-databases &amp;gt; ALLDB.</description>
 			<content type="html"><![CDATA[<p>简单记录一些mysql知识点</p>
 <!-- more -->
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+### 三大范式
+- 列不可再分: 	服务名,服务描述
+- 属性完全依赖主键:	服务名依赖于服务ID
+- 属性直接依赖主键: 	HTTP,TCP,GRPC 规则各为一张表
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 </center>

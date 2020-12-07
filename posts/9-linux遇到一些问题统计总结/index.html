@@ -14,7 +14,7 @@
  1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的) 2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选. 而multi-paxos 是随意的 所以raft 可以看成是简化版本的multi paxos(这里multi-paxos 因为允许并发的写log, 因此不存在一个最新, 最全的日志节点, 因此只能这么做.">
 <meta itemprop="datePublished" content="2020-11-12T10:33:32+00:00" />
 <meta itemprop="dateModified" content="2020-11-12T10:33:32+00:00" />
-<meta itemprop="wordCount" content="1049">
+<meta itemprop="wordCount" content="1068">
 
 
 
@@ -472,6 +472,7 @@ server {
 <h3 id="网络问题-转发正代和反代">网络问题: 转发,正代和反代<a href="#网络问题-转发正代和反代" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <pre><code>1. 正代: 内网客户端172.16.88.88想要访问google,通过浏览器配置代理服务器ip(172.16.88.2:1080) 去访问google, 代理服务器和客户端在同一个局域网
 2. 反代: 内网服务端10.10.88.88上有http服务,通过配置代理服务器(10.10.88.2:80 外网地址:1.1.1.1:80)绑定域名www.googoo.com对外提供服务, 代理服务器和服务端在同一个局域网
+3. 转发: 只是数据转发, 不会重新建立tcp连接,代理是需要与上游和下游都建立tcp连接
 </code></pre><hr>
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
@@ -498,7 +499,12 @@ vim /etc/fstab
 <div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">vim /var/lib/pgsql/9.4/data/postgresql.conf
 <span class="nv">log_timezone</span> <span class="o">=</span> <span class="s1">&#39;PRC&#39;</span>
 <span class="nv">timezone</span> <span class="o">=</span> <span class="s1">&#39;PRC&#39;</span>
-</code></pre></div>
+</code></pre></div><h3 id="其他问题-kafka和rocketmq比较">其他问题: kafka和rocketMQ比较<a href="#其他问题-kafka和rocketmq比较" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li><a href="https://blog.csdn.net/lppl010_/article/details/86662346">阿里 RocketMQ 优势对比</a></li>
+</ul>
+<p>RocketMQ 是对kafka的一种优化, kafka中的每个topic的每个分区都会对应一个物理文件, 但topic数量越多时, 分区分散更明显,就会导致磁盘IO成为瓶颈, 而rocketMQ所有的消息是保存在同一个物理文件中, topic和分区数对rocketMQ只是逻辑上的概念, 因此随着topic增加, kafka性能急剧下降, rocketMQ影响不大</p>
+
 			</div>
    
 
@@ -507,7 +513,7 @@ vim /etc/fstab
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/linux">linux</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1049 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1068 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-11-12 18:33 &#43;0800</p>
 			</footer>
 		</article>
@@ -539,6 +545,7 @@ vim /etc/fstab
         <li><a href="#其他问题-修改swap">其他问题: 修改swap</a></li>
         <li><a href="#其他问题-jenkins-ui特别慢-jobs数量100">其他问题: jenkins ui特别慢 (jobs数量100+)</a></li>
         <li><a href="#其他问题-postgresql时区修改">其他问题: postgreSql时区修改</a></li>
+        <li><a href="#其他问题-kafka和rocketmq比较">其他问题: kafka和rocketMQ比较</a></li>
       </ul>
     </li>
   </ul>

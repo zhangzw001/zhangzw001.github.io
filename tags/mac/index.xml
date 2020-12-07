@@ -18,7 +18,7 @@
  1. Item2     1.1 同时按住 option(alt) 键，可以以列选中，类似于 sublime3中 按住 alt的列选中 。 Command + option(alt) 
   1.2 剪贴板历史记录 Command + Shift + h
   1.3 将文本内容复制到剪切板 pbcopy &amp;lt; a.txt
-   2. 其他    1.4 前进的快捷键  1. sublime3 command + shift + z (比后退 command + z 多一个shift) 或者 command + y </description>
+   2. 其他    2.1 前进的快捷键  1. sublime3 command + shift + z (比后退 command + z 多一个shift) 或者 command + y  2.2 从linux生成的.csv文件到mac上乱码  iconv -f UTF8 -t GB18030 2020-12-02.</description>
     </item>
     
   </channel>

@@ -11,7 +11,7 @@
 <meta itemprop="description" content="go的一些简单记录">
 <meta itemprop="datePublished" content="2020-05-27T17:25:31+00:00" />
 <meta itemprop="dateModified" content="2020-05-27T17:25:31+00:00" />
-<meta itemprop="wordCount" content="1146">
+<meta itemprop="wordCount" content="1209">
 
 
 
@@ -559,7 +559,22 @@ go env -w <span class="nv">GOPROXY</span><span class="o">=</span>https://goproxy
  <span class="k">return</span> <span class="nx">background</span>
 <span class="p">}</span>
 
-</code></pre></div>
+</code></pre></div><h3 id="21-swagger本地测试的一个问题">21. swagger本地测试的一个问题<a href="#21-swagger本地测试的一个问题" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>在执行try it out 的时候报错: TypeError: Failed to fetch</p>
+</blockquote>
+<p>原因是swagger的配置中 <code>host=&quot;localhost:8880&quot;</code> , 而我浏览器打开的是 <code>127.0.0.1:8880</code> , 从日志也能看到是不同的请求</p>
+<pre><code># TypeError: Failed to fetch 错误的请求日志:
+[GIN] 2020/12/01 - 16:12:49 | 404 |         790ns |             ::1 | OPTIONS  &quot;/admin_login/login&quot;
+
+# 正常的请求日志:
+[GIN] 2020/12/01 - 16:15:24 | 200 |     452.808µs |             ::1 | POST     &quot;/admin_login/login&quot;
+</code></pre><p>所以只要保持一致即可, 配置的是<code>localhost</code>请求就不要用<code>127.0.0.1</code></p>
+<h3 id="22-gorm">22. gorm.<a href="#22-gorm" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p><a href="https://segmentfault.com/a/1190000021363996">GORM之ErrRecordNotFound采坑记录</a></p>
+<blockquote>
+<p>gorm.DB 的Find或First等方法, 在传入struc的时候 , 可能返回ErrRecordNotFound, 在传入list的时候, 可能返回nil</p>
+</blockquote>
 			</div>
    
 
@@ -568,7 +583,7 @@ go env -w <span class="nv">GOPROXY</span><span class="o">=</span>https://goproxy
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/go">go</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1146 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1209 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-05-28 01:25 &#43;0800</p>
 			</footer>
 		</article>
@@ -598,6 +613,8 @@ go env -w <span class="nv">GOPROXY</span><span class="o">=</span>https://goproxy
         <li><a href="#18-go-get-超时的错误">18 go get 超时的错误</a></li>
         <li><a href="#19-bitcount的代码解析">19 bitCount的代码解析</a></li>
         <li><a href="#20-简单介绍接口的实现">20 简单介绍接口的实现</a></li>
+        <li><a href="#21-swagger本地测试的一个问题">21. swagger本地测试的一个问题</a></li>
+        <li><a href="#22-gorm">22. gorm.</a></li>
       </ul>
     </li>
   </ul>
