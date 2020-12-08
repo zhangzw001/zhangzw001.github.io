@@ -6,173 +6,13 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Fri, 13 Nov 2020 17:28:38 +0800</lastBuildDate>
+		<lastBuildDate>Tue, 08 Dec 2020 17:42:54 +0000</lastBuildDate>
 		<atom:link href="https://k1s.club/posts/index.xml" rel="self" type="application/rss+xml" />
-		
-		<item>
-			<title>Tcpdump抓包分析tcp三次握手和四次挥手</title>
-			<link>https://k1s.club/posts/62-tcpdump%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/</link>
-			<pubDate>Fri, 13 Nov 2020 17:28:38 +0800</pubDate>
-			
-			<guid>https://k1s.club/posts/62-tcpdump%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/</guid>
-			<description>命令参数说明  -n 主机名域名显示成ip -S 用绝对而非相对数值列出TCP关联数。 -i 接口名,指定网卡名 host 请求地址: www.baidu.com tcp 请求端口: tcp:80  标志说明  Flags [S]: 请求连接(SYN) Flags [S.]: sync+ack(SYN+ACK) Flags [.]: ack(ACK) Flags [P.]: 发送数据包(PUSH) Flags [F]: 发送方没有更多包发送了(FIN) Flags [R]: 表明packet的发送方马上就要断开当前连接了(RST)   参考官方手册
- 本次抓取的结果  通过curl http://www.baiu.com得到
- # 抓取 enp0s3 网卡请求 http://www.baidu.com 的包并显示ip和实际发送seq和ack tcpdump -n -S -i enp0s3 host www.baidu.com and tcp port 80 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes # 三次握手包 15:35:23.</description>
-			<content type="html"><![CDATA[<h3 id="命令参数说明">命令参数说明</h3>
-<ul>
-<li>-n 主机名域名显示成ip</li>
-<li>-S 用绝对而非相对数值列出TCP关联数。</li>
-<li>-i 接口名,指定网卡名</li>
-<li>host 请求地址: <a href="http://www.baidu.com">www.baidu.com</a></li>
-<li>tcp  请求端口: tcp:80</li>
-</ul>
-<h3 id="标志说明">标志说明</h3>
-<ul>
-<li>Flags [S]: 请求连接(SYN)</li>
-<li>Flags [S.]: sync+ack(SYN+ACK)</li>
-<li>Flags [.]: ack(ACK)</li>
-<li>Flags [P.]: 发送数据包(PUSH)</li>
-<li>Flags [F]: 发送方没有更多包发送了(FIN)</li>
-<li>Flags [R]: 表明packet的发送方马上就要断开当前连接了(RST)</li>
-</ul>
-<blockquote>
-<p>参考<a href="http://www.tcpdump.org/manpages/tcpdump.1.html">官方手册</a></p>
-</blockquote>
-<h3 id="本次抓取的结果">本次抓取的结果</h3>
-<blockquote>
-<p>通过<code>curl http://www.baiu.com</code>得到</p>
-</blockquote>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># 抓取 enp0s3 网卡请求 http://www.baidu.com 的包并显示ip和实际发送seq和ack</span>
-tcpdump -n -S -i enp0s3 host www.baidu.com and tcp port <span class="m">80</span>
-tcpdump: verbose output suppressed, use -v or -vv <span class="k">for</span> full protocol decode
-listening on enp0s3, link-type EN10MB <span class="o">(</span>Ethernet<span class="o">)</span>, capture size <span class="m">262144</span> bytes
-
-
-<span class="c1"># 三次握手包</span>
-15:35:23.254118 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>S<span class="o">]</span>, seq 2358640817, win 29200, options <span class="o">[</span>mss 1460,sackOK,TS val <span class="m">1164279598</span> ecr 0,nop,wscale 7<span class="o">]</span>, length <span class="m">0</span>
-15:35:23.262005 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>S.<span class="o">]</span>, seq 1212165121, ack 2358640818, win 8192, options <span class="o">[</span>mss 1452,sackOK,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,wscale 5<span class="o">]</span>, length <span class="m">0</span>
-15:35:23.262068 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212165122, win 229, length <span class="m">0</span>
-
-<span class="c1"># 数据传输包</span>
-15:35:23.262260 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 2358640818:2358640895, ack 1212165122, win 229, length 77: HTTP: GET / HTTP/1.1
-15:35:23.272385 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640895, win 908, length <span class="m">0</span>
-15:35:23.273343 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 1212165122:1212167903, ack 2358640895, win 908, length 2781: HTTP: HTTP/1.1 <span class="m">200</span> OK
-15:35:23.273403 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167903, win 272, length <span class="m">0</span>
-
-<span class="c1"># 四次挥手包</span>
-15:35:23.273657 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 2358640895, ack 1212167903, win 272, length <span class="m">0</span>
-15:35:23.282240 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640896, win 908, length <span class="m">0</span>
-15:35:23.282290 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 1212167903, ack 2358640896, win 908, length <span class="m">0</span>
-15:35:23.282322 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167904, win 272, length <span class="m">0</span>
-
-<span class="c1"># RST包</span>
-15:35:26.295824 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>R<span class="o">]</span>, seq 1212167904, win 0, length <span class="m">0</span>
-
-</code></pre></div><p><img src="/images/tcp_open_close.jpg" alt=""></p>
-<blockquote>
-<p>说明: 这边write()传输数据为0的时候,默认+1,否则进入死循环,seq=ack就同一个值在校验了,所以seq=x+1,ACK=y+1是没问题的, 我这边请求百度的数据发送是: 77,后面百度服务端回复的数据长度是: 2781, 所以如果length不为空的时候,seq=x+len</p>
-</blockquote>
-<blockquote>
-<p>这里我<code>telnet 80</code> 端口测试连接 并发送数据<code>1</code>,结果当然nginx会给<code>400</code>, 可以看到这边<code>length=3</code></p>
-<p>为啥是3呢?</p>
-<p>(猜测哈)&hellip; 首先回车应该也算了一个字节,数据<code>1</code>算一个字节, 现在就两个字节了, 还有一个应该是每次ack的<code>+1</code>吧? 但好像有点牵强&hellip;</p>
-</blockquote>
-<p>参考: <a href="http://c.biancheng.net/view/2352.html">详细分析TCP数据的传输过程</a></p>
-<blockquote>
-<p>所以: 1669015475 = 1669015472 + 2(发送字节数) +1 ???  那为啥 length要记成3呢&hellip; 记录成2更合理吧,感觉还是有点问题</p>
-</blockquote>
-<pre><code>17:44:35.874189 IP 172.xx.xx.xx.58623 &gt; 172.16.56.116.http: Flags [P.], seq 1669015472:1669015475, ack 2645576909, win 4117, options [nop,nop,TS val 531802073 ecr 1306189625], length 3: HTTP
-17:44:35.874291 IP 172.16.56.116.http &gt; 172.xx.xx.xx.58623: Flags [.], ack 1669015475, win 227, options [nop,nop,TS val 1306191841 ecr 531802073], length 0
-17:44:35.874869 IP 172.16.56.116.http &gt; 172.xx.xx.xx.58623: Flags [P.], seq 2645576909:2645577234, ack 1669015475, win 227, options [nop,nop,TS val 1306191842 ecr 531802073], length 325: HTTP: HTTP/1.1 400 Bad Request
-</code></pre><h3 id="分析三次握手包">分析三次握手包</h3>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.254118 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>S<span class="o">]</span>, seq 2358640817, win 29200, options <span class="o">[</span>mss 1460,sackOK,TS val <span class="m">1164279598</span> ecr 0,nop,wscale 7<span class="o">]</span>, length <span class="m">0</span>
-15:35:23.262005 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>S.<span class="o">]</span>, seq 1212165121, ack 2358640818, win 8192, options <span class="o">[</span>mss 1452,sackOK,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,wscale 5<span class="o">]</span>, length <span class="m">0</span>
-15:35:23.262068 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212165122, win 229, length <span class="m">0</span>
-</code></pre></div><ul>
-<li>
-<ol>
-<li>客户端发起关闭,发送SYN包,   <code>Flags [S]</code> 代表<code>syn</code>标志,  发送随机数<code>seq=2358640817</code>, <code>win=29200</code>, 发送数据<code>length=0</code></li>
-</ol>
-</li>
-<li>
-<ol start="2">
-<li>服务端回复确认包并且发送SYN包, <code>Flags [S.]</code>中的. 代表<code>ack</code>, 这里<code>ack=2358640817+1</code>, 新的服务端发送随机数<code>seq=2358640817</code>, <code>win=8192</code>,</li>
-</ol>
-</li>
-<li>
-<ol start="3">
-<li>客户端回复SYN确认包,    回复<code>ack=1212165121+1</code></li>
-</ol>
-</li>
-</ul>
-<h3 id="分析数据传输包">分析数据传输包</h3>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.262260 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 2358640818:2358640895, ack 1212165122, win 229, length 77: HTTP: GET / HTTP/1.1
-15:35:23.272385 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640895, win 908, length <span class="m">0</span>
-15:35:23.273343 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 1212165122:1212167903, ack 2358640895, win 908, length 2781: HTTP: HTTP/1.1 <span class="m">200</span> OK
-15:35:23.273403 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167903, win 272, length <span class="m">0</span>
-
-</code></pre></div><ul>
-<li>
-<ol>
-<li><code>Flags [P.]</code>  <code>P</code>表示发送数据, <code>.</code>表示ack回复, 这里seq中 <code>2358640895=2358640818+77</code>(数据长度) 2358640818就是上次的<code>ack</code>值, <code>ack=1212165122</code></li>
-</ol>
-</li>
-<li>
-<ol start="2">
-<li><code>Flags [.]</code>   <code>.</code>表示<code>ack 2358640895=2358640818+77</code></li>
-</ol>
-</li>
-<li>
-<ol start="3">
-<li><code>Flags [P.]</code>  P表示发送数据, .表示ack回复, 这里seq中 <code>1212167903=1212165122+2781</code>(数据长度), <code>ack=2358640895</code></li>
-</ol>
-</li>
-<li>
-<ol start="4">
-<li><code>Flags [.]</code>   <code>.</code>表示<code>ack 1212167903=1212165122+2781</code></li>
-</ol>
-</li>
-</ul>
-<h3 id="四次挥手包">四次挥手包</h3>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.273657 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 2358640895, ack 1212167903, win 272, length <span class="m">0</span>
-15:35:23.282240 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640896, win 908, length <span class="m">0</span>
-15:35:23.282290 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 1212167903, ack 2358640896, win 908, length <span class="m">0</span>
-15:35:23.282322 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167904, win 272, length <span class="m">0</span>
-</code></pre></div><ul>
-<li>
-<ol>
-<li><code>Flags [F.]</code>  客户端发起fin包,  <code>F</code>表示发起挥手FIN,<code>.</code>表示<code>ack</code>, <code>seq=2358640895</code>就是上次的<code>ack</code>值, <code>ack=1212167903</code></li>
-</ol>
-</li>
-<li>
-<ol start="2">
-<li><code>Flags [.]</code>   服务端回复确认包, <code>.</code>表示<code>ack</code>,<code>ack=2358640895+1</code>,</li>
-</ol>
-</li>
-<li>
-<ol start="3">
-<li><code>Flags [F.]</code>  服务端发起fin包, <code>F</code>表示发起挥手FIN,<code>.</code>表示<code>ack</code>,  <code>seq=1212167903</code>是上次的<code>ack</code>值,, <code>ack=2358640895+1</code></li>
-</ol>
-</li>
-<li>
-<ol start="4">
-<li><code>Flags [.]</code>   客户端回复确认包, <code>.</code>表示<code>ack=1212167903+1</code>,</li>
-</ol>
-</li>
-</ul>
-<h3 id="其他文章">其他文章</h3>
-<ul>
-<li><a href="https://www.cnblogs.com/nzbbody/p/8622497.html">什么是win</a></li>
-<li><a href="https://blog.csdn.net/Mr_rsq/article/details/81082127">TCP三次握手四次断开及11种状态转变</a></li>
-<li><a href="https://testerhome.com/topics/22107">Tcpdump 结果说明</a></li>
-</ul>
-]]></content>
-		</item>
 		
 		<item>
 			<title>linux遇到一些问题统计</title>
 			<link>https://k1s.club/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
-			<pubDate>Thu, 12 Nov 2020 10:33:32 +0000</pubDate>
+			<pubDate>Tue, 08 Dec 2020 17:42:54 +0000</pubDate>
 			
 			<guid>https://k1s.club/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
 			<description>记录一些Linux,nginx或其他服务一些问题
@@ -386,6 +226,15 @@ net.ipv4.icmp_echo_ignore_all=1
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 </center>
+<h3 id="nginx问题-提示tmp无权限问题">nginx问题: 提示tmp无权限问题</h3>
+<pre><code>2020/12/08 17:14:52 [crit] 111455#0: *1842 open() &quot;/var/lib/nginx/tmp/client_body/0000001489&quot; failed (13: Permission denied), client: 10.10.154.36, server: xxx.com, request: &quot;POST /?xxx HTTP/1.0&quot;, host: &quot;xxx.com&quot;, referrer: &quot;http://&quot;
+</code></pre><p>首先由于该环境nginx配置修改了用户由 nginx用户 变成nobody用户的原因, 导致改目录无权限写入&hellip;</p>
+<p>知道问题了, 那为啥会写到这个目录呢?需要看下面两个参数</p>
+<pre><code>client_max_body_size	1m;
+client_body_buffer_size 16k;
+</code></pre><p><code>client_max_body_size</code> 默认 1M，表示 客户端请求服务器最大允许大小，在<code>Content-Length</code>请求头中指定。如果请求的正文数据大于<code>client_max_body_size</code>，HTTP协议会报错 <code>413 Request Entity Too Large</code>。</p>
+<p>那这里为啥会写tmp目录呢?</p>
+<p>看下<code>client_body_buffer_size</code>, 默认 16k , 小于这个值会直接写入内存,  但如果 <code>client_body_buffer_size</code> 请求数据 &lt; <code>client_max_body_size</code> , 那么此时就会写临时目录,默认<code>/var/lib/nginx/tmp/client_body</code></p>
 <h3 id="nginx问题-http_x_real_ip问题">nginx问题: http_x_real_ip问题</h3>
 <p>nginx的反向代理服务器一般都需要加上 <code>proxy_set_header X-Real-IP $remote_addr;</code>, 为啥需要加上这个呢?</p>
 <p>比如我有如下架构代理:
@@ -602,6 +451,166 @@ vim /etc/fstab
 <li><a href="https://blog.csdn.net/lppl010_/article/details/86662346">阿里 RocketMQ 优势对比</a></li>
 </ul>
 <p>RocketMQ 是对kafka的一种优化, kafka中的每个topic的每个分区都会对应一个物理文件, 但topic数量越多时, 分区分散更明显,就会导致磁盘IO成为瓶颈, 而rocketMQ所有的消息是保存在同一个物理文件中, topic和分区数对rocketMQ只是逻辑上的概念, 因此随着topic增加, kafka性能急剧下降, rocketMQ影响不大</p>
+]]></content>
+		</item>
+		
+		<item>
+			<title>Tcpdump抓包分析tcp三次握手和四次挥手</title>
+			<link>https://k1s.club/posts/62-tcpdump%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/</link>
+			<pubDate>Fri, 13 Nov 2020 17:28:38 +0800</pubDate>
+			
+			<guid>https://k1s.club/posts/62-tcpdump%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/</guid>
+			<description>命令参数说明  -n 主机名域名显示成ip -S 用绝对而非相对数值列出TCP关联数。 -i 接口名,指定网卡名 host 请求地址: www.baidu.com tcp 请求端口: tcp:80  标志说明  Flags [S]: 请求连接(SYN) Flags [S.]: sync+ack(SYN+ACK) Flags [.]: ack(ACK) Flags [P.]: 发送数据包(PUSH) Flags [F]: 发送方没有更多包发送了(FIN) Flags [R]: 表明packet的发送方马上就要断开当前连接了(RST)   参考官方手册
+ 本次抓取的结果  通过curl http://www.baiu.com得到
+ # 抓取 enp0s3 网卡请求 http://www.baidu.com 的包并显示ip和实际发送seq和ack tcpdump -n -S -i enp0s3 host www.baidu.com and tcp port 80 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes # 三次握手包 15:35:23.</description>
+			<content type="html"><![CDATA[<h3 id="命令参数说明">命令参数说明</h3>
+<ul>
+<li>-n 主机名域名显示成ip</li>
+<li>-S 用绝对而非相对数值列出TCP关联数。</li>
+<li>-i 接口名,指定网卡名</li>
+<li>host 请求地址: <a href="http://www.baidu.com">www.baidu.com</a></li>
+<li>tcp  请求端口: tcp:80</li>
+</ul>
+<h3 id="标志说明">标志说明</h3>
+<ul>
+<li>Flags [S]: 请求连接(SYN)</li>
+<li>Flags [S.]: sync+ack(SYN+ACK)</li>
+<li>Flags [.]: ack(ACK)</li>
+<li>Flags [P.]: 发送数据包(PUSH)</li>
+<li>Flags [F]: 发送方没有更多包发送了(FIN)</li>
+<li>Flags [R]: 表明packet的发送方马上就要断开当前连接了(RST)</li>
+</ul>
+<blockquote>
+<p>参考<a href="http://www.tcpdump.org/manpages/tcpdump.1.html">官方手册</a></p>
+</blockquote>
+<h3 id="本次抓取的结果">本次抓取的结果</h3>
+<blockquote>
+<p>通过<code>curl http://www.baiu.com</code>得到</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># 抓取 enp0s3 网卡请求 http://www.baidu.com 的包并显示ip和实际发送seq和ack</span>
+tcpdump -n -S -i enp0s3 host www.baidu.com and tcp port <span class="m">80</span>
+tcpdump: verbose output suppressed, use -v or -vv <span class="k">for</span> full protocol decode
+listening on enp0s3, link-type EN10MB <span class="o">(</span>Ethernet<span class="o">)</span>, capture size <span class="m">262144</span> bytes
+
+
+<span class="c1"># 三次握手包</span>
+15:35:23.254118 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>S<span class="o">]</span>, seq 2358640817, win 29200, options <span class="o">[</span>mss 1460,sackOK,TS val <span class="m">1164279598</span> ecr 0,nop,wscale 7<span class="o">]</span>, length <span class="m">0</span>
+15:35:23.262005 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>S.<span class="o">]</span>, seq 1212165121, ack 2358640818, win 8192, options <span class="o">[</span>mss 1452,sackOK,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,wscale 5<span class="o">]</span>, length <span class="m">0</span>
+15:35:23.262068 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212165122, win 229, length <span class="m">0</span>
+
+<span class="c1"># 数据传输包</span>
+15:35:23.262260 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 2358640818:2358640895, ack 1212165122, win 229, length 77: HTTP: GET / HTTP/1.1
+15:35:23.272385 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640895, win 908, length <span class="m">0</span>
+15:35:23.273343 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 1212165122:1212167903, ack 2358640895, win 908, length 2781: HTTP: HTTP/1.1 <span class="m">200</span> OK
+15:35:23.273403 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167903, win 272, length <span class="m">0</span>
+
+<span class="c1"># 四次挥手包</span>
+15:35:23.273657 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 2358640895, ack 1212167903, win 272, length <span class="m">0</span>
+15:35:23.282240 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640896, win 908, length <span class="m">0</span>
+15:35:23.282290 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 1212167903, ack 2358640896, win 908, length <span class="m">0</span>
+15:35:23.282322 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167904, win 272, length <span class="m">0</span>
+
+<span class="c1"># RST包</span>
+15:35:26.295824 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>R<span class="o">]</span>, seq 1212167904, win 0, length <span class="m">0</span>
+
+</code></pre></div><p><img src="/images/tcp_open_close.jpg" alt=""></p>
+<blockquote>
+<p>说明: 这边write()传输数据为0的时候,默认+1,否则进入死循环,seq=ack就同一个值在校验了,所以seq=x+1,ACK=y+1是没问题的, 我这边请求百度的数据发送是: 77,后面百度服务端回复的数据长度是: 2781, 所以如果length不为空的时候,seq=x+len</p>
+</blockquote>
+<blockquote>
+<p>这里我<code>telnet 80</code> 端口测试连接 并发送数据<code>1</code>,结果当然nginx会给<code>400</code>, 可以看到这边<code>length=3</code></p>
+<p>为啥是3呢?</p>
+<p>(猜测哈)&hellip; 首先回车应该也算了一个字节,数据<code>1</code>算一个字节, 现在就两个字节了, 还有一个应该是每次ack的<code>+1</code>吧? 但好像有点牵强&hellip;</p>
+</blockquote>
+<p>参考: <a href="http://c.biancheng.net/view/2352.html">详细分析TCP数据的传输过程</a></p>
+<blockquote>
+<p>所以: 1669015475 = 1669015472 + 2(发送字节数) +1 ???  那为啥 length要记成3呢&hellip; 记录成2更合理吧,感觉还是有点问题</p>
+</blockquote>
+<pre><code>17:44:35.874189 IP 172.xx.xx.xx.58623 &gt; 172.16.56.116.http: Flags [P.], seq 1669015472:1669015475, ack 2645576909, win 4117, options [nop,nop,TS val 531802073 ecr 1306189625], length 3: HTTP
+17:44:35.874291 IP 172.16.56.116.http &gt; 172.xx.xx.xx.58623: Flags [.], ack 1669015475, win 227, options [nop,nop,TS val 1306191841 ecr 531802073], length 0
+17:44:35.874869 IP 172.16.56.116.http &gt; 172.xx.xx.xx.58623: Flags [P.], seq 2645576909:2645577234, ack 1669015475, win 227, options [nop,nop,TS val 1306191842 ecr 531802073], length 325: HTTP: HTTP/1.1 400 Bad Request
+</code></pre><h3 id="分析三次握手包">分析三次握手包</h3>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.254118 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>S<span class="o">]</span>, seq 2358640817, win 29200, options <span class="o">[</span>mss 1460,sackOK,TS val <span class="m">1164279598</span> ecr 0,nop,wscale 7<span class="o">]</span>, length <span class="m">0</span>
+15:35:23.262005 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>S.<span class="o">]</span>, seq 1212165121, ack 2358640818, win 8192, options <span class="o">[</span>mss 1452,sackOK,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,nop,wscale 5<span class="o">]</span>, length <span class="m">0</span>
+15:35:23.262068 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212165122, win 229, length <span class="m">0</span>
+</code></pre></div><ul>
+<li>
+<ol>
+<li>客户端发起关闭,发送SYN包,   <code>Flags [S]</code> 代表<code>syn</code>标志,  发送随机数<code>seq=2358640817</code>, <code>win=29200</code>, 发送数据<code>length=0</code></li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>服务端回复确认包并且发送SYN包, <code>Flags [S.]</code>中的. 代表<code>ack</code>, 这里<code>ack=2358640817+1</code>, 新的服务端发送随机数<code>seq=2358640817</code>, <code>win=8192</code>,</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>客户端回复SYN确认包,    回复<code>ack=1212165121+1</code></li>
+</ol>
+</li>
+</ul>
+<h3 id="分析数据传输包">分析数据传输包</h3>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.262260 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 2358640818:2358640895, ack 1212165122, win 229, length 77: HTTP: GET / HTTP/1.1
+15:35:23.272385 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640895, win 908, length <span class="m">0</span>
+15:35:23.273343 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>P.<span class="o">]</span>, seq 1212165122:1212167903, ack 2358640895, win 908, length 2781: HTTP: HTTP/1.1 <span class="m">200</span> OK
+15:35:23.273403 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167903, win 272, length <span class="m">0</span>
+
+</code></pre></div><ul>
+<li>
+<ol>
+<li><code>Flags [P.]</code>  <code>P</code>表示发送数据, <code>.</code>表示ack回复, 这里seq中 <code>2358640895=2358640818+77</code>(数据长度) 2358640818就是上次的<code>ack</code>值, <code>ack=1212165122</code></li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li><code>Flags [.]</code>   <code>.</code>表示<code>ack 2358640895=2358640818+77</code></li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li><code>Flags [P.]</code>  P表示发送数据, .表示ack回复, 这里seq中 <code>1212167903=1212165122+2781</code>(数据长度), <code>ack=2358640895</code></li>
+</ol>
+</li>
+<li>
+<ol start="4">
+<li><code>Flags [.]</code>   <code>.</code>表示<code>ack 1212167903=1212165122+2781</code></li>
+</ol>
+</li>
+</ul>
+<h3 id="四次挥手包">四次挥手包</h3>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">15:35:23.273657 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 2358640895, ack 1212167903, win 272, length <span class="m">0</span>
+15:35:23.282240 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>.<span class="o">]</span>, ack 2358640896, win 908, length <span class="m">0</span>
+15:35:23.282290 IP 180.101.49.11.http &gt; 172.xx.xx.xx.54646: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 1212167903, ack 2358640896, win 908, length <span class="m">0</span>
+15:35:23.282322 IP 172.xx.xx.xx.54646 &gt; 180.101.49.11.http: Flags <span class="o">[</span>.<span class="o">]</span>, ack 1212167904, win 272, length <span class="m">0</span>
+</code></pre></div><ul>
+<li>
+<ol>
+<li><code>Flags [F.]</code>  客户端发起fin包,  <code>F</code>表示发起挥手FIN,<code>.</code>表示<code>ack</code>, <code>seq=2358640895</code>就是上次的<code>ack</code>值, <code>ack=1212167903</code></li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li><code>Flags [.]</code>   服务端回复确认包, <code>.</code>表示<code>ack</code>,<code>ack=2358640895+1</code>,</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li><code>Flags [F.]</code>  服务端发起fin包, <code>F</code>表示发起挥手FIN,<code>.</code>表示<code>ack</code>,  <code>seq=1212167903</code>是上次的<code>ack</code>值,, <code>ack=2358640895+1</code></li>
+</ol>
+</li>
+<li>
+<ol start="4">
+<li><code>Flags [.]</code>   客户端回复确认包, <code>.</code>表示<code>ack=1212167903+1</code>,</li>
+</ol>
+</li>
+</ul>
+<h3 id="其他文章">其他文章</h3>
+<ul>
+<li><a href="https://www.cnblogs.com/nzbbody/p/8622497.html">什么是win</a></li>
+<li><a href="https://blog.csdn.net/Mr_rsq/article/details/81082127">TCP三次握手四次断开及11种状态转变</a></li>
+<li><a href="https://testerhome.com/topics/22107">Tcpdump 结果说明</a></li>
+</ul>
 ]]></content>
 		</item>
 		
