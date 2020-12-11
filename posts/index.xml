@@ -451,7 +451,30 @@ vim /etc/fstab
 <li><a href="https://blog.csdn.net/lppl010_/article/details/86662346">阿里 RocketMQ 优势对比</a></li>
 </ul>
 <p>RocketMQ 是对kafka的一种优化, kafka中的每个topic的每个分区都会对应一个物理文件, 但topic数量越多时, 分区分散更明显,就会导致磁盘IO成为瓶颈, 而rocketMQ所有的消息是保存在同一个物理文件中, topic和分区数对rocketMQ只是逻辑上的概念, 因此随着topic增加, kafka性能急剧下降, rocketMQ影响不大</p>
-]]></content>
+<h3 id="其他问题-记录一个php扩展动态安装的错误问题">其他问题: 记录一个php扩展动态安装的错误问题</h3>
+<p>同事在自己的vagrant安装php7.0的mongodb1.7.5扩展,但是添加到ini的时候报错如下:</p>
+<pre><code>undefined symbol: zend_string_init_interned
+</code></pre><ul>
+<li>分析</li>
+</ul>
+<pre><code>1 首先扩展被安装到 /usr/lib/php/20180731目录
+2 报错显示无法加载的动态库
+</code></pre><ul>
+<li>问题1 由于php7.0的extension_dir配置查看发现是/usr/lib/php/20151012,所以改动态编译并未生成到正确的路径</li>
+<li>问题2 该报错可能是动态库不能识别问题</li>
+</ul>
+<p>经过确认该环境安装了多个php版本, 最新的是php7.4, 而php命令默认是link到php7.0, 但是动态扩展编译的命令如下:</p>
+<pre><code>/usr/php/phpize
+./configure
+make
+make install 
+</code></pre><p>显然问题就在这, 这里phpize 和configure会走默认的配置, 默认的配置可能是最新的php7.4(大概是仅仅php命令link到了php7.0)
+因此重新编译如下:</p>
+<pre><code>/usr/php/phpize7.0
+./configure --with-php-config=/path/to/php-config7.0
+make
+make install
+</code></pre>]]></content>
 		</item>
 		
 		<item>
@@ -9737,7 +9760,7 @@ default-character-set=utf8
 			
 			<guid>https://k1s.club/posts/18-%E6%94%B6%E8%97%8F%E9%93%BE%E6%8E%A5/</guid>
 			<description>记录一些好的网址
- 容器    云原生图书编年史 云原生大佬博客汇总 (2000个) kubernetes 社群分享 QA 汇总 k8s CRD(CustomResourceDefinition)自定义controller sample k8s 集群部署运营实践总结 k8s 创建一个只读的用户权限 kubectl 创建 Pod 背后到底发生了什么？ 白话Kubernetes网络(推荐)   Linux服务    MySQL 5.6, 5.7, 8.0版本的新特性大全 nginx+lua实现灰度发布 计算机网络 根域名的知识 常见状态码   golang    go学习指南 go圣经 go-mod学习 go包 go相关源码  《Go 语言编程之旅：一起用 Go 做项目》 vue+go 利用go优越的性能-设计与实现高性能企业级微服务网关     常用的工具网址    不用翻墙就能谷歌 deepl 比谷歌翻译好用的翻译 tableconvert 在线excel转markdown processon 免费在线作图 表情锅 自制表情动图 在线解析 子网掩码换算等   其他文章    Raft 为什么是更易理解的分布式一致性算法 Raft 一步步动态教你理解raft协议 Raft 更多形象化理解 Elasticsearch分布式一致性原理剖析(一)-节点篇   想看的书籍    金字塔原理  </description>
+ 容器    云原生图书编年史 云原生大佬博客汇总 (2000个) kubernetes 社群分享 QA 汇总 k8s CRD(CustomResourceDefinition)自定义controller sample k8s 集群部署运营实践总结 k8s 创建一个只读的用户权限 kubectl 创建 Pod 背后到底发生了什么？ 白话Kubernetes网络(推荐) 张馆长docker科普 cgroup相关  linux cgroups 简介 cgroups与systemd     Linux服务    MySQL 5.6, 5.7, 8.0版本的新特性大全 nginx+lua实现灰度发布 计算机网络 根域名的知识 常见状态码   golang    go学习指南 go圣经 go-mod学习 go包 go相关源码  《Go 语言编程之旅：一起用 Go 做项目》 vue+go 利用go优越的性能-设计与实现高性能企业级微服务网关     常用的工具网址    不用翻墙就能谷歌 deepl 比谷歌翻译好用的翻译 tableconvert 在线excel转markdown processon 免费在线作图 表情锅 自制表情动图 在线解析 子网掩码换算等   其他文章    Raft 为什么是更易理解的分布式一致性算法 Raft 一步步动态教你理解raft协议 Raft 更多形象化理解 Elasticsearch分布式一致性原理剖析(一)-节点篇   想看的书籍    金字塔原理  </description>
 			<content type="html"><![CDATA[<p>记录一些好的网址</p>
 <!-- more -->
 <center>
@@ -9753,6 +9776,13 @@ default-character-set=utf8
 <li><a href="http://www.huilog.com/?p=1173">k8s 创建一个只读的用户权限</a></li>
 <li><a href="https://fuckcloudnative.io/posts/what-happens-when-k8s/">kubectl 创建 Pod 背后到底发生了什么？</a></li>
 <li><a href="https://juejin.im/entry/599d33ad6fb9a0247804d430">白话Kubernetes网络(推荐)</a></li>
+<li><a href="https://github.com/zhangguanzhang/docker-need-to-know/blob/master/SUMMARY.md">张馆长docker科普</a></li>
+<li>cgroup相关
+<ul>
+<li><a href="https://www.cnblogs.com/sparkdev/p/8296063.html">linux cgroups 简介</a></li>
+<li><a href="https://www.imooc.com/article/72502">cgroups与systemd</a></li>
+</ul>
+</li>
 </ul>
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>

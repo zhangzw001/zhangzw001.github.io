@@ -14,7 +14,7 @@
  1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的) 2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选. 而multi-paxos 是随意的 所以raft 可以看成是简化版本的multi paxos(这里multi-paxos 因为允许并发的写log, 因此不存在一个最新, 最全的日志节点, 因此只能这么做.">
 <meta itemprop="datePublished" content="2020-12-08T17:42:54+00:00" />
 <meta itemprop="dateModified" content="2020-12-08T17:42:54+00:00" />
-<meta itemprop="wordCount" content="1125">
+<meta itemprop="wordCount" content="1161">
 
 
 
@@ -513,7 +513,30 @@ vim /etc/fstab
 <li><a href="https://blog.csdn.net/lppl010_/article/details/86662346">阿里 RocketMQ 优势对比</a></li>
 </ul>
 <p>RocketMQ 是对kafka的一种优化, kafka中的每个topic的每个分区都会对应一个物理文件, 但topic数量越多时, 分区分散更明显,就会导致磁盘IO成为瓶颈, 而rocketMQ所有的消息是保存在同一个物理文件中, topic和分区数对rocketMQ只是逻辑上的概念, 因此随着topic增加, kafka性能急剧下降, rocketMQ影响不大</p>
-
+<h3 id="其他问题-记录一个php扩展动态安装的错误问题">其他问题: 记录一个php扩展动态安装的错误问题<a href="#其他问题-记录一个php扩展动态安装的错误问题" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>同事在自己的vagrant安装php7.0的mongodb1.7.5扩展,但是添加到ini的时候报错如下:</p>
+<pre><code>undefined symbol: zend_string_init_interned
+</code></pre><ul>
+<li>分析</li>
+</ul>
+<pre><code>1 首先扩展被安装到 /usr/lib/php/20180731目录
+2 报错显示无法加载的动态库
+</code></pre><ul>
+<li>问题1 由于php7.0的extension_dir配置查看发现是/usr/lib/php/20151012,所以改动态编译并未生成到正确的路径</li>
+<li>问题2 该报错可能是动态库不能识别问题</li>
+</ul>
+<p>经过确认该环境安装了多个php版本, 最新的是php7.4, 而php命令默认是link到php7.0, 但是动态扩展编译的命令如下:</p>
+<pre><code>/usr/php/phpize
+./configure
+make
+make install 
+</code></pre><p>显然问题就在这, 这里phpize 和configure会走默认的配置, 默认的配置可能是最新的php7.4(大概是仅仅php命令link到了php7.0)
+因此重新编译如下:</p>
+<pre><code>/usr/php/phpize7.0
+./configure --with-php-config=/path/to/php-config7.0
+make
+make install
+</code></pre>
 			</div>
    
 
@@ -522,7 +545,7 @@ vim /etc/fstab
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/linux">linux</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1125 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1161 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-12-09 01:42 &#43;0800</p>
 			</footer>
 		</article>
@@ -556,6 +579,7 @@ vim /etc/fstab
         <li><a href="#其他问题-jenkins-ui特别慢-jobs数量100">其他问题: jenkins ui特别慢 (jobs数量100+)</a></li>
         <li><a href="#其他问题-postgresql时区修改">其他问题: postgreSql时区修改</a></li>
         <li><a href="#其他问题-kafka和rocketmq比较">其他问题: kafka和rocketMQ比较</a></li>
+        <li><a href="#其他问题-记录一个php扩展动态安装的错误问题">其他问题: 记录一个php扩展动态安装的错误问题</a></li>
       </ul>
     </li>
   </ul>
