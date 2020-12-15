@@ -7,7 +7,22 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 20 Oct 2020 16:42:57 +0800</lastBuildDate><atom:link href="https://k1s.club/tags/untagged/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 15 Dec 2020 11:15:52 +0800</lastBuildDate><atom:link href="https://k1s.club/tags/untagged/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Gitlab Ce的https开启问题</title>
+      <link>https://k1s.club/posts/63-gitlab-ce%E7%9A%84https%E5%BC%80%E5%90%AF%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Tue, 15 Dec 2020 11:15:52 +0800</pubDate>
+      
+      <guid>https://k1s.club/posts/63-gitlab-ce%E7%9A%84https%E5%BC%80%E5%90%AF%E9%97%AE%E9%A2%98/</guid>
+      <description>前言
+ 首先需要开启https并不会因为之前没有开启, 之前已经是https访问, 通过nginx反向代理到gitlab-ce:10080端口
+但是由于新版Chrome浏览器对于https的域名内部post调用http时 会提示不安全
+这种情况下才准备将gitlab直接通过https启动, 然后nginx反代到https的gitlab-ce上
+首先修改下gitlab.rb  external_url &#39;https://gitlab.xxx.com&#39; nginx[&#39;redirect_http_to_https&#39;] = true nginx[&#39;redirect_http_to_https_port&#39;] = 80 nginx[&#39;listen_port&#39;] = 80 nginx[&#39;ssl_certificate&#39;] = &amp;quot;/etc/gitlab/ssl/server.pem&amp;quot; nginx[&#39;ssl_certificate_key&#39;] = &amp;quot;/etc/gitlab/ssl/server.key&amp;quot;  这里有个插曲, 因为我之前配置的时候docker 端口映射是10080:10080, 所以容器的gitlab.rc配置是这样:
+  nginx[&#39;redirect_http_to_https_port&#39;] = 10080 nginx[&#39;listen_port&#39;] = 10080 这样就导致开启https的redirect 可能有点问题(可能漏改, 或者某些默认配置的问题), 其实没必要, 目前改成容器内默认的80
+然后reconfigure即可 gitlab-ctl reconfigure 由于我是docker swarm启动 version: &amp;quot;3&amp;quot; services: gitlab: image: hub.xxx.com/bq/gitlab-ce:11.5.4 hostname: &#39;gitlab.xxx.com&#39; environment: TZ: &#39;Asia/Shanghai&#39; GITLAB_OMNIBUS_CONFIG: | gitlab_rails[&#39;time_zone&#39;] = &#39;Asia/Shanghai&#39; volumes: - /data/container/gitlab-ce/logs:/var/log/gitlab - /data/container/gitlab-ce/data/:/var/opt/gitlab:rw - /data/container/gitlab-ce/config/:/etc/gitlab:rw deploy: replicas: 1 restart_policy: condition: on-failure ports: - 10443:443 - 10080:80 - 10022:22 networks: - gitlabnet environment: HOSTNAME: gitlab.</description>
+    </item>
+    
     <item>
       <title>Goland快捷键记录</title>
       <link>https://k1s.club/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/</link>
