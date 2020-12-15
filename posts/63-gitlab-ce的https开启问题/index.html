@@ -7,42 +7,42 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<meta name="theme-color" content="#494f5c">
 	<meta name="msapplication-TileColor" content="#494f5c">
-<meta itemprop="name" content="Gitlab Ce的https开启问题">
+<meta itemprop="name" content="Gitlab-Ce的https开启问题">
 <meta itemprop="description" content="前言
  首先需要开启https并不会因为之前没有开启, 之前已经是https访问, 通过nginx反向代理到gitlab-ce:10080端口
 但是由于新版Chrome浏览器对于https的域名内部post调用http时 会提示不安全
 这种情况下才准备将gitlab直接通过https启动, 然后nginx反代到https的gitlab-ce上
-首先修改下gitlab.rb  external_url &#39;https://gitlab.xxx.com&#39; nginx[&#39;redirect_http_to_https&#39;] = true nginx[&#39;redirect_http_to_https_port&#39;] = 80 nginx[&#39;listen_port&#39;] = 80 nginx[&#39;ssl_certificate&#39;] = &quot;/etc/gitlab/ssl/server.pem&quot; nginx[&#39;ssl_certificate_key&#39;] = &quot;/etc/gitlab/ssl/server.key&quot;  这里有个插曲, 因为我之前配置的时候docker 端口映射是10080:10080, 所以容器的gitlab.rc配置是这样:
+首先修改下gitlab.rb  external_url &#39;https://gitlab.xxx.com&#39; nginx[&#39;redirect_http_to_https&#39;] = true nginx[&#39;redirect_http_to_https_port&#39;] = 80 nginx[&#39;listen_port&#39;] = 80 nginx[&#39;ssl_certificate&#39;] = &quot;/etc/gitlab/ssl/server.pem&quot; nginx[&#39;ssl_certificate_key&#39;] = &quot;/etc/gitlab/ssl/server.key&quot;  这里有个插曲, 因为我之前配置的时候docker 端口映射是10080:10080, 所以容器的gitlab.rb配置是这样:
   nginx[&#39;redirect_http_to_https_port&#39;] = 10080 nginx[&#39;listen_port&#39;] = 10080 这样就导致开启https的redirect 可能有点问题(可能漏改, 或者某些默认配置的问题), 其实没必要, 目前改成容器内默认的80
-然后reconfigure即可 gitlab-ctl reconfigure 由于我是docker swarm启动 version: &quot;3&quot; services: gitlab: image: hub.xxx.com/bq/gitlab-ce:11.5.4 hostname: &#39;gitlab.xxx.com&#39; environment: TZ: &#39;Asia/Shanghai&#39; GITLAB_OMNIBUS_CONFIG: | gitlab_rails[&#39;time_zone&#39;] = &#39;Asia/Shanghai&#39; volumes: - /data/container/gitlab-ce/logs:/var/log/gitlab - /data/container/gitlab-ce/data/:/var/opt/gitlab:rw - /data/container/gitlab-ce/config/:/etc/gitlab:rw deploy: replicas: 1 restart_policy: condition: on-failure ports: - 10443:443 - 10080:80 - 10022:22 networks: - gitlabnet environment: HOSTNAME: gitlab.">
+然后reconfigure即可 gitlab-ctl reconfigure 由于我是docker swarm启动 version:&#34;3&#34;services:gitlab:image:hub.xxx.com/bq/gitlab-ce:11.5.4hostname:&#39;gitlab.xxx.com&#39;environment:TZ:&#39;Asia/Shanghai&#39;GITLAB_OMNIBUS_CONFIG:|gitlab_rails[&#39;time_zone&#39;] = &#39;Asia/Shanghai&#39;volumes:- /data/container/gitlab-ce/logs:/var/log/gitlab- /data/container/gitlab-ce/data/:/var/opt/gitlab:rw- /data/container/gitlab-ce/config/:/etc/gitlab:rwdeploy:replicas:1restart_policy:condition:on-failureports:- 10443:443- 10080:80- 10022:22networks:- gitlabnetenvironment:HOSTNAME:gitlab.xxx.comnetworks:gitlabnet:nginx代理修改 server { listen 80; listen 443 ssl http2; charset utf-8; server_name gitlab.">
 <meta itemprop="datePublished" content="2020-12-15T11:15:52+08:00" />
 <meta itemprop="dateModified" content="2020-12-15T11:15:52+08:00" />
-<meta itemprop="wordCount" content="172">
+<meta itemprop="wordCount" content="137">
 
 
 
 <meta itemprop="keywords" content="untagged," />
-<meta property="og:title" content="Gitlab Ce的https开启问题" />
+<meta property="og:title" content="Gitlab-Ce的https开启问题" />
 <meta property="og:description" content="前言
  首先需要开启https并不会因为之前没有开启, 之前已经是https访问, 通过nginx反向代理到gitlab-ce:10080端口
 但是由于新版Chrome浏览器对于https的域名内部post调用http时 会提示不安全
 这种情况下才准备将gitlab直接通过https启动, 然后nginx反代到https的gitlab-ce上
-首先修改下gitlab.rb  external_url &#39;https://gitlab.xxx.com&#39; nginx[&#39;redirect_http_to_https&#39;] = true nginx[&#39;redirect_http_to_https_port&#39;] = 80 nginx[&#39;listen_port&#39;] = 80 nginx[&#39;ssl_certificate&#39;] = &quot;/etc/gitlab/ssl/server.pem&quot; nginx[&#39;ssl_certificate_key&#39;] = &quot;/etc/gitlab/ssl/server.key&quot;  这里有个插曲, 因为我之前配置的时候docker 端口映射是10080:10080, 所以容器的gitlab.rc配置是这样:
+首先修改下gitlab.rb  external_url &#39;https://gitlab.xxx.com&#39; nginx[&#39;redirect_http_to_https&#39;] = true nginx[&#39;redirect_http_to_https_port&#39;] = 80 nginx[&#39;listen_port&#39;] = 80 nginx[&#39;ssl_certificate&#39;] = &quot;/etc/gitlab/ssl/server.pem&quot; nginx[&#39;ssl_certificate_key&#39;] = &quot;/etc/gitlab/ssl/server.key&quot;  这里有个插曲, 因为我之前配置的时候docker 端口映射是10080:10080, 所以容器的gitlab.rb配置是这样:
   nginx[&#39;redirect_http_to_https_port&#39;] = 10080 nginx[&#39;listen_port&#39;] = 10080 这样就导致开启https的redirect 可能有点问题(可能漏改, 或者某些默认配置的问题), 其实没必要, 目前改成容器内默认的80
-然后reconfigure即可 gitlab-ctl reconfigure 由于我是docker swarm启动 version: &quot;3&quot; services: gitlab: image: hub.xxx.com/bq/gitlab-ce:11.5.4 hostname: &#39;gitlab.xxx.com&#39; environment: TZ: &#39;Asia/Shanghai&#39; GITLAB_OMNIBUS_CONFIG: | gitlab_rails[&#39;time_zone&#39;] = &#39;Asia/Shanghai&#39; volumes: - /data/container/gitlab-ce/logs:/var/log/gitlab - /data/container/gitlab-ce/data/:/var/opt/gitlab:rw - /data/container/gitlab-ce/config/:/etc/gitlab:rw deploy: replicas: 1 restart_policy: condition: on-failure ports: - 10443:443 - 10080:80 - 10022:22 networks: - gitlabnet environment: HOSTNAME: gitlab." />
+然后reconfigure即可 gitlab-ctl reconfigure 由于我是docker swarm启动 version:&#34;3&#34;services:gitlab:image:hub.xxx.com/bq/gitlab-ce:11.5.4hostname:&#39;gitlab.xxx.com&#39;environment:TZ:&#39;Asia/Shanghai&#39;GITLAB_OMNIBUS_CONFIG:|gitlab_rails[&#39;time_zone&#39;] = &#39;Asia/Shanghai&#39;volumes:- /data/container/gitlab-ce/logs:/var/log/gitlab- /data/container/gitlab-ce/data/:/var/opt/gitlab:rw- /data/container/gitlab-ce/config/:/etc/gitlab:rwdeploy:replicas:1restart_policy:condition:on-failureports:- 10443:443- 10080:80- 10022:22networks:- gitlabnetenvironment:HOSTNAME:gitlab.xxx.comnetworks:gitlabnet:nginx代理修改 server { listen 80; listen 443 ssl http2; charset utf-8; server_name gitlab." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://k1s.club/posts/63-gitlab-ce%E7%9A%84https%E5%BC%80%E5%90%AF%E9%97%AE%E9%A2%98/" />
 <meta property="article:published_time" content="2020-12-15T11:15:52+08:00" />
 <meta property="article:modified_time" content="2020-12-15T11:15:52+08:00" />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Gitlab Ce的https开启问题"/>
+<meta name="twitter:title" content="Gitlab-Ce的https开启问题"/>
 <meta name="twitter:description" content="前言
  首先需要开启https并不会因为之前没有开启, 之前已经是https访问, 通过nginx反向代理到gitlab-ce:10080端口
 但是由于新版Chrome浏览器对于https的域名内部post调用http时 会提示不安全
 这种情况下才准备将gitlab直接通过https启动, 然后nginx反代到https的gitlab-ce上
-首先修改下gitlab.rb  external_url &#39;https://gitlab.xxx.com&#39; nginx[&#39;redirect_http_to_https&#39;] = true nginx[&#39;redirect_http_to_https_port&#39;] = 80 nginx[&#39;listen_port&#39;] = 80 nginx[&#39;ssl_certificate&#39;] = &quot;/etc/gitlab/ssl/server.pem&quot; nginx[&#39;ssl_certificate_key&#39;] = &quot;/etc/gitlab/ssl/server.key&quot;  这里有个插曲, 因为我之前配置的时候docker 端口映射是10080:10080, 所以容器的gitlab.rc配置是这样:
+首先修改下gitlab.rb  external_url &#39;https://gitlab.xxx.com&#39; nginx[&#39;redirect_http_to_https&#39;] = true nginx[&#39;redirect_http_to_https_port&#39;] = 80 nginx[&#39;listen_port&#39;] = 80 nginx[&#39;ssl_certificate&#39;] = &quot;/etc/gitlab/ssl/server.pem&quot; nginx[&#39;ssl_certificate_key&#39;] = &quot;/etc/gitlab/ssl/server.key&quot;  这里有个插曲, 因为我之前配置的时候docker 端口映射是10080:10080, 所以容器的gitlab.rb配置是这样:
   nginx[&#39;redirect_http_to_https_port&#39;] = 10080 nginx[&#39;listen_port&#39;] = 10080 这样就导致开启https的redirect 可能有点问题(可能漏改, 或者某些默认配置的问题), 其实没必要, 目前改成容器内默认的80
-然后reconfigure即可 gitlab-ctl reconfigure 由于我是docker swarm启动 version: &quot;3&quot; services: gitlab: image: hub.xxx.com/bq/gitlab-ce:11.5.4 hostname: &#39;gitlab.xxx.com&#39; environment: TZ: &#39;Asia/Shanghai&#39; GITLAB_OMNIBUS_CONFIG: | gitlab_rails[&#39;time_zone&#39;] = &#39;Asia/Shanghai&#39; volumes: - /data/container/gitlab-ce/logs:/var/log/gitlab - /data/container/gitlab-ce/data/:/var/opt/gitlab:rw - /data/container/gitlab-ce/config/:/etc/gitlab:rw deploy: replicas: 1 restart_policy: condition: on-failure ports: - 10443:443 - 10080:80 - 10022:22 networks: - gitlabnet environment: HOSTNAME: gitlab."/>
+然后reconfigure即可 gitlab-ctl reconfigure 由于我是docker swarm启动 version:&#34;3&#34;services:gitlab:image:hub.xxx.com/bq/gitlab-ce:11.5.4hostname:&#39;gitlab.xxx.com&#39;environment:TZ:&#39;Asia/Shanghai&#39;GITLAB_OMNIBUS_CONFIG:|gitlab_rails[&#39;time_zone&#39;] = &#39;Asia/Shanghai&#39;volumes:- /data/container/gitlab-ce/logs:/var/log/gitlab- /data/container/gitlab-ce/data/:/var/opt/gitlab:rw- /data/container/gitlab-ce/config/:/etc/gitlab:rwdeploy:replicas:1restart_policy:condition:on-failureports:- 10443:443- 10080:80- 10022:22networks:- gitlabnetenvironment:HOSTNAME:gitlab.xxx.comnetworks:gitlabnet:nginx代理修改 server { listen 80; listen 443 ssl http2; charset utf-8; server_name gitlab."/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -51,7 +51,7 @@
 	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
 	<link rel="shortcut icon" href="/favicon.ico">
 
-	<title>Gitlab Ce的https开启问题</title>
+	<title>Gitlab-Ce的https开启问题</title>
 	<link rel="stylesheet" href="https://k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
 	
 </head>
@@ -87,7 +87,7 @@
 		<article class="thin">
 			<header class="post-header">
 				<div class="post-meta"><span>Dec 15, 2020</span></div>
-				<h1>Gitlab Ce的https开启问题</h1>
+				<h1>Gitlab-Ce的https开启问题</h1>
 			</header>
 			<div class="content">
 				<blockquote>
@@ -105,7 +105,7 @@
  nginx['ssl_certificate'] = &quot;/etc/gitlab/ssl/server.pem&quot;
  nginx['ssl_certificate_key'] = &quot;/etc/gitlab/ssl/server.key&quot;
 </code></pre><blockquote>
-<p>这里有个插曲, 因为我之前配置的时候docker 端口映射是10080:10080, 所以容器的gitlab.rc配置是这样:</p>
+<p>这里有个插曲, 因为我之前配置的时候docker 端口映射是10080:10080, 所以容器的gitlab.rb配置是这样:</p>
 </blockquote>
 <pre><code> nginx['redirect_http_to_https_port'] = 10080
  nginx['listen_port'] = 10080
@@ -113,69 +113,69 @@
 <h3 id="然后reconfigure即可">然后reconfigure即可<a href="#然后reconfigure即可" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <pre><code>gitlab-ctl reconfigure
 </code></pre><h3 id="由于我是docker-swarm启动">由于我是docker swarm启动<a href="#由于我是docker-swarm启动" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-<pre><code>version: &quot;3&quot;
-services:
-  gitlab:
-    image: hub.xxx.com/bq/gitlab-ce:11.5.4
-    hostname: 'gitlab.xxx.com'
-    environment:
-      TZ: 'Asia/Shanghai'
-      GITLAB_OMNIBUS_CONFIG: |
-        gitlab_rails['time_zone'] = 'Asia/Shanghai'
-    volumes:
-      - /data/container/gitlab-ce/logs:/var/log/gitlab
-      - /data/container/gitlab-ce/data/:/var/opt/gitlab:rw
-      - /data/container/gitlab-ce/config/:/etc/gitlab:rw
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-    ports:
-      - 10443:443
-      - 10080:80
-      - 10022:22
-    networks:
-      - gitlabnet
-    environment:
-      HOSTNAME: gitlab.xxx.com
-networks:
-  gitlabnet:
-</code></pre><h3 id="nginx代理修改">nginx代理修改<a href="#nginx代理修改" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-<pre><code>server {
-        listen  80;
-        listen 443 ssl http2;
-        charset utf-8;
-        server_name gitlab.xxx.com;
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;3&#34;</span><span class="w">
+</span><span class="w"></span><span class="nt">services</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">gitlab</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">hub.xxx.com/bq/gitlab-ce:11.5.4</span><span class="w">
+</span><span class="w">    </span><span class="nt">hostname</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;gitlab.xxx.com&#39;</span><span class="w">
+</span><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span><span class="nt">TZ</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;Asia/Shanghai&#39;</span><span class="w">
+</span><span class="w">      </span><span class="nt">GITLAB_OMNIBUS_CONFIG</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span><span class="sd">        </span><span class="w">        </span><span class="l">gitlab_rails[&#39;time_zone&#39;] = &#39;Asia/Shanghai&#39;</span><span class="w">
+</span><span class="w">    </span><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="l">/data/container/gitlab-ce/logs:/var/log/gitlab</span><span class="w">
+</span><span class="w">      </span>- <span class="l">/data/container/gitlab-ce/data/:/var/opt/gitlab:rw</span><span class="w">
+</span><span class="w">      </span>- <span class="l">/data/container/gitlab-ce/config/:/etc/gitlab:rw</span><span class="w">
+</span><span class="w">    </span><span class="nt">deploy</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span><span class="w">      </span><span class="nt">restart_policy</span><span class="p">:</span><span class="w">
+</span><span class="w">        </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="kc">on</span>-<span class="l">failure</span><span class="w">
+</span><span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="m">10443</span><span class="p">:</span><span class="m">443</span><span class="w">
+</span><span class="w">      </span>- <span class="m">10080</span><span class="p">:</span><span class="m">80</span><span class="w">
+</span><span class="w">      </span>- <span class="m">10022</span><span class="p">:</span><span class="m">22</span><span class="w">
+</span><span class="w">    </span><span class="nt">networks</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="l">gitlabnet</span><span class="w">
+</span><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span><span class="nt">HOSTNAME</span><span class="p">:</span><span class="w"> </span><span class="l">gitlab.xxx.com</span><span class="w">
+</span><span class="w"></span><span class="nt">networks</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">gitlabnet</span><span class="p">:</span><span class="w">
+</span></code></pre></div><h3 id="nginx代理修改">nginx代理修改<a href="#nginx代理修改" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">server <span class="o">{</span>
+        listen  80<span class="p">;</span>
+        listen <span class="m">443</span> ssl http2<span class="p">;</span>
+        charset utf-8<span class="p">;</span>
+        server_name gitlab.xxx.com<span class="p">;</span>
 
-        ssl_certificate   /etc/nginx/server.pem;
-        ssl_certificate_key   /etc/nginx/server.key;
-        ssl_session_timeout 5m;
-        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-        ssl_ciphers AESGCM:ALL:!DH:!EXPORT:!RC4:+HIGH:!MEDIUM:!LOW:!aNULL:!eNULL;
-        ssl_prefer_server_ciphers on;
+        ssl_certificate   /etc/nginx/server.pem<span class="p">;</span>
+        ssl_certificate_key   /etc/nginx/server.key<span class="p">;</span>
+        ssl_session_timeout 5m<span class="p">;</span>
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2<span class="p">;</span>
+        ssl_ciphers AESGCM:ALL:!DH:!EXPORT:!RC4:+HIGH:!MEDIUM:!LOW:!aNULL:!eNULL<span class="p">;</span>
+        ssl_prefer_server_ciphers on<span class="p">;</span>
 
-        client_max_body_size 300M;
-        access_log  /nginx_logs/gitlab.xxx.com.access.log  server_name_main;
+        client_max_body_size 300M<span class="p">;</span>
+        access_log  /nginx_logs/gitlab.xxx.com.access.log  server_name_main<span class="p">;</span>
 
-        if ($scheme = http) {
-            return 301 https://$server_name$request_uri;
-        }
+        <span class="k">if</span> <span class="o">(</span><span class="nv">$scheme</span> <span class="o">=</span> http<span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="m">301</span> https://<span class="nv">$server_name$request_uri</span><span class="p">;</span>
+        <span class="o">}</span>
 
-        location / {
-            #add_header Strict-Transport-Security &quot;max-age=31536000;includeSubDomains&quot; ;
-            proxy_pass https://xxx:10443;		//修改这里
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto  $scheme;
-        }
+        location / <span class="o">{</span>
+            <span class="c1">#add_header Strict-Transport-Security &#34;max-age=31536000;includeSubDomains&#34; ;</span>
+            proxy_pass https://xxx:10443<span class="p">;</span>		//修改这里
+            proxy_set_header Host <span class="nv">$host</span><span class="p">;</span>
+            proxy_set_header X-Real-IP <span class="nv">$remote_addr</span><span class="p">;</span>
+            proxy_set_header X-Forwarded-For <span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span>
+            proxy_set_header X-Forwarded-Proto  <span class="nv">$scheme</span><span class="p">;</span>
+        <span class="o">}</span>
 
-        error_page   500 502 503 504  /50x.html;
-        location = /50x.html {
-            root   html;
-        }
-}
-</code></pre><h3 id="其他一些说明">其他一些说明<a href="#其他一些说明" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+        error_page   <span class="m">500</span> <span class="m">502</span> <span class="m">503</span> <span class="m">504</span>  /50x.html<span class="p">;</span>
+        <span class="nv">location</span> <span class="o">=</span> /50x.html <span class="o">{</span>
+            root   html<span class="p">;</span>
+        <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div><h3 id="其他一些说明">其他一些说明<a href="#其他一些说明" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <pre><code> gitlab_rails['gitlab_shell_ssh_port'] = 10022 
 </code></pre>
 			</div>
@@ -186,7 +186,7 @@ networks:
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/untagged">untagged</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>172 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>137 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-12-15 11:15 &#43;0800</p>
 			</footer>
 		</article>
