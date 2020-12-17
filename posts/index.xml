@@ -1074,6 +1074,9 @@ kubectl create service nodeport nginx --tcp<span class="o">=</span>31112:80 -n <
 <span class="mf">6.</span> <span class="nx">列操作</span>
 <span class="s">`Shift + option(alt) + 鼠标左键选择`</span>
 
+<span class="mf">7.</span> <span class="nx">重构</span>
+<span class="nx">shift</span> <span class="o">+</span> <span class="nx">f6</span>
+
 </code></pre></div>]]></content>
 		</item>
 		
@@ -1678,13 +1681,17 @@ ok
 <pre><code>1. 测试函数必须导入testing包
 2. 测试函数的名字必须以Test开头，可选的后缀名必须以大写字母开头：
 </code></pre><h3 id="一些常用命令">一些常用命令</h3>
-<pre><code>1. go test 	// 返回正确 或者返回错误详情
-2. go test -v 	// 返回详情,包括正确的测试案例
-3. go test -v -run=&quot;French|Can.*l&quot;	// 执行指定的测试案例(参数-run对应一个正则表达式)
-4. go test -run=Fib -coverprofile=c.out . //生成c.out
-5. go tool cover -html=c.out //将c.out转成html格式打开
-6. go test -bench=Fib -benchmem // 基准测试 显示内存和内存分配次数
-</code></pre>]]></content>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="mf">1.</span> <span class="k">go</span> <span class="nx">test</span> 	<span class="c1">// 返回正确 或者返回错误详情
+</span><span class="c1"></span><span class="mf">2.</span> <span class="k">go</span> <span class="nx">test</span> <span class="o">-</span><span class="nx">v</span> 	<span class="c1">// 返回详情,包括正确的测试案例
+</span><span class="c1"></span><span class="mf">3.</span> <span class="k">go</span> <span class="nx">test</span> <span class="o">-</span><span class="nx">v</span> <span class="o">-</span><span class="nx">run</span><span class="p">=</span><span class="s">&#34;French|Can.*l&#34;</span>	<span class="c1">// 执行指定的测试案例(参数-run对应一个正则表达式)
+</span><span class="c1"></span><span class="mf">4.</span> <span class="k">go</span> <span class="nx">test</span> <span class="o">-</span><span class="nx">run</span><span class="p">=</span><span class="nx">Fib</span> <span class="o">-</span><span class="nx">coverprofile</span><span class="p">=</span><span class="nx">c</span><span class="p">.</span><span class="nx">out</span> <span class="p">.</span> <span class="c1">//生成c.out
+</span><span class="c1"></span><span class="mf">5.</span> <span class="k">go</span> <span class="nx">tool</span> <span class="nx">cover</span> <span class="o">-</span><span class="nx">html</span><span class="p">=</span><span class="nx">c</span><span class="p">.</span><span class="nx">out</span> <span class="c1">//将c.out转成html格式打开
+</span><span class="c1"></span><span class="mf">6.</span> <span class="k">go</span> <span class="nx">test</span> <span class="o">-</span><span class="nx">bench</span><span class="p">=</span><span class="nx">Fib</span> <span class="o">-</span><span class="nx">benchmem</span> <span class="c1">// 基准测试 显示内存和内存分配次数
+</span><span class="c1"></span><span class="mf">7.</span> <span class="k">go</span> <span class="nx">test</span> <span class="o">-</span><span class="nx">bench</span> <span class="p">.</span> <span class="o">-</span><span class="nx">cpuprofile</span> <span class="nx">cpu</span><span class="p">.</span><span class="nx">out</span>	<span class="c1">// 生成cpu.out
+</span><span class="c1"></span><span class="mf">8.</span> <span class="k">go</span> <span class="nx">tool</span> <span class="nx">pprof</span> <span class="nx">cpu</span><span class="p">.</span><span class="nx">out</span>   
+   <span class="c1">// 然后交互式输入web查看图形界面(但是需要安装brew install graphviz )
+</span><span class="c1"></span>   <span class="c1">// 或者交互式输入png,会得到类型profile001.png的文件, 打开查看即可
+</span></code></pre></div>]]></content>
 		</item>
 		
 		<item>

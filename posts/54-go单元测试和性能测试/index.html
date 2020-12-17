@@ -11,7 +11,7 @@
 <meta itemprop="description" content="简单记录一下单元测试 和性能测试的例子">
 <meta itemprop="datePublished" content="2020-08-12T16:44:10+00:00" />
 <meta itemprop="dateModified" content="2020-08-12T16:44:10+00:00" />
-<meta itemprop="wordCount" content="456">
+<meta itemprop="wordCount" content="478">
 
 
 
@@ -231,13 +231,17 @@ ok
 <pre><code>1. 测试函数必须导入testing包
 2. 测试函数的名字必须以Test开头，可选的后缀名必须以大写字母开头：
 </code></pre><h3 id="一些常用命令">一些常用命令<a href="#一些常用命令" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-<pre><code>1. go test 	// 返回正确 或者返回错误详情
-2. go test -v 	// 返回详情,包括正确的测试案例
-3. go test -v -run=&quot;French|Can.*l&quot;	// 执行指定的测试案例(参数-run对应一个正则表达式)
-4. go test -run=Fib -coverprofile=c.out . //生成c.out
-5. go tool cover -html=c.out //将c.out转成html格式打开
-6. go test -bench=Fib -benchmem // 基准测试 显示内存和内存分配次数
-</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="mf">1.</span> <span class="k">go</span> <span class="nx">test</span> 	<span class="c1">// 返回正确 或者返回错误详情
+</span><span class="c1"></span><span class="mf">2.</span> <span class="k">go</span> <span class="nx">test</span> <span class="o">-</span><span class="nx">v</span> 	<span class="c1">// 返回详情,包括正确的测试案例
+</span><span class="c1"></span><span class="mf">3.</span> <span class="k">go</span> <span class="nx">test</span> <span class="o">-</span><span class="nx">v</span> <span class="o">-</span><span class="nx">run</span><span class="p">=</span><span class="s">&#34;French|Can.*l&#34;</span>	<span class="c1">// 执行指定的测试案例(参数-run对应一个正则表达式)
+</span><span class="c1"></span><span class="mf">4.</span> <span class="k">go</span> <span class="nx">test</span> <span class="o">-</span><span class="nx">run</span><span class="p">=</span><span class="nx">Fib</span> <span class="o">-</span><span class="nx">coverprofile</span><span class="p">=</span><span class="nx">c</span><span class="p">.</span><span class="nx">out</span> <span class="p">.</span> <span class="c1">//生成c.out
+</span><span class="c1"></span><span class="mf">5.</span> <span class="k">go</span> <span class="nx">tool</span> <span class="nx">cover</span> <span class="o">-</span><span class="nx">html</span><span class="p">=</span><span class="nx">c</span><span class="p">.</span><span class="nx">out</span> <span class="c1">//将c.out转成html格式打开
+</span><span class="c1"></span><span class="mf">6.</span> <span class="k">go</span> <span class="nx">test</span> <span class="o">-</span><span class="nx">bench</span><span class="p">=</span><span class="nx">Fib</span> <span class="o">-</span><span class="nx">benchmem</span> <span class="c1">// 基准测试 显示内存和内存分配次数
+</span><span class="c1"></span><span class="mf">7.</span> <span class="k">go</span> <span class="nx">test</span> <span class="o">-</span><span class="nx">bench</span> <span class="p">.</span> <span class="o">-</span><span class="nx">cpuprofile</span> <span class="nx">cpu</span><span class="p">.</span><span class="nx">out</span>	<span class="c1">// 生成cpu.out
+</span><span class="c1"></span><span class="mf">8.</span> <span class="k">go</span> <span class="nx">tool</span> <span class="nx">pprof</span> <span class="nx">cpu</span><span class="p">.</span><span class="nx">out</span>   
+   <span class="c1">// 然后交互式输入web查看图形界面(但是需要安装brew install graphviz )
+</span><span class="c1"></span>   <span class="c1">// 或者交互式输入png,会得到类型profile001.png的文件, 打开查看即可
+</span></code></pre></div>
 			</div>
    
 
@@ -246,7 +250,7 @@ ok
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/go">go</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>456 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>478 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-08-13 00:44 &#43;0800</p>
 			</footer>
 		</article>
