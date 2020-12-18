@@ -1691,6 +1691,8 @@ ok
 </span><span class="c1"></span><span class="mf">8.</span> <span class="k">go</span> <span class="nx">tool</span> <span class="nx">pprof</span> <span class="nx">cpu</span><span class="p">.</span><span class="nx">out</span>   
    <span class="c1">// 然后交互式输入web查看图形界面(但是需要安装brew install graphviz )
 </span><span class="c1"></span>   <span class="c1">// 或者交互式输入png,会得到类型profile001.png的文件, 打开查看即可
+</span><span class="c1"></span><span class="mf">9.</span> <span class="k">go</span> <span class="nx">run</span> <span class="o">-</span><span class="nx">race</span> <span class="nx">a</span><span class="p">.</span><span class="nx">g</span> <span class="c1">// 查看是否存在锁
+</span><span class="c1"></span><span class="mf">10.</span>  <span class="nx">godoc</span> <span class="o">-</span><span class="nx">http</span> <span class="p">:</span><span class="mi">8000</span> <span class="c1">//启动一个godoc
 </span></code></pre></div>]]></content>
 		</item>
 		

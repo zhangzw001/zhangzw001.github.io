@@ -7,7 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 15 Dec 2020 11:15:52 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 18 Dec 2020 18:00:44 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>广度优先算法学习-迷宫</title>
+      <link>https://k1s.club/golang/%E5%B9%BF%E5%BA%A6%E6%B7%B1%E5%BA%A6%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BF%B7%E5%AE%AB/</link>
+      <pubDate>Fri, 18 Dec 2020 18:00:44 +0800</pubDate>
+      
+      <guid>https://k1s.club/golang/%E5%B9%BF%E5%BA%A6%E6%B7%B1%E5%BA%A6%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BF%B7%E5%AE%AB/</guid>
+      <description>这里学习了Google吱声工程师深度讲解go语言-迷宫广度优先算法以记录
+&amp;lt;!-more&amp;gt;
+算法说明 图源: 图解迷宫算法（广度优先遍历)
+首先看一张迷宫图, 左右黄色0 表示起始点, 0 表示可以行走, 1表示墙体 迷宫的广度优先算法的意思是, 可以通过0 发现四个方向的1, 然后在通过四个1 发现所有的2, 所有的2探索完 , 在探索3&amp;hellip; 以此类推&amp;hellip; 这里每个点都有三种状态:  未发现 已发现未探索 已探索  最终我们能探索到这样的结果图: 下面是详细代码 代码结构 ── maze ├── maze.go └── maze.in maze.in文件 6 5 0 1 0 0 0 0 0 0 1 0 0 1 0 1 0 1 1 1 0 0 0 1 0 0 1 0 1 0 0 0 maze.go package main import ( &amp;#34;fmt&amp;#34; &amp;#34;log&amp;#34; &amp;#34;os&amp;#34; ) /* maze.</description>
+    </item>
+    
     <item>
       <title>Gitlab-Ce的https开启问题</title>
       <link>https://k1s.club/posts/63-gitlab-ce%E7%9A%84https%E5%BC%80%E5%90%AF%E9%97%AE%E9%A2%98/</link>
@@ -106,15 +118,6 @@
       <guid>https://k1s.club/posts/57-gin%E8%AE%B0%E5%BD%95%E8%AF%B4%E6%98%8E/</guid>
       <description>简单记录一些gin框架学习遇到的一些问题
  ### 1. unknown driver &#34;mysql&#34; (forgotten import?) ``` _ &#34;github.com/go-sql-driver/mysql&#34; ``` </description>
-    </item>
-    
-    <item>
-      <title>关于</title>
-      <link>https://k1s.club/about/</link>
-      <pubDate>Thu, 15 Oct 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://k1s.club/about/</guid>
-      <description>联系方式：  Github：https://github.com/zhangzw001/blog 邮箱：zzw18298252933@gmail.com  </description>
     </item>
     
   </channel>
