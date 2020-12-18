@@ -13,7 +13,7 @@
 首先看一张迷宫图, 左右黄色0 表示起始点, 0 表示可以行走, 1表示墙体 迷宫的广度优先算法的意思是, 可以通过0 发现四个方向的1, 然后在通过四个1 发现所有的2, 所有的2探索完 , 在探索3&hellip; 以此类推&hellip; 这里每个点都有三种状态:  未发现 已发现未探索 已探索  最终我们能探索到这样的结果图: 下面是详细代码 代码结构 ── maze ├── maze.go └── maze.in maze.in文件 6 5 0 1 0 0 0 0 0 0 1 0 0 1 0 1 0 1 1 1 0 0 0 1 0 0 1 0 1 0 0 0 maze.go package main import ( &#34;fmt&#34; &#34;log&#34; &#34;os&#34; ) /* maze.">
 <meta itemprop="datePublished" content="2020-12-18T18:00:44+08:00" />
 <meta itemprop="dateModified" content="2020-12-18T18:00:44+08:00" />
-<meta itemprop="wordCount" content="695">
+<meta itemprop="wordCount" content="689">
 
 
 
@@ -80,11 +80,11 @@
 <h3 id="算法说明">算法说明<a href="#算法说明" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <p>图源: <a href="https://www.pianshen.com/article/8849857777/">图解迷宫算法（广度优先遍历)</a></p>
 <h4 id="首先看一张迷宫图-左右黄色0-表示起始点-0-表示可以行走-1表示墙体">首先看一张迷宫图, 左右黄色0 表示起始点, 0 表示可以行走, 1表示墙体<a href="#首先看一张迷宫图-左右黄色0-表示起始点-0-表示可以行走-1表示墙体" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
-<p><img src="images/golang/maze-01.png" alt=""></p>
+<p><img src="//zhangzw001.github.io/images/golang/maze-01.png" alt=""></p>
 <p>迷宫的广度优先算法的意思是, 可以通过0 发现四个方向的1, 然后在通过四个1 发现所有的2, 所有的2探索完 , 在探索3&hellip;
-<img src="images/golang/maze-02.png" alt=""></p>
+<img src="//zhangzw001.github.io/images/golang/maze-02.png" alt=""></p>
 <p>以此类推&hellip;
-<img src="images/golang/maze-03.png" alt=""></p>
+<img src="//zhangzw001.github.io/images/golang/maze-03.png" alt=""></p>
 <h4 id="这里每个点都有三种状态">这里每个点都有三种状态:<a href="#这里每个点都有三种状态" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
 <ul>
 <li>未发现</li>
@@ -92,7 +92,7 @@
 <li>已探索</li>
 </ul>
 <p>最终我们能探索到这样的结果图:
-<img src="image/golang/maze-04.png" alt=""></p>
+<img src="//zhangzw001.github.io/images/golang/maze-04.png" alt=""></p>
 <h3 id="下面是详细代码">下面是详细代码<a href="#下面是详细代码" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <h4 id="代码结构">代码结构<a href="#代码结构" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
 <pre><code>── maze
@@ -131,7 +131,6 @@
 </span><span class="cm">- 已探索
 </span><span class="cm">
 </span><span class="cm">- 广度优先算法 -&gt; 把所有的1全部探索完,再探索2
-</span><span class="cm">- 深度优先算法 -&gt; 1还没有探索完,就先探索2
 </span><span class="cm">*/</span>
 
 <span class="kd">func</span> <span class="nf">readMaze</span><span class="p">(</span><span class="nx">filename</span> <span class="kt">string</span><span class="p">)</span> <span class="p">[][]</span><span class="kt">int</span> <span class="p">{</span>
@@ -155,9 +154,9 @@
 <span class="p">}</span>
 
 <span class="kd">type</span> <span class="nx">point</span> <span class="kd">struct</span> <span class="p">{</span>
- <span class="nx">i</span> <span class="kt">int</span> <span class="c1">//行坐标(相当于y轴)
-</span><span class="c1"></span> <span class="nx">j</span> <span class="kt">int</span> <span class="c1">//列坐标(相当于x轴)
-</span><span class="c1"></span><span class="p">}</span>
+ <span class="nx">i</span> <span class="kt">int</span> 
+ <span class="nx">j</span> <span class="kt">int</span> 
+<span class="p">}</span>
 
 <span class="kd">var</span> <span class="nx">dirs</span> <span class="p">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="nx">point</span><span class="p">{</span>
  <span class="p">{</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span> <span class="c1">//上
