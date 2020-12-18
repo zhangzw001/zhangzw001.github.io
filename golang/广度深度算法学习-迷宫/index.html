@@ -9,19 +9,17 @@
 	<meta name="msapplication-TileColor" content="#494f5c">
 <meta itemprop="name" content="广度优先算法学习-迷宫">
 <meta itemprop="description" content="这里学习了Google吱声工程师深度讲解go语言-迷宫广度优先算法以记录
-&lt;!-more&gt;
 算法说明 图源: 图解迷宫算法（广度优先遍历)
 首先看一张迷宫图, 左右黄色0 表示起始点, 0 表示可以行走, 1表示墙体 迷宫的广度优先算法的意思是, 可以通过0 发现四个方向的1, 然后在通过四个1 发现所有的2, 所有的2探索完 , 在探索3&hellip; 以此类推&hellip; 这里每个点都有三种状态:  未发现 已发现未探索 已探索  最终我们能探索到这样的结果图: 下面是详细代码 代码结构 ── maze ├── maze.go └── maze.in maze.in文件 6 5 0 1 0 0 0 0 0 0 1 0 0 1 0 1 0 1 1 1 0 0 0 1 0 0 1 0 1 0 0 0 maze.go package main import ( &#34;fmt&#34; &#34;log&#34; &#34;os&#34; ) /* maze.">
 <meta itemprop="datePublished" content="2020-12-18T18:00:44+08:00" />
 <meta itemprop="dateModified" content="2020-12-18T18:00:44+08:00" />
-<meta itemprop="wordCount" content="696">
+<meta itemprop="wordCount" content="695">
 
 
 
 <meta itemprop="keywords" content="" />
 <meta property="og:title" content="广度优先算法学习-迷宫" />
 <meta property="og:description" content="这里学习了Google吱声工程师深度讲解go语言-迷宫广度优先算法以记录
-&lt;!-more&gt;
 算法说明 图源: 图解迷宫算法（广度优先遍历)
 首先看一张迷宫图, 左右黄色0 表示起始点, 0 表示可以行走, 1表示墙体 迷宫的广度优先算法的意思是, 可以通过0 发现四个方向的1, 然后在通过四个1 发现所有的2, 所有的2探索完 , 在探索3&hellip; 以此类推&hellip; 这里每个点都有三种状态:  未发现 已发现未探索 已探索  最终我们能探索到这样的结果图: 下面是详细代码 代码结构 ── maze ├── maze.go └── maze.in maze.in文件 6 5 0 1 0 0 0 0 0 0 1 0 0 1 0 1 0 1 1 1 0 0 0 1 0 0 1 0 1 0 0 0 maze.go package main import ( &#34;fmt&#34; &#34;log&#34; &#34;os&#34; ) /* maze." />
 <meta property="og:type" content="article" />
@@ -31,7 +29,6 @@
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="广度优先算法学习-迷宫"/>
 <meta name="twitter:description" content="这里学习了Google吱声工程师深度讲解go语言-迷宫广度优先算法以记录
-&lt;!-more&gt;
 算法说明 图源: 图解迷宫算法（广度优先遍历)
 首先看一张迷宫图, 左右黄色0 表示起始点, 0 表示可以行走, 1表示墙体 迷宫的广度优先算法的意思是, 可以通过0 发现四个方向的1, 然后在通过四个1 发现所有的2, 所有的2探索完 , 在探索3&hellip; 以此类推&hellip; 这里每个点都有三种状态:  未发现 已发现未探索 已探索  最终我们能探索到这样的结果图: 下面是详细代码 代码结构 ── maze ├── maze.go └── maze.in maze.in文件 6 5 0 1 0 0 0 0 0 0 1 0 0 1 0 1 0 1 1 1 0 0 0 1 0 0 1 0 1 0 0 0 maze.go package main import ( &#34;fmt&#34; &#34;log&#34; &#34;os&#34; ) /* maze."/>
 
@@ -79,7 +76,7 @@
 		<h1>广度优先算法学习-迷宫</h1>
 		<div class="content">
 			<p>这里学习了Google吱声工程师深度讲解go语言-迷宫广度优先算法以记录</p>
-<p>&lt;!-more&gt;</p>
+<!-- more -->
 <h3 id="算法说明">算法说明<a href="#算法说明" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <p>图源: <a href="https://www.pianshen.com/article/8849857777/">图解迷宫算法（广度优先遍历)</a></p>
 <h4 id="首先看一张迷宫图-左右黄色0-表示起始点-0-表示可以行走-1表示墙体">首先看一张迷宫图, 左右黄色0 表示起始点, 0 表示可以行走, 1表示墙体<a href="#首先看一张迷宫图-左右黄色0-表示起始点-0-表示可以行走-1表示墙体" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
