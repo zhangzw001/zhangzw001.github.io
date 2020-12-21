@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="Google资深工程师深度讲解Go语言 单任务爬虫">
+<meta itemprop="description" content="由于教程的代码在zhenai.com更新之后无法访问,所以记录下代码改动">
+<meta itemprop="datePublished" content="2020-12-21T18:03:36+08:00" />
+<meta itemprop="dateModified" content="2020-12-21T18:03:36+08:00" />
+<meta itemprop="wordCount" content="174">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta property="og:title" content="Google资深工程师深度讲解Go语言 单任务爬虫" />
+<meta property="og:description" content="由于教程的代码在zhenai.com更新之后无法访问,所以记录下代码改动" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-%E5%8D%95%E4%BB%BB%E5%8A%A1%E7%88%AC%E8%99%AB/" />
+<meta property="article:published_time" content="2020-12-21T18:03:36+08:00" />
+<meta property="article:modified_time" content="2020-12-21T18:03:36+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Google资深工程师深度讲解Go语言 单任务爬虫"/>
+<meta name="twitter:description" content="由于教程的代码在zhenai.com更新之后无法访问,所以记录下代码改动"/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>Google资深工程师深度讲解Go语言 单任务爬虫</title>
+	<link rel="stylesheet" href="https://k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://k1s.club/golang/">golang</a>
+					<a href="https://k1s.club/posts/">文章</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://k1s.club/posts/">文章</a></li>
+			<li><a href="https://k1s.club/tags/">标签</a></li>
+			<li><a href="https://k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+
+	<main class="site-main section-inner thin animated fadeIn faster">
+		<h1>Google资深工程师深度讲解Go语言 单任务爬虫</h1>
+		<div class="content">
+			<p>由于教程的代码在zhenai.com更新之后无法访问,所以记录下代码改动</p>
+<h3 id="问题说明">问题说明<a href="#问题说明" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>这里在首页和城市列表页访问是没有问题的, curl请求也是正常, 但是当请求到用户信息的时候, 是需要UA 和cookie的
+没有UA 会提示403, 没有cookie会提示 202</p>
+<h3 id="下面记录下代码">下面记录下代码<a href="#下面记录下代码" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>fetcher.go</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">fetcher</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+ <span class="s">&#34;bufio&#34;</span>
+ <span class="s">&#34;fmt&#34;</span>
+ <span class="s">&#34;golang.org/x/net/html/charset&#34;</span>
+ <span class="s">&#34;golang.org/x/text/encoding&#34;</span>
+ <span class="s">&#34;golang.org/x/text/encoding/unicode&#34;</span>
+ <span class="s">&#34;golang.org/x/text/transform&#34;</span>
+ <span class="s">&#34;io/ioutil&#34;</span>
+ <span class="s">&#34;log&#34;</span>
+ <span class="s">&#34;net/http&#34;</span>
+ <span class="s">&#34;strings&#34;</span>
+<span class="p">)</span>
+
+
+<span class="kd">func</span> <span class="nf">Fetch</span><span class="p">(</span><span class="nx">url</span> <span class="kt">string</span><span class="p">)</span> <span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+ <span class="nx">client</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">http</span><span class="p">.</span><span class="nx">Client</span><span class="p">{}</span>
+ <span class="nx">newUrl</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">Replace</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="s">&#34;http://&#34;</span><span class="p">,</span><span class="s">&#34;https://&#34;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+ <span class="nx">request</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">http</span><span class="p">.</span><span class="nf">NewRequest</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">MethodGet</span><span class="p">,</span> <span class="nx">newUrl</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+ <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+  <span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+ <span class="p">}</span>
+ <span class="c1">//添加header
+</span><span class="c1"></span> <span class="nx">request</span><span class="p">.</span><span class="nx">Header</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="s">&#34;Referer&#34;</span><span class="p">,</span><span class="s">&#34;http://www.zhenai.com/&#34;</span><span class="p">)</span>
+ <span class="nx">request</span><span class="p">.</span><span class="nx">Header</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="s">&#34;User-Agent&#34;</span><span class="p">,</span><span class="s">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36&#34;</span><span class="p">)</span>
+ <span class="c1">//这里cookie只有1分钟有效期
+</span><span class="c1"></span> <span class="nx">request</span><span class="p">.</span><span class="nx">Header</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="s">&#34;cookie&#34;</span><span class="p">,</span><span class="s">&#34;FSSBBIl1UgzbN7NO=53ZIxjnyRAeDyH5t9pg7cBA7QAYBxvaF7jmWYAZu2.CGt7mB9u9LeMhKl8ljte21zs7CWozraQ0E5VOTTi2KxSa; FSSBBIl1UgzbN7NP=5U5rnkYdGQG7qqqmCfWUuTapalzEu3wBuwQIl47nXp0HkSYoWXO9YSlekNkkwawdb3zC2rSWIE1_qIWRw3n3..NPhTqKwJXHroqsoGBqaeo_dgsIn64FK2YWZU6Y6L_l6d6tC7YBN8SMAPRcMqpmfS_9Jw.J8tXrIUZ6bUSeDufFFL1lNf8p4Om5i4P2teK4H1gnsMEldbBc9MLc1xhrJ7yLwLZhXr_mi2AhSHpshGFF7BkPzO_5ye_HaYME37Ukhc9MqOaqdytUs.ZebVaXEo7; Hm_lvt_2c8ad67df9e787ad29dbd54ee608f5d2=1608543698; Hm_lpvt_2c8ad67df9e787ad29dbd54ee608f5d2=1608544780; sid=d399176c-21e3-4e91-b550-fa8656de10e1; _exid=Fj3xNob61luAF5gXz5MAJq5CxrtoI86y%2Bqoc4YZ%2F64joUS0XSSIaALTyeW81WLbDLc0Pzw0kcM1r%2FGU1gm%2F2lA%3D%3D; ec=DH5wblNm-1608543720671-6a5cbb1e341df-781494537; _efmdata=HZvSyojNYRIMPbor%2FAzLk%2B5xwF4NLHTxU22OynbdfqEpXG7eNyAO1kHkZ%2FWDHgT7hGdqxoGwjueLMevvIv%2FF3upAu3SmFFc2zAJsHFMNjAc%3D&#34;</span><span class="p">)</span>
+
+ <span class="nx">resp</span> <span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">Do</span><span class="p">(</span><span class="nx">request</span><span class="p">)</span>
+ <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+ <span class="p">}</span>
+ <span class="k">defer</span> <span class="nx">resp</span><span class="p">.</span><span class="nx">Body</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+ <span class="k">if</span> <span class="nx">resp</span><span class="p">.</span><span class="nx">StatusCode</span> <span class="o">!=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">StatusOK</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;wrong status code: %d&#34;</span><span class="p">,</span><span class="nx">resp</span><span class="p">.</span><span class="nx">StatusCode</span><span class="p">)</span>
+ <span class="p">}</span>
+
+ <span class="nx">bodyReader</span> <span class="o">:=</span> <span class="nx">bufio</span><span class="p">.</span><span class="nf">NewReader</span><span class="p">(</span><span class="nx">resp</span><span class="p">.</span><span class="nx">Body</span><span class="p">)</span>
+ <span class="nx">e</span> <span class="o">:=</span> <span class="nf">determineEncoding</span><span class="p">(</span><span class="nx">bodyReader</span><span class="p">)</span>
+ <span class="nx">uft8Reader</span> <span class="o">:=</span> <span class="nx">transform</span><span class="p">.</span><span class="nf">NewReader</span><span class="p">(</span><span class="nx">bodyReader</span><span class="p">,</span><span class="nx">e</span><span class="p">.</span><span class="nf">NewDecoder</span><span class="p">())</span>
+ <span class="k">return</span>  <span class="nx">ioutil</span><span class="p">.</span><span class="nf">ReadAll</span><span class="p">(</span><span class="nx">uft8Reader</span><span class="p">)</span>
+<span class="p">}</span>
+
+
+<span class="kd">func</span> <span class="nf">determineEncoding</span><span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">bufio</span><span class="p">.</span><span class="nx">Reader</span><span class="p">)</span> <span class="nx">encoding</span><span class="p">.</span><span class="nx">Encoding</span> <span class="p">{</span>
+ <span class="nx">bytes</span> <span class="p">,</span><span class="nx">err</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">Peek</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+ <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Fetcher error : %v&#34;</span><span class="p">,</span><span class="nx">err</span><span class="p">)</span>
+  <span class="k">return</span> <span class="nx">unicode</span><span class="p">.</span><span class="nx">UTF8</span>
+ <span class="p">}</span>
+
+ <span class="nx">e</span><span class="p">,</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">charset</span><span class="p">.</span><span class="nf">DetermineEncoding</span><span class="p">(</span><span class="nx">bytes</span><span class="p">,</span><span class="s">&#34;&#34;</span><span class="p">)</span>
+ <span class="k">return</span> <span class="nx">e</span>
+<span class="p">}</span>
+
+</code></pre></div><h3 id="profile_testgo-测试一下">profile_test.go 测试一下<a href="#profile_testgo-测试一下" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">parser</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+ <span class="s">&#34;learngo_crawler/fetcher&#34;</span>
+ <span class="s">&#34;testing&#34;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span> <span class="nf">TestParseProfile</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+ <span class="nx">contents</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">fetcher</span><span class="p">.</span><span class="nf">Fetch</span><span class="p">(</span><span class="s">&#34;https://album.zhenai.com/u/1715998969&#34;</span><span class="p">)</span>
+ <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+  <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+ <span class="p">}</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%s\n&#34;</span><span class="p">,</span><span class="nx">contents</span><span class="p">)</span>
+ <span class="nf">ParseProfile</span><span class="p">(</span><span class="nx">contents</span><span class="p">)</span>
+<span class="p">}</span>
+
+
+</code></pre></div>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2020 <a href="https://k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-180942795-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>
