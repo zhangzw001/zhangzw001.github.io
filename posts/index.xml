@@ -1077,6 +1077,8 @@ kubectl create service nodeport nginx --tcp<span class="o">=</span>31112:80 -n <
 <span class="mf">7.</span> <span class="nx">重构</span>
 <span class="nx">shift</span> <span class="o">+</span> <span class="nx">f6</span>
 
+<span class="mf">8.</span> <span class="nx">导入</span> <span class="nx">type想实现的接口的方法</span>
+<span class="nx">control</span> <span class="o">+</span> <span class="nx">i</span>
 </code></pre></div>]]></content>
 		</item>
 		
