@@ -11,7 +11,7 @@
 <meta itemprop="description" content="记录一下Gin学习验证器和翻译器模块">
 <meta itemprop="datePublished" content="2021-01-12T10:17:46+08:00" />
 <meta itemprop="dateModified" content="2021-01-12T10:17:46+08:00" />
-<meta itemprop="wordCount" content="920">
+<meta itemprop="wordCount" content="939">
 
 
 
@@ -466,7 +466,7 @@
 	<span class="nx">c</span><span class="p">.</span><span class="nf">AbortWithError</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="nx">err</span><span class="p">)</span>
 <span class="p">}</span>
 
-</code></pre></div><h3 id="5-配置文件-configenvgo">5. 配置文件 config/env.go<a href="#5-配置文件-configenvgo" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+</code></pre></div><h3 id="6-配置文件-configenvgo">6. 配置文件 config/env.go<a href="#6-配置文件-configenvgo" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">config</span>
 
 <span class="kd">const</span> <span class="p">(</span>
@@ -481,6 +481,23 @@
 	<span class="nx">ValidatorKey</span>  <span class="p">=</span> <span class="s">&#34;ValidatorKey&#34;</span>
 	<span class="nx">TranslatorKey</span> <span class="p">=</span> <span class="s">&#34;TranslatorKey&#34;</span>
 <span class="p">)</span>
+</code></pre></div><h3 id="maingo">main.go<a href="#maingo" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&#34;github.com/gin-gonic/gin&#34;</span>
+	<span class="s">&#34;github.com/zhangzw001/learnGin/config&#34;</span>
+	<span class="s">&#34;github.com/zhangzw001/learnGin/routers&#34;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+
+	<span class="nx">gin</span><span class="p">.</span><span class="nf">SetMode</span><span class="p">(</span><span class="nx">gin</span><span class="p">.</span><span class="nx">DebugMode</span><span class="p">)</span>
+	<span class="nx">e</span> <span class="o">:=</span> <span class="nx">gin</span><span class="p">.</span><span class="nf">Default</span><span class="p">()</span>
+	<span class="nx">routers</span><span class="p">.</span><span class="nf">InitRouter</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span>
+	<span class="nx">e</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">PORT</span><span class="p">)</span>
+<span class="p">}</span>
+
 </code></pre></div>
 		</div>
 		<div id="comments" class="thin">
