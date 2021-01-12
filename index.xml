@@ -7,7 +7,25 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Mon, 21 Dec 2020 18:03:36 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 12 Jan 2021 10:17:46 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Gin学习 Validator</title>
+      <link>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-validator/</link>
+      <pubDate>Tue, 12 Jan 2021 10:17:46 +0800</pubDate>
+      
+      <guid>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-validator/</guid>
+      <description>&lt;p&gt;记录一下Gin学习验证器和翻译器模块&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Google资深工程师深度讲解Go语言 Elastic简单使用</title>
+      <link>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-elastic%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Wed, 06 Jan 2021 14:27:27 +0800</pubDate>
+      
+      <guid>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-elastic%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>Google资深工程师深度讲解Go语言 单任务爬虫</title>
       <link>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-%E5%8D%95%E4%BB%BB%E5%8A%A1%E7%88%AC%E8%99%AB/</link>
@@ -98,24 +116,6 @@
       
       <guid>https://k1s.club/posts/61-kubectl%E5%91%BD%E4%BB%A4%E7%AE%80%E5%8D%95%E7%86%9F%E6%82%89/</guid>
       <description>kubectl命令熟悉 # 创建namespace kubectl create ns test # 查看namespace kubectl get ns # 命令创建deployment kubectl create deployment my-nginx --image=nginx --replicas=1 -n test # 命令删除deployment kubectl delete deployments.apps my-nginx -n test # 容器执行命令 kubectl exec -ti deployments.apps/nginx -n test -- nginx -v nginx version: nginx/1.16.0 # 通过yaml创建deployment kubectl apply -f nginx.yaml --record # 通过新增或修改注释方式更新deployment kubectl patch -f nginx.yaml -p &amp;#34;{\&amp;#34;spec\&amp;#34;:{\&amp;#34;template\&amp;#34;:{\&amp;#34;metadata\&amp;#34;:{\&amp;#34;annotations\&amp;#34;:{\&amp;#34;test-last-updated\&amp;#34;:\&amp;#34;$(date +&amp;#39;%F %T&amp;#39;)\&amp;#34;}}}}}&amp;#34; # 修改image kubectl set image deployment/nginx nginx=nginx:1.16.0 -n test # 滚动升级 kubectl scale deployment nginx --replicas=2 -n test # 加上--record history就能看到变更信息(但感觉左右不大) kubectl rollout history deployment nginx -n test # describe 其实更详细 kubectl describe deployment nginx -n test # 查看yaml配置 kubectl get deployment.</description>
-    </item>
-    
-    <item>
-      <title>Goland快捷键记录</title>
-      <link>https://k1s.club/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/</link>
-      <pubDate>Tue, 20 Oct 2020 16:42:57 +0800</pubDate>
-      
-      <guid>https://k1s.club/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/</guid>
-      <description>1. 记录一些常见的goland快捷键(mac) 1. command + alt + ← | → // 回退|前进 到上次浏览的位置  2. command d | x // 复制行 |删除行  3. command b = command + 单击 // 快速打开光标处的类或方法  4. command alt l // 重新格式化代码  5. 代码折叠和展开 - command shift + / - // 代码全部展开 / 折叠 (项目所有go文件全部展开/折叠) - command alt + / - // 代码递归展开 / 折叠 (所选内容行内全部展开/折叠) - command + / - // 代码展开 / 折叠 (所选内容展开/折叠)  6.</description>
-    </item>
-    
-    <item>
-      <title>Hugo博客使用记录</title>
-      <link>https://k1s.club/posts/58-hugo%E5%8D%9A%E5%AE%A2%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/</link>
-      <pubDate>Fri, 16 Oct 2020 17:01:36 +0800</pubDate>
-      
-      <guid>https://k1s.club/posts/58-hugo%E5%8D%9A%E5%AE%A2%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/</guid>
-      <description>&lt;p&gt;由于hexo生成博客整的很慢, 而且很占cpu, 甚至导致老mac卡死了&amp;hellip; hugo真的很香&lt;/p&gt;</description>
     </item>
     
   </channel>

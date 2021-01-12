@@ -3865,9 +3865,7 @@ go env -w <span class="nv">GOPROXY</span><span class="o">=</span>https://goproxy
 <span class="p">}</span>
 
 </code></pre></div><h3 id="21-swagger本地测试的一个问题">21. swagger本地测试的一个问题</h3>
-<blockquote>
-<p>在执行try it out 的时候报错: TypeError: Failed to fetch</p>
-</blockquote>
+<h4 id="211-在执行try-it-out-的时候报错-typeerror-failed-to-fetch">21.1 在执行try it out 的时候报错: TypeError: Failed to fetch</h4>
 <p>原因是swagger的配置中 <code>host=&quot;localhost:8880&quot;</code> , 而我浏览器打开的是 <code>127.0.0.1:8880</code> , 从日志也能看到是不同的请求</p>
 <pre><code># TypeError: Failed to fetch 错误的请求日志:
 [GIN] 2020/12/01 - 16:12:49 | 404 |         790ns |             ::1 | OPTIONS  &quot;/admin_login/login&quot;
@@ -3875,7 +3873,19 @@ go env -w <span class="nv">GOPROXY</span><span class="o">=</span>https://goproxy
 # 正常的请求日志:
 [GIN] 2020/12/01 - 16:15:24 | 200 |     452.808µs |             ::1 | POST     &quot;/admin_login/login&quot;
 </code></pre><p>所以只要保持一致即可, 配置的是<code>localhost</code>请求就不要用<code>127.0.0.1</code></p>
-<h3 id="22-gorm">22. gorm.</h3>
+<h4 id="212-打开页面日志报错-not-yet-registered-swag">21.2 打开页面日志报错: not yet registered swag</h4>
+<blockquote>
+<p>当前配置:</p>
+</blockquote>
+<pre><code># 首先已经添加了路由规则
+e.GET(&quot;/swagger/*any&quot;,ginSwagger.WrapHandler(swaggerFiles.Handler))
+</code></pre><blockquote>
+<p>解决方法:</p>
+</blockquote>
+<pre><code># 导入项目中的docs目录
+import	_ &quot;github.com/zhangzw001/learnGin/docs&quot;
+
+</code></pre><h3 id="22-gorm">22. gorm.</h3>
 <p><a href="https://segmentfault.com/a/1190000021363996">GORM之ErrRecordNotFound采坑记录</a></p>
 <blockquote>
 <p>gorm.DB 的Find或First等方法, 在传入struc的时候 , 可能返回ErrRecordNotFound, 在传入list的时候, 可能返回nil</p>
@@ -8855,7 +8865,7 @@ else {
 			<description>记录一些shell脚本
 1 清理es几天前的索引脚本 2 从mysql导出表到clickhouse脚本
  ###命令汇总
-生成字符串 tr -dc A-Za-z0-9_@$\%\^\/\+ &amp;lt; /dev/urandom|head -c 16|xargs grep需要转义的字符 grep &#39;&amp;quot;第一个转义\$第二个转义\[{&#39; a.txt 或者直接使用-F grep -F &#39;&amp;quot;$[{&#39; a.txt shell参数 while [ -n &amp;quot;$1&amp;quot; ] do case &amp;quot;$1&amp;quot; in -a) a=$2;shift 2;; -s) s=$2;shift 2;; *) ;; case done #%处理变量 tmpDir=/dir1/dir2/dir3/my.file.txt ${tmpDir#*/}	-&amp;gt; dir1/dir2/dir3/my.file.txt	(左)删除从左往右第一个 /以及左边的所有内容 ${tmpDir##*/}	-&amp;gt; my.file.txt	(左)删除从左往右最后一个/以及左边的所有内容 ${tmpDir%/*}	-&amp;gt; /dir1/dir2/dir3/	(右)删除从右往左第一个 /以及右边的所有内容 ${tmpDir%%/*}	-&amp;gt; 空	(右)删除从右往左最后一个/以及右边的所有内容 </description>
+生成字符串 tr -dc A-Za-z0-9_@$\%\^\/\+ &amp;lt; /dev/urandom|head -c 16|xargs grep需要转义的字符 grep &#39;&amp;quot;第一个转义\$第二个转义\[{&#39; a.txt 或者直接使用-F grep -F &#39;&amp;quot;$[{&#39; a.txt sed命令 # 替换24位字符 /abcd...123 为 /5fcb9ab67195b854c35afd12 sed &#39;s/\/[a-z0-9]\{24\}/\/5fcb9ab67195b854c35afd12/g&#39; shell参数 while [ -n &amp;quot;$1&amp;quot; ] do case &amp;quot;$1&amp;quot; in -a) a=$2;shift 2;; -s) s=$2;shift 2;; *) ;; case done #%处理变量 tmpDir=/dir1/dir2/dir3/my.file.txt ${tmpDir#*/}	-&amp;gt; dir1/dir2/dir3/my.file.txt	(左)删除从左往右第一个 /以及左边的所有内容 ${tmpDir##*/}	-&amp;gt; my.file.txt	(左)删除从左往右最后一个/以及左边的所有内容 ${tmpDir%/*}	-&amp;gt; /dir1/dir2/dir3/	(右)删除从右往左第一个 /以及右边的所有内容 ${tmpDir%%/*}	-&amp;gt; 空	(右)删除从右往左最后一个/以及右边的所有内容 </description>
 			<content type="html"><![CDATA[<p>记录一些shell脚本</p>
 <!-- more -->
 <p>1 <a href="//zhangzw001.github.io/sh/clean_es_data.sh.sh">清理es几天前的索引脚本</a>
@@ -8869,6 +8879,9 @@ else {
 <pre><code>grep '&quot;第一个转义\$第二个转义\[{'  a.txt
 或者直接使用-F
 grep -F '&quot;$[{' a.txt
+</code></pre><h4 id="sed命令">sed命令</h4>
+<pre><code># 替换24位字符 /abcd...123 为 /5fcb9ab67195b854c35afd12 
+sed  's/\/[a-z0-9]\{24\}/\/5fcb9ab67195b854c35afd12/g'
 </code></pre><h4 id="shell参数">shell参数</h4>
 <pre><code>while [ -n &quot;$1&quot; ]
 do

@@ -17,7 +17,7 @@
       <description>记录一些shell脚本
 1 清理es几天前的索引脚本 2 从mysql导出表到clickhouse脚本
  ###命令汇总
-生成字符串 tr -dc A-Za-z0-9_@$\%\^\/\+ &amp;lt; /dev/urandom|head -c 16|xargs grep需要转义的字符 grep &#39;&amp;quot;第一个转义\$第二个转义\[{&#39; a.txt 或者直接使用-F grep -F &#39;&amp;quot;$[{&#39; a.txt shell参数 while [ -n &amp;quot;$1&amp;quot; ] do case &amp;quot;$1&amp;quot; in -a) a=$2;shift 2;; -s) s=$2;shift 2;; *) ;; case done #%处理变量 tmpDir=/dir1/dir2/dir3/my.file.txt ${tmpDir#*/}	-&amp;gt; dir1/dir2/dir3/my.file.txt	(左)删除从左往右第一个 /以及左边的所有内容 ${tmpDir##*/}	-&amp;gt; my.file.txt	(左)删除从左往右最后一个/以及左边的所有内容 ${tmpDir%/*}	-&amp;gt; /dir1/dir2/dir3/	(右)删除从右往左第一个 /以及右边的所有内容 ${tmpDir%%/*}	-&amp;gt; 空	(右)删除从右往左最后一个/以及右边的所有内容 </description>
+生成字符串 tr -dc A-Za-z0-9_@$\%\^\/\+ &amp;lt; /dev/urandom|head -c 16|xargs grep需要转义的字符 grep &#39;&amp;quot;第一个转义\$第二个转义\[{&#39; a.txt 或者直接使用-F grep -F &#39;&amp;quot;$[{&#39; a.txt sed命令 # 替换24位字符 /abcd...123 为 /5fcb9ab67195b854c35afd12 sed &#39;s/\/[a-z0-9]\{24\}/\/5fcb9ab67195b854c35afd12/g&#39; shell参数 while [ -n &amp;quot;$1&amp;quot; ] do case &amp;quot;$1&amp;quot; in -a) a=$2;shift 2;; -s) s=$2;shift 2;; *) ;; case done #%处理变量 tmpDir=/dir1/dir2/dir3/my.file.txt ${tmpDir#*/}	-&amp;gt; dir1/dir2/dir3/my.file.txt	(左)删除从左往右第一个 /以及左边的所有内容 ${tmpDir##*/}	-&amp;gt; my.file.txt	(左)删除从左往右最后一个/以及左边的所有内容 ${tmpDir%/*}	-&amp;gt; /dir1/dir2/dir3/	(右)删除从右往左第一个 /以及右边的所有内容 ${tmpDir%%/*}	-&amp;gt; 空	(右)删除从右往左最后一个/以及右边的所有内容 </description>
     </item>
     
     <item>
