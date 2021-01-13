@@ -9,11 +9,11 @@
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
     <lastBuildDate>Wed, 13 Jan 2021 14:24:43 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Gin学习 简单记录form数据获取</title>
-      <link>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96/</link>
+      <title>Gin学习 简单记录form数据获取源码解读</title>
+      <link>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</link>
       <pubDate>Wed, 13 Jan 2021 14:24:43 +0800</pubDate>
       
-      <guid>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96/</guid>
+      <guid>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</guid>
       <description>http.request form 数据测试 func main() { e := gin.Default() e.Any(&amp;#34;/test&amp;#34;,func(c *gin.Context) { // 获取所有参数 	_ = c.Request.ParseForm() // log.Println(c.Request.Header[&amp;#34;Content-Type&amp;#34;])  // get form 参数, c.Request.URL.Query, err = url.ParseQuery 	log.Println(c.Request.URL.Query()) //log.Println(url.ParseQuery(c.Request.URL.RawQuery)) 	// post form 参数 	log.Println(c.Request.PostForm) // form 参数 	log.Println(c.Request.Form) }) e.Run(&amp;#34;localhost:8123&amp;#34;) }  请求日志
  # curl -XPOST &amp;quot;http://localhost:8123/test&amp;quot; -d &amp;quot;abc=123&amp;amp;q=123&amp;amp;ccc=123123&amp;quot; 2021/01/13 14:31:30 map[] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] [GIN] 2021/01/13 - 14:31:30 | 200 | 339.</description>
     </item>

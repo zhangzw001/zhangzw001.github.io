@@ -10,11 +10,11 @@
 		<atom:link href="https://k1s.club/golang/index.xml" rel="self" type="application/rss+xml" />
 		
 		<item>
-			<title>Gin学习 简单记录form数据获取</title>
-			<link>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96/</link>
+			<title>Gin学习 简单记录form数据获取源码解读</title>
+			<link>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</link>
 			<pubDate>Wed, 13 Jan 2021 14:24:43 +0800</pubDate>
 			
-			<guid>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96/</guid>
+			<guid>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</guid>
 			<description>http.request form 数据测试 func main() { e := gin.Default() e.Any(&amp;#34;/test&amp;#34;,func(c *gin.Context) { // 获取所有参数 	_ = c.Request.ParseForm() // log.Println(c.Request.Header[&amp;#34;Content-Type&amp;#34;])  // get form 参数, c.Request.URL.Query, err = url.ParseQuery 	log.Println(c.Request.URL.Query()) //log.Println(url.ParseQuery(c.Request.URL.RawQuery)) 	// post form 参数 	log.Println(c.Request.PostForm) // form 参数 	log.Println(c.Request.Form) }) e.Run(&amp;#34;localhost:8123&amp;#34;) }  请求日志
  # curl -XPOST &amp;quot;http://localhost:8123/test&amp;quot; -d &amp;quot;abc=123&amp;amp;q=123&amp;amp;ccc=123123&amp;quot; 2021/01/13 14:31:30 map[] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] [GIN] 2021/01/13 - 14:31:30 | 200 | 339.</description>
 			<content type="html"><![CDATA[<h3 id="httprequest-form-数据测试">http.request form 数据测试</h3>
@@ -120,6 +120,7 @@
 </span><span class="c1"></span>			<span class="nx">reader</span> <span class="p">=</span> <span class="nx">io</span><span class="p">.</span><span class="nf">LimitReader</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">Body</span><span class="p">,</span> <span class="nx">maxFormSize</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
 		<span class="p">}</span>
         <span class="c1">// 这里会调用 io.LimitedReader 的Read 方法, 通过接口实现
+</span><span class="c1"></span>        <span class="c1">// 直接读取post 的body即可
 </span><span class="c1"></span>		<span class="nx">b</span><span class="p">,</span> <span class="nx">e</span> <span class="o">:=</span> <span class="nx">ioutil</span><span class="p">.</span><span class="nf">ReadAll</span><span class="p">(</span><span class="nx">reader</span><span class="p">)</span>
 		<span class="k">if</span> <span class="nx">e</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
 			<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
@@ -155,6 +156,49 @@
 	<span class="nx">n</span><span class="p">,</span> <span class="nx">err</span> <span class="p">=</span> <span class="nx">l</span><span class="p">.</span><span class="nx">R</span><span class="p">.</span><span class="nf">Read</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span>
 	<span class="nx">l</span><span class="p">.</span><span class="nx">N</span> <span class="o">-=</span> <span class="nb">int64</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span>
 	<span class="k">return</span>
+<span class="p">}</span>
+
+</code></pre></div><h3 id="parsequery-分析">parseQuery 分析</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="kd">func</span> <span class="nf">parseQuery</span><span class="p">(</span><span class="nx">m</span> <span class="nx">Values</span><span class="p">,</span> <span class="nx">query</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// 这里的循环结束条件是 query == &#34;&#34;
+</span><span class="c1"></span>    <span class="c1">// 那什么时候会空呢?
+</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">query</span> <span class="o">!=</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+		<span class="nx">key</span> <span class="o">:=</span> <span class="nx">query</span>
+        <span class="c1">// 这里取到第一个 &amp;或者; 的索引, 然后将 query 分成两半
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">IndexAny</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="s">&#34;&amp;;&#34;</span><span class="p">);</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="p">{</span>
+            <span class="c1">// 这里会每次 截取后一半 赋值给query, 所以query一直在消耗 第一个&amp;前的数据
+</span><span class="c1"></span>			<span class="nx">key</span><span class="p">,</span> <span class="nx">query</span> <span class="p">=</span> <span class="nx">key</span><span class="p">[:</span><span class="nx">i</span><span class="p">],</span> <span class="nx">key</span><span class="p">[</span><span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="c1">// 如果 已经没有 &amp; 或者 ; 字符了, 说明只有最后一个字段了, 那么就直接置空 query, 然后读取完key 就可以结束循环了
+</span><span class="c1"></span>		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+			<span class="nx">query</span> <span class="p">=</span> <span class="s">&#34;&#34;</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="nx">key</span> <span class="o">==</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+			<span class="k">continue</span>
+		<span class="p">}</span>
+		<span class="nx">value</span> <span class="o">:=</span> <span class="s">&#34;&#34;</span>
+        <span class="c1">// 取出 第一个 &amp; 前面的 参数 按照=分割, 从而得到 变量名 和变量值
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">Index</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="s">&#34;=&#34;</span><span class="p">);</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="p">{</span>
+			<span class="nx">key</span><span class="p">,</span> <span class="nx">value</span> <span class="p">=</span> <span class="nx">key</span><span class="p">[:</span><span class="nx">i</span><span class="p">],</span> <span class="nx">key</span><span class="p">[</span><span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+		<span class="p">}</span>
+		<span class="nx">key</span><span class="p">,</span> <span class="nx">err1</span> <span class="o">:=</span> <span class="nf">QueryUnescape</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nx">err1</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+				<span class="nx">err</span> <span class="p">=</span> <span class="nx">err1</span>
+			<span class="p">}</span>
+			<span class="k">continue</span>
+		<span class="p">}</span>
+		<span class="nx">value</span><span class="p">,</span> <span class="nx">err1</span> <span class="p">=</span> <span class="nf">QueryUnescape</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nx">err1</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+				<span class="nx">err</span> <span class="p">=</span> <span class="nx">err1</span>
+			<span class="p">}</span>
+			<span class="k">continue</span>
+		<span class="p">}</span>
+        <span class="c1">// 最后将 post参数写成map结构 写到m (url.Value) 中
+</span><span class="c1"></span>		<span class="nx">m</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">m</span><span class="p">[</span><span class="nx">key</span><span class="p">],</span> <span class="nx">value</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">err</span>
 <span class="p">}</span>
 
 </code></pre></div>]]></content>
