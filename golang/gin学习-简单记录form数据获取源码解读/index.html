@@ -8,7 +8,7 @@
 	<meta name="theme-color" content="#494f5c">
 	<meta name="msapplication-TileColor" content="#494f5c">
 <meta itemprop="name" content="Gin学习 简单记录form数据获取源码解读">
-<meta itemprop="description" content="http.request form 数据测试 func main() { e := gin.Default() e.Any(&#34;/test&#34;,func(c *gin.Context) { // 获取所有参数 	_ = c.Request.ParseForm() // log.Println(c.Request.Header[&#34;Content-Type&#34;])  // get form 参数, c.Request.URL.Query, err = url.ParseQuery 	log.Println(c.Request.URL.Query()) //log.Println(url.ParseQuery(c.Request.URL.RawQuery)) 	// post form 参数 	log.Println(c.Request.PostForm) // form 参数 	log.Println(c.Request.Form) }) e.Run(&#34;localhost:8123&#34;) }  请求日志
+<meta itemprop="description" content="http.request form 数据测试 func main() { e := gin.Default() e.Any(&#34;/test&#34;,func(c *gin.Context) { // 获取所有参数 	_ = c.Request.ParseForm() // log.Println(c.Request.Header[&#34;Content-Type&#34;]) 	// get form 参数, c.Request.URL.Query, err = url.ParseQuery 	log.Println(c.Request.URL.Query()) //log.Println(url.ParseQuery(c.Request.URL.RawQuery)) 	// post form 参数 	log.Println(c.Request.PostForm) // form 参数 	log.Println(c.Request.Form) }) e.Run(&#34;localhost:8123&#34;) }  请求日志
  # curl -XPOST &quot;http://localhost:8123/test&quot; -d &quot;abc=123&amp;q=123&amp;ccc=123123&quot; 2021/01/13 14:31:30 map[] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] [GIN] 2021/01/13 - 14:31:30 | 200 | 339.">
 <meta itemprop="datePublished" content="2021-01-13T14:24:43+08:00" />
 <meta itemprop="dateModified" content="2021-01-13T14:24:43+08:00" />
@@ -18,7 +18,7 @@
 
 <meta itemprop="keywords" content="golang," />
 <meta property="og:title" content="Gin学习 简单记录form数据获取源码解读" />
-<meta property="og:description" content="http.request form 数据测试 func main() { e := gin.Default() e.Any(&#34;/test&#34;,func(c *gin.Context) { // 获取所有参数 	_ = c.Request.ParseForm() // log.Println(c.Request.Header[&#34;Content-Type&#34;])  // get form 参数, c.Request.URL.Query, err = url.ParseQuery 	log.Println(c.Request.URL.Query()) //log.Println(url.ParseQuery(c.Request.URL.RawQuery)) 	// post form 参数 	log.Println(c.Request.PostForm) // form 参数 	log.Println(c.Request.Form) }) e.Run(&#34;localhost:8123&#34;) }  请求日志
+<meta property="og:description" content="http.request form 数据测试 func main() { e := gin.Default() e.Any(&#34;/test&#34;,func(c *gin.Context) { // 获取所有参数 	_ = c.Request.ParseForm() // log.Println(c.Request.Header[&#34;Content-Type&#34;]) 	// get form 参数, c.Request.URL.Query, err = url.ParseQuery 	log.Println(c.Request.URL.Query()) //log.Println(url.ParseQuery(c.Request.URL.RawQuery)) 	// post form 参数 	log.Println(c.Request.PostForm) // form 参数 	log.Println(c.Request.Form) }) e.Run(&#34;localhost:8123&#34;) }  请求日志
  # curl -XPOST &quot;http://localhost:8123/test&quot; -d &quot;abc=123&amp;q=123&amp;ccc=123123&quot; 2021/01/13 14:31:30 map[] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] [GIN] 2021/01/13 - 14:31:30 | 200 | 339." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" />
@@ -26,7 +26,7 @@
 <meta property="article:modified_time" content="2021-01-13T14:24:43+08:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Gin学习 简单记录form数据获取源码解读"/>
-<meta name="twitter:description" content="http.request form 数据测试 func main() { e := gin.Default() e.Any(&#34;/test&#34;,func(c *gin.Context) { // 获取所有参数 	_ = c.Request.ParseForm() // log.Println(c.Request.Header[&#34;Content-Type&#34;])  // get form 参数, c.Request.URL.Query, err = url.ParseQuery 	log.Println(c.Request.URL.Query()) //log.Println(url.ParseQuery(c.Request.URL.RawQuery)) 	// post form 参数 	log.Println(c.Request.PostForm) // form 参数 	log.Println(c.Request.Form) }) e.Run(&#34;localhost:8123&#34;) }  请求日志
+<meta name="twitter:description" content="http.request form 数据测试 func main() { e := gin.Default() e.Any(&#34;/test&#34;,func(c *gin.Context) { // 获取所有参数 	_ = c.Request.ParseForm() // log.Println(c.Request.Header[&#34;Content-Type&#34;]) 	// get form 参数, c.Request.URL.Query, err = url.ParseQuery 	log.Println(c.Request.URL.Query()) //log.Println(url.ParseQuery(c.Request.URL.RawQuery)) 	// post form 参数 	log.Println(c.Request.PostForm) // form 参数 	log.Println(c.Request.Form) }) e.Run(&#34;localhost:8123&#34;) }  请求日志
  # curl -XPOST &quot;http://localhost:8123/test&quot; -d &quot;abc=123&amp;q=123&amp;ccc=123123&quot; 2021/01/13 14:31:30 map[] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] [GIN] 2021/01/13 - 14:31:30 | 200 | 339."/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -82,8 +82,8 @@
 	<span class="nx">e</span><span class="p">.</span><span class="nf">Any</span><span class="p">(</span><span class="s">&#34;/test&#34;</span><span class="p">,</span><span class="kd">func</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">gin</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">{</span>
 		<span class="c1">// 获取所有参数
 </span><span class="c1"></span>		<span class="nx">_</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Request</span><span class="p">.</span><span class="nf">ParseForm</span><span class="p">()</span>
-        <span class="c1">// log.Println(c.Request.Header[&#34;Content-Type&#34;])
-</span><span class="c1"></span>        <span class="c1">// get form 参数, c.Request.URL.Query, err  = url.ParseQuery
+		<span class="c1">// log.Println(c.Request.Header[&#34;Content-Type&#34;])
+</span><span class="c1"></span>		<span class="c1">// get form 参数, c.Request.URL.Query, err  = url.ParseQuery
 </span><span class="c1"></span>		<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">Request</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nf">Query</span><span class="p">())</span>
 		<span class="c1">//log.Println(url.ParseQuery(c.Request.URL.RawQuery))
 </span><span class="c1"></span>		<span class="c1">// post form 参数
@@ -119,7 +119,7 @@
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="nf">ParseForm</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
 	<span class="kd">var</span> <span class="nx">err</span> <span class="kt">error</span>
 	<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">PostForm</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-        <span class="c1">// 以下方法 会调用 parsePostForm
+		<span class="c1">// 以下方法 会调用 parsePostForm
 </span><span class="c1"></span>		<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="s">&#34;POST&#34;</span> <span class="o">||</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="s">&#34;PUT&#34;</span> <span class="o">||</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="s">&#34;PATCH&#34;</span> <span class="p">{</span>
 			<span class="nx">r</span><span class="p">.</span><span class="nx">PostForm</span><span class="p">,</span> <span class="nx">err</span> <span class="p">=</span> <span class="nf">parsePostForm</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
 		<span class="p">}</span>
@@ -128,12 +128,12 @@
 		<span class="p">}</span>
 	<span class="p">}</span>
 	<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Form</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-        <span class="c1">// 这里  PostForm 会复制到 Form, 所以 Form &gt;= PostForm
+		<span class="c1">// 这里  PostForm 会复制到 Form, 所以 Form &gt;= PostForm
 </span><span class="c1"></span>		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">PostForm</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
 			<span class="nx">r</span><span class="p">.</span><span class="nx">Form</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="nx">url</span><span class="p">.</span><span class="nx">Values</span><span class="p">)</span>
 			<span class="nf">copyValues</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">Form</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">PostForm</span><span class="p">)</span>
 		<span class="p">}</span>
-        <span class="c1">// 这里 get的参数是在r.URL里面的, 所以通过 ParseQuery 获取get参数
+		<span class="c1">// 这里 get的参数是在r.URL里面的, 所以通过 ParseQuery 获取get参数
 </span><span class="c1"></span>		<span class="kd">var</span> <span class="nx">newValues</span> <span class="nx">url</span><span class="p">.</span><span class="nx">Values</span>
 		<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">URL</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
 			<span class="kd">var</span> <span class="nx">e</span> <span class="kt">error</span>
@@ -145,7 +145,7 @@
 		<span class="k">if</span> <span class="nx">newValues</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
 			<span class="nx">newValues</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="nx">url</span><span class="p">.</span><span class="nx">Values</span><span class="p">)</span>
 		<span class="p">}</span>
-        <span class="c1">// 最后也会添加 get参数到form, 所以 Form &gt;= url.Query()
+		<span class="c1">// 最后也会添加 get参数到form, 所以 Form &gt;= url.Query()
 </span><span class="c1"></span>		<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Form</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
 			<span class="nx">r</span><span class="p">.</span><span class="nx">Form</span> <span class="p">=</span> <span class="nx">newValues</span>
 		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
