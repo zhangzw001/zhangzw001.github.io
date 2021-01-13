@@ -55,11 +55,11 @@
     </item>
     
     <item>
-      <title>广度优先算法学习-迷宫</title>
-      <link>https://k1s.club/golang/%E5%B9%BF%E5%BA%A6%E6%B7%B1%E5%BA%A6%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BF%B7%E5%AE%AB/</link>
+      <title>Google资深工程师深度讲解Go语言-广度优先算法学习-迷宫</title>
+      <link>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-%E5%B9%BF%E5%BA%A6%E6%B7%B1%E5%BA%A6%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BF%B7%E5%AE%AB/</link>
       <pubDate>Fri, 18 Dec 2020 18:00:44 +0800</pubDate>
       
-      <guid>https://k1s.club/golang/%E5%B9%BF%E5%BA%A6%E6%B7%B1%E5%BA%A6%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BF%B7%E5%AE%AB/</guid>
+      <guid>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-%E5%B9%BF%E5%BA%A6%E6%B7%B1%E5%BA%A6%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BF%B7%E5%AE%AB/</guid>
       <description>这里学习了Google吱声工程师深度讲解go语言-迷宫广度优先算法以记录
 算法说明 图源: 图解迷宫算法（广度优先遍历)
 首先看一张迷宫图, 左右黄色0 表示起始点, 0 表示可以行走, 1表示墙体 迷宫的广度优先算法的意思是, 可以通过0 发现四个方向的1, 然后在通过四个1 发现所有的2, 所有的2探索完 , 在探索3&amp;hellip; 以此类推&amp;hellip; 这里每个点都有三种状态:  未发现 已发现未探索 已探索  最终我们能探索到这样的结果图: 下面是详细代码 代码结构 ── maze ├── maze.go └── maze.in maze.in文件 6 5 0 1 0 0 0 0 0 0 1 0 0 1 0 1 0 1 1 1 0 0 0 1 0 0 1 0 1 0 0 0 maze.go package main import ( &amp;#34;fmt&amp;#34; &amp;#34;log&amp;#34; &amp;#34;os&amp;#34; ) /* maze.</description>
