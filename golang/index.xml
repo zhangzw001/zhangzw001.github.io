@@ -86,7 +86,7 @@
 		<span class="k">if</span> <span class="nx">newValues</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
 			<span class="nx">newValues</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="nx">url</span><span class="p">.</span><span class="nx">Values</span><span class="p">)</span>
 		<span class="p">}</span>
-        <span class="c1">// 最后也会添加 get参数到form, 所以 Form &gt;= url.Queue
+        <span class="c1">// 最后也会添加 get参数到form, 所以 Form &gt;= url.Query()
 </span><span class="c1"></span>		<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Form</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
 			<span class="nx">r</span><span class="p">.</span><span class="nx">Form</span> <span class="p">=</span> <span class="nx">newValues</span>
 		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
