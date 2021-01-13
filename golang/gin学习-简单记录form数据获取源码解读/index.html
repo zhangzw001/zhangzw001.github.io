@@ -166,20 +166,20 @@
 	<span class="p">}</span>
 	<span class="nx">ct</span><span class="p">,</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">err</span> <span class="p">=</span> <span class="nx">mime</span><span class="p">.</span><span class="nf">ParseMediaType</span><span class="p">(</span><span class="nx">ct</span><span class="p">)</span>
 	<span class="k">switch</span> <span class="p">{</span>
-    <span class="c1">// 这里我们默认的header 就是 application/x-www-form-urlencoded
-</span><span class="c1"></span>    <span class="c1">// 可以 log.Println(c.Request.Header[&#34;Content-Type&#34;]) 打印查看
+	<span class="c1">// 这里我们默认的header 就是 application/x-www-form-urlencoded
+</span><span class="c1"></span>	<span class="c1">// 可以 log.Println(c.Request.Header[&#34;Content-Type&#34;]) 打印查看
 </span><span class="c1"></span>	<span class="k">case</span> <span class="nx">ct</span> <span class="o">==</span> <span class="s">&#34;application/x-www-form-urlencoded&#34;</span><span class="p">:</span>
 		<span class="kd">var</span> <span class="nx">reader</span> <span class="nx">io</span><span class="p">.</span><span class="nx">Reader</span> <span class="p">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Body</span>
-        <span class="c1">// 首先初始化 maxFormSize = 2^63 -1
+		<span class="c1">// 首先初始化 maxFormSize = 2^63 -1
 </span><span class="c1"></span>		<span class="nx">maxFormSize</span> <span class="o">:=</span> <span class="nb">int64</span><span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">63</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 		<span class="k">if</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Body</span><span class="p">.(</span><span class="o">*</span><span class="nx">maxBytesReader</span><span class="p">);</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
-            <span class="c1">// 设置 io.LimitedReader 的  N
+			<span class="c1">// 设置 io.LimitedReader 的  N
 </span><span class="c1"></span>			<span class="nx">maxFormSize</span> <span class="p">=</span> <span class="nb">int64</span><span class="p">(</span><span class="mi">10</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">)</span> <span class="c1">// 10 MB is a lot of text.
-</span><span class="c1"></span>            <span class="c1">// 返回了一个 带限制的 io.LimitedReader, 当然实现了 Reader interfacer
+</span><span class="c1"></span>			<span class="c1">// 返回了一个 带限制的 io.LimitedReader, 当然实现了 Reader interfacer
 </span><span class="c1"></span>			<span class="nx">reader</span> <span class="p">=</span> <span class="nx">io</span><span class="p">.</span><span class="nf">LimitReader</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">Body</span><span class="p">,</span> <span class="nx">maxFormSize</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
 		<span class="p">}</span>
-        <span class="c1">// 这里会调用 io.LimitedReader 的Read 方法, 通过接口实现
-</span><span class="c1"></span>        <span class="c1">// 直接读取post 的body即可
+		<span class="c1">// 这里会调用 io.LimitedReader 的Read 方法, 通过接口实现
+</span><span class="c1"></span>		<span class="c1">// 直接读取post 的body即可
 </span><span class="c1"></span>		<span class="nx">b</span><span class="p">,</span> <span class="nx">e</span> <span class="o">:=</span> <span class="nx">ioutil</span><span class="p">.</span><span class="nf">ReadAll</span><span class="p">(</span><span class="nx">reader</span><span class="p">)</span>
 		<span class="k">if</span> <span class="nx">e</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
 			<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
@@ -191,8 +191,8 @@
 			<span class="nx">err</span> <span class="p">=</span> <span class="nx">errors</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s">&#34;http: POST too large&#34;</span><span class="p">)</span>
 			<span class="k">return</span>
 		<span class="p">}</span>
-        <span class="c1">// 最终也是调用 url.ParseQuery
-</span><span class="c1"></span>        <span class="c1">// 这里 string(b) = abc=123&amp;q=123&amp;ccc=123123
+		<span class="c1">// 最终也是调用 url.ParseQuery
+</span><span class="c1"></span>		<span class="c1">// 这里 string(b) = abc=123&amp;q=123&amp;ccc=123123
 </span><span class="c1"></span>		<span class="nx">vs</span><span class="p">,</span> <span class="nx">e</span> <span class="p">=</span> <span class="nx">url</span><span class="p">.</span><span class="nf">ParseQuery</span><span class="p">(</span><span class="nb">string</span><span class="p">(</span><span class="nx">b</span><span class="p">))</span>
 		<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
 			<span class="nx">err</span> <span class="p">=</span> <span class="nx">e</span>
@@ -220,15 +220,15 @@
 </code></pre></div><h3 id="parsequery-分析">parseQuery 分析<a href="#parsequery-分析" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
 <span class="kd">func</span> <span class="nf">parseQuery</span><span class="p">(</span><span class="nx">m</span> <span class="nx">Values</span><span class="p">,</span> <span class="nx">query</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// 这里的循环结束条件是 query == &#34;&#34;
-</span><span class="c1"></span>    <span class="c1">// 那什么时候会空呢?
+	<span class="c1">// 这里的循环结束条件是 query == &#34;&#34;
+</span><span class="c1"></span>	<span class="c1">// 那什么时候会空呢?
 </span><span class="c1"></span>	<span class="k">for</span> <span class="nx">query</span> <span class="o">!=</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
 		<span class="nx">key</span> <span class="o">:=</span> <span class="nx">query</span>
-        <span class="c1">// 这里取到第一个 &amp;或者; 的索引, 然后将 query 分成两半
+		<span class="c1">// 这里取到第一个 &amp;或者; 的索引, 然后将 query 分成两半
 </span><span class="c1"></span>		<span class="k">if</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">IndexAny</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="s">&#34;&amp;;&#34;</span><span class="p">);</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="p">{</span>
-            <span class="c1">// 这里会每次 截取后一半 赋值给query, 所以query一直在消耗 第一个&amp;前的数据
+			<span class="c1">// 这里会每次 截取后一半 赋值给query, 所以query一直在消耗 第一个&amp;前的数据
 </span><span class="c1"></span>			<span class="nx">key</span><span class="p">,</span> <span class="nx">query</span> <span class="p">=</span> <span class="nx">key</span><span class="p">[:</span><span class="nx">i</span><span class="p">],</span> <span class="nx">key</span><span class="p">[</span><span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
-            <span class="c1">// 如果 已经没有 &amp; 或者 ; 字符了, 说明只有最后一个字段了, 那么就直接置空 query, 然后读取完key 就可以结束循环了
+		<span class="c1">// 如果 已经没有 &amp; 或者 ; 字符了, 说明只有最后一个字段了, 那么就直接置空 query, 然后读取完key 就可以结束循环了
 </span><span class="c1"></span>		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
 			<span class="nx">query</span> <span class="p">=</span> <span class="s">&#34;&#34;</span>
 		<span class="p">}</span>
@@ -236,7 +236,7 @@
 			<span class="k">continue</span>
 		<span class="p">}</span>
 		<span class="nx">value</span> <span class="o">:=</span> <span class="s">&#34;&#34;</span>
-        <span class="c1">// 取出 第一个 &amp; 前面的 参数 按照=分割, 从而得到 变量名 和变量值
+		<span class="c1">// 取出 第一个 &amp; 前面的 参数 按照=分割, 从而得到 变量名 和变量值
 </span><span class="c1"></span>		<span class="k">if</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">Index</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="s">&#34;=&#34;</span><span class="p">);</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="p">{</span>
 			<span class="nx">key</span><span class="p">,</span> <span class="nx">value</span> <span class="p">=</span> <span class="nx">key</span><span class="p">[:</span><span class="nx">i</span><span class="p">],</span> <span class="nx">key</span><span class="p">[</span><span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
 		<span class="p">}</span>
@@ -254,7 +254,7 @@
 			<span class="p">}</span>
 			<span class="k">continue</span>
 		<span class="p">}</span>
-        <span class="c1">// 最后将 post参数写成map结构 写到m (url.Value) 中
+		<span class="c1">// 最后将 post参数写成map结构 写到m (url.Value) 中
 </span><span class="c1"></span>		<span class="nx">m</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">m</span><span class="p">[</span><span class="nx">key</span><span class="p">],</span> <span class="nx">value</span><span class="p">)</span>
 	<span class="p">}</span>
 	<span class="k">return</span> <span class="nx">err</span>
