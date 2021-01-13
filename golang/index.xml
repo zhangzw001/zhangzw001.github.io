@@ -6,8 +6,61 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Wed, 13 Jan 2021 14:24:43 +0800</lastBuildDate>
+		<lastBuildDate>Wed, 13 Jan 2021 18:32:54 +0800</lastBuildDate>
 		<atom:link href="https://k1s.club/golang/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Go学习 测试编写struct</title>
+			<link>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99struct/</link>
+			<pubDate>Wed, 13 Jan 2021 18:32:54 +0800</pubDate>
+			
+			<guid>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99struct/</guid>
+			<description>parsePattern 函数 // Only one * is allowed // /test/v1/add -&amp;gt; [test v1 add] // /test/:version/add -&amp;gt; [test :version add] // /test/*name/add -&amp;gt; [test *name] func parsePattern(pattern string ) []string { vs := strings.Split(pattern,&amp;#34;/&amp;#34;) parts := make([]string,0) for _ , item := range vs { if item != &amp;#34;&amp;#34; { parts = append(parts, item) if item[0] == &amp;#39;*&amp;#39; { break } } } return parts } 路由分析测试 func TestParsePattern(t *testing.T) { tests := []struct { patterns string parts []string }{ {&amp;#34;/test/v1/add&amp;#34;,[]string{&amp;#34;test&amp;#34;, &amp;#34;v1&amp;#34;, &amp;#34;add&amp;#34;}}, {&amp;#34;/test/*name/add&amp;#34;,[]string{&amp;#34;test&amp;#34;, &amp;#34;*name&amp;#34;}}, {&amp;#34;/test/:name&amp;#34;,[]string{&amp;#34;test&amp;#34;,&amp;#34;:name&amp;#34;}}, {&amp;#34;/test/:name/abc&amp;#34;,[]string{&amp;#34;test&amp;#34;,&amp;#34;:name&amp;#34;,&amp;#34;abc&amp;#34;}}, } m := make(map[string][]string) for _, test := range tests { m[test.</description>
+			<content type="html"><![CDATA[<h3 id="parsepattern-函数">parsePattern 函数</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Only one * is allowed
+</span><span class="c1">// /test/v1/add -&gt; [test v1 add]
+</span><span class="c1">// /test/:version/add -&gt; [test :version add]
+</span><span class="c1">// /test/*name/add -&gt; [test *name]
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">parsePattern</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span> <span class="p">)</span> <span class="p">[]</span><span class="kt">string</span> <span class="p">{</span>
+	<span class="nx">vs</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">Split</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span><span class="s">&#34;/&#34;</span><span class="p">)</span>
+	<span class="nx">parts</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">string</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+	<span class="k">for</span> <span class="nx">_</span> <span class="p">,</span> <span class="nx">item</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">vs</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">item</span> <span class="o">!=</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+			<span class="nx">parts</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">parts</span><span class="p">,</span> <span class="nx">item</span><span class="p">)</span>
+			<span class="k">if</span> <span class="nx">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;*&#39;</span> <span class="p">{</span>
+				<span class="k">break</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">parts</span>
+<span class="p">}</span>
+
+</code></pre></div><h3 id="路由分析测试">路由分析测试</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="kd">func</span> <span class="nf">TestParsePattern</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">tests</span> <span class="o">:=</span> <span class="p">[]</span><span class="kd">struct</span> <span class="p">{</span>
+		<span class="nx">patterns</span> <span class="kt">string</span>
+		<span class="nx">parts</span> <span class="p">[]</span><span class="kt">string</span>
+	<span class="p">}{</span>
+		<span class="p">{</span><span class="s">&#34;/test/v1/add&#34;</span><span class="p">,[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span> <span class="s">&#34;v1&#34;</span><span class="p">,</span> <span class="s">&#34;add&#34;</span><span class="p">}},</span>
+		<span class="p">{</span><span class="s">&#34;/test/*name/add&#34;</span><span class="p">,[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span> <span class="s">&#34;*name&#34;</span><span class="p">}},</span>
+		<span class="p">{</span><span class="s">&#34;/test/:name&#34;</span><span class="p">,[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span><span class="s">&#34;:name&#34;</span><span class="p">}},</span>
+		<span class="p">{</span><span class="s">&#34;/test/:name/abc&#34;</span><span class="p">,[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span><span class="s">&#34;:name&#34;</span><span class="p">,</span><span class="s">&#34;abc&#34;</span><span class="p">}},</span>
+	<span class="p">}</span>
+
+	<span class="nx">m</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">][]</span><span class="kt">string</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">test</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">tests</span> <span class="p">{</span>
+		<span class="nx">m</span><span class="p">[</span><span class="nx">test</span><span class="p">.</span><span class="nx">patterns</span><span class="p">]</span> <span class="p">=</span> <span class="nx">test</span><span class="p">.</span><span class="nx">parts</span>
+		<span class="nx">p</span> <span class="o">:=</span> <span class="nf">parsePattern</span><span class="p">(</span><span class="nx">test</span><span class="p">.</span><span class="nx">patterns</span><span class="p">)</span>
+		<span class="k">if</span> <span class="p">!</span><span class="nx">reflect</span><span class="p">.</span><span class="nf">DeepEqual</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">m</span><span class="p">[</span><span class="nx">test</span><span class="p">.</span><span class="nx">patterns</span><span class="p">]){</span>
+			<span class="nx">t</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;expect %v, but actual %v\n&#34;</span><span class="p">,</span><span class="nx">m</span><span class="p">[</span><span class="nx">test</span><span class="p">.</span><span class="nx">patterns</span><span class="p">],</span><span class="nx">p</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div>]]></content>
+		</item>
 		
 		<item>
 			<title>Gin学习 简单记录form数据获取源码解读</title>
