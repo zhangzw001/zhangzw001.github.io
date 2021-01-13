@@ -7,7 +7,17 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 12 Jan 2021 10:17:46 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 13 Jan 2021 14:24:43 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Gin学习 简单记录form数据获取</title>
+      <link>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96/</link>
+      <pubDate>Wed, 13 Jan 2021 14:24:43 +0800</pubDate>
+      
+      <guid>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96/</guid>
+      <description>http.request form 数据测试 func main() { e := gin.Default() e.Any(&amp;#34;/test&amp;#34;,func(c *gin.Context) { // 获取所有参数 	_ = c.Request.ParseForm() // log.Println(c.Request.Header[&amp;#34;Content-Type&amp;#34;])  // get form 参数, c.Request.URL.Query, err = url.ParseQuery 	log.Println(c.Request.URL.Query()) //log.Println(url.ParseQuery(c.Request.URL.RawQuery)) 	// post form 参数 	log.Println(c.Request.PostForm) // form 参数 	log.Println(c.Request.Form) }) e.Run(&amp;#34;localhost:8123&amp;#34;) }  请求日志
+ # curl -XPOST &amp;quot;http://localhost:8123/test&amp;quot; -d &amp;quot;abc=123&amp;amp;q=123&amp;amp;ccc=123123&amp;quot; 2021/01/13 14:31:30 map[] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] [GIN] 2021/01/13 - 14:31:30 | 200 | 339.</description>
+    </item>
+    
     <item>
       <title>Gin学习 Validator</title>
       <link>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-validator/</link>
@@ -107,15 +117,6 @@
 如果存在多个数字二进制中 1 的数目相同，则必须将它们按照数值大小升序排列。
 请你返回排序后的数组。
   示例 1：  输入：arr = [0,1,2,3,4,5,6,7,8] 输出：[0,1,2,4,8,3,5,6,7] 解释：[0] 是唯一一个有 0 个 1 的数。 [1,2,4,8] 都有 1 个 1 。 [3,5,6] 有 2 个 1 。 [7] 有 3 个 1 。 按照 1 的个数排序得到的结果数组为 [0,1,2,4,8,3,5,6,7] 示例 2： 解题思路 1 首先对数组中每个元素进行bitcount计算, 如果bit大一定靠前, 所以bitcount的结果 * 100000 首先按bit为1数量排序 2 其次将 乘法之后的结果 加上本身, 表示如果bit为1的count相同, 那就需要看本身数字谁大 代码示例 func sortByBits(arr []int) []int { for i :=0 ; i &amp;lt; len(arr) ; i++ { arr[i] = getCount(arr[i]) * 1000000 + arr[i] } sort.</description>
-    </item>
-    
-    <item>
-      <title>Kubectl命令简单熟悉</title>
-      <link>https://k1s.club/posts/61-kubectl%E5%91%BD%E4%BB%A4%E7%AE%80%E5%8D%95%E7%86%9F%E6%82%89/</link>
-      <pubDate>Thu, 29 Oct 2020 11:15:58 +0800</pubDate>
-      
-      <guid>https://k1s.club/posts/61-kubectl%E5%91%BD%E4%BB%A4%E7%AE%80%E5%8D%95%E7%86%9F%E6%82%89/</guid>
-      <description>kubectl命令熟悉 # 创建namespace kubectl create ns test # 查看namespace kubectl get ns # 命令创建deployment kubectl create deployment my-nginx --image=nginx --replicas=1 -n test # 命令删除deployment kubectl delete deployments.apps my-nginx -n test # 容器执行命令 kubectl exec -ti deployments.apps/nginx -n test -- nginx -v nginx version: nginx/1.16.0 # 通过yaml创建deployment kubectl apply -f nginx.yaml --record # 通过新增或修改注释方式更新deployment kubectl patch -f nginx.yaml -p &amp;#34;{\&amp;#34;spec\&amp;#34;:{\&amp;#34;template\&amp;#34;:{\&amp;#34;metadata\&amp;#34;:{\&amp;#34;annotations\&amp;#34;:{\&amp;#34;test-last-updated\&amp;#34;:\&amp;#34;$(date +&amp;#39;%F %T&amp;#39;)\&amp;#34;}}}}}&amp;#34; # 修改image kubectl set image deployment/nginx nginx=nginx:1.16.0 -n test # 滚动升级 kubectl scale deployment nginx --replicas=2 -n test # 加上--record history就能看到变更信息(但感觉左右不大) kubectl rollout history deployment nginx -n test # describe 其实更详细 kubectl describe deployment nginx -n test # 查看yaml配置 kubectl get deployment.</description>
     </item>
     
   </channel>

@@ -6,8 +6,159 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Tue, 12 Jan 2021 10:17:46 +0800</lastBuildDate>
+		<lastBuildDate>Wed, 13 Jan 2021 14:24:43 +0800</lastBuildDate>
 		<atom:link href="https://k1s.club/golang/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Gin学习 简单记录form数据获取</title>
+			<link>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96/</link>
+			<pubDate>Wed, 13 Jan 2021 14:24:43 +0800</pubDate>
+			
+			<guid>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96/</guid>
+			<description>http.request form 数据测试 func main() { e := gin.Default() e.Any(&amp;#34;/test&amp;#34;,func(c *gin.Context) { // 获取所有参数 	_ = c.Request.ParseForm() // log.Println(c.Request.Header[&amp;#34;Content-Type&amp;#34;])  // get form 参数, c.Request.URL.Query, err = url.ParseQuery 	log.Println(c.Request.URL.Query()) //log.Println(url.ParseQuery(c.Request.URL.RawQuery)) 	// post form 参数 	log.Println(c.Request.PostForm) // form 参数 	log.Println(c.Request.Form) }) e.Run(&amp;#34;localhost:8123&amp;#34;) }  请求日志
+ # curl -XPOST &amp;quot;http://localhost:8123/test&amp;quot; -d &amp;quot;abc=123&amp;amp;q=123&amp;amp;ccc=123123&amp;quot; 2021/01/13 14:31:30 map[] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] [GIN] 2021/01/13 - 14:31:30 | 200 | 339.</description>
+			<content type="html"><![CDATA[<h3 id="httprequest-form-数据测试">http.request form 数据测试</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">e</span> <span class="o">:=</span> <span class="nx">gin</span><span class="p">.</span><span class="nf">Default</span><span class="p">()</span>
+	<span class="nx">e</span><span class="p">.</span><span class="nf">Any</span><span class="p">(</span><span class="s">&#34;/test&#34;</span><span class="p">,</span><span class="kd">func</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">gin</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">{</span>
+		<span class="c1">// 获取所有参数
+</span><span class="c1"></span>		<span class="nx">_</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Request</span><span class="p">.</span><span class="nf">ParseForm</span><span class="p">()</span>
+        <span class="c1">// log.Println(c.Request.Header[&#34;Content-Type&#34;])
+</span><span class="c1"></span>        <span class="c1">// get form 参数, c.Request.URL.Query, err  = url.ParseQuery
+</span><span class="c1"></span>		<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">Request</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nf">Query</span><span class="p">())</span>
+		<span class="c1">//log.Println(url.ParseQuery(c.Request.URL.RawQuery))
+</span><span class="c1"></span>		<span class="c1">// post form 参数
+</span><span class="c1"></span>		<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">Request</span><span class="p">.</span><span class="nx">PostForm</span><span class="p">)</span>
+		<span class="c1">// form 参数
+</span><span class="c1"></span>		<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">Request</span><span class="p">.</span><span class="nx">Form</span><span class="p">)</span>
+	<span class="p">})</span>
+
+	<span class="nx">e</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="s">&#34;localhost:8123&#34;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div><blockquote>
+<p>请求日志</p>
+</blockquote>
+<pre><code># curl -XPOST &quot;http://localhost:8123/test&quot; -d &quot;abc=123&amp;q=123&amp;ccc=123123&quot;
+2021/01/13 14:31:30 map[]
+2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]]
+2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]]
+[GIN] 2021/01/13 - 14:31:30 | 200 |     339.106µs |       127.0.0.1 | POST     &quot;/test&quot;
+
+# curl &quot;http://localhost:8123/test?aaa=111&amp;bbbb=2222&quot;
+2021/01/13 14:31:38 map[aaa:[111] bbbb:[2222]]
+2021/01/13 14:31:38 map[]
+2021/01/13 14:31:38 map[aaa:[111] bbbb:[2222]]
+[GIN] 2021/01/13 - 14:31:38 | 200 |      73.852µs |       127.0.0.1 | GET      &quot;/test?aaa=111&amp;bbbb=2222&quot;
+
+# curl -XPOST &quot;http://localhost:8123/test?aaa=111&amp;bbbb=2222&quot; -d &quot;abc=123&amp;q=123&amp;ccc=123123&quot;
+2021/01/13 14:31:48 map[aaa:[111] bbbb:[2222]]
+2021/01/13 14:31:48 map[abc:[123] ccc:[123123] q:[123]]
+2021/01/13 14:31:48 map[aaa:[111] abc:[123] bbbb:[2222] ccc:[123123] q:[123]]
+[GIN] 2021/01/13 - 14:31:48 | 200 |     119.833µs |       127.0.0.1 | POST     &quot;/test?aaa=111&amp;bbbb=2222&quot;
+
+</code></pre><h3 id="看下parseform-的源码">看下ParseForm 的源码</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="nf">ParseForm</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">err</span> <span class="kt">error</span>
+	<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">PostForm</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+        <span class="c1">// 以下方法 会调用 parsePostForm
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="s">&#34;POST&#34;</span> <span class="o">||</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="s">&#34;PUT&#34;</span> <span class="o">||</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="s">&#34;PATCH&#34;</span> <span class="p">{</span>
+			<span class="nx">r</span><span class="p">.</span><span class="nx">PostForm</span><span class="p">,</span> <span class="nx">err</span> <span class="p">=</span> <span class="nf">parsePostForm</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">PostForm</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nx">r</span><span class="p">.</span><span class="nx">PostForm</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="nx">url</span><span class="p">.</span><span class="nx">Values</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Form</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+        <span class="c1">// 这里  PostForm 会复制到 Form, 所以 Form &gt;= PostForm
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">PostForm</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+			<span class="nx">r</span><span class="p">.</span><span class="nx">Form</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="nx">url</span><span class="p">.</span><span class="nx">Values</span><span class="p">)</span>
+			<span class="nf">copyValues</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">Form</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">PostForm</span><span class="p">)</span>
+		<span class="p">}</span>
+        <span class="c1">// 这里 get的参数是在r.URL里面的, 所以通过 ParseQuery 获取get参数
+</span><span class="c1"></span>		<span class="kd">var</span> <span class="nx">newValues</span> <span class="nx">url</span><span class="p">.</span><span class="nx">Values</span>
+		<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">URL</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="kd">var</span> <span class="nx">e</span> <span class="kt">error</span>
+			<span class="nx">newValues</span><span class="p">,</span> <span class="nx">e</span> <span class="p">=</span> <span class="nx">url</span><span class="p">.</span><span class="nf">ParseQuery</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">RawQuery</span><span class="p">)</span>
+			<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+				<span class="nx">err</span> <span class="p">=</span> <span class="nx">e</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="nx">newValues</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nx">newValues</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="nx">url</span><span class="p">.</span><span class="nx">Values</span><span class="p">)</span>
+		<span class="p">}</span>
+        <span class="c1">// 最后也会添加 get参数到form, 所以 Form &gt;= url.Queue
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Form</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nx">r</span><span class="p">.</span><span class="nx">Form</span> <span class="p">=</span> <span class="nx">newValues</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+			<span class="nf">copyValues</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">Form</span><span class="p">,</span> <span class="nx">newValues</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">err</span>
+<span class="p">}</span>
+</code></pre></div><h3 id="这里看下-parsepostform">这里看下 parsePostForm</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">parsePostForm</span><span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">(</span><span class="nx">vs</span> <span class="nx">url</span><span class="p">.</span><span class="nx">Values</span><span class="p">,</span> <span class="nx">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Body</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">err</span> <span class="p">=</span> <span class="nx">errors</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s">&#34;missing form body&#34;</span><span class="p">)</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="nx">ct</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Header</span><span class="p">.</span><span class="nf">Get</span><span class="p">(</span><span class="s">&#34;Content-Type&#34;</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">ct</span> <span class="o">==</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+		<span class="nx">ct</span> <span class="p">=</span> <span class="s">&#34;application/octet-stream&#34;</span>
+	<span class="p">}</span>
+	<span class="nx">ct</span><span class="p">,</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">err</span> <span class="p">=</span> <span class="nx">mime</span><span class="p">.</span><span class="nf">ParseMediaType</span><span class="p">(</span><span class="nx">ct</span><span class="p">)</span>
+	<span class="k">switch</span> <span class="p">{</span>
+    <span class="c1">// 这里我们默认的header 就是 application/x-www-form-urlencoded
+</span><span class="c1"></span>    <span class="c1">// 可以 log.Println(c.Request.Header[&#34;Content-Type&#34;]) 打印查看
+</span><span class="c1"></span>	<span class="k">case</span> <span class="nx">ct</span> <span class="o">==</span> <span class="s">&#34;application/x-www-form-urlencoded&#34;</span><span class="p">:</span>
+		<span class="kd">var</span> <span class="nx">reader</span> <span class="nx">io</span><span class="p">.</span><span class="nx">Reader</span> <span class="p">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Body</span>
+        <span class="c1">// 首先初始化 maxFormSize = 2^63 -1
+</span><span class="c1"></span>		<span class="nx">maxFormSize</span> <span class="o">:=</span> <span class="nb">int64</span><span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">63</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Body</span><span class="p">.(</span><span class="o">*</span><span class="nx">maxBytesReader</span><span class="p">);</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
+            <span class="c1">// 设置 io.LimitedReader 的  N
+</span><span class="c1"></span>			<span class="nx">maxFormSize</span> <span class="p">=</span> <span class="nb">int64</span><span class="p">(</span><span class="mi">10</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">)</span> <span class="c1">// 10 MB is a lot of text.
+</span><span class="c1"></span>            <span class="c1">// 返回了一个 带限制的 io.LimitedReader, 当然实现了 Reader interfacer
+</span><span class="c1"></span>			<span class="nx">reader</span> <span class="p">=</span> <span class="nx">io</span><span class="p">.</span><span class="nf">LimitReader</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">Body</span><span class="p">,</span> <span class="nx">maxFormSize</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+		<span class="p">}</span>
+        <span class="c1">// 这里会调用 io.LimitedReader 的Read 方法, 通过接口实现
+</span><span class="c1"></span>		<span class="nx">b</span><span class="p">,</span> <span class="nx">e</span> <span class="o">:=</span> <span class="nx">ioutil</span><span class="p">.</span><span class="nf">ReadAll</span><span class="p">(</span><span class="nx">reader</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nx">e</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+				<span class="nx">err</span> <span class="p">=</span> <span class="nx">e</span>
+			<span class="p">}</span>
+			<span class="k">break</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="nb">int64</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">b</span><span class="p">))</span> <span class="p">&gt;</span> <span class="nx">maxFormSize</span> <span class="p">{</span>
+			<span class="nx">err</span> <span class="p">=</span> <span class="nx">errors</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s">&#34;http: POST too large&#34;</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="p">}</span>
+        <span class="c1">// 最终也是调用 url.ParseQuery
+</span><span class="c1"></span>        <span class="c1">// 这里 string(b) = abc=123&amp;q=123&amp;ccc=123123
+</span><span class="c1"></span>		<span class="nx">vs</span><span class="p">,</span> <span class="nx">e</span> <span class="p">=</span> <span class="nx">url</span><span class="p">.</span><span class="nf">ParseQuery</span><span class="p">(</span><span class="nb">string</span><span class="p">(</span><span class="nx">b</span><span class="p">))</span>
+		<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nx">err</span> <span class="p">=</span> <span class="nx">e</span>
+		<span class="p">}</span>
+	<span class="k">case</span> <span class="nx">ct</span> <span class="o">==</span> <span class="s">&#34;multipart/form-data&#34;</span><span class="p">:</span>
+	<span class="p">}</span>
+	<span class="k">return</span>
+<span class="p">}</span>
+
+</code></pre></div><h3 id="简单看下-iolimitedreader-的read-方法">简单看下 io.LimitedReader 的Read 方法</h3>
+<blockquote>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">LimitedReader</span><span class="p">)</span> <span class="nf">Read</span><span class="p">(</span><span class="nx">p</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="nx">n</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">l</span><span class="p">.</span><span class="nx">N</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">EOF</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nb">int64</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">p</span><span class="p">))</span> <span class="p">&gt;</span> <span class="nx">l</span><span class="p">.</span><span class="nx">N</span> <span class="p">{</span>
+		<span class="nx">p</span> <span class="p">=</span> <span class="nx">p</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nx">l</span><span class="p">.</span><span class="nx">N</span><span class="p">]</span>
+	<span class="p">}</span>
+	<span class="nx">n</span><span class="p">,</span> <span class="nx">err</span> <span class="p">=</span> <span class="nx">l</span><span class="p">.</span><span class="nx">R</span><span class="p">.</span><span class="nf">Read</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span>
+	<span class="nx">l</span><span class="p">.</span><span class="nx">N</span> <span class="o">-=</span> <span class="nb">int64</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span>
+	<span class="k">return</span>
+<span class="p">}</span>
+
+</code></pre></div>]]></content>
+		</item>
 		
 		<item>
 			<title>Gin学习 Validator</title>
