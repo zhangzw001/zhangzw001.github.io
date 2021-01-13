@@ -329,7 +329,57 @@ net.ipv4.icmp_echo_ignore_all=1
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 </center>
-<h3 id="nginx问题-提示tmp无权限问题">nginx问题: 提示tmp无权限问题</h3>
+<h3 id="nginx问题-单域名通过cookie跳转不同后端">nginx问题: 单域名通过cookie跳转不同后端</h3>
+<ul>
+<li>
+<ol>
+<li>浏览器访问 supervisor.xxxx.com?to=1 , 然后在访问 supervisor.xxxx.com 会请求到common队列</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>浏览器访问 supervisor.xxxx.com?to=2 , 然后在访问 supervisor.xxxx.com 会请求到test队列</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>curl请求方式:
+<code>curl &quot;http://supervisor.xxxx.com/index.html?action=restartall&quot; --cookie &quot;bqxserver=test&quot;</code></li>
+</ol>
+</li>
+</ul>
+<pre><code>server {
+        listen 80 ;
+        charset utf-8;
+        server_name supervisor.xxxx.com;
+
+        location / {
+           if ($arg_to = &quot;1&quot;){
+                 add_header Set-Cookie &quot;bqxserver=common&quot;;
+                 add_header Content-Type &quot;text/plain;charset=utf-8&quot;;
+                 return 200 &quot;当前的数据服务器位置:common supervisor&quot;;
+                }
+           if ($arg_to = &quot;2&quot;){
+                 add_header Set-Cookie &quot;bqxserver=test&quot;;
+                 add_header Content-Type &quot;text/plain;charset=utf-8&quot;;
+                 return 200 &quot;当前的数据服务器位置:test supervisor&quot;;
+                }
+            set $proxy_name '127.0.0.1:32019';
+            if ($cookie_bqxserver = &quot;test&quot;){
+                set $proxy_name  '127.0.0.1:32020';
+            }
+            if ($cookie_bqxserver = &quot;common&quot;){
+                set $proxy_name  '127.0.0.1:32019';
+            }
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header HOST $http_host;
+                proxy_set_header X-NginX-Proxy true;
+                proxy_set_header X-Forwarded-Host $host;
+                proxy_set_header X-Forwarded-Server $host;
+                proxy_pass http://$proxy_name;
+  }
+}
+</code></pre><h3 id="nginx问题-提示tmp无权限问题">nginx问题: 提示tmp无权限问题</h3>
 <pre><code>2020/12/08 17:14:52 [crit] 111455#0: *1842 open() &quot;/var/lib/nginx/tmp/client_body/0000001489&quot; failed (13: Permission denied), client: 10.10.154.36, server: xxx.com, request: &quot;POST /?xxx HTTP/1.0&quot;, host: &quot;xxx.com&quot;, referrer: &quot;http://&quot;
 </code></pre><p>首先由于该环境nginx配置修改了用户由 nginx用户 变成nobody用户的原因, 导致改目录无权限写入&hellip;</p>
 <p>知道问题了, 那为啥会写到这个目录呢?需要看下面两个参数</p>
