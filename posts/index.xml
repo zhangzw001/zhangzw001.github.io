@@ -10561,7 +10561,7 @@ mysql test &lt;tbl_size.sql &gt;tbl_info_20191028.txt
 <pre><code>stop slave;
 SET GLOBAL sql_slave_skip_counter =1;
 start slave;
-show slave status\G; 
+show slave status\G;
 </code></pre><center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 </center>
@@ -10592,6 +10592,19 @@ WHERE
 <li>2: 执行 Analyze table tableName; 会统计所有表数据（在生产环境中不建议使用，因为会锁表！）；
 原文链接：<a href="https://blog.csdn.net/David_jiahuan/article/details/98478740">mysql information_schema.TABLES表中的table_rows 字段值与count值不同</a></li>
 </ul>
+<h3 id="mysqldump-导出的触发器导致测试库报权限不足错误">mysqldump 导出的触发器导致测试库报权限不足错误</h3>
+<p>网上有一些教程: <a href="https://stackoverflow.com/questions/10169960/mysql-error-1449-the-user-specified-as-a-definer-does-not-exist">https://stackoverflow.com/questions/10169960/mysql-error-1449-the-user-specified-as-a-definer-does-not-exist</a>
+mysql如何修改所有的definer: <a href="https://blog.csdn.net/weixin_30739595/article/details/95782340">https://blog.csdn.net/weixin_30739595/article/details/95782340</a></p>
+<blockquote>
+<p>从线上导出表到测试, 发现测试报错: The user specified as a definer (&lsquo;xxx&rsquo;@&lsquo;x.x.%.%') does not exist</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">mysqldump --single-transaction --max-allowed-packet<span class="o">=</span><span class="m">1073741824</span> dbname tablename &gt; tablename.sql
+</code></pre></div><blockquote>
+<p>这里用了一种不太好的方法解决了该问题(主要是不懂&hellip;)</p>
+</blockquote>
+<p>将 tablename.sql 文件中的 DEFINER=<code>xxx</code>@<code>x.x.%.%</code> 改成测试库中之前的用户名比如说: DEFINER=<code>test</code>@<code>%</code>
+然后重新导入覆盖</p>
+<p>所以说触发器的definer不是很方便修改</p>
 ]]></content>
 		</item>
 		

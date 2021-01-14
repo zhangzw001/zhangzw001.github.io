@@ -6,8 +6,38 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Thu, 14 Jan 2021 11:32:54 +0800</lastBuildDate>
+		<lastBuildDate>Thu, 14 Jan 2021 17:49:48 +0800</lastBuildDate>
 		<atom:link href="https://k1s.club/golang/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Go学习 并发的实现原理</title>
+			<link>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-%E5%B9%B6%E5%8F%91%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</link>
+			<pubDate>Thu, 14 Jan 2021 17:49:48 +0800</pubDate>
+			
+			<guid>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-%E5%B9%B6%E5%8F%91%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</guid>
+			<description>&lt;p&gt;go&lt;/p&gt;</description>
+			<content type="html"><![CDATA[<p>go</p>
+<ul>
+<li><a href="https://studygolang.com/articles/22390?fr=sidebar">【深度知识】GO语言的goroutine并发原理和调度机制</a></li>
+</ul>
+<h3 id="go并发的模型">go并发的模型</h3>
+<ul>
+<li>多线程共享内存</li>
+<li>CSP(communicating sequential processes)   - 以通信的方式来共享内存</li>
+</ul>
+<h3 id="go的csp并发模型是通过goroutine和channel来实现的">Go的CSP并发模型，是通过goroutine和channel来实现的。</h3>
+<ul>
+<li>goroutine 是Go语言中并发的执行单位。有点抽象，其实就是和传统概念上的&quot;线程“类似，可以理解为&quot;线程“。</li>
+<li>channel是Go语言中各个并发结构体(goroutine)之前的通信机制。 通俗的讲，就是各个goroutine之间通信的&quot;管道“，有点类似于Linux中的管道。</li>
+</ul>
+<h3 id="go线程实现模型mpg">Go线程实现模型MPG</h3>
+<ul>
+<li>M指的是Machine，一个M直接关联了一个内核线程。由操作系统管理。</li>
+<li>P指的是&quot;processor&quot;，代表了M所需的上下文环境，也是处理用户级代码逻辑的处理器。它负责衔接M和G的调度上下文，将等待执行的G与M对接。</li>
+<li>G指的是Goroutine，其实本质上也是一种轻量级的线程。包括了调用栈，重要的调度信息，例如channel等。</li>
+</ul>
+<p><img src="assets/markdown-img-paste-20210114180539724.png" alt=""></p>]]></content>
+		</item>
 		
 		<item>
 			<title>Gee学习-路由trie测试编写</title>

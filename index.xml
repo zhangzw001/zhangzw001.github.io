@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Thu, 14 Jan 2021 11:32:54 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 14 Jan 2021 17:49:48 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go学习 并发的实现原理</title>
+      <link>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-%E5%B9%B6%E5%8F%91%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</link>
+      <pubDate>Thu, 14 Jan 2021 17:49:48 +0800</pubDate>
+      
+      <guid>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-%E5%B9%B6%E5%8F%91%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</guid>
+      <description>&lt;p&gt;go&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>Gee学习-路由trie测试编写</title>
       <link>https://k1s.club/golang/gee%E5%AD%A6%E4%B9%A0-%E8%B7%AF%E7%94%B1trie%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99/</link>
@@ -102,18 +111,6 @@
       <description>命令参数说明  -n 主机名域名显示成ip -S 用绝对而非相对数值列出TCP关联数。 -i 接口名,指定网卡名 host 请求地址: www.baidu.com tcp 请求端口: tcp:80  标志说明  Flags [S]: 请求连接(SYN) Flags [S.]: sync+ack(SYN+ACK) Flags [.]: ack(ACK) Flags [P.]: 发送数据包(PUSH) Flags [F]: 发送方没有更多包发送了(FIN) Flags [R]: 表明packet的发送方马上就要断开当前连接了(RST)   参考官方手册
  本次抓取的结果  通过curl http://www.baiu.com得到
  # 抓取 enp0s3 网卡请求 http://www.baidu.com 的包并显示ip和实际发送seq和ack tcpdump -n -S -i enp0s3 host www.baidu.com and tcp port 80 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes # 三次握手包 15:35:23.</description>
-    </item>
-    
-    <item>
-      <title>k8s遇到的一些问题统计总结</title>
-      <link>https://k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
-      <pubDate>Tue, 10 Nov 2020 14:06:41 +0000</pubDate>
-      
-      <guid>https://k1s.club/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
-      <description>不定时更新,文章可能比较散乱,&amp;gt;_&amp;lt;
-  1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
-  deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
- # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从`hub.</description>
     </item>
     
   </channel>
