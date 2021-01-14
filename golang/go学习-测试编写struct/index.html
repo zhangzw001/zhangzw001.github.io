@@ -8,23 +8,23 @@
 	<meta name="theme-color" content="#494f5c">
 	<meta name="msapplication-TileColor" content="#494f5c">
 <meta itemprop="name" content="Go学习 测试编写struct">
-<meta itemprop="description" content="parsePattern 函数 // Only one * is allowed // /test/v1/add -&gt; [test v1 add] // /test/:version/add -&gt; [test :version add] // /test/*name/add -&gt; [test *name] func parsePattern(pattern string ) []string { vs := strings.Split(pattern,&#34;/&#34;) parts := make([]string,0) for _ , item := range vs { if item != &#34;&#34; { parts = append(parts, item) if item[0] == &#39;*&#39; { break } } } return parts } 路由分析测试 func TestParsePattern(t *testing.T) { tests := []struct { patterns string parts []string }{ {&#34;/test/v1/add&#34;,[]string{&#34;test&#34;, &#34;v1&#34;, &#34;add&#34;}}, {&#34;/test/*name/add&#34;,[]string{&#34;test&#34;, &#34;*name&#34;}}, {&#34;/test/:name&#34;,[]string{&#34;test&#34;,&#34;:name&#34;}}, {&#34;/test/:name/abc&#34;,[]string{&#34;test&#34;,&#34;:name&#34;,&#34;abc&#34;}}, } m := make(map[string][]string) for _, test := range tests { m[test.">
+<meta itemprop="description" content="路由分析测试 package gee import ( &#34;reflect&#34; &#34;testing&#34; ) func TestParsePattern(t *testing.T) { tests := []struct { patterns string parts []string ok bool }{ {&#34;/test/v1/add&#34;, []string{&#34;test&#34;, &#34;v1&#34;, &#34;add&#34;},true }, {&#34;/test/*name/add&#34;, []string{&#34;test&#34;, &#34;*name&#34;},true}, {&#34;/test/:name&#34;, []string{&#34;test&#34;, &#34;:name&#34;},true }, {&#34;/test/:name/abc&#34;, []string{&#34;test&#34;, &#34;:name&#34;, &#34;abc&#34;},true}, {&#34;/test/v1/add&#34;, []string{&#34;testv1&#34;, &#34;add&#34;},false }, {&#34;/test/*name/add&#34;, []string{&#34;test&#34;, &#34;*name&#34;,&#34;add&#34;},false}, {&#34;/test/:name&#34;, []string{&#34;test&#34;, &#34;:&#34;,&#34;name&#34;},false }, {&#34;/test/:name/abc&#34;, []string{&#34;test&#34;, &#34;:name&#34;},false}, } m := make(map[string][]string) for _, test := range tests { m[test.patterns] = test.parts p := parsePattern(test.patterns) if test.">
 <meta itemprop="datePublished" content="2021-01-13T18:32:54+08:00" />
 <meta itemprop="dateModified" content="2021-01-13T18:32:54+08:00" />
-<meta itemprop="wordCount" content="115">
+<meta itemprop="wordCount" content="525">
 
 
 
 <meta itemprop="keywords" content="golang," />
 <meta property="og:title" content="Go学习 测试编写struct" />
-<meta property="og:description" content="parsePattern 函数 // Only one * is allowed // /test/v1/add -&gt; [test v1 add] // /test/:version/add -&gt; [test :version add] // /test/*name/add -&gt; [test *name] func parsePattern(pattern string ) []string { vs := strings.Split(pattern,&#34;/&#34;) parts := make([]string,0) for _ , item := range vs { if item != &#34;&#34; { parts = append(parts, item) if item[0] == &#39;*&#39; { break } } } return parts } 路由分析测试 func TestParsePattern(t *testing.T) { tests := []struct { patterns string parts []string }{ {&#34;/test/v1/add&#34;,[]string{&#34;test&#34;, &#34;v1&#34;, &#34;add&#34;}}, {&#34;/test/*name/add&#34;,[]string{&#34;test&#34;, &#34;*name&#34;}}, {&#34;/test/:name&#34;,[]string{&#34;test&#34;,&#34;:name&#34;}}, {&#34;/test/:name/abc&#34;,[]string{&#34;test&#34;,&#34;:name&#34;,&#34;abc&#34;}}, } m := make(map[string][]string) for _, test := range tests { m[test." />
+<meta property="og:description" content="路由分析测试 package gee import ( &#34;reflect&#34; &#34;testing&#34; ) func TestParsePattern(t *testing.T) { tests := []struct { patterns string parts []string ok bool }{ {&#34;/test/v1/add&#34;, []string{&#34;test&#34;, &#34;v1&#34;, &#34;add&#34;},true }, {&#34;/test/*name/add&#34;, []string{&#34;test&#34;, &#34;*name&#34;},true}, {&#34;/test/:name&#34;, []string{&#34;test&#34;, &#34;:name&#34;},true }, {&#34;/test/:name/abc&#34;, []string{&#34;test&#34;, &#34;:name&#34;, &#34;abc&#34;},true}, {&#34;/test/v1/add&#34;, []string{&#34;testv1&#34;, &#34;add&#34;},false }, {&#34;/test/*name/add&#34;, []string{&#34;test&#34;, &#34;*name&#34;,&#34;add&#34;},false}, {&#34;/test/:name&#34;, []string{&#34;test&#34;, &#34;:&#34;,&#34;name&#34;},false }, {&#34;/test/:name/abc&#34;, []string{&#34;test&#34;, &#34;:name&#34;},false}, } m := make(map[string][]string) for _, test := range tests { m[test.patterns] = test.parts p := parsePattern(test.patterns) if test." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99struct/" />
 <meta property="article:published_time" content="2021-01-13T18:32:54+08:00" />
 <meta property="article:modified_time" content="2021-01-13T18:32:54+08:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Go学习 测试编写struct"/>
-<meta name="twitter:description" content="parsePattern 函数 // Only one * is allowed // /test/v1/add -&gt; [test v1 add] // /test/:version/add -&gt; [test :version add] // /test/*name/add -&gt; [test *name] func parsePattern(pattern string ) []string { vs := strings.Split(pattern,&#34;/&#34;) parts := make([]string,0) for _ , item := range vs { if item != &#34;&#34; { parts = append(parts, item) if item[0] == &#39;*&#39; { break } } } return parts } 路由分析测试 func TestParsePattern(t *testing.T) { tests := []struct { patterns string parts []string }{ {&#34;/test/v1/add&#34;,[]string{&#34;test&#34;, &#34;v1&#34;, &#34;add&#34;}}, {&#34;/test/*name/add&#34;,[]string{&#34;test&#34;, &#34;*name&#34;}}, {&#34;/test/:name&#34;,[]string{&#34;test&#34;,&#34;:name&#34;}}, {&#34;/test/:name/abc&#34;,[]string{&#34;test&#34;,&#34;:name&#34;,&#34;abc&#34;}}, } m := make(map[string][]string) for _, test := range tests { m[test."/>
+<meta name="twitter:description" content="路由分析测试 package gee import ( &#34;reflect&#34; &#34;testing&#34; ) func TestParsePattern(t *testing.T) { tests := []struct { patterns string parts []string ok bool }{ {&#34;/test/v1/add&#34;, []string{&#34;test&#34;, &#34;v1&#34;, &#34;add&#34;},true }, {&#34;/test/*name/add&#34;, []string{&#34;test&#34;, &#34;*name&#34;},true}, {&#34;/test/:name&#34;, []string{&#34;test&#34;, &#34;:name&#34;},true }, {&#34;/test/:name/abc&#34;, []string{&#34;test&#34;, &#34;:name&#34;, &#34;abc&#34;},true}, {&#34;/test/v1/add&#34;, []string{&#34;testv1&#34;, &#34;add&#34;},false }, {&#34;/test/*name/add&#34;, []string{&#34;test&#34;, &#34;*name&#34;,&#34;add&#34;},false}, {&#34;/test/:name&#34;, []string{&#34;test&#34;, &#34;:&#34;,&#34;name&#34;},false }, {&#34;/test/:name/abc&#34;, []string{&#34;test&#34;, &#34;:name&#34;},false}, } m := make(map[string][]string) for _, test := range tests { m[test.patterns] = test.parts p := parsePattern(test.patterns) if test."/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -73,10 +73,120 @@
 				<h1>Go学习 测试编写struct</h1>
 			</header>
 			<div class="content">
-				<h3 id="parsepattern-函数">parsePattern 函数<a href="#parsepattern-函数" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Only one * is allowed
+				<h3 id="路由分析测试">路由分析测试<a href="#路由分析测试" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="kn">package</span> <span class="nx">gee</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&#34;reflect&#34;</span>
+	<span class="s">&#34;testing&#34;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span> <span class="nf">TestParsePattern</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">tests</span> <span class="o">:=</span> <span class="p">[]</span><span class="kd">struct</span> <span class="p">{</span>
+		<span class="nx">patterns</span> <span class="kt">string</span>
+		<span class="nx">parts</span>    <span class="p">[]</span><span class="kt">string</span>
+		<span class="nx">ok</span> <span class="kt">bool</span>
+	<span class="p">}{</span>
+		<span class="p">{</span><span class="s">&#34;/test/v1/add&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span> <span class="s">&#34;v1&#34;</span><span class="p">,</span> <span class="s">&#34;add&#34;</span><span class="p">},</span><span class="kc">true</span> <span class="p">},</span>
+		<span class="p">{</span><span class="s">&#34;/test/*name/add&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span> <span class="s">&#34;*name&#34;</span><span class="p">},</span><span class="kc">true</span><span class="p">},</span>
+		<span class="p">{</span><span class="s">&#34;/test/:name&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span> <span class="s">&#34;:name&#34;</span><span class="p">},</span><span class="kc">true</span> <span class="p">},</span>
+		<span class="p">{</span><span class="s">&#34;/test/:name/abc&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span> <span class="s">&#34;:name&#34;</span><span class="p">,</span> <span class="s">&#34;abc&#34;</span><span class="p">},</span><span class="kc">true</span><span class="p">},</span>
+		<span class="p">{</span><span class="s">&#34;/test/v1/add&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;testv1&#34;</span><span class="p">,</span> <span class="s">&#34;add&#34;</span><span class="p">},</span><span class="kc">false</span> <span class="p">},</span>
+		<span class="p">{</span><span class="s">&#34;/test/*name/add&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span> <span class="s">&#34;*name&#34;</span><span class="p">,</span><span class="s">&#34;add&#34;</span><span class="p">},</span><span class="kc">false</span><span class="p">},</span>
+		<span class="p">{</span><span class="s">&#34;/test/:name&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span> <span class="s">&#34;:&#34;</span><span class="p">,</span><span class="s">&#34;name&#34;</span><span class="p">},</span><span class="kc">false</span> <span class="p">},</span>
+		<span class="p">{</span><span class="s">&#34;/test/:name/abc&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span> <span class="s">&#34;:name&#34;</span><span class="p">},</span><span class="kc">false</span><span class="p">},</span>
+	<span class="p">}</span>
+
+	<span class="nx">m</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">][]</span><span class="kt">string</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">test</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">tests</span> <span class="p">{</span>
+		<span class="nx">m</span><span class="p">[</span><span class="nx">test</span><span class="p">.</span><span class="nx">patterns</span><span class="p">]</span> <span class="p">=</span> <span class="nx">test</span><span class="p">.</span><span class="nx">parts</span>
+		<span class="nx">p</span> <span class="o">:=</span> <span class="nf">parsePattern</span><span class="p">(</span><span class="nx">test</span><span class="p">.</span><span class="nx">patterns</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="nx">test</span><span class="p">.</span><span class="nx">ok</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="p">!</span><span class="nx">reflect</span><span class="p">.</span><span class="nf">DeepEqual</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">m</span><span class="p">[</span><span class="nx">test</span><span class="p">.</span><span class="nx">patterns</span><span class="p">])</span> <span class="p">{</span>
+				<span class="nx">t</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;expect %v, but actual %v\n&#34;</span><span class="p">,</span> <span class="nx">m</span><span class="p">[</span><span class="nx">test</span><span class="p">.</span><span class="nx">patterns</span><span class="p">],</span> <span class="nx">p</span><span class="p">)</span>
+			<span class="p">}</span>
+		<span class="p">}</span><span class="k">else</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="nx">reflect</span><span class="p">.</span><span class="nf">DeepEqual</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">m</span><span class="p">[</span><span class="nx">test</span><span class="p">.</span><span class="nx">patterns</span><span class="p">])</span> <span class="p">{</span>
+				<span class="nx">t</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;not expect %v, but actual %v\n&#34;</span><span class="p">,</span> <span class="nx">m</span><span class="p">[</span><span class="nx">test</span><span class="p">.</span><span class="nx">patterns</span><span class="p">],</span> <span class="nx">p</span><span class="p">)</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+
+
+	<span class="p">}</span>
+
+<span class="p">}</span>
+
+
+<span class="kd">func</span> <span class="nf">TestRouterGroup_GET</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">tests</span> <span class="o">:=</span> <span class="p">[]</span><span class="kd">struct</span> <span class="p">{</span>
+		<span class="nx">method</span>  <span class="kt">string</span>
+		<span class="nx">pattern</span> <span class="kt">string</span>
+		<span class="nx">parts</span>   <span class="p">[]</span><span class="kt">string</span>
+		<span class="nx">ok</span>      <span class="kt">bool</span>
+	<span class="p">}{</span>
+		<span class="p">{</span><span class="s">&#34;GET&#34;</span><span class="p">,</span> <span class="s">&#34;/test1/v1/add&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;/test1/v1/add&#34;</span><span class="p">},</span> <span class="kc">true</span><span class="p">},</span>
+		<span class="p">{</span><span class="s">&#34;GET&#34;</span><span class="p">,</span> <span class="s">&#34;/test2/*name&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;/test2/name1&#34;</span><span class="p">,</span> <span class="s">&#34;/test2/name1/name2&#34;</span><span class="p">},</span> <span class="kc">true</span><span class="p">},</span>
+		<span class="p">{</span><span class="s">&#34;GET&#34;</span><span class="p">,</span> <span class="s">&#34;/test3/:file/add&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;/test3/file123/add&#34;</span><span class="p">,</span> <span class="s">&#34;/test3/file_!@#$/add&#34;</span><span class="p">,</span> <span class="s">&#34;/test3/123431/add&#34;</span><span class="p">},</span> <span class="kc">true</span><span class="p">},</span>
+		<span class="p">{</span><span class="s">&#34;GET&#34;</span><span class="p">,</span> <span class="s">&#34;/test4/:file/add&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;/test4/file123&#34;</span><span class="p">,</span> <span class="s">&#34;/test3/file_!@#$/add123&#34;</span><span class="p">,</span> <span class="s">&#34;/test3/123431/123_@#&#34;</span><span class="p">},</span> <span class="kc">false</span><span class="p">},</span>
+	<span class="p">}</span>
+
+	<span class="nx">r</span> <span class="o">:=</span> <span class="nf">newRouter</span><span class="p">()</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">test</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">tests</span> <span class="p">{</span>
+		<span class="nx">r</span><span class="p">.</span><span class="nf">addRoute</span><span class="p">(</span><span class="nx">test</span><span class="p">.</span><span class="nx">method</span><span class="p">,</span> <span class="nx">test</span><span class="p">.</span><span class="nx">pattern</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">test</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">tests</span> <span class="p">{</span>
+		<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">part</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">test</span><span class="p">.</span><span class="nx">parts</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="nx">test</span><span class="p">.</span><span class="nx">ok</span> <span class="p">{</span>
+				<span class="nx">node</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">getRoute</span><span class="p">(</span><span class="nx">test</span><span class="p">.</span><span class="nx">method</span><span class="p">,</span> <span class="nx">part</span><span class="p">)</span>
+				<span class="k">if</span> <span class="nx">node</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+					<span class="nx">t</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;url Path %s, expected : %s, but actual : %s\n&#34;</span><span class="p">,</span> <span class="nx">part</span><span class="p">,</span> <span class="nx">test</span><span class="p">.</span><span class="nx">pattern</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">)</span>
+					<span class="k">continue</span>
+				<span class="p">}</span>
+				<span class="k">if</span> <span class="nx">node</span><span class="p">.</span><span class="nx">pattern</span> <span class="o">!=</span> <span class="nx">test</span><span class="p">.</span><span class="nx">pattern</span> <span class="o">&amp;&amp;</span> <span class="nx">test</span><span class="p">.</span><span class="nx">ok</span> <span class="p">{</span>
+					<span class="nx">t</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;url Path %s, expected : %s, but actual : %s\n&#34;</span><span class="p">,</span> <span class="nx">part</span><span class="p">,</span> <span class="nx">test</span><span class="p">.</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">pattern</span><span class="p">)</span>
+				<span class="p">}</span>
+			<span class="p">}</span><span class="k">else</span> <span class="p">{</span>
+				<span class="nx">node</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">getRoute</span><span class="p">(</span><span class="nx">test</span><span class="p">.</span><span class="nx">method</span><span class="p">,</span> <span class="nx">part</span><span class="p">)</span>
+				<span class="k">if</span> <span class="nx">node</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+					<span class="k">continue</span>
+				<span class="p">}</span>
+				<span class="k">if</span> <span class="nx">node</span><span class="p">.</span><span class="nx">pattern</span> <span class="o">==</span> <span class="nx">test</span><span class="p">.</span><span class="nx">pattern</span> <span class="p">{</span>
+					<span class="nx">t</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;url Path %s, not expected : %s, but actual : %s\n&#34;</span><span class="p">,</span> <span class="nx">part</span><span class="p">,</span> <span class="nx">test</span><span class="p">.</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">pattern</span><span class="p">)</span>
+				<span class="p">}</span>
+			<span class="p">}</span>
+
+		<span class="p">}</span>
+	<span class="p">}</span>
+
+<span class="p">}</span>
+
+</code></pre></div><h3 id="路由代码">路由代码<a href="#路由代码" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">gee</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&#34;net/http&#34;</span>
+	<span class="s">&#34;strings&#34;</span>
+<span class="p">)</span>
+
+<span class="c1">// 这里包装router
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">RouterGroup</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">roots</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">node</span>
+	<span class="nx">handlers</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">HandlerFunc</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">newRouter</span><span class="p">()</span> <span class="o">*</span><span class="nx">RouterGroup</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">RouterGroup</span><span class="p">{</span>
+		<span class="nx">handlers</span><span class="p">:</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">HandlerFunc</span><span class="p">),</span>
+		<span class="nx">roots</span><span class="p">:</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">node</span> <span class="p">),</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Only one * is allowed
 </span><span class="c1">// /test/v1/add -&gt; [test v1 add]
-</span><span class="c1">// /test/:version/add -&gt; [test :version add]
 </span><span class="c1">// /test/*name/add -&gt; [test *name]
 </span><span class="c1"></span><span class="kd">func</span> <span class="nf">parsePattern</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span> <span class="p">)</span> <span class="p">[]</span><span class="kt">string</span> <span class="p">{</span>
 	<span class="nx">vs</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">Split</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span><span class="s">&#34;/&#34;</span><span class="p">)</span>
@@ -92,30 +202,69 @@
 	<span class="k">return</span> <span class="nx">parts</span>
 <span class="p">}</span>
 
-</code></pre></div><h3 id="路由分析测试">路由分析测试<a href="#路由分析测试" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
-<span class="kd">func</span> <span class="nf">TestParsePattern</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
-	<span class="nx">tests</span> <span class="o">:=</span> <span class="p">[]</span><span class="kd">struct</span> <span class="p">{</span>
-		<span class="nx">patterns</span> <span class="kt">string</span>
-		<span class="nx">parts</span> <span class="p">[]</span><span class="kt">string</span>
-	<span class="p">}{</span>
-		<span class="p">{</span><span class="s">&#34;/test/v1/add&#34;</span><span class="p">,[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span> <span class="s">&#34;v1&#34;</span><span class="p">,</span> <span class="s">&#34;add&#34;</span><span class="p">}},</span>
-		<span class="p">{</span><span class="s">&#34;/test/*name/add&#34;</span><span class="p">,[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span> <span class="s">&#34;*name&#34;</span><span class="p">}},</span>
-		<span class="p">{</span><span class="s">&#34;/test/:name&#34;</span><span class="p">,[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span><span class="s">&#34;:name&#34;</span><span class="p">}},</span>
-		<span class="p">{</span><span class="s">&#34;/test/:name/abc&#34;</span><span class="p">,[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span><span class="s">&#34;:name&#34;</span><span class="p">,</span><span class="s">&#34;abc&#34;</span><span class="p">}},</span>
+<span class="c1">//
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">RouterGroup</span><span class="p">)</span> <span class="nf">addRoute</span><span class="p">(</span><span class="nx">method</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">HandlerFunc</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="nx">parts</span> <span class="o">:=</span> <span class="nf">parsePattern</span><span class="p">(</span><span class="nx">pattern</span><span class="p">)</span>
+	<span class="nx">key</span> <span class="o">:=</span> <span class="nx">method</span><span class="o">+</span><span class="s">&#34;-&#34;</span><span class="o">+</span><span class="nx">pattern</span>
+	<span class="nx">_</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">roots</span><span class="p">[</span><span class="nx">method</span><span class="p">]</span>
+	<span class="k">if</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
+		<span class="nx">r</span><span class="p">.</span><span class="nx">roots</span><span class="p">[</span><span class="nx">method</span><span class="p">]</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">node</span><span class="p">{}</span>
 	<span class="p">}</span>
-
-	<span class="nx">m</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">][]</span><span class="kt">string</span><span class="p">)</span>
-
-	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">test</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">tests</span> <span class="p">{</span>
-		<span class="nx">m</span><span class="p">[</span><span class="nx">test</span><span class="p">.</span><span class="nx">patterns</span><span class="p">]</span> <span class="p">=</span> <span class="nx">test</span><span class="p">.</span><span class="nx">parts</span>
-		<span class="nx">p</span> <span class="o">:=</span> <span class="nf">parsePattern</span><span class="p">(</span><span class="nx">test</span><span class="p">.</span><span class="nx">patterns</span><span class="p">)</span>
-		<span class="k">if</span> <span class="p">!</span><span class="nx">reflect</span><span class="p">.</span><span class="nf">DeepEqual</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">m</span><span class="p">[</span><span class="nx">test</span><span class="p">.</span><span class="nx">patterns</span><span class="p">]){</span>
-			<span class="nx">t</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;expect %v, but actual %v\n&#34;</span><span class="p">,</span><span class="nx">m</span><span class="p">[</span><span class="nx">test</span><span class="p">.</span><span class="nx">patterns</span><span class="p">],</span><span class="nx">p</span><span class="p">)</span>
-		<span class="p">}</span>
-	<span class="p">}</span>
-
+	<span class="nx">r</span><span class="p">.</span><span class="nx">roots</span><span class="p">[</span><span class="nx">method</span><span class="p">].</span><span class="nf">insert</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span><span class="nx">parts</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+	<span class="nx">r</span><span class="p">.</span><span class="nx">handlers</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nx">handler</span>
 <span class="p">}</span>
+
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">RouterGroup</span><span class="p">)</span> <span class="nf">handle</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Context</span><span class="p">)</span> <span class="p">{</span>
+
+	<span class="nx">n</span><span class="p">,</span> <span class="nx">params</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">getRoute</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">Method</span><span class="p">,</span><span class="nx">c</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">n</span> <span class="o">!=</span> <span class="kc">nil</span>  <span class="p">{</span>
+		<span class="nx">c</span><span class="p">.</span><span class="nx">Params</span> <span class="p">=</span> <span class="nx">params</span>
+		<span class="nx">key</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Method</span> <span class="o">+</span> <span class="s">&#34;-&#34;</span> <span class="o">+</span> <span class="nx">n</span><span class="p">.</span><span class="nx">pattern</span>
+		<span class="nx">r</span><span class="p">.</span><span class="nx">handlers</span><span class="p">[</span><span class="nx">key</span><span class="p">](</span><span class="nx">c</span><span class="p">)</span>
+	<span class="p">}</span><span class="k">else</span> <span class="p">{</span>
+		<span class="nx">c</span><span class="p">.</span><span class="nf">String</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusNotFound</span><span class="p">,</span><span class="s">&#34;404 not found : %s\n&#34;</span><span class="p">,</span><span class="nx">c</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">RouterGroup</span><span class="p">)</span> <span class="nf">getRoute</span><span class="p">(</span><span class="nx">method</span> <span class="kt">string</span> <span class="p">,</span> <span class="nx">path</span> <span class="kt">string</span> <span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">node</span><span class="p">,</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">searchParts</span> <span class="o">:=</span> <span class="nf">parsePattern</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span>
+	<span class="nx">params</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">)</span>
+	<span class="nx">root</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">roots</span><span class="p">[</span><span class="nx">method</span><span class="p">]</span>
+
+	<span class="k">if</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span>
+	<span class="p">}</span>
+
+	<span class="nx">n</span> <span class="o">:=</span> <span class="nx">root</span><span class="p">.</span><span class="nf">search</span><span class="p">(</span><span class="nx">searchParts</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+	<span class="k">if</span> <span class="nx">n</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">parts</span> <span class="o">:=</span> <span class="nf">parsePattern</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">pattern</span><span class="p">)</span>
+		<span class="k">for</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">part</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">parts</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="nx">part</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;:&#39;</span> <span class="p">{</span>
+				<span class="nx">params</span><span class="p">[</span><span class="nx">part</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span> <span class="p">=</span> <span class="nx">searchParts</span><span class="p">[</span><span class="nx">index</span><span class="p">]</span>
+			<span class="p">}</span>
+			<span class="k">if</span> <span class="nx">part</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;*&#39;</span> <span class="o">&amp;&amp;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">part</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">1</span> <span class="p">{</span>
+				<span class="nx">params</span><span class="p">[</span><span class="nx">part</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span> <span class="p">=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">Join</span><span class="p">(</span><span class="nx">searchParts</span><span class="p">[</span><span class="nx">index</span><span class="p">:],</span> <span class="s">&#34;/&#34;</span><span class="p">)</span>
+				<span class="k">break</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+		<span class="k">return</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">params</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span>
+<span class="p">}</span>
+
+<span class="c1">// 这里GET方法写在 RouterGroup 里面
+</span><span class="c1">// engine 是包含 RouterGroup
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">RouterGroup</span><span class="p">)</span> <span class="nf">GET</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">HandlerFunc</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">r</span><span class="p">.</span><span class="nf">addRoute</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">MethodGet</span><span class="p">,</span><span class="nx">pattern</span><span class="p">,</span><span class="nx">handler</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">RouterGroup</span><span class="p">)</span> <span class="nf">POST</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">HandlerFunc</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">r</span><span class="p">.</span><span class="nf">addRoute</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">MethodPost</span><span class="p">,</span><span class="nx">pattern</span><span class="p">,</span><span class="nx">handler</span><span class="p">)</span>
+<span class="p">}</span>
+
 </code></pre></div>
 			</div>
    
@@ -125,7 +274,7 @@
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/golang">golang</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>115 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>525 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2021-01-13 18:32 &#43;0800</p>
 			</footer>
 		</article>
@@ -135,8 +284,8 @@
   <ul>
     <li>
       <ul>
-        <li><a href="#parsepattern-函数">parsePattern 函数</a></li>
         <li><a href="#路由分析测试">路由分析测试</a></li>
+        <li><a href="#路由代码">路由代码</a></li>
       </ul>
     </li>
   </ul>
