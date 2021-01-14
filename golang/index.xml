@@ -17,8 +17,7 @@
 			<guid>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99struct/</guid>
 			<description>路由分析测试 package gee import ( &amp;#34;reflect&amp;#34; &amp;#34;testing&amp;#34; ) func TestParsePattern(t *testing.T) { tests := []struct { patterns string parts []string ok bool }{ {&amp;#34;/test/v1/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;v1&amp;#34;, &amp;#34;add&amp;#34;},true }, {&amp;#34;/test/*name/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;*name&amp;#34;},true}, {&amp;#34;/test/:name&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;},true }, {&amp;#34;/test/:name/abc&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;, &amp;#34;abc&amp;#34;},true}, {&amp;#34;/test/v1/add&amp;#34;, []string{&amp;#34;testv1&amp;#34;, &amp;#34;add&amp;#34;},false }, {&amp;#34;/test/*name/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;*name&amp;#34;,&amp;#34;add&amp;#34;},false}, {&amp;#34;/test/:name&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:&amp;#34;,&amp;#34;name&amp;#34;},false }, {&amp;#34;/test/:name/abc&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;},false}, } m := make(map[string][]string) for _, test := range tests { m[test.patterns] = test.parts p := parsePattern(test.patterns) if test.</description>
 			<content type="html"><![CDATA[<h3 id="路由分析测试">路由分析测试</h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
-<span class="kn">package</span> <span class="nx">gee</span>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">gee</span>
 
 <span class="kn">import</span> <span class="p">(</span>
 	<span class="s">&#34;reflect&#34;</span>
@@ -74,6 +73,10 @@
 		<span class="p">{</span><span class="s">&#34;GET&#34;</span><span class="p">,</span> <span class="s">&#34;/test2/*name&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;/test2/name1&#34;</span><span class="p">,</span> <span class="s">&#34;/test2/name1/name2&#34;</span><span class="p">},</span> <span class="kc">true</span><span class="p">},</span>
 		<span class="p">{</span><span class="s">&#34;GET&#34;</span><span class="p">,</span> <span class="s">&#34;/test3/:file/add&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;/test3/file123/add&#34;</span><span class="p">,</span> <span class="s">&#34;/test3/file_!@#$/add&#34;</span><span class="p">,</span> <span class="s">&#34;/test3/123431/add&#34;</span><span class="p">},</span> <span class="kc">true</span><span class="p">},</span>
 		<span class="p">{</span><span class="s">&#34;GET&#34;</span><span class="p">,</span> <span class="s">&#34;/test4/:file/add&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;/test4/file123&#34;</span><span class="p">,</span> <span class="s">&#34;/test3/file_!@#$/add123&#34;</span><span class="p">,</span> <span class="s">&#34;/test3/123431/123_@#&#34;</span><span class="p">},</span> <span class="kc">false</span><span class="p">},</span>
+		<span class="c1">// 这两条 应该怎么走呢?
+</span><span class="c1"></span>		<span class="p">{</span><span class="s">&#34;GET&#34;</span><span class="p">,</span> <span class="s">&#34;/hello/*name&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;/hello/geektutu/a/b&#34;</span><span class="p">,</span><span class="s">&#34;hello/geektutu&#34;</span><span class="p">},</span> <span class="kc">true</span><span class="p">},</span>
+		<span class="p">{</span><span class="s">&#34;GET&#34;</span><span class="p">,</span> <span class="s">&#34;/hello/geektutu&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;hello/geektutu&#34;</span><span class="p">},</span> <span class="kc">true</span><span class="p">},</span>
+
 	<span class="p">}</span>
 
 	<span class="nx">r</span> <span class="o">:=</span> <span class="nf">newRouter</span><span class="p">()</span>
@@ -129,7 +132,7 @@
 <span class="p">}</span>
 
 <span class="c1">// Only one * is allowed
-</span><span class="c1">// /test/v1/add -&gt; [test v1 add]
+</span><span class="c1">// 将 /test/v1/add -&gt; [test v1 add]
 </span><span class="c1">// /test/*name/add -&gt; [test *name]
 </span><span class="c1"></span><span class="kd">func</span> <span class="nf">parsePattern</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span> <span class="p">)</span> <span class="p">[]</span><span class="kt">string</span> <span class="p">{</span>
 	<span class="nx">vs</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">Split</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span><span class="s">&#34;/&#34;</span><span class="p">)</span>
@@ -178,9 +181,7 @@
 	<span class="k">if</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
 		<span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span>
 	<span class="p">}</span>
-
 	<span class="nx">n</span> <span class="o">:=</span> <span class="nx">root</span><span class="p">.</span><span class="nf">search</span><span class="p">(</span><span class="nx">searchParts</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
 	<span class="k">if</span> <span class="nx">n</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
 		<span class="nx">parts</span> <span class="o">:=</span> <span class="nf">parsePattern</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">pattern</span><span class="p">)</span>
 		<span class="k">for</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">part</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">parts</span> <span class="p">{</span>
@@ -206,6 +207,109 @@
 
 <span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">RouterGroup</span><span class="p">)</span> <span class="nf">POST</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">HandlerFunc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">r</span><span class="p">.</span><span class="nf">addRoute</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">MethodPost</span><span class="p">,</span><span class="nx">pattern</span><span class="p">,</span><span class="nx">handler</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div><h3 id="trie-树代码">trie 树代码</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">gee</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&#34;strings&#34;</span>
+<span class="p">)</span>
+
+<span class="c1">// 采用 前缀树 方式来实现动态路由
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">node</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">pattern</span> <span class="kt">string</span> <span class="c1">//待匹配路由, 例如  /p/:lang , 是 req.URL.Path
+</span><span class="c1"></span>	<span class="nx">part</span> <span class="kt">string</span> <span class="c1">// 路由中一部分, 例如 :lang, 是按照 / 分割的部分
+</span><span class="c1"></span>	<span class="nx">children</span> <span class="p">[]</span><span class="o">*</span><span class="nx">node</span> <span class="c1">// 子节点, 例如 [ doc, tutorial, intro ]
+</span><span class="c1"></span>	<span class="nx">isWild</span> <span class="kt">bool</span> <span class="c1">// 是否精确匹配, part含有: 或 * 时为true
+</span><span class="c1"></span><span class="p">}</span>
+
+
+
+<span class="c1">// 第一个匹配成功的节点, 用于插入 insert 方法
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">n</span> <span class="o">*</span><span class="nx">node</span> <span class="p">)</span> <span class="nf">matchChild</span><span class="p">(</span><span class="nx">part</span> <span class="kt">string</span><span class="p">)</span> <span class="o">*</span><span class="nx">node</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">child</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">n</span><span class="p">.</span><span class="nx">children</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">child</span><span class="p">.</span><span class="nx">part</span> <span class="o">==</span> <span class="nx">part</span> <span class="o">||</span> <span class="nx">child</span><span class="p">.</span><span class="nx">isWild</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="nx">child</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="kc">nil</span>
+<span class="p">}</span>
+
+<span class="c1">// 所有匹配成功的节点，用于查找 search 方法
+</span><span class="c1">//  例如 /test/v1/add
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">n</span> <span class="o">*</span><span class="nx">node</span><span class="p">)</span> <span class="nf">matchChildren</span><span class="p">(</span><span class="nx">part</span> <span class="kt">string</span><span class="p">)</span> <span class="p">[]</span><span class="o">*</span><span class="nx">node</span> <span class="p">{</span>
+	<span class="nx">nodes</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="o">*</span><span class="nx">node</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+	<span class="c1">// 查询方法就是从trie树中查询, 如果查到了添加到列表, 返回查询到的列表
+</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">child</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">n</span><span class="p">.</span><span class="nx">children</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">child</span><span class="p">.</span><span class="nx">part</span> <span class="o">==</span> <span class="nx">part</span> <span class="o">||</span> <span class="nx">child</span><span class="p">.</span><span class="nx">isWild</span> <span class="p">{</span>
+			<span class="nx">nodes</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">nodes</span><span class="p">,</span> <span class="nx">child</span><span class="p">)</span>
+			<span class="c1">// 这里加break是让查到的第一个就结束, 不希望路由匹配到多个结果
+</span><span class="c1"></span>			<span class="c1">//break
+</span><span class="c1"></span>		<span class="p">}</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span> <span class="nx">nodes</span>
+<span class="p">}</span>
+
+<span class="c1">// 插入方法就是 判断 part路由是否已经存在路由节点中 如果是模糊匹配 直接返回
+</span><span class="c1">//   if child.part == part || child.isWild {
+</span><span class="c1">// 如果没有找到且是精确匹配, 那么就添加到子节点中
+</span><span class="c1">//   n.children = append(n.children, child)
+</span><span class="c1">//
+</span><span class="c1">//  pattern 是完整路由url ,parts 是将 pattern 按照 / 拆分的 每一部分 , 然后height 从0 递归对 parts 进行查询或插入
+</span><span class="c1">//
+</span><span class="c1">//  这里是一个逆向看的, 可以先去查询 parsePattern 方法
+</span><span class="c1">//  例如 /test/v1/add
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">n</span> <span class="o">*</span><span class="nx">node</span><span class="p">)</span> <span class="nf">insert</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">parts</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="nx">height</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">// 在node中生成一条 test(node) -&gt; v2(node) -&gt; add(node) 一条trie链表 之后
+</span><span class="c1"></span>	<span class="c1">// len(parts == height == 3 , 可以退出
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">parts</span><span class="p">)</span> <span class="o">==</span> <span class="nx">height</span> <span class="p">{</span>
+		<span class="nx">n</span><span class="p">.</span><span class="nx">pattern</span> <span class="p">=</span> <span class="nx">pattern</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="c1">//
+</span><span class="c1"></span>	<span class="nx">part</span> <span class="o">:=</span> <span class="nx">parts</span><span class="p">[</span><span class="nx">height</span><span class="p">]</span>
+	<span class="c1">// 首先取 test 从node中查询, 如果查到了 那么目前查到路由 : /test
+</span><span class="c1"></span>	<span class="c1">// 那么继续递归insert, 取v1 去查询,
+</span><span class="c1"></span>	<span class="c1">// 如果查到了说明路由存在, 如果没有查到 那么新建这个node,添加到当前node的children, 目前查到路由: /test/v1,
+</span><span class="c1"></span>	<span class="c1">// 同样最后可以 在node中生成一条 test(node) -&gt; v2(node) -&gt; add(node) 一条trie链表
+</span><span class="c1"></span>	<span class="nx">child</span> <span class="o">:=</span> <span class="nx">n</span><span class="p">.</span><span class="nf">matchChild</span><span class="p">(</span><span class="nx">part</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">child</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">child</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">node</span><span class="p">{</span>
+			<span class="nx">part</span><span class="p">:</span><span class="nx">part</span><span class="p">,</span>
+			<span class="nx">isWild</span><span class="p">:</span><span class="nx">part</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;:&#39;</span> <span class="o">||</span> <span class="nx">part</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;*&#39;</span><span class="p">,</span>
+		<span class="p">}</span>
+		<span class="nx">n</span><span class="p">.</span><span class="nx">children</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">children</span><span class="p">,</span> <span class="nx">child</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="nx">child</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">parts</span><span class="p">,</span> <span class="nx">height</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">// 从node中查询节点是否存在, 如果存在就返回
+</span><span class="c1">//  例如 /test/v1/add
+</span><span class="c1"></span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">n</span> <span class="o">*</span><span class="nx">node</span><span class="p">)</span> <span class="nf">search</span><span class="p">(</span><span class="nx">parts</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="nx">height</span> <span class="kt">int</span> <span class="p">)</span> <span class="o">*</span><span class="nx">node</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">parts</span><span class="p">)</span> <span class="o">==</span> <span class="nx">height</span> <span class="o">||</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">HasPrefix</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">part</span><span class="p">,</span><span class="s">&#34;*&#34;</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">n</span><span class="p">.</span><span class="nx">pattern</span> <span class="o">==</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="kc">nil</span>
+		<span class="p">}</span>
+		<span class="k">return</span> <span class="nx">n</span>
+	<span class="p">}</span>
+	<span class="nx">part</span> <span class="o">:=</span> <span class="nx">parts</span><span class="p">[</span><span class="nx">height</span><span class="p">]</span>
+	<span class="c1">// 这里查询同样是 先查询 test, 如果找到trie树的第一个节点 children = [ test(node) ]
+</span><span class="c1"></span>	<span class="c1">// 然后在出现v1, 根据trie结构, v1只能是在test(node) 这个节点的
+</span><span class="c1"></span>	<span class="c1">// 这里需要for循环 为什么不直接取 children[0] 呢?
+</span><span class="c1"></span>	<span class="c1">// 1. 有可能是因为v1 可能匹配到 /test/v1 也可能匹配到 /test/:version, 所以返回的是2个
+</span><span class="c1"></span>	<span class="c1">// 2. 如果让每次matchChildren查询返回一定是唯一呢? 那如果先有路由1:&#34;/hello/geektutu&#34;, 在注册了路由2:&#34;/hello/*name&#34;, 当请求&#34;/hello/geektutu/a/b&#34;的时候就会无法匹配路由2
+</span><span class="c1"></span>	<span class="nx">children</span> <span class="o">:=</span> <span class="nx">n</span><span class="p">.</span><span class="nf">matchChildren</span><span class="p">(</span><span class="nx">part</span><span class="p">)</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">child</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">children</span> <span class="p">{</span>
+		<span class="c1">//log.Println(&#34;child:&#34;,child.pattern)
+</span><span class="c1"></span>		<span class="nx">result</span> <span class="o">:=</span> <span class="nx">child</span><span class="p">.</span><span class="nf">search</span><span class="p">(</span><span class="nx">parts</span><span class="p">,</span> <span class="nx">height</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nx">result</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="nx">result</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="kc">nil</span>
 <span class="p">}</span>
 
 </code></pre></div>]]></content>
