@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="Mysql5.7-alter锁表问题">
+<meta itemprop="description" content="由于需要更新 my_test_table 的 style字段 由 tinyint(2) 为 int(10)  由于认为 mysql5.6和5.7 alter table 不会锁表, 因此在执行时 导致了锁表无法 update my_test_table
+  根据官方说明 Changing the column data type 不支持 online ddl
+  https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html  新增临时表做测试 准备临时表, 导入部分数据 # 主库执行 create table my_test_table_tmp_20210119 like my_test_table; show create table my_test_table\G ENGINE=InnoDB AUTO_INCREMENT=48544733 DEFAULT CHARSET=utf8 COMMENT=&#39;测试表&#39; alter table my_test_table_tmp_20210119 AUTO_INCREMENT=49000000; 测试执行alter table 修改字段data type是否会锁表 # 首先终端1 执行 alter alter table my_test_table_tmp_20210119 modify style int(10) not null default 0 comment &#39;下单方式&#39;; # 首先终端2 执行 update(是会卡住) update my_test_table_tmp_20210119 set status =1 limit 1; # 查看 processlist (如下图,出现Waiting for table metadata lock) show full processlist 开始测试 pt-online-schema-change 工具  参考文档: https://www.">
+<meta itemprop="datePublished" content="2021-01-19T11:28:39+08:00" />
+<meta itemprop="dateModified" content="2021-01-19T11:28:39+08:00" />
+<meta itemprop="wordCount" content="323">
+
+
+
+<meta itemprop="keywords" content="mysql," />
+<meta property="og:title" content="Mysql5.7-alter锁表问题" />
+<meta property="og:description" content="由于需要更新 my_test_table 的 style字段 由 tinyint(2) 为 int(10)  由于认为 mysql5.6和5.7 alter table 不会锁表, 因此在执行时 导致了锁表无法 update my_test_table
+  根据官方说明 Changing the column data type 不支持 online ddl
+  https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html  新增临时表做测试 准备临时表, 导入部分数据 # 主库执行 create table my_test_table_tmp_20210119 like my_test_table; show create table my_test_table\G ENGINE=InnoDB AUTO_INCREMENT=48544733 DEFAULT CHARSET=utf8 COMMENT=&#39;测试表&#39; alter table my_test_table_tmp_20210119 AUTO_INCREMENT=49000000; 测试执行alter table 修改字段data type是否会锁表 # 首先终端1 执行 alter alter table my_test_table_tmp_20210119 modify style int(10) not null default 0 comment &#39;下单方式&#39;; # 首先终端2 执行 update(是会卡住) update my_test_table_tmp_20210119 set status =1 limit 1; # 查看 processlist (如下图,出现Waiting for table metadata lock) show full processlist 开始测试 pt-online-schema-change 工具  参考文档: https://www." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://k1s.club/posts/64-mysql5.7-alter%E9%94%81%E8%A1%A8%E9%97%AE%E9%A2%98/" />
+<meta property="article:published_time" content="2021-01-19T11:28:39+08:00" />
+<meta property="article:modified_time" content="2021-01-19T11:28:39+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Mysql5.7-alter锁表问题"/>
+<meta name="twitter:description" content="由于需要更新 my_test_table 的 style字段 由 tinyint(2) 为 int(10)  由于认为 mysql5.6和5.7 alter table 不会锁表, 因此在执行时 导致了锁表无法 update my_test_table
+  根据官方说明 Changing the column data type 不支持 online ddl
+  https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html  新增临时表做测试 准备临时表, 导入部分数据 # 主库执行 create table my_test_table_tmp_20210119 like my_test_table; show create table my_test_table\G ENGINE=InnoDB AUTO_INCREMENT=48544733 DEFAULT CHARSET=utf8 COMMENT=&#39;测试表&#39; alter table my_test_table_tmp_20210119 AUTO_INCREMENT=49000000; 测试执行alter table 修改字段data type是否会锁表 # 首先终端1 执行 alter alter table my_test_table_tmp_20210119 modify style int(10) not null default 0 comment &#39;下单方式&#39;; # 首先终端2 执行 update(是会卡住) update my_test_table_tmp_20210119 set status =1 limit 1; # 查看 processlist (如下图,出现Waiting for table metadata lock) show full processlist 开始测试 pt-online-schema-change 工具  参考文档: https://www."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>Mysql5.7-alter锁表问题</title>
+	<link rel="stylesheet" href="https://k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://k1s.club">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://k1s.club/golang/">golang</a>
+					<a href="https://k1s.club/posts/">文章</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://k1s.club/posts/">文章</a></li>
+			<li><a href="https://k1s.club/tags/">标签</a></li>
+			<li><a href="https://k1s.club/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Jan 19, 2021</span></div>
+				<h1>Mysql5.7-alter锁表问题</h1>
+			</header>
+			<div class="content">
+				<h3 id="由于需要更新-my_test_table-的-style字段-由-tinyint2-为-int10">由于需要更新 my_test_table 的 style字段 由 tinyint(2) 为 int(10)<a href="#由于需要更新-my_test_table-的-style字段-由-tinyint2-为-int10" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>由于认为 mysql5.6和5.7 alter table 不会锁表, 因此在执行时 导致了锁表无法 update my_test_table</p>
+</blockquote>
+<blockquote>
+<p>根据官方说明 Changing the column data type 不支持 online ddl</p>
+</blockquote>
+<ul>
+<li><a href="https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html">https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html</a></li>
+</ul>
+<h3 id="新增临时表做测试">新增临时表做测试<a href="#新增临时表做测试" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="准备临时表-导入部分数据">准备临时表, 导入部分数据<a href="#准备临时表-导入部分数据" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-sql" data-lang="sql"><span class="o">#</span> <span class="err">主库执行</span>
+<span class="k">create</span> <span class="k">table</span> <span class="n">my_test_table_tmp_20210119</span> <span class="k">like</span> <span class="n">my_test_table</span><span class="p">;</span>
+
+<span class="k">show</span> <span class="k">create</span> <span class="k">table</span> <span class="n">my_test_table</span><span class="err">\</span><span class="k">G</span>
+<span class="n">ENGINE</span><span class="o">=</span><span class="n">InnoDB</span> <span class="n">AUTO_INCREMENT</span><span class="o">=</span><span class="mi">48544733</span> <span class="k">DEFAULT</span> <span class="n">CHARSET</span><span class="o">=</span><span class="n">utf8</span> <span class="k">COMMENT</span><span class="o">=</span><span class="s1">&#39;测试表&#39;</span>
+
+<span class="k">alter</span> <span class="k">table</span> <span class="n">my_test_table_tmp_20210119</span> <span class="n">AUTO_INCREMENT</span><span class="o">=</span><span class="mi">49000000</span><span class="p">;</span>
+
+</code></pre></div><h3 id="测试执行alter-table-修改字段data-type是否会锁表">测试执行alter table 修改字段data type是否会锁表<a href="#测试执行alter-table-修改字段data-type是否会锁表" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-sql" data-lang="sql"><span class="o">#</span> <span class="err">首先终端</span><span class="mi">1</span> <span class="err">执行</span> <span class="k">alter</span>
+<span class="k">alter</span> <span class="k">table</span> <span class="n">my_test_table_tmp_20210119</span> <span class="k">modify</span> <span class="n">style</span> <span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span> <span class="k">default</span> <span class="mi">0</span> <span class="k">comment</span> <span class="s1">&#39;下单方式&#39;</span><span class="p">;</span>
+<span class="o">#</span> <span class="err">首先终端</span><span class="mi">2</span> <span class="err">执行</span> <span class="k">update</span><span class="p">(</span><span class="err">是会卡住</span><span class="p">)</span>
+<span class="k">update</span> <span class="n">my_test_table_tmp_20210119</span> <span class="k">set</span> <span class="n">status</span> <span class="o">=</span><span class="mi">1</span> <span class="k">limit</span> <span class="mi">1</span><span class="p">;</span>
+<span class="o">#</span> <span class="err">查看</span> <span class="n">processlist</span> <span class="p">(</span><span class="err">如下图</span><span class="p">,</span><span class="err">出现</span><span class="n">Waiting</span> <span class="k">for</span> <span class="k">table</span> <span class="n">metadata</span> <span class="k">lock</span><span class="p">)</span>
+<span class="k">show</span> <span class="k">full</span> <span class="n">processlist</span>
+</code></pre></div><h3 id="开始测试-pt-online-schema-change-工具">开始测试 pt-online-schema-change 工具<a href="#开始测试-pt-online-schema-change-工具" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>参考文档: <a href="https://www.cnblogs.com/xinysu/p/6758170.html">https://www.cnblogs.com/xinysu/p/6758170.html</a></li>
+</ul>
+<h4 id="简单安装说明">简单安装说明<a href="#简单安装说明" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-sql" data-lang="sql"><span class="o">#</span> <span class="err">从官方下载包</span>
+<span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">downloads</span><span class="p">.</span><span class="n">percona</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">downloads</span><span class="o">/</span><span class="n">percona</span><span class="o">-</span><span class="n">toolkit</span><span class="o">/</span><span class="mi">3</span><span class="p">.</span><span class="mi">0</span><span class="p">.</span><span class="mi">13</span><span class="o">/</span><span class="nb">binary</span><span class="o">/</span><span class="n">redhat</span><span class="o">/</span><span class="mi">6</span><span class="o">/</span><span class="n">x86_64</span><span class="o">/</span><span class="n">percona</span><span class="o">-</span><span class="n">toolkit</span><span class="o">-</span><span class="mi">3</span><span class="p">.</span><span class="mi">0</span><span class="p">.</span><span class="mi">13</span><span class="o">-</span><span class="mi">1</span><span class="p">.</span><span class="n">el6</span><span class="p">.</span><span class="n">x86_64</span><span class="p">.</span><span class="n">rpm</span>
+<span class="o">#</span> <span class="n">yum</span> <span class="err">安装</span>
+<span class="n">yum</span> <span class="n">localinstall</span> <span class="n">percona</span><span class="o">-</span><span class="n">toolkit</span><span class="o">-</span><span class="mi">3</span><span class="p">.</span><span class="mi">0</span><span class="p">.</span><span class="mi">13</span><span class="o">-</span><span class="mi">1</span><span class="p">.</span><span class="n">el6</span><span class="p">.</span><span class="n">x86_64</span><span class="p">.</span><span class="n">rpm</span>
+
+<span class="o">#</span> <span class="err">订单库主库</span><span class="n">test库添加表dsns</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="o">`</span><span class="n">test</span><span class="o">`</span><span class="p">.</span><span class="o">`</span><span class="n">dsns</span><span class="o">`</span> <span class="p">(</span>
+  <span class="o">`</span><span class="n">id</span><span class="o">`</span> <span class="nb">int</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+  <span class="o">`</span><span class="n">parent_id</span><span class="o">`</span> <span class="nb">int</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+  <span class="o">`</span><span class="n">dsn</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+  <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="p">(</span><span class="o">`</span><span class="n">id</span><span class="o">`</span><span class="p">)</span>
+<span class="p">)</span> <span class="n">ENGINE</span><span class="o">=</span><span class="n">InnoDB</span> <span class="n">AUTO_INCREMENT</span><span class="o">=</span><span class="mi">6</span> <span class="k">DEFAULT</span> <span class="n">CHARSET</span><span class="o">=</span><span class="n">utf8</span>
+
+<span class="o">#</span> <span class="n">insert从库信息</span><span class="err">，有</span><span class="mi">2</span><span class="err">个从库</span><span class="p">(</span><span class="err">添加之后不会有主从延迟</span><span class="p">)</span>
+<span class="k">insert</span> <span class="k">into</span> <span class="n">dsns</span><span class="p">(</span><span class="n">dsn</span><span class="p">)</span> <span class="k">select</span> <span class="s2">&#34;h=从库 ip&#34;</span><span class="p">;</span>
+<span class="k">insert</span> <span class="k">into</span> <span class="n">dsns</span><span class="p">(</span><span class="n">dsn</span><span class="p">)</span> <span class="k">select</span> <span class="s2">&#34;h=从库2 ip&#34;</span><span class="p">;</span>
+</code></pre></div><h4 id="编写脚本">编写脚本<a href="#编写脚本" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell"><span class="cp">#!/bin/bash
+</span><span class="cp"></span><span class="o">[</span> <span class="nv">$#</span> !<span class="o">=</span> <span class="m">3</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">&#34;Please input dbname and tablename and alter statement!&#34;</span> <span class="o">&amp;&amp;</span> <span class="nb">exit</span> <span class="m">0</span>
+<span class="nv">dbname</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nv">tablename</span><span class="o">=</span><span class="nv">$2</span>
+<span class="nv">alter_statement</span><span class="o">=</span><span class="nv">$3</span>
+<span class="nv">MYSQL_USER</span><span class="o">=</span>dba用户
+<span class="nv">MYSQL_HOST</span><span class="o">=</span>主库地址
+<span class="nv">MYSQL_PWD</span><span class="o">=</span>dba用户密码
+<span class="nv">exec_time</span><span class="o">=</span><span class="sb">`</span>date +%Y%m%d%H%M%S<span class="sb">`</span>
+
+<span class="c1">#num_triggers=`mysql -u$MYSQL_USER -h$MYSQL_HOST -p$MYSQL_PWD $dbname -e &#34;show triggers like \&#34;$tablename\&#34;&#34; | wc -l`</span>
+<span class="c1">#[ $num_triggers -gt 0 ] &amp;&amp; { echo -e &#34;\033[31mException: $dbname.$tablename have triggers!\033[0m&#34;;exit;}</span>
+
+<span class="nv">log_file</span><span class="o">=</span><span class="s2">&#34;/root/pt_osc_log/&#34;</span><span class="si">${</span><span class="nv">tablename</span><span class="si">}</span>_<span class="si">${</span><span class="nv">exec_time</span><span class="si">}</span>.log
+<span class="nv">exec_statement</span><span class="o">=</span><span class="s2">&#34;nohup pt-online-schema-change --nocheck-replication-filters --max-load \&#34;Threads_connected:200\&#34; --alter \&#34;</span><span class="nv">$alter_statement</span><span class="s2">\&#34; A=utf8,u=</span><span class="nv">$MYSQL_USER</span><span class="s2">,h=</span><span class="nv">$MYSQL_HOST</span><span class="s2">,p=</span><span class="nv">$MYSQL_PWD</span><span class="s2">,D=</span><span class="nv">$dbname</span><span class="s2">,t=</span><span class="nv">$tablename</span><span class="s2"> --recursion-method dsn=D=test,t=dsns --execute &gt;</span><span class="nv">$log_file</span><span class="s2"> 2&gt;&amp;1 &amp;&#34;</span>
+<span class="nv">exec_statement</span><span class="o">=</span><span class="si">${</span><span class="nv">exec_statement</span><span class="p">//</span><span class="se">\`</span><span class="p">/</span><span class="se">\\\`</span><span class="si">}</span>
+
+<span class="nb">echo</span> -e <span class="s2">&#34;\033[32m执行命令为：\033[0m&#34;</span>
+<span class="nb">echo</span> -e <span class="s2">&#34;\033[35m</span><span class="nv">$exec_statement</span><span class="s2">\033[0m&#34;</span>
+<span class="nb">echo</span> -e -n <span class="s2">&#34;\033[32m请确认,继续执行按\033[31m【y|Y】\033[32m，否则按任意键退出：\033[0m&#34;</span>
+<span class="nb">read</span> -n1 isexec
+<span class="nb">echo</span>
+<span class="k">if</span> <span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$isexec</span><span class="s2">&#34;</span> <span class="o">==</span> <span class="s2">&#34;y&#34;</span> -o <span class="s2">&#34;</span><span class="nv">$isexec</span><span class="s2">&#34;</span> <span class="o">==</span> <span class="s2">&#34;Y&#34;</span> <span class="o">]</span><span class="p">;</span><span class="k">then</span>
+  <span class="nb">eval</span> <span class="nv">$exec_statement</span>
+  <span class="nb">echo</span> -e <span class="s2">&#34;\033[32m查看执行结果：\033[33m</span><span class="nv">$log_file</span><span class="s2">\033[0m&#34;</span>
+<span class="k">else</span>
+  <span class="nb">echo</span> -e <span class="s2">&#34;\033[31m中断执行\033[0m&#34;</span>
+  <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>
+</code></pre></div><h4 id="执行命令测试">执行命令测试<a href="#执行命令测试" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">sh pt_osc.sh hzkj_zh my_test_table_tmp_20210119 <span class="s2">&#34;modify style int(11) not null default 0 comment &#39;方式&#39;;&#34;</span>
+</code></pre></div><h3 id="总结">总结<a href="#总结" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>1. 根据官方文档, 在change column data type的时候 默认是通过 copy to tmp table 方法, 不支持 algorithm=inplace
+    执行: 	alter table my_test_table_tmp_20210119 modify issendbean int(10) not null default 0 comment '下单方式',algorithm=inplace;
+    报错: 	ERROR 1846 (0A000): ALGORITHM=INPLACE is not supported. Reason: Cannot change column type INPLACE. Try ALGORITHM=COPY.
+2. 所以在执行 change column data type 的sql时候, 需要通过 pt-online-schema-change 工具执行 alter table
+</code></pre>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/mysql">mysql</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>323 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2021-01-19 11:28 &#43;0800</p>
+			</footer>
+		</article>
+		<aside id="toc" class="show-toc">
+			<div class="toc-title">Table of Contents</div>
+			<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#由于需要更新-my_test_table-的-style字段-由-tinyint2-为-int10">由于需要更新 my_test_table 的 style字段 由 tinyint(2) 为 int(10)</a></li>
+        <li><a href="#新增临时表做测试">新增临时表做测试</a></li>
+        <li><a href="#测试执行alter-table-修改字段data-type是否会锁表">测试执行alter table 修改字段data type是否会锁表</a></li>
+        <li><a href="#开始测试-pt-online-schema-change-工具">开始测试 pt-online-schema-change 工具</a></li>
+        <li><a href="#总结">总结</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+		</aside>
+		<div class="post-nav thin">
+			<a class="prev-post" href="https://k1s.club/posts/63-gitlab-ce%E7%9A%84https%E5%BC%80%E5%90%AF%E9%97%AE%E9%A2%98/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Gitlab-Ce的https开启问题</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2021 <a href="https://k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-180942795-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>
