@@ -10605,6 +10605,8 @@ mysql如何修改所有的definer: <a href="https://blog.csdn.net/weixin_3073959
 <p>将 tablename.sql 文件中的 DEFINER=<code>xxx</code>@<code>x.x.%.%</code> 改成测试库中之前的用户名比如说: DEFINER=<code>test</code>@<code>%</code>
 然后重新导入覆盖</p>
 <p>所以说触发器的definer不是很方便修改</p>
+<h3 id="change-column-导致锁">change column 导致锁</h3>
+<p>官方online-ddl文档: <a href="https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html">https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html</a></p>
 ]]></content>
 		</item>
 		
