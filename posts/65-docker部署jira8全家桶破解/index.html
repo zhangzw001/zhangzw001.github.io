@@ -208,9 +208,9 @@ docker logs -f ${jiraId}
 <p>这里通过ip访问, 后续可以配置nginx反向代理</p>
 </blockquote>
 <p>jira页面流程-选择language和I&rsquo;ll set it up myself(盗图)</p>
-<p><img src="images/64/1.png" alt=""></p>
+<p><img src="/images/64/1.png" alt=""></p>
 <p>jira页面流程-这里复制 服务器ID(盗图)</p>
-<p><img src="images/64/2.png" alt=""></p>
+<p><img src="/images/64/2.png" alt=""></p>
 <h3 id="生成破解需要的许可证这里不用去jira官方获取">生成破解需要的许可证(这里不用去jira官方获取)<a href="#生成破解需要的许可证这里不用去jira官方获取" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <pre><code>docker exec -ti ${jiraId} bash
 cd /opt/atlassian/jira/
@@ -218,9 +218,9 @@ cd /opt/atlassian/jira/
 java -jar atlassian-agent.jar -d -m test@test.com -n BAT -p jira -o http://xxx.com -s xxxxxx
 
 # 复制生成的许可证, 贴到如下图位置:
-</code></pre><p><img src="images/64/3.png" alt=""></p>
+</code></pre><p><img src="/images/64/3.png" alt=""></p>
 <p>之后继续下一步即可, 查看是否已经破解</p>
-<p><img src="images/64/4.png" alt=""></p>
+<p><img src="/images/64/4.png" alt=""></p>
 <h3 id="生成破解第三方插件需要的许可证不用去jira官方获取">生成破解第三方插件需要的许可证(不用去jira官方获取)<a href="#生成破解第三方插件需要的许可证不用去jira官方获取" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <pre><code>docker exec -ti ${jiraId} bash
 cd /opt/atlassian/jira/
@@ -228,7 +228,7 @@ cd /opt/atlassian/jira/
 java -jar /opt/atlassian/jira/atlassian-agent.jar -d -m test@test.com -n BAT -p com.innovalog.jmwe.jira-misc-workflow-extensions -o http://xxx.com -s xxxxxx
 
 # 复制生成的许可证, 贴到如下图位置:
-</code></pre><p><img src="images/64/5.png" alt=""></p>
+</code></pre><p><img src="/images/64/5.png" alt=""></p>
 <h3 id="声明">声明：<a href="#声明" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <ul>
 <li>本文提供的破解方法和程序只做个人学习研究之⽤，不得⽤于商业用途！</li>
