@@ -285,7 +285,7 @@ java -jar /opt/atlassian/jira/atlassian-agent.jar -d -m test@test.com -n BAT -p 
 </blockquote>
 <p>首先需要开启https并不会因为之前没有开启, 之前已经是https访问, 通过nginx反向代理到gitlab-ce:10080端口</p>
 <p>但是由于新版Chrome浏览器对于https的域名内部post调用http时 会提示不安全</p>
-<p><img src="images/63/63-1.png" alt=""></p>
+<p><img src="/images/63/63-1.png" alt=""></p>
 <p>这种情况下才准备将gitlab直接通过https启动, 然后nginx反代到https的gitlab-ce上</p>
 <h3 id="首先修改下gitlabrb">首先修改下gitlab.rb</h3>
 <pre><code> external_url 'https://gitlab.xxx.com'
@@ -366,7 +366,7 @@ java -jar /opt/atlassian/jira/atlassian-agent.jar -d -m test@test.com -n BAT -p 
         <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div><h3 id="其他一些说明">其他一些说明</h3>
-<pre><code> gitlab_rails['gitlab_shell_ssh_port'] = 10022 
+<pre><code> gitlab_rails['gitlab_shell_ssh_port'] = 10022
 </code></pre>]]></content>
 		</item>
 		
