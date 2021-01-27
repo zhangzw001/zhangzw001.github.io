@@ -7,7 +7,30 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 19 Jan 2021 11:28:39 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 27 Jan 2021 18:13:13 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Docker部署jira8全家桶破解</title>
+      <link>https://k1s.club/posts/65-docker%E9%83%A8%E7%BD%B2jira8%E5%85%A8%E5%AE%B6%E6%A1%B6%E7%A0%B4%E8%A7%A3/</link>
+      <pubDate>Wed, 27 Jan 2021 18:13:13 +0800</pubDate>
+      
+      <guid>https://k1s.club/posts/65-docker%E9%83%A8%E7%BD%B2jira8%E5%85%A8%E5%AE%B6%E6%A1%B6%E7%A0%B4%E8%A7%A3/</guid>
+      <description>参考文档
+   通过atlassian-agent.jar全家桶破解: https://www.cnblogs.com/zhmiao/p/10620903.html
+  通过altassian-agent.jar全家桶破解插件(超详细 推荐): https://www.dqzboy.com/atlassian全家桶以及插件破解详细教程
+  通过自己覆盖jar包的方式: https://www.cnblogs.com/tchua/p/10862670.html
+  atlassian-agent.jar官方下载: https://gitee.com/pengzhile/atlassian-agent/releases/v1.2.3
+   说明 1. atlassian-agent.jar版本: v1.2.3 2. 通过docker swarm 部署 3. jira版本为: 8.1.0 4. mysql版本: 5.7.24  安装mysql步骤 编写 docker-compose.yml version: &#39;3&#39; services: mysql: image: xxx.com/mysql:5.7.24 volumes: - /data/container/jira8-mysql/data/:/var/lib/mysql:rw - /data/container/jira8-mysql/etc-mysql:/etc/mysql:rw deploy: replicas: 1 resources: limits: cpus: &#39;2&#39; memory: 4G environment: MYSQL_ROOT_PASSWORD: &amp;quot;root默认密码&amp;quot; ports: - &amp;quot;13336:3306&amp;quot; networks: - jira8 networks: jira8: 按照jira的mysql5.</description>
+    </item>
+    
+    <item>
+      <title>Go源码学习 Sort包Search方法</title>
+      <link>https://k1s.club/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</link>
+      <pubDate>Mon, 25 Jan 2021 14:54:22 +0800</pubDate>
+      
+      <guid>https://k1s.club/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</guid>
+      <description>&lt;p&gt;Sort包Search方法的实践说明&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>Mysql5.7-alter锁表问题</title>
       <link>https://k1s.club/posts/64-mysql5.7-alter%E9%94%81%E8%A1%A8%E9%97%AE%E9%A2%98/</link>
@@ -84,33 +107,6 @@
       <description>这里学习了Google吱声工程师深度讲解go语言-迷宫广度优先算法以记录
 算法说明 图源: 图解迷宫算法（广度优先遍历)
 首先看一张迷宫图, 左右黄色0 表示起始点, 0 表示可以行走, 1表示墙体 迷宫的广度优先算法的意思是, 可以通过0 发现四个方向的1, 然后在通过四个1 发现所有的2, 所有的2探索完 , 在探索3&amp;hellip; 以此类推&amp;hellip; 这里每个点都有三种状态:  未发现 已发现未探索 已探索  最终我们能探索到这样的结果图: 下面是详细代码 代码结构 ── maze ├── maze.go └── maze.in maze.in文件 6 5 0 1 0 0 0 0 0 0 1 0 0 1 0 1 0 1 1 1 0 0 0 1 0 0 1 0 1 0 0 0 maze.go package main import ( &amp;#34;fmt&amp;#34; &amp;#34;log&amp;#34; &amp;#34;os&amp;#34; ) /* maze.</description>
-    </item>
-    
-    <item>
-      <title>Gitlab-Ce的https开启问题</title>
-      <link>https://k1s.club/posts/63-gitlab-ce%E7%9A%84https%E5%BC%80%E5%90%AF%E9%97%AE%E9%A2%98/</link>
-      <pubDate>Tue, 15 Dec 2020 11:15:52 +0800</pubDate>
-      
-      <guid>https://k1s.club/posts/63-gitlab-ce%E7%9A%84https%E5%BC%80%E5%90%AF%E9%97%AE%E9%A2%98/</guid>
-      <description>前言
- 首先需要开启https并不会因为之前没有开启, 之前已经是https访问, 通过nginx反向代理到gitlab-ce:10080端口
-但是由于新版Chrome浏览器对于https的域名内部post调用http时 会提示不安全
-这种情况下才准备将gitlab直接通过https启动, 然后nginx反代到https的gitlab-ce上
-首先修改下gitlab.rb  external_url &#39;https://gitlab.xxx.com&#39; nginx[&#39;redirect_http_to_https&#39;] = true nginx[&#39;redirect_http_to_https_port&#39;] = 80 nginx[&#39;listen_port&#39;] = 80 nginx[&#39;ssl_certificate&#39;] = &amp;quot;/etc/gitlab/ssl/server.pem&amp;quot; nginx[&#39;ssl_certificate_key&#39;] = &amp;quot;/etc/gitlab/ssl/server.key&amp;quot;  这里有个插曲, 因为我之前配置的时候docker 端口映射是10080:10080, 所以容器的gitlab.rb配置是这样:
-  nginx[&#39;redirect_http_to_https_port&#39;] = 10080 nginx[&#39;listen_port&#39;] = 10080 这样就导致开启https的redirect 可能有点问题(可能漏改, 或者某些默认配置的问题), 其实没必要, 目前改成容器内默认的80
-然后reconfigure即可 gitlab-ctl reconfigure 由于我是docker swarm启动 version:&amp;#34;3&amp;#34;services:gitlab:image:hub.xxx.com/bq/gitlab-ce:11.5.4hostname:&amp;#39;gitlab.xxx.com&amp;#39;environment:TZ:&amp;#39;Asia/Shanghai&amp;#39;GITLAB_OMNIBUS_CONFIG:|gitlab_rails[&amp;#39;time_zone&amp;#39;] = &amp;#39;Asia/Shanghai&amp;#39;volumes:- /data/container/gitlab-ce/logs:/var/log/gitlab- /data/container/gitlab-ce/data/:/var/opt/gitlab:rw- /data/container/gitlab-ce/config/:/etc/gitlab:rwdeploy:replicas:1restart_policy:condition:on-failureports:- 10443:443- 10080:80- 10022:22networks:- gitlabnetenvironment:HOSTNAME:gitlab.xxx.comnetworks:gitlabnet:nginx代理修改 server { listen 80; listen 443 ssl http2; charset utf-8; server_name gitlab.</description>
-    </item>
-    
-    <item>
-      <title>linux遇到一些问题统计</title>
-      <link>https://k1s.club/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
-      <pubDate>Tue, 08 Dec 2020 17:42:54 +0000</pubDate>
-      
-      <guid>https://k1s.club/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
-      <description>记录一些Linux,nginx或其他服务一些问题
-  分布式问题: 分布式算法 Basic paxos 算法 1. 获取一个Proposal ID n，为了保证Proposal ID唯一，可采用时间戳+Server ID生成； 2. Proposer向所有Acceptors广播Prepare(n)请求； 3. Acceptor比较n和minProposal，如果n&amp;gt;minProposal，minProposal=n，并且将 acceptedProposal 和 acceptedValue 返回； 4. Proposer接收到过半数回复后，如果发现有acceptedValue返回，将所有回复中acceptedProposal最大的acceptedValue作为本次提案的value，否则可以任意决定本次提案的value； 5. 到这里可以进入第二阶段，广播Accept (n,value) 到所有节点； 6. Acceptor比较n和minProposal，如果n&amp;gt;=minProposal，则acceptedProposal=minProposal=n，acceptedValue=value，本地持久化后，返回；否则，返回minProposal。 7. 提议者接收到过半数请求后，如果发现有返回值result &amp;gt;n，表示有更新的提议，跳转到1；否则value达成一致。 Multi-Paxos 算法  为了解决实际应用中连续多值传输的高效性,改进了Basix Paxos为Multi-Paxos:
- 1. 针对每一个要确定的值，运行一次Paxos算法实例（Instance），形成决议。每一个Paxos实例使用唯一的Instance ID标识。 2. 在所有Proposers中选举一个Leader，由Leader唯一地提交Proposal给Acceptors进行表决。这样没有Proposer竞争，解决了活锁问题。在系统中仅有一个Leader进行Value提交的情况下，Prepare阶段就可以跳过，从而将两阶段变为一阶段，提高效率。 raft  为了更简便理解和实现,改进了Multi-Paxos 为raft
- 1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的) 2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选. 而multi-paxos 是随意的 所以raft 可以看成是简化版本的multi paxos(这里multi-paxos 因为允许并发的写log, 因此不存在一个最新, 最全的日志节点, 因此只能这么做.</description>
     </item>
     
   </channel>

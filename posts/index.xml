@@ -6,8 +6,169 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Tue, 19 Jan 2021 11:28:39 +0800</lastBuildDate>
+		<lastBuildDate>Wed, 27 Jan 2021 18:13:13 +0800</lastBuildDate>
 		<atom:link href="https://k1s.club/posts/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Docker部署jira8全家桶破解</title>
+			<link>https://k1s.club/posts/65-docker%E9%83%A8%E7%BD%B2jira8%E5%85%A8%E5%AE%B6%E6%A1%B6%E7%A0%B4%E8%A7%A3/</link>
+			<pubDate>Wed, 27 Jan 2021 18:13:13 +0800</pubDate>
+			
+			<guid>https://k1s.club/posts/65-docker%E9%83%A8%E7%BD%B2jira8%E5%85%A8%E5%AE%B6%E6%A1%B6%E7%A0%B4%E8%A7%A3/</guid>
+			<description>参考文档
+   通过atlassian-agent.jar全家桶破解: https://www.cnblogs.com/zhmiao/p/10620903.html
+  通过altassian-agent.jar全家桶破解插件(超详细 推荐): https://www.dqzboy.com/atlassian全家桶以及插件破解详细教程
+  通过自己覆盖jar包的方式: https://www.cnblogs.com/tchua/p/10862670.html
+  atlassian-agent.jar官方下载: https://gitee.com/pengzhile/atlassian-agent/releases/v1.2.3
+   说明 1. atlassian-agent.jar版本: v1.2.3 2. 通过docker swarm 部署 3. jira版本为: 8.1.0 4. mysql版本: 5.7.24  安装mysql步骤 编写 docker-compose.yml version: &#39;3&#39; services: mysql: image: xxx.com/mysql:5.7.24 volumes: - /data/container/jira8-mysql/data/:/var/lib/mysql:rw - /data/container/jira8-mysql/etc-mysql:/etc/mysql:rw deploy: replicas: 1 resources: limits: cpus: &#39;2&#39; memory: 4G environment: MYSQL_ROOT_PASSWORD: &amp;quot;root默认密码&amp;quot; ports: - &amp;quot;13336:3306&amp;quot; networks: - jira8 networks: jira8: 按照jira的mysql5.</description>
+			<content type="html"><![CDATA[<blockquote>
+<p>参考文档</p>
+</blockquote>
+<ul>
+<li>
+<p>通过atlassian-agent.jar全家桶破解: <a href="https://www.cnblogs.com/zhmiao/p/10620903.html">https://www.cnblogs.com/zhmiao/p/10620903.html</a></p>
+</li>
+<li>
+<p>通过altassian-agent.jar全家桶破解插件(超详细 推荐): <a href="https://www.dqzboy.com/atlassian%e5%85%a8%e5%ae%b6%e6%a1%b6%e4%bb%a5%e5%8f%8a%e6%8f%92%e4%bb%b6%e7%a0%b4%e8%a7%a3%e8%af%a6%e7%bb%86%e6%95%99%e7%a8%8b">https://www.dqzboy.com/atlassian全家桶以及插件破解详细教程</a></p>
+</li>
+<li>
+<p>通过自己覆盖jar包的方式: <a href="https://www.cnblogs.com/tchua/p/10862670.html">https://www.cnblogs.com/tchua/p/10862670.html</a></p>
+</li>
+<li>
+<p>atlassian-agent.jar官方下载: <a href="https://gitee.com/pengzhile/atlassian-agent/releases/v1.2.3">https://gitee.com/pengzhile/atlassian-agent/releases/v1.2.3</a></p>
+</li>
+</ul>
+<hr>
+<h3 id="说明">说明</h3>
+<pre><code>1. atlassian-agent.jar版本: v1.2.3
+2. 通过docker swarm 部署
+3. jira版本为: 8.1.0
+4. mysql版本: 5.7.24
+</code></pre><hr>
+<h3 id="安装mysql步骤">安装mysql步骤</h3>
+<h4 id="编写-docker-composeyml">编写 docker-compose.yml</h4>
+<pre><code>version: '3'
+services:
+  mysql:
+    image: xxx.com/mysql:5.7.24
+    volumes:
+      - /data/container/jira8-mysql/data/:/var/lib/mysql:rw
+      - /data/container/jira8-mysql/etc-mysql:/etc/mysql:rw
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+    environment:
+      MYSQL_ROOT_PASSWORD: &quot;root默认密码&quot;
+    ports:
+      - &quot;13336:3306&quot;
+    networks:
+      - jira8
+networks:
+  jira8:
+</code></pre><h4 id="按照jira的mysql57配置参数要求配置以下">按照jira的mysql5.7配置参数要求配置以下</h4>
+<pre><code>#etc-mysql 是从mysql5.7内cp下来的, 方便后续直接修改, 挂载到本地
+
+#/data/container/jira8-mysql/etc-mysql/conf.d/docker.cnf
+[mysqld]
+skip-host-cache
+skip-name-resolve
+character_set_server=utf8mb4
+innodb_default_row_format=DYNAMIC
+default-storage-engine=INNODB
+innodb_large_prefix=ON
+innodb_file_format=Barracuda
+innodb_log_file_size=2G
+sql_mode = NO_AUTO_VALUE_ON_ZERO
+</code></pre><h4 id="docker-swarm启动-mysql">docker swarm启动 mysql</h4>
+<pre><code>cd /data/container/jira8-mysql
+docker stack deploy -c docker-compose.yml jira8
+</code></pre><h4 id="创建数据库">创建数据库</h4>
+<pre><code>这里通过root账号和默认密码登录
+CREATE DATABASE jiradb CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+GRANT ALL on jiradb.* TO 'jira'@'%' IDENTIFIED BY 'xxxxxxxx';
+
+</code></pre><hr>
+<h3 id="安装jira步骤">安装jira步骤</h3>
+<h4 id="下载atlassian-agent-v123zip并解压">下载atlassian-agent-v1.2.3.zip并解压</h4>
+<h4 id="拉取镜像">拉取镜像</h4>
+<pre><code>docker pull cptactionhank/atlassian-jira-software:8.1.0
+</code></pre><h4 id="修改下dockerfile">修改下Dockerfile</h4>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="l">from cptactionhank/atlassian-jira-software:8.1.0</span><span class="w">
+</span><span class="w"></span><span class="l">USER root</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="l">COPY &#34;atlassian-agent.jar&#34; /opt/atlassian/jira/</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="l">RUN echo &#39;export CATALINA_OPTS=&#34;-javaagent:/opt/atlassian/jira/atlassian-agent.jar ${CATALINA_OPTS}&#34;&#39; &gt;&gt; /opt/atlassian/jira/bin/setenv.sh</span><span class="w">
+</span><span class="w">
+</span></code></pre></div><h4 id="build镜像并上传到内网镜像服务器">build镜像并上传到内网镜像服务器</h4>
+<pre><code>docker build -t xxx.com/atlassian-jira-software:8.1.0-free .
+docker push xxx.com/atlassian-jira-software:8.1.0-free
+</code></pre><h4 id="编写-docker-composeyml-1">编写 docker-compose.yml</h4>
+<pre><code>version: &quot;3&quot;
+services:
+  web:
+    image: xxx.com/atlassian-jira-software:8.1.0-free
+    environment:
+      TZ: 'Asia/Shanghai'
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /data/container/jira8/data:/var/atlassian/jira:rw
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '4'
+      restart_policy:
+        condition: on-failure
+    ports:
+      - &quot;8081:8080&quot;
+    networks:
+      - jira8
+networks:
+  jira8:
+</code></pre><h4 id="启动jira-server服务">启动jira server服务</h4>
+<pre><code>cd /data/container/jira8
+docker stack deploy -c docker-compose.yml jira8
+# 获取id
+export jiraId=$(docker ps|grep &quot;atlassian-jira-software:8.1.0-free&quot;|awk '{print $1}')
+查看日志
+docker logs -f ${jiraId}
+</code></pre><h4 id="破解">破解</h4>
+<blockquote>
+<p>这里通过ip访问, 后续可以配置nginx反向代理</p>
+</blockquote>
+<p>jira页面流程-选择language和I&rsquo;ll set it up myself(盗图)</p>
+<p><img src="images/64/1.png" alt=""></p>
+<p>jira页面流程-这里复制 服务器ID(盗图)</p>
+<p><img src="images/64/2.png" alt=""></p>
+<h3 id="生成破解需要的许可证这里不用去jira官方获取">生成破解需要的许可证(这里不用去jira官方获取)</h3>
+<pre><code>docker exec -ti ${jiraId} bash
+cd /opt/atlassian/jira/
+# 生成许可证
+java -jar atlassian-agent.jar -d -m test@test.com -n BAT -p jira -o http://xxx.com -s xxxxxx
+
+# 复制生成的许可证, 贴到如下图位置:
+</code></pre><p><img src="images/64/3.png" alt=""></p>
+<p>之后继续下一步即可, 查看是否已经破解</p>
+<p><img src="images/64/4.png" alt=""></p>
+<h3 id="生成破解第三方插件需要的许可证不用去jira官方获取">生成破解第三方插件需要的许可证(不用去jira官方获取)</h3>
+<pre><code>docker exec -ti ${jiraId} bash
+cd /opt/atlassian/jira/
+# 复制第三方插件的 插件密钥, 生成许可证
+java -jar /opt/atlassian/jira/atlassian-agent.jar -d -m test@test.com -n BAT -p com.innovalog.jmwe.jira-misc-workflow-extensions -o http://xxx.com -s xxxxxx
+
+# 复制生成的许可证, 贴到如下图位置:
+</code></pre><p><img src="images/64/5.png" alt=""></p>
+<h3 id="声明">声明：</h3>
+<ul>
+<li>本文提供的破解方法和程序只做个人学习研究之⽤，不得⽤于商业用途！</li>
+<li>商业使⽤请向Atlassian购买正版，谢谢合作！</li>
+</ul>
+]]></content>
+		</item>
 		
 		<item>
 			<title>Mysql5.7-alter锁表问题</title>

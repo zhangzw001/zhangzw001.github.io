@@ -7,7 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 12 Jan 2021 10:17:46 +0800</lastBuildDate><atom:link href="https://k1s.club/tags/untagged/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 27 Jan 2021 18:13:13 +0800</lastBuildDate><atom:link href="https://k1s.club/tags/untagged/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Docker部署jira8全家桶破解</title>
+      <link>https://k1s.club/posts/65-docker%E9%83%A8%E7%BD%B2jira8%E5%85%A8%E5%AE%B6%E6%A1%B6%E7%A0%B4%E8%A7%A3/</link>
+      <pubDate>Wed, 27 Jan 2021 18:13:13 +0800</pubDate>
+      
+      <guid>https://k1s.club/posts/65-docker%E9%83%A8%E7%BD%B2jira8%E5%85%A8%E5%AE%B6%E6%A1%B6%E7%A0%B4%E8%A7%A3/</guid>
+      <description>参考文档
+   通过atlassian-agent.jar全家桶破解: https://www.cnblogs.com/zhmiao/p/10620903.html
+  通过altassian-agent.jar全家桶破解插件(超详细 推荐): https://www.dqzboy.com/atlassian全家桶以及插件破解详细教程
+  通过自己覆盖jar包的方式: https://www.cnblogs.com/tchua/p/10862670.html
+  atlassian-agent.jar官方下载: https://gitee.com/pengzhile/atlassian-agent/releases/v1.2.3
+   说明 1. atlassian-agent.jar版本: v1.2.3 2. 通过docker swarm 部署 3. jira版本为: 8.1.0 4. mysql版本: 5.7.24  安装mysql步骤 编写 docker-compose.yml version: &#39;3&#39; services: mysql: image: xxx.com/mysql:5.7.24 volumes: - /data/container/jira8-mysql/data/:/var/lib/mysql:rw - /data/container/jira8-mysql/etc-mysql:/etc/mysql:rw deploy: replicas: 1 resources: limits: cpus: &#39;2&#39; memory: 4G environment: MYSQL_ROOT_PASSWORD: &amp;quot;root默认密码&amp;quot; ports: - &amp;quot;13336:3306&amp;quot; networks: - jira8 networks: jira8: 按照jira的mysql5.</description>
+    </item>
+    
     <item>
       <title>Gin学习 Validator</title>
       <link>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-validator/</link>

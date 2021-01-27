@@ -6,8 +6,62 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Thu, 14 Jan 2021 17:49:48 +0800</lastBuildDate>
+		<lastBuildDate>Mon, 25 Jan 2021 14:54:22 +0800</lastBuildDate>
 		<atom:link href="https://k1s.club/golang/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Go源码学习 Sort包Search方法</title>
+			<link>https://k1s.club/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</link>
+			<pubDate>Mon, 25 Jan 2021 14:54:22 +0800</pubDate>
+			
+			<guid>https://k1s.club/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</guid>
+			<description>&lt;p&gt;Sort包Search方法的实践说明&lt;/p&gt;</description>
+			<content type="html"><![CDATA[<p>Sort包Search方法的实践说明</p>
+<h3 id="首先查看示例">首先查看示例</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&#34;log&#34;</span>
+	<span class="s">&#34;sort&#34;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">data</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">10</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">1</span><span class="p">}</span>
+	<span class="nx">sort</span><span class="p">.</span><span class="nf">Ints</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+	<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+	<span class="c1">// Search 会查询已排序数列 满足条件的最小索引
+</span><span class="c1"></span>	<span class="nx">i</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">Search</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">data</span><span class="p">),</span> <span class="kd">func</span><span class="p">(</span><span class="nx">i</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+		<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;当前查询的index: %v, 查询的结果data[%v]: %v&#34;</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">data</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span>
+		<span class="c1">// 因为该列表已经排序, 满足二分条件(即左边全部小于右边)
+</span><span class="c1"></span>		<span class="c1">// 当满足条件的时候, 向前查询
+</span><span class="c1"></span>		<span class="c1">// 只要满足条件, 前面就可能还有更小的满足条件的值
+</span><span class="c1"></span>		<span class="k">return</span> <span class="nx">data</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">23</span>
+	<span class="p">})</span>
+	<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;最终的结果为&#34;</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="c1">// 1
+</span><span class="c1"></span><span class="p">}</span>
+
+</code></pre></div><h3 id="sort的search源码">sort的Search源码</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">Search</span><span class="p">(</span><span class="nx">n</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">f</span> <span class="kd">func</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="kt">bool</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+	<span class="c1">// Define f(-1) == false and f(n) == true.
+</span><span class="c1"></span>	<span class="c1">// Invariant: f(i-1) == false, f(j) == true.
+</span><span class="c1"></span>	<span class="nx">i</span><span class="p">,</span> <span class="nx">j</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">n</span>
+	<span class="k">for</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">j</span> <span class="p">{</span>
+		<span class="c1">// 这里左移 实现二分 h = (i+j) / 2
+</span><span class="c1"></span>		<span class="nx">h</span> <span class="o">:=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">uint</span><span class="p">(</span><span class="nx">i</span><span class="o">+</span><span class="nx">j</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="c1">// avoid overflow when computing h
+</span><span class="c1"></span>		<span class="c1">// i ≤ h &lt; j
+</span><span class="c1"></span>		<span class="c1">// 如果f(h) 为false, 那么就执行 i = h + 1 , 查看 中间位置的下一个值, 向后查询
+</span><span class="c1"></span>		<span class="k">if</span> <span class="p">!</span><span class="nf">f</span><span class="p">(</span><span class="nx">h</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">i</span> <span class="p">=</span> <span class="nx">h</span> <span class="o">+</span> <span class="mi">1</span> <span class="c1">// preserves f(i-1) == false
+</span><span class="c1"></span>		<span class="c1">// 否则f(h) 为true , 那么执行 j = h , 查询的区间由 (i,n) 变成 (i,h) , 向前查询
+</span><span class="c1"></span>		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+			<span class="nx">j</span> <span class="p">=</span> <span class="nx">h</span> <span class="c1">// preserves f(j) == true
+</span><span class="c1"></span>		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="c1">// i == j, f(i-1) == false, and f(j) (= f(i)) == true  =&gt;  answer is i.
+</span><span class="c1"></span>	<span class="k">return</span> <span class="nx">i</span>
+<span class="p">}</span>
+</code></pre></div>]]></content>
+		</item>
 		
 		<item>
 			<title>Go学习 并发的实现原理</title>
