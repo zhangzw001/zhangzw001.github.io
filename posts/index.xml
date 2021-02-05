@@ -587,7 +587,14 @@ net.ipv4.icmp_echo_ignore_all=1
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 </center>
-<h3 id="nginx问题-单域名通过cookie跳转不同后端">nginx问题: 单域名通过cookie跳转不同后端</h3>
+### nginx问题: 各种退出信号使用
+<pre><code>1. hup(kill -1):	重新读取配置并是服务配置生效(nginx -s reload)
+2. quit(kill -3): 	优雅关闭进程
+3. kill(kill -9):	强制关闭(必杀)
+4. usr1(kill -10):	重新打开服务(通常用nginx日志分割)
+5. usr2(kill -12):	平滑升级到新版本的程序
+6. term(kill -15):	强制关闭(先清理善后)
+</code></pre><h3 id="nginx问题-单域名通过cookie跳转不同后端">nginx问题: 单域名通过cookie跳转不同后端</h3>
 <ul>
 <li>
 <ol>
@@ -9173,7 +9180,7 @@ else {
 			<description>记录一些shell脚本
 1 清理es几天前的索引脚本 2 从mysql导出表到clickhouse脚本
  ###命令汇总
-生成字符串 tr -dc A-Za-z0-9_@$\%\^\/\+ &amp;lt; /dev/urandom|head -c 16|xargs grep需要转义的字符 grep &#39;&amp;quot;第一个转义\$第二个转义\[{&#39; a.txt 或者直接使用-F grep -F &#39;&amp;quot;$[{&#39; a.txt sed命令 # 替换24位字符 /abcd...123 为 /5fcb9ab67195b854c35afd12 sed &#39;s/\/[a-z0-9]\{24\}/\/5fcb9ab67195b854c35afd12/g&#39; shell参数 while [ -n &amp;quot;$1&amp;quot; ] do case &amp;quot;$1&amp;quot; in -a) a=$2;shift 2;; -s) s=$2;shift 2;; *) ;; case done #%处理变量 tmpDir=/dir1/dir2/dir3/my.file.txt ${tmpDir#*/}	-&amp;gt; dir1/dir2/dir3/my.file.txt	(左)删除从左往右第一个 /以及左边的所有内容 ${tmpDir##*/}	-&amp;gt; my.file.txt	(左)删除从左往右最后一个/以及左边的所有内容 ${tmpDir%/*}	-&amp;gt; /dir1/dir2/dir3/	(右)删除从右往左第一个 /以及右边的所有内容 ${tmpDir%%/*}	-&amp;gt; 空	(右)删除从右往左最后一个/以及右边的所有内容 </description>
+生成字符串 tr -dc A-Za-z0-9_@$\%\^\/\+ &amp;lt; /dev/urandom|head -c 16|xargs grep需要转义的字符 grep &#39;&amp;quot;第一个转义\$第二个转义\[{&#39; a.txt 或者直接使用-F grep -F &#39;&amp;quot;$[{&#39; a.txt sed命令 # 替换24位字符 /abcd...123 为 /5fcb9ab67195b854c35afd12 sed &#39;s/\/[a-z0-9]\{24\}/\/5fcb9ab67195b854c35afd12/g&#39; shell参数 while [ -n &amp;quot;$1&amp;quot; ] do case &amp;quot;$1&amp;quot; in -a) a=$2;shift 2;; -s) s=$2;shift 2;; *) ;; case done #%处理变量 tmpDir=/dir1/dir2/dir3/my.file.txt ${tmpDir#*/}	-&amp;gt; dir1/dir2/dir3/my.file.txt	(左)删除从左往右第一个 /以及左边的所有内容 ${tmpDir##*/}	-&amp;gt; my.file.txt	(左)删除从左往右最后一个/以及左边的所有内容 ${tmpDir%/*}	-&amp;gt; /dir1/dir2/dir3/	(右)删除从右往左第一个 /以及右边的所有内容 ${tmpDir%%/*}	-&amp;gt; 空	(右)删除从右往左最后一个/以及右边的所有内容 dd+grep  来自:“���”引发的线上事故</description>
 			<content type="html"><![CDATA[<p>记录一些shell脚本</p>
 <!-- more -->
 <p>1 <a href="//zhangzw001.github.io/sh/clean_es_data.sh.sh">清理es几天前的索引脚本</a>
@@ -9205,6 +9212,36 @@ ${tmpDir#*/}	-&gt; dir1/dir2/dir3/my.file.txt	(左)删除从左往右第一个  
 ${tmpDir##*/}	-&gt; my.file.txt			(左)删除从左往右最后一个/以及左边的所有内容
 ${tmpDir%/*}	-&gt; /dir1/dir2/dir3/		(右)删除从右往左第一个  /以及右边的所有内容
 ${tmpDir%%/*}	-&gt; 空				(右)删除从右往左最后一个/以及右边的所有内容
+</code></pre><h3 id="ddgrep">dd+grep</h3>
+<blockquote>
+<p>来自:<a href="https://qcrao.com/2020/04/27/codec-accident/">“���”引发的线上事故</a></p>
+</blockquote>
+<p>由于一些大文件grep很慢,通过dd+grep查找, 这里简单举例说明</p>
+<pre><code>#a.txt
+123
+456
+789
+abc
+kkk
+</code></pre><p>有这么一个文件a.txt,需要找到abc</p>
+<pre><code># bs代表每次输入输出块的大小
+# skip代表跳过的bytes = bs * skip 
+# count代表copy多个块,最后输出总bytes = bs * count
+
+$ dd if=a.txt bs=2 skip=0 count=5
+123
+456
+785+0 records in
+5+0 records out
+10 bytes (10 B) copied, 4.4648e-05 s, 224 kB/s
+</code></pre><pre><code># 如下会跳过10字节,然后输出10字节内容
+$ dd if=a.txt bs=2 skip=5 count=5
+9
+abc
+kkk
+5+0 records in
+5+0 records out
+10 bytes (10 B) copied, 6.1424e-05 s, 163 kB/s
 </code></pre>]]></content>
 		</item>
 		
@@ -10865,7 +10902,26 @@ mysql如何修改所有的definer: <a href="https://blog.csdn.net/weixin_3073959
 <p>所以说触发器的definer不是很方便修改</p>
 <h3 id="change-column-导致锁">change column 导致锁</h3>
 <p>官方online-ddl文档: <a href="https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html">https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html</a></p>
-]]></content>
+<h3 id="php-warning--mysql_fetch_array-supplied-argument-is-not-a-valid-mysql-result-resource-in">PHP Warning:  mysql_fetch_array(): supplied argument is not a valid MySQL result resource in</h3>
+<blockquote>
+<p>这个问题是因为查询数据库结果可能为空, 直接return的时候报warning</p>
+</blockquote>
+<h4 id="原示例">原示例:</h4>
+<pre><code>function get($sql) {
+    $row = mysql_fetch_array($this-&gt;query($sql));
+    return $row[0]
+    ...
+}
+</code></pre><h4 id="修改示例">修改示例:</h4>
+<pre><code>function get($sql) {
+  $query = $this-&gt;query($sql);
+  if($query){
+     $row = mysql_fetch_array($query);
+     return $row[0]
+  }
+  ...
+}   
+</code></pre>]]></content>
 		</item>
 		
 		<item>

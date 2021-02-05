@@ -12,7 +12,7 @@
   ### 三大范式 - 列不可再分: 服务名,服务描述 - 属性完全依赖主键:	服务名依赖于服务ID - 属性直接依赖主键: HTTP,TCP,GRPC 规则各为一张表   SQL 语句主要可以划分为以下 3 个类别 DDL（Data Definition Languages）语句：数据定义语言，这些语句定义了不同的数据段、数据库、表、列、索引等数据库对象的定义。常用的语句关键字主要包括 create、drop、alter等。 DML（Data Manipulation Language）语句：数据操纵语句，用于添加、删除、更新和查询数据库记录，并检查数据完整性，常用的语句关键字主要包括 insert、delete、udpate 和select 等。(增添改查） DCL（Data Control Language）语句：数据控制语句，用于控制不同数据段直接的许可和访问级别的语句。这些语句定义了数据库、表、字段、用户的访问权限和安全级别。主要的语句关键字包括 grant、revoke 等。   清空表 删除表信息的方式有两种 : truncate table table_name; delete * from table_name; 注 : truncate操作中的table可以省略，delete操作中的*可以省略 truncate、delete 清空表数据的区别 : 1&gt; truncate 是整体删除 (速度较快)，delete是逐条删除 (速度较慢) 2&gt; truncate 不写服务器 log，delete 写服务器 log，也就是 truncate 效率比 delete高的原因 3&gt; truncate 不激活trigger (触发器)，但是会重置Identity (标识列、自增字段)，相当于自增列会被置为初始值，又重新从1开始记录，而不是接着原来的 ID数。而 delete 删除以后，identity 依旧是接着被删除的最近的那一条记录ID加1后进行记录。如果只需删除表中的部分记录，只能使用 DELETE语句配合 where条件   备份 # 全量锁表备份(不可写) mysqldump --lock-all-tables --all-databases &gt; ALLDB.">
 <meta itemprop="datePublished" content="2019-10-10T10:40:20+00:00" />
 <meta itemprop="dateModified" content="2019-10-10T10:40:20+00:00" />
-<meta itemprop="wordCount" content="371">
+<meta itemprop="wordCount" content="413">
 
 
 
@@ -241,7 +241,26 @@ mysql如何修改所有的definer: <a href="https://blog.csdn.net/weixin_3073959
 <p>所以说触发器的definer不是很方便修改</p>
 <h3 id="change-column-导致锁">change column 导致锁<a href="#change-column-导致锁" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <p>官方online-ddl文档: <a href="https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html">https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html</a></p>
-
+<h3 id="php-warning--mysql_fetch_array-supplied-argument-is-not-a-valid-mysql-result-resource-in">PHP Warning:  mysql_fetch_array(): supplied argument is not a valid MySQL result resource in<a href="#php-warning--mysql_fetch_array-supplied-argument-is-not-a-valid-mysql-result-resource-in" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>这个问题是因为查询数据库结果可能为空, 直接return的时候报warning</p>
+</blockquote>
+<h4 id="原示例">原示例:<a href="#原示例" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>function get($sql) {
+    $row = mysql_fetch_array($this-&gt;query($sql));
+    return $row[0]
+    ...
+}
+</code></pre><h4 id="修改示例">修改示例:<a href="#修改示例" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>function get($sql) {
+  $query = $this-&gt;query($sql);
+  if($query){
+     $row = mysql_fetch_array($query);
+     return $row[0]
+  }
+  ...
+}   
+</code></pre>
 			</div>
    
 
@@ -250,7 +269,7 @@ mysql如何修改所有的definer: <a href="https://blog.csdn.net/weixin_3073959
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/mysql">mysql</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>371 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>413 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-10-10 18:40 &#43;0800</p>
 			</footer>
 		</article>
@@ -272,6 +291,7 @@ mysql如何修改所有的definer: <a href="https://blog.csdn.net/weixin_3073959
         <li><a href="#mysql-information_schematables表中的table_rows-字段值与count-值不同">mysql information_schema.TABLES表中的table_rows 字段值与&rsquo;count(*)' 值不同</a></li>
         <li><a href="#mysqldump-导出的触发器导致测试库报权限不足错误">mysqldump 导出的触发器导致测试库报权限不足错误</a></li>
         <li><a href="#change-column-导致锁">change column 导致锁</a></li>
+        <li><a href="#php-warning--mysql_fetch_array-supplied-argument-is-not-a-valid-mysql-result-resource-in">PHP Warning:  mysql_fetch_array(): supplied argument is not a valid MySQL result resource in</a></li>
       </ul>
     </li>
   </ul>
