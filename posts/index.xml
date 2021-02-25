@@ -3909,8 +3909,8 @@ net stop sshd
 <span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
 	<span class="nx">i</span> <span class="o">:=</span> <span class="nx">info</span><span class="p">{</span><span class="s">&#34;test&#34;</span><span class="p">,</span><span class="mi">11</span><span class="p">}</span>
 	<span class="nx">j</span> <span class="p">,</span><span class="nx">_</span> <span class="o">:=</span> <span class="nx">json</span><span class="p">.</span><span class="nf">Marshal</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span>
-	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%v, %+v, %v \n&#34;</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nb">string</span><span class="p">(</span><span class="nx">j</span><span class="p">))</span> 
-	<span class="c1">//{test 11}, {Name:test Age:11}, {&#34;name&#34;:&#34;test&#34;,&#34;age&#34;:11} 
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%v, %+v, %v \n&#34;</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nb">string</span><span class="p">(</span><span class="nx">j</span><span class="p">))</span>
+	<span class="c1">//{test 11}, {Name:test Age:11}, {&#34;name&#34;:&#34;test&#34;,&#34;age&#34;:11}
 </span><span class="c1"></span>
 <span class="p">}</span>
 </code></pre></div><h3 id="13-类型断言">13. 类型断言</h3>
@@ -4204,7 +4204,13 @@ import	_ &quot;github.com/zhangzw001/learnGin/docs&quot;
 <p><a href="https://segmentfault.com/a/1190000021363996">GORM之ErrRecordNotFound采坑记录</a></p>
 <blockquote>
 <p>gorm.DB 的Find或First等方法, 在传入struc的时候 , 可能返回ErrRecordNotFound, 在传入list的时候, 可能返回nil</p>
-</blockquote>]]></content>
+</blockquote>
+<h3 id="23-go转汇编">23. go转汇编</h3>
+<pre><code># 第一种
+go tool compile -S go-main-slice.go
+# 第二种
+GOSSAFUNC=main go build go-main-slice.go
+</code></pre>]]></content>
 		</item>
 		
 		<item>
@@ -10888,8 +10894,10 @@ WHERE
 原文链接：<a href="https://blog.csdn.net/David_jiahuan/article/details/98478740">mysql information_schema.TABLES表中的table_rows 字段值与count值不同</a></li>
 </ul>
 <h3 id="mysqldump-导出的触发器导致测试库报权限不足错误">mysqldump 导出的触发器导致测试库报权限不足错误</h3>
-<p>网上有一些教程: <a href="https://stackoverflow.com/questions/10169960/mysql-error-1449-the-user-specified-as-a-definer-does-not-exist">https://stackoverflow.com/questions/10169960/mysql-error-1449-the-user-specified-as-a-definer-does-not-exist</a>
-mysql如何修改所有的definer: <a href="https://blog.csdn.net/weixin_30739595/article/details/95782340">https://blog.csdn.net/weixin_30739595/article/details/95782340</a></p>
+<ul>
+<li>网上有一些教程: <a href="https://stackoverflow.com/questions/10169960/mysql-error-1449-the-user-specified-as-a-definer-does-not-exist">https://stackoverflow.com/questions/10169960/mysql-error-1449-the-user-specified-as-a-definer-does-not-exist</a></li>
+<li>mysql如何修改所有的definer: <a href="https://blog.csdn.net/weixin_30739595/article/details/95782340">https://blog.csdn.net/weixin_30739595/article/details/95782340</a></li>
+</ul>
 <blockquote>
 <p>从线上导出表到测试, 发现测试报错: The user specified as a definer (&lsquo;xxx&rsquo;@&lsquo;x.x.%.%') does not exist</p>
 </blockquote>

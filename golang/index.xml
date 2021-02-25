@@ -6,8 +6,109 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Mon, 25 Jan 2021 14:54:22 +0800</lastBuildDate>
+		<lastBuildDate>Thu, 25 Feb 2021 10:43:52 +0800</lastBuildDate>
 		<atom:link href="https://k1s.club/golang/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Go学习 Goroutine泄露</title>
+			<link>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-goroutine%E6%B3%84%E9%9C%B2/</link>
+			<pubDate>Thu, 25 Feb 2021 10:43:52 +0800</pubDate>
+			
+			<guid>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-goroutine%E6%B3%84%E9%9C%B2/</guid>
+			<description>&lt;p&gt;goroutine 泄露常见说明&lt;/p&gt;</description>
+			<content type="html"><![CDATA[<p>goroutine 泄露常见说明</p>
+<blockquote>
+<p>参考文档</p>
+</blockquote>
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/74090074">Go 笔记之如何防止 goroutine 泄露</a></li>
+<li><a href="https://juejin.cn/post/6844903901410361358">Go 笔记之如何防止 goroutine 泄露（二）</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/68921032">Go 译文之如何构建并发 Pipeline</a></li>
+</ul>
+<h3 id="泄露情况分类">泄露情况分类</h3>
+<ul>
+<li>
+<ol>
+<li>死循环导致goroutine 无法退出</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>channel泄露</li>
+</ol>
+<ul>
+<li>发送无接收</li>
+<li>接收无发送</li>
+<li>nil channel 发送和接收都会阻塞, 通过select方式, nil channel不会被select</li>
+</ul>
+</li>
+<li>
+<ol start="3">
+<li>传统同步机制</li>
+</ol>
+<ul>
+<li>sync.Mutex 使用未释放, 建议Lock 后执行defer  Unlock</li>
+<li>sync.WaitGroup 设置的任务数错误导致一直 wait阻塞, 建议每次wg.Add(1)</li>
+</ul>
+</li>
+</ul>
+<h3 id="简单实例">简单实例</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="kd">func</span> <span class="nf">Test4</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">c</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
+	<span class="nx">count</span> <span class="o">:=</span> <span class="mi">0</span>
+	<span class="nx">ctx</span><span class="p">,</span> <span class="nx">cancel</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nf">WithCancel</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">())</span>
+	<span class="nx">timeout</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">{</span>
+            <span class="k">select</span> <span class="p">{</span>
+        	<span class="k">case</span> <span class="nx">c</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}:</span>
+        		<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+        	<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">ctx</span><span class="p">.</span><span class="nf">Done</span><span class="p">():</span>
+        		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;停止写入 ... &#34;</span><span class="p">)</span>
+        		<span class="k">return</span>
+        	<span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}()</span>
+	<span class="k">for</span> <span class="p">{</span>
+		<span class="k">select</span> <span class="p">{</span>
+		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">c</span><span class="p">:</span>
+			<span class="nx">count</span><span class="o">++</span>
+		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">timeout</span><span class="p">:</span>
+			<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;timeout ... &#34;</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="k">default</span><span class="p">:</span>
+			<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+			<span class="k">if</span> <span class="nx">count</span> <span class="p">&gt;</span> <span class="mi">3</span> <span class="p">{</span>
+				<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;已经写入三次, 准备停止...&#34;</span><span class="p">)</span>
+				<span class="nf">cancel</span><span class="p">()</span>
+				<span class="k">return</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div><h3 id="自动化测试泄露">自动化测试泄露</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">TestTest4</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">//defer goleak.VerifyNone(t)
+</span><span class="c1"></span>	<span class="k">defer</span> <span class="nx">leaktest</span><span class="p">.</span><span class="nf">Check</span><span class="p">(</span><span class="nx">t</span><span class="p">)()</span>
+	<span class="nf">Test4</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div><h3 id="通过-runtimenumgoroutine-函数计数">通过 runtime.NumGoroutine() 函数计数</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">for</span> <span class="p">{</span>
+			<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;runtime.NumGoroutine : &#34;</span><span class="p">,</span><span class="nx">runtime</span><span class="p">.</span><span class="nf">NumGoroutine</span><span class="p">())</span>
+			<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span> <span class="o">*</span> <span class="mi">500</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}()</span>
+	<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">test1</span><span class="p">.</span><span class="nf">Test3</span><span class="p">()</span>
+	<span class="p">}</span>
+</code></pre></div>]]></content>
+		</item>
 		
 		<item>
 			<title>Go源码学习 Sort包Search方法</title>

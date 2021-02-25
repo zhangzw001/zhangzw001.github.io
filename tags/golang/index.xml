@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Mon, 25 Jan 2021 14:54:22 +0800</lastBuildDate><atom:link href="https://k1s.club/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 25 Feb 2021 10:43:52 +0800</lastBuildDate><atom:link href="https://k1s.club/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go学习 Goroutine泄露</title>
+      <link>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-goroutine%E6%B3%84%E9%9C%B2/</link>
+      <pubDate>Thu, 25 Feb 2021 10:43:52 +0800</pubDate>
+      
+      <guid>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-goroutine%E6%B3%84%E9%9C%B2/</guid>
+      <description>&lt;p&gt;goroutine 泄露常见说明&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>Go源码学习 Sort包Search方法</title>
       <link>https://k1s.club/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</link>
