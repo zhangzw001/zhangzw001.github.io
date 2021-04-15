@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>算法 on zhangzw</title>
+    <link>https://k1s.club/tags/%E7%AE%97%E6%B3%95/</link>
+    <description>Recent content in 算法 on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Thu, 15 Apr 2021 18:09:46 +0800</lastBuildDate><atom:link href="https://k1s.club/tags/%E7%AE%97%E6%B3%95/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go算法学习 找出缺失的整数</title>
+      <link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%89%BE%E5%87%BA%E7%BC%BA%E5%A4%B1%E7%9A%84%E6%95%B4%E6%95%B0/</link>
+      <pubDate>Thu, 15 Apr 2021 18:09:46 +0800</pubDate>
+      
+      <guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%89%BE%E5%87%BA%E7%BC%BA%E5%A4%B1%E7%9A%84%E6%95%B4%E6%95%B0/</guid>
+      <description>原文: 程序员小灰 找出缺失的整数
+实现代码 package main import ( &amp;#34;fmt&amp;#34; &amp;#34;math/rand&amp;#34; &amp;#34;time&amp;#34; ) var ( a []int b []int c []int l = 100 r = rand.New(rand.NewSource(time.Now().UnixNano())) ) func init() { // 1~10 随机数 	tmp := r.Intn(l-1)+1 // 在生成一个不等于tmp的随机数 	var tmp2 int for tmp2 == 0 || tmp2 == tmp { tmp2 = r.Intn(l-1)+1 } fmt.Println(tmp,tmp2) for i:=1 ;i &amp;lt;=l;i++ { if i == tmp { b = append(b, i) continue } a = append(a, i) b = append(b, i) b = append(b, i) } for i:=1 ;i &amp;lt;=l;i++ { if i == tmp ||i == tmp2 { c = append(c,i) continue } c = append(c,i) c = append(c,i) } //fmt.</description>
+    </item>
+    
+  </channel>
+</rss>

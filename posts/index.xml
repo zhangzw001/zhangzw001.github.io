@@ -1991,7 +1991,7 @@ ok
 <pre><code>1. go版本最好是1.13 (go1.11开始支持)
 2. 首先 go mod init , 并修改go.mod
     增加: replace fib =&gt; ./fib
-3. 然后进去到fib目录, 执行go mod init 
+3. 然后进去到fib目录, 执行go mod init
 4. 在执行main.go 即可
 
 </code></pre><h3 id="说明">说明</h3>
@@ -2008,7 +2008,7 @@ ok
 </span><span class="c1"></span><span class="mf">8.</span> <span class="k">go</span> <span class="nx">tool</span> <span class="nx">pprof</span> <span class="nx">cpu</span><span class="p">.</span><span class="nx">out</span>   
    <span class="c1">// 然后交互式输入web查看图形界面(但是需要安装brew install graphviz )
 </span><span class="c1"></span>   <span class="c1">// 或者交互式输入png,会得到类型profile001.png的文件, 打开查看即可
-</span><span class="c1"></span><span class="mf">9.</span> <span class="k">go</span> <span class="nx">run</span> <span class="o">-</span><span class="nx">race</span> <span class="nx">a</span><span class="p">.</span><span class="nx">g</span> <span class="c1">// 查看是否存在锁
+</span><span class="c1"></span><span class="mf">9.</span> <span class="k">go</span> <span class="nx">run</span> <span class="o">-</span><span class="nx">race</span> <span class="nx">a</span><span class="p">.</span><span class="k">go</span> <span class="c1">// 查看是否存在锁
 </span><span class="c1"></span><span class="mf">10.</span>  <span class="nx">godoc</span> <span class="o">-</span><span class="nx">http</span> <span class="p">:</span><span class="mi">8000</span> <span class="c1">//启动一个godoc
 </span></code></pre></div>]]></content>
 		</item>
@@ -3767,7 +3767,7 @@ net stop sshd
 </span></code></pre></div><h3 id="4-go中内置分配内存函数new和make的用法">4. go中内置分配内存函数new和make的用法</h3>
 <p>原文: <a href="https://www.cnblogs.com/xhhgo/p/10916254.html">go语言值类型与引用类型理解</a></p>
 <ul>
-<li>make 仅用于 slice, map, channel, 返回类型是本身</li>
+<li>make 仅用于 slice, map, channel, 返回类型是本身, 并且会初始化</li>
 </ul>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nb">make</span><span class="p">(</span><span class="nx">t</span> <span class="nx">Type</span><span class="p">,</span> <span class="nx">size</span> <span class="o">...</span><span class="nx">IntegerType</span><span class="p">)</span> <span class="nx">Type</span>
 </code></pre></div><ul>
@@ -3983,88 +3983,105 @@ net stop sshd
 
 </code></pre></div><h3 id="14-select-和switch">14 select 和switch</h3>
 <p>select 操作语句只能是【IO 操作】,一般用于channel</p>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
- <span class="nx">timeout</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
-
- <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-  <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
-  <span class="nx">timeout</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
- <span class="p">}()</span>
-
- <span class="nx">ch</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Tick</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
- <span class="k">for</span> <span class="p">{</span>
-  <span class="k">select</span> <span class="p">{</span>
-  <span class="k">case</span> <span class="o">&lt;-</span><span class="nx">ch</span><span class="p">:</span>
-   <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="o">&lt;-</span><span class="nx">ch</span><span class="p">)</span>
-  <span class="k">case</span> <span class="o">&lt;-</span><span class="nx">timeout</span><span class="p">:</span>
-   <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;timeout!&#34;</span><span class="p">)</span>
-   <span class="k">return</span>
-  <span class="p">}</span>
- <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><h3 id="15-channel简单例子">15 channel简单例子</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="kd">func</span> <span class="nf">worker</span><span class="p">()</span>  <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}</span> <span class="p">{</span>
+	<span class="nx">workerChan</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
+	<span class="nx">r</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="nx">rand</span><span class="p">.</span><span class="nf">NewSource</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">UnixNano</span><span class="p">()))</span>
+	<span class="nx">workTime</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nf">Int63n</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span>
+	<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">workTime</span><span class="p">)</span>
+	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">workerChan</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
+	<span class="p">}()</span>
+	<span class="k">return</span>  <span class="nx">workerChan</span>
+<span class="p">}</span>
 <span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
- <span class="c1">// 设置一个超时时间
-</span><span class="c1"></span> <span class="nx">timeout</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
- <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-  <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
-  <span class="nx">timeout</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
- <span class="p">}()</span>
+	<span class="nx">timeout</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span> <span class="o">*</span> <span class="mi">10</span>
+	<span class="nx">timer</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">NewTimer</span><span class="p">(</span><span class="nx">timeout</span><span class="p">)</span>
+	<span class="nx">ticker</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">NewTicker</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+	<span class="nx">myWorkerTime</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
 
- <span class="c1">// 设置一个脚本, 如果运行超过timeout时间,则中断(这里模拟程序执行时间)
-</span><span class="c1"></span> <span class="nx">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span> <span class="kd">chan</span> <span class="kd">struct</span> <span class="p">{}</span> <span class="p">)</span>
- <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;ch 的子进程开始...&#34;</span><span class="p">)</span>
-  <span class="nx">rand</span><span class="p">.</span><span class="nf">Seed</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">Unix</span><span class="p">())</span>
-  <span class="nx">r</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Intn</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;模拟延迟 %ds\n&#34;</span><span class="p">,</span><span class="nx">r</span><span class="p">)</span>
-  <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
-  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;ch 的子进程结束...&#34;</span><span class="p">)</span>
-  <span class="nx">ch</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
- <span class="p">}()</span>
+	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span> <span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">5</span> <span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">{</span>
+		<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+			<span class="nx">myWorkerTime</span> <span class="p">=</span> <span class="nf">worker</span><span class="p">()</span>
+		<span class="p">}()</span>
+	<span class="p">}</span>
+	<span class="k">for</span> <span class="p">{</span>
+		<span class="k">select</span> <span class="p">{</span>
+		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">timer</span><span class="p">.</span><span class="nx">C</span><span class="p">:</span>
+			<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;timer.c &gt;&gt;&gt; timeout &#34;</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">ticker</span><span class="p">.</span><span class="nx">C</span><span class="p">:</span>
+			<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;ticker.c &gt;&gt;&gt;&#34;</span><span class="p">)</span>
+		<span class="k">case</span> <span class="o">&lt;-</span> <span class="nx">myWorkerTime</span><span class="p">:</span>
+			<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;workerTime &gt;&gt;&gt;&#34;</span><span class="p">)</span>
+			<span class="nx">timer</span><span class="p">.</span><span class="nf">Reset</span><span class="p">(</span><span class="nx">timeout</span><span class="p">)</span>
+		<span class="k">default</span><span class="p">:</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span>
 
- <span class="k">for</span> <span class="p">{</span>
-  <span class="k">select</span> <span class="p">{</span>
-  <span class="k">case</span> <span class="o">&lt;-</span><span class="nx">ch</span><span class="p">:</span>
-   <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;任务正常结束&#34;</span><span class="p">)</span>
-   <span class="nb">close</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span>
-   <span class="k">return</span>
-  <span class="k">case</span> <span class="o">&lt;-</span><span class="nx">timeout</span><span class="p">:</span>
-   <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;timeout!&#34;</span><span class="p">)</span>
-   <span class="nb">close</span><span class="p">(</span><span class="nx">timeout</span><span class="p">)</span>
-   <span class="k">return</span>
-  <span class="p">}</span>
- <span class="p">}</span>
+</code></pre></div><h3 id="15-channel简单例子">15 channel简单例子</h3>
+<blockquote>
+<p>channel 导致 deadlock 是由于未 close channel</p>
+<p>close channel之后,还可以读取 channel</p>
+<ol>
+<li>
+<p>value,ok := &lt;- channel 但是返回value=0,ok=false</p>
+</li>
+<li>
+<p>for value := range channel 的时候会退出 for 循环</p>
+</li>
+</ol>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="kd">func</span> <span class="nf">write</span><span class="p">(</span><span class="nx">ch1</span> <span class="kd">chan</span> <span class="kt">int</span> <span class="p">,</span> <span class="nx">done</span> <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{},</span><span class="nx">wg</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">defer</span> <span class="nx">wg</span><span class="p">.</span><span class="nf">Done</span><span class="p">()</span>
+	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">ch1</span> <span class="o">&lt;-</span> <span class="nx">i</span>
+		<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+	<span class="p">}</span>
+
+    <span class="c1">// 必须要 close
+</span><span class="c1"></span>	<span class="nb">close</span><span class="p">(</span><span class="nx">ch1</span><span class="p">)</span>
+    <span class="c1">// 或者通过 done 来退出
+</span><span class="c1"></span>    <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">done</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
+    <span class="p">}()</span>
+
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">read</span><span class="p">(</span><span class="nx">ch1</span> <span class="kd">chan</span> <span class="kt">int</span> <span class="p">,</span> <span class="nx">done</span> <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{},</span><span class="nx">wg</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">defer</span> <span class="nx">wg</span><span class="p">.</span><span class="nf">Done</span><span class="p">()</span>
+	<span class="k">for</span> <span class="p">{</span>
+		<span class="k">select</span> <span class="p">{</span>
+		<span class="k">case</span> <span class="nx">v</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">ch1</span><span class="p">:</span>
+            <span class="c1">// 如果 close 这里会收到 not ok
+</span><span class="c1"></span>			<span class="k">if</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
+				<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;not OK&#34;</span><span class="p">,</span><span class="nx">v</span><span class="p">)</span>
+				<span class="k">return</span>
+			<span class="p">}</span>
+			<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;v:&#34;</span><span class="p">,</span> <span class="nx">v</span><span class="p">)</span>
+		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">done</span><span class="p">:</span>
+			<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;received done channel finish&#34;</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">ch1</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">)</span>
+	<span class="nx">done</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
+	<span class="kd">var</span> <span class="nx">wg</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span>
+	<span class="nx">wg</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+	<span class="k">go</span> <span class="nf">write</span><span class="p">(</span><span class="nx">ch1</span><span class="p">,</span><span class="nx">done</span><span class="p">,</span><span class="o">&amp;</span><span class="nx">wg</span><span class="p">)</span>
+	<span class="k">go</span> <span class="nf">read</span><span class="p">(</span><span class="nx">ch1</span><span class="p">,</span><span class="nx">done</span><span class="p">,</span><span class="o">&amp;</span><span class="nx">wg</span><span class="p">)</span>
+	<span class="nx">wg</span><span class="p">.</span><span class="nf">Wait</span><span class="p">()</span>
 <span class="p">}</span>
 
 </code></pre></div><h3 id="16-syncwaitgroup-使用">16 sync.WaitGroup 使用</h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
-<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
- <span class="nx">wg</span> <span class="o">:=</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span><span class="p">{}</span>
- <span class="nx">wg</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
- <span class="k">go</span> <span class="nf">fun1</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">wg</span><span class="p">)</span>
- <span class="k">go</span> <span class="nf">fun2</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">wg</span><span class="p">)</span>
- <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;main 等待子程序执行完毕, 等待中...&#34;</span><span class="p">)</span>
- <span class="nx">wg</span><span class="p">.</span><span class="nf">Wait</span><span class="p">()</span>
- <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;子程序全部执行完毕&#34;</span><span class="p">)</span>
-<span class="p">}</span>
-<span class="c1">//
-</span><span class="c1"></span><span class="kd">func</span> <span class="nf">fun1</span><span class="p">(</span><span class="nx">wg</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span><span class="p">)</span> <span class="p">{</span>
- <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span> <span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">5</span> <span class="p">;</span> <span class="nx">i</span> <span class="o">++</span> <span class="p">{</span>
-  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;func1 : %d\n&#34;</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span>
-  <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
- <span class="p">}</span>
- <span class="nx">wg</span><span class="p">.</span><span class="nf">Done</span><span class="p">()</span>
-<span class="p">}</span>
-<span class="kd">func</span> <span class="nf">fun2</span><span class="p">(</span><span class="nx">wg</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span><span class="p">)</span> <span class="p">{</span>
- <span class="k">defer</span> <span class="nx">wg</span><span class="p">.</span><span class="nf">Done</span><span class="p">()</span>
- <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span> <span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">2</span> <span class="p">;</span> <span class="nx">i</span> <span class="o">++</span> <span class="p">{</span>
-  <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;func2 : %d\n&#34;</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span>
-  <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
- <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><h3 id="17-包导入的几点说明">17 包导入的几点说明</h3>
+<blockquote>
+<p>同上</p>
+</blockquote>
+<h3 id="17-包导入的几点说明">17 包导入的几点说明</h3>
 <blockquote>
 <p>详情见<a href="http://shouce.jb51.net/gopl-zh/ch10/ch10-03.html">go圣经</a></p>
 </blockquote>
@@ -8190,6 +8207,11 @@ command + y
 <li>n.2 从linux生成的.csv文件到mac上乱码</li>
 </ul>
 <pre><code>iconv -f UTF8 -t GB18030 2020-12-02.csv &gt; 2020-12-02-2.csv
+</code></pre><ul>
+<li>n.3 输入如何输入中文句号。 ？</li>
+</ul>
+<pre><code>由于我的搜狗输入法 偏好设置 开启了 中文下使用英文标点, 所以我所有的标点符号都是英文的
+因此我要切换的还输入 control+. , 就会切换到中文下的标点
 </code></pre>]]></content>
 		</item>
 		

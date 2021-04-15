@@ -225,7 +225,7 @@ ok
 <pre><code>1. go版本最好是1.13 (go1.11开始支持)
 2. 首先 go mod init , 并修改go.mod
     增加: replace fib =&gt; ./fib
-3. 然后进去到fib目录, 执行go mod init 
+3. 然后进去到fib目录, 执行go mod init
 4. 在执行main.go 即可
 
 </code></pre><h3 id="说明">说明<a href="#说明" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
@@ -242,7 +242,7 @@ ok
 </span><span class="c1"></span><span class="mf">8.</span> <span class="k">go</span> <span class="nx">tool</span> <span class="nx">pprof</span> <span class="nx">cpu</span><span class="p">.</span><span class="nx">out</span>   
    <span class="c1">// 然后交互式输入web查看图形界面(但是需要安装brew install graphviz )
 </span><span class="c1"></span>   <span class="c1">// 或者交互式输入png,会得到类型profile001.png的文件, 打开查看即可
-</span><span class="c1"></span><span class="mf">9.</span> <span class="k">go</span> <span class="nx">run</span> <span class="o">-</span><span class="nx">race</span> <span class="nx">a</span><span class="p">.</span><span class="nx">g</span> <span class="c1">// 查看是否存在锁
+</span><span class="c1"></span><span class="mf">9.</span> <span class="k">go</span> <span class="nx">run</span> <span class="o">-</span><span class="nx">race</span> <span class="nx">a</span><span class="p">.</span><span class="k">go</span> <span class="c1">// 查看是否存在锁
 </span><span class="c1"></span><span class="mf">10.</span>  <span class="nx">godoc</span> <span class="o">-</span><span class="nx">http</span> <span class="p">:</span><span class="mi">8000</span> <span class="c1">//启动一个godoc
 </span></code></pre></div>
 			</div>

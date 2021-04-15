@@ -6,8 +6,153 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Thu, 25 Feb 2021 10:43:52 +0800</lastBuildDate>
+		<lastBuildDate>Thu, 15 Apr 2021 18:09:46 +0800</lastBuildDate>
 		<atom:link href="https://k1s.club/golang/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Go算法学习 找出缺失的整数</title>
+			<link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%89%BE%E5%87%BA%E7%BC%BA%E5%A4%B1%E7%9A%84%E6%95%B4%E6%95%B0/</link>
+			<pubDate>Thu, 15 Apr 2021 18:09:46 +0800</pubDate>
+			
+			<guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%89%BE%E5%87%BA%E7%BC%BA%E5%A4%B1%E7%9A%84%E6%95%B4%E6%95%B0/</guid>
+			<description>原文: 程序员小灰 找出缺失的整数
+实现代码 package main import ( &amp;#34;fmt&amp;#34; &amp;#34;math/rand&amp;#34; &amp;#34;time&amp;#34; ) var ( a []int b []int c []int l = 100 r = rand.New(rand.NewSource(time.Now().UnixNano())) ) func init() { // 1~10 随机数 	tmp := r.Intn(l-1)+1 // 在生成一个不等于tmp的随机数 	var tmp2 int for tmp2 == 0 || tmp2 == tmp { tmp2 = r.Intn(l-1)+1 } fmt.Println(tmp,tmp2) for i:=1 ;i &amp;lt;=l;i++ { if i == tmp { b = append(b, i) continue } a = append(a, i) b = append(b, i) b = append(b, i) } for i:=1 ;i &amp;lt;=l;i++ { if i == tmp ||i == tmp2 { c = append(c,i) continue } c = append(c,i) c = append(c,i) } //fmt.</description>
+			<content type="html"><![CDATA[<p>原文: <a href="https://mp.weixin.qq.com/s?__biz=MzIxMjE5MTE1Nw==&amp;mid=2653189951&amp;idx=1&amp;sn=0181c95484b67d108672235b14e5ebbb&amp;chksm=8c9905e5bbee8cf3362ccc4c7e091caa18b5783183ce4475b6f011c09c1cb03847ea4cb5220c&amp;scene=21#wechat_redirect">程序员小灰 找出缺失的整数</a></p>
+<h3 id="实现代码">实现代码</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&#34;fmt&#34;</span>
+	<span class="s">&#34;math/rand&#34;</span>
+	<span class="s">&#34;time&#34;</span>
+<span class="p">)</span>
+
+<span class="kd">var</span> <span class="p">(</span>
+	<span class="nx">a</span> <span class="p">[]</span><span class="kt">int</span>
+	<span class="nx">b</span> <span class="p">[]</span><span class="kt">int</span>
+	<span class="nx">c</span> <span class="p">[]</span><span class="kt">int</span>
+	<span class="nx">l</span> <span class="p">=</span> <span class="mi">100</span>
+	<span class="nx">r</span> <span class="p">=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="nx">rand</span><span class="p">.</span><span class="nf">NewSource</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">UnixNano</span><span class="p">()))</span>
+
+<span class="p">)</span>
+
+<span class="kd">func</span> <span class="nf">init</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c1">// 1~10 随机数
+</span><span class="c1"></span>	<span class="nx">tmp</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">Intn</span><span class="p">(</span><span class="nx">l</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+	<span class="c1">// 在生成一个不等于tmp的随机数
+</span><span class="c1"></span>	<span class="kd">var</span> <span class="nx">tmp2</span> <span class="kt">int</span>
+	<span class="k">for</span> <span class="nx">tmp2</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">tmp2</span> <span class="o">==</span> <span class="nx">tmp</span> <span class="p">{</span>
+		<span class="nx">tmp2</span> <span class="p">=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">Intn</span><span class="p">(</span><span class="nx">l</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+	<span class="p">}</span>
+
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">tmp</span><span class="p">,</span><span class="nx">tmp2</span><span class="p">)</span>
+	<span class="k">for</span> <span class="nx">i</span><span class="o">:=</span><span class="mi">1</span> <span class="p">;</span><span class="nx">i</span> <span class="o">&lt;=</span><span class="nx">l</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">i</span> <span class="o">==</span> <span class="nx">tmp</span> <span class="p">{</span>
+			<span class="nx">b</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span>
+			<span class="k">continue</span>
+		<span class="p">}</span>
+		<span class="nx">a</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span>
+		<span class="nx">b</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span>
+		<span class="nx">b</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span>
+
+	<span class="p">}</span>
+
+	<span class="k">for</span> <span class="nx">i</span><span class="o">:=</span><span class="mi">1</span> <span class="p">;</span><span class="nx">i</span> <span class="o">&lt;=</span><span class="nx">l</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">i</span> <span class="o">==</span> <span class="nx">tmp</span> <span class="o">||</span><span class="nx">i</span> <span class="o">==</span> <span class="nx">tmp2</span>  <span class="p">{</span>
+			<span class="nx">c</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span>
+			<span class="k">continue</span>
+		<span class="p">}</span>
+		<span class="nx">c</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span>
+		<span class="nx">c</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="c1">//fmt.Println(&#34;&gt;&gt;&gt; 有序数组&#34;)
+</span><span class="c1"></span>	<span class="c1">//fmt.Println(a)
+</span><span class="c1"></span>	<span class="c1">//fmt.Println(b)
+</span><span class="c1"></span>	<span class="c1">//fmt.Println(c)
+</span><span class="c1"></span>	<span class="nf">random</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>
+	<span class="nf">random</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span>
+	<span class="nf">random</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
+	<span class="c1">//fmt.Println(&#34;&gt;&gt;&gt; 无序数组&#34;)
+</span><span class="c1"></span>	<span class="c1">//fmt.Println(a)
+</span><span class="c1"></span>	<span class="c1">//fmt.Println(b)
+</span><span class="c1"></span>	<span class="c1">//fmt.Println(c)
+</span><span class="c1"></span><span class="p">}</span>
+
+<span class="c1">// 随机打乱字符串算法
+</span><span class="c1">//Fisher-Yates随机置乱算法
+</span><span class="c1">//也称高纳德置乱算法
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">random</span><span class="p">(</span><span class="nx">nums</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">nums</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="p">{</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+
+	<span class="k">for</span> <span class="nb">len</span><span class="p">(</span><span class="nx">nums</span><span class="p">)&gt;</span><span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">n</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">nums</span><span class="p">)</span>
+		<span class="nx">tmp</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">Intn</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span>
+		<span class="nx">nums</span><span class="p">[</span><span class="nx">tmp</span><span class="p">]</span> <span class="p">,</span> <span class="nx">nums</span><span class="p">[</span><span class="nx">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">=</span> <span class="nx">nums</span><span class="p">[</span><span class="nx">n</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nx">nums</span><span class="p">[</span><span class="nx">tmp</span><span class="p">]</span>
+		<span class="c1">//对前n-1进行替换
+</span><span class="c1"></span>		<span class="nx">nums</span> <span class="p">=</span> <span class="nx">nums</span><span class="p">[:</span><span class="nx">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">//题目：一个无序数组里有99个不重复正整数，范围从1到100，唯独缺少一个整数。如何找出这个缺失的整数？
+</span><span class="c1"></span><span class="kd">func</span>  <span class="nf">findInt1</span><span class="p">(</span><span class="nx">a</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">)</span> <span class="kt">int</span>  <span class="p">{</span>
+	<span class="nx">sum</span> <span class="o">:=</span> <span class="mi">0</span>
+	<span class="nx">sumA</span> <span class="o">:=</span> <span class="mi">0</span>
+	<span class="k">for</span> <span class="nx">i</span><span class="o">:=</span> <span class="mi">0</span> <span class="p">;</span><span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">l</span><span class="o">-</span><span class="mi">1</span> <span class="p">;</span><span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">sum</span><span class="o">+=</span><span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+	<span class="p">}</span>
+	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">1</span> <span class="p">;</span><span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">l</span><span class="o">+</span><span class="mi">1</span> <span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">sumA</span> <span class="o">+=</span><span class="nx">i</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">sumA</span><span class="o">-</span><span class="nx">sum</span>
+<span class="p">}</span>
+
+<span class="c1">//题目扩展：一个无序数组里有若干个正整数，范围从1到100，其中99个整数都出现了偶数次，
+</span><span class="c1">//只有一个整数出现了奇数次（比如1,1,2,2,3,3,4,5,5），如何找到这个出现奇数次的整数？
+</span><span class="c1">// 思路: 所有的数做 异或
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">findInt2</span><span class="p">(</span><span class="nx">a</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+	<span class="nx">rst</span> <span class="o">:=</span> <span class="nx">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+	<span class="k">for</span> <span class="nx">i</span><span class="o">:=</span> <span class="mi">1</span> <span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span><span class="nx">i</span><span class="o">++</span><span class="p">{</span>
+		<span class="nx">rst</span> <span class="p">^=</span><span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">rst</span>
+<span class="p">}</span>
+
+<span class="c1">//题目第二次扩展：一个无序数组里有若干个正整数，范围从1到100，其中98个整数都出现了偶数次，
+</span><span class="c1">//只有两个整数出现了奇数次（比如1,1,2,2,3,4,5,5），如何找到这个出现奇数次的整数？
+</span><span class="c1">// 思路:
+</span><span class="c1">// 1. 先对所有数异或, 异或的结果就是两个奇数的异或结果, 这个数二进制位必定有一位是1
+</span><span class="c1">// 2. 按异或结果其中一个1的位置, 将无序数组分成两个数组
+</span><span class="c1">//
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">findInt3</span><span class="p">(</span><span class="nx">a</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="kt">int</span><span class="p">,</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">a1</span> <span class="o">:=</span> <span class="nf">findInt2</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>
+	<span class="c1">//fmt.Println(a1)
+</span><span class="c1"></span>	<span class="nx">m</span> <span class="o">:=</span> <span class="mi">0</span>
+	<span class="k">for</span> <span class="nx">a1</span> <span class="o">&amp;</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">a1</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span>
+		<span class="nx">m</span><span class="o">++</span>
+	<span class="p">}</span>
+	<span class="c1">//fmt.Println(m)
+</span><span class="c1"></span>	<span class="nx">odd</span><span class="p">,</span><span class="nx">even</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+	<span class="k">for</span> <span class="nx">i</span><span class="o">:=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="c1">// 说明该位 是1
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">&gt;&gt;</span> <span class="nx">m</span> <span class="o">&amp;</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">{</span>
+			<span class="nx">odd</span> <span class="p">^=</span><span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+		<span class="p">}</span><span class="k">else</span> <span class="p">{</span>
+			<span class="nx">even</span> <span class="p">^=</span><span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">odd</span><span class="p">,</span><span class="nx">even</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nf">findInt1</span><span class="p">(</span><span class="nx">a</span><span class="p">))</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nf">findInt2</span><span class="p">(</span><span class="nx">b</span><span class="p">))</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nf">findInt3</span><span class="p">(</span><span class="nx">c</span><span class="p">))</span>
+<span class="p">}</span>
+
+</code></pre></div>]]></content>
+		</item>
 		
 		<item>
 			<title>Go学习 Goroutine泄露</title>

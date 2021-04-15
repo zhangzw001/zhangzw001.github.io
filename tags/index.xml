@@ -7,13 +7,31 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Thu, 25 Feb 2021 10:43:52 +0800</lastBuildDate><atom:link href="https://k1s.club/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 15 Apr 2021 18:09:46 +0800</lastBuildDate><atom:link href="https://k1s.club/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>golang</title>
       <link>https://k1s.club/tags/golang/</link>
-      <pubDate>Thu, 25 Feb 2021 10:43:52 +0800</pubDate>
+      <pubDate>Thu, 15 Apr 2021 18:09:46 +0800</pubDate>
       
       <guid>https://k1s.club/tags/golang/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>算法</title>
+      <link>https://k1s.club/tags/%E7%AE%97%E6%B3%95/</link>
+      <pubDate>Thu, 15 Apr 2021 18:09:46 +0800</pubDate>
+      
+      <guid>https://k1s.club/tags/%E7%AE%97%E6%B3%95/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>goroutine</title>
+      <link>https://k1s.club/tags/goroutine/</link>
+      <pubDate>Thu, 25 Feb 2021 10:43:52 +0800</pubDate>
+      
+      <guid>https://k1s.club/tags/goroutine/</guid>
       <description></description>
     </item>
     
@@ -77,24 +95,6 @@
       <pubDate>Tue, 10 Nov 2020 14:06:41 +0000</pubDate>
       
       <guid>https://k1s.club/tags/k8s/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>kubectl</title>
-      <link>https://k1s.club/tags/kubectl/</link>
-      <pubDate>Thu, 29 Oct 2020 11:15:58 +0800</pubDate>
-      
-      <guid>https://k1s.club/tags/kubectl/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>hugo</title>
-      <link>https://k1s.club/tags/hugo/</link>
-      <pubDate>Fri, 16 Oct 2020 17:01:36 +0800</pubDate>
-      
-      <guid>https://k1s.club/tags/hugo/</guid>
       <description></description>
     </item>
     
