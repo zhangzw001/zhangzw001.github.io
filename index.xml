@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Thu, 15 Apr 2021 18:09:46 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 16 Apr 2021 10:09:37 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go算法学习 最小栈的实现</title>
+      <link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</link>
+      <pubDate>Fri, 16 Apr 2021 10:09:37 +0800</pubDate>
+      
+      <guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</guid>
+      <description>&lt;p&gt;go&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>Go算法学习 找出缺失的整数</title>
       <link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%89%BE%E5%87%BA%E7%BC%BA%E5%A4%B1%E7%9A%84%E6%95%B4%E6%95%B0/</link>
@@ -97,15 +106,6 @@
       
       <guid>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-validator/</guid>
       <description>&lt;p&gt;记录一下Gin学习验证器和翻译器模块&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Google资深工程师深度讲解Go语言 Elastic简单使用</title>
-      <link>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-elastic%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</link>
-      <pubDate>Wed, 06 Jan 2021 14:27:27 +0800</pubDate>
-      
-      <guid>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-elastic%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</guid>
-      <description></description>
     </item>
     
   </channel>

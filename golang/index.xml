@@ -6,8 +6,89 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Thu, 15 Apr 2021 18:09:46 +0800</lastBuildDate>
+		<lastBuildDate>Fri, 16 Apr 2021 10:09:37 +0800</lastBuildDate>
 		<atom:link href="https://k1s.club/golang/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Go算法学习 最小栈的实现</title>
+			<link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</link>
+			<pubDate>Fri, 16 Apr 2021 10:09:37 +0800</pubDate>
+			
+			<guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</guid>
+			<description>&lt;p&gt;go&lt;/p&gt;</description>
+			<content type="html"><![CDATA[<p>go</p>
+<p>原文: <a href="https://mp.weixin.qq.com/s?__biz=MzIxMjE5MTE1Nw==&amp;mid=2653190073&amp;idx=1&amp;sn=c20c002127e2ce3fe0c71a00aee70806&amp;chksm=8c990563bbee8c75521c54ea8eb44b009ad07266b1e5fbf22926baf9a7b7302c7e4f7657dbb8&amp;scene=21#wechat_redirect">程序员小灰 最小栈的实现</a></p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
+
+
+<span class="c1">//题目：实现一个栈，带有出栈（pop），入栈（push），取最小元素（getMin）三个方法。要保证这三个方法的时间复杂度都是O（1）。
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">stack</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">V</span> <span class="p">[]</span><span class="kt">int</span>	<span class="c1">// 栈存储
+</span><span class="c1"></span>	<span class="nx">Min</span> <span class="p">[]</span><span class="kt">int</span>	<span class="c1">//栈最小值下标存储
+</span><span class="c1"></span><span class="p">}</span>
+
+<span class="c1">// 入栈
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">stack</span><span class="p">)</span> <span class="nf">Pop</span><span class="p">(</span><span class="nx">a</span> <span class="kt">int</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="c1">// 入栈
+</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nx">V</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">V</span><span class="p">,</span> <span class="nx">a</span><span class="p">)</span>
+	<span class="c1">// 判断min是否为空
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">Min</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">s</span><span class="p">.</span><span class="nx">Min</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">Min</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">V</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="c1">// 如果比最小栈 栈顶值小, 就入栈
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">a</span> <span class="p">&lt;</span> <span class="nx">s</span><span class="p">.</span><span class="nx">V</span><span class="p">[</span><span class="nx">s</span><span class="p">.</span><span class="nx">Min</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">Min</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="p">{</span>
+		<span class="nx">s</span><span class="p">.</span><span class="nx">Min</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">Min</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">V</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// 出栈
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">stack</span><span class="p">)</span> <span class="nf">Push</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+	<span class="c1">// 出栈
+</span><span class="c1"></span>	<span class="nx">a1</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nx">V</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">V</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+	<span class="c1">// 如果出栈的下标等于最小栈栈顶的值,就删除最小栈栈顶
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">V</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="nx">s</span><span class="p">.</span><span class="nx">Min</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">Min</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">{</span>
+		<span class="nx">s</span><span class="p">.</span><span class="nx">Min</span> <span class="p">=</span> <span class="nx">s</span><span class="p">.</span><span class="nx">Min</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">Min</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+	<span class="p">}</span>
+	<span class="c1">// 在删除栈顶
+</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nx">V</span> <span class="p">=</span> <span class="nx">s</span><span class="p">.</span><span class="nx">V</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">V</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+	<span class="k">return</span> <span class="nx">a1</span>
+<span class="p">}</span>
+
+<span class="c1">//新建堆
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewStack</span><span class="p">(</span><span class="nx">l</span> <span class="o">...</span><span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">stack</span><span class="p">{</span>
+	<span class="nx">stack1</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">stack</span><span class="p">{}</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">l</span> <span class="p">{</span>
+		<span class="nx">stack1</span><span class="p">.</span><span class="nf">Pop</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">stack1</span>
+<span class="p">}</span>
+
+<span class="c1">// 查询最小值
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">stack</span><span class="p">)</span> <span class="nf">GetMin</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+	<span class="nx">min</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nx">Min</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">Min</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+	<span class="nx">s</span><span class="p">.</span><span class="nx">Min</span> <span class="p">=</span> <span class="nx">s</span><span class="p">.</span><span class="nx">Min</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">Min</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+	<span class="k">return</span> <span class="nx">min</span>
+<span class="p">}</span>
+
+
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">stack1</span> <span class="o">:=</span> <span class="nf">NewStack</span><span class="p">([]</span><span class="kt">int</span><span class="p">{</span><span class="mi">10</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">14</span><span class="p">}</span><span class="o">...</span><span class="p">)</span>
+	<span class="nx">stack1</span><span class="p">.</span><span class="nf">Pop</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">stack1</span><span class="p">)</span>
+	<span class="nx">stack1</span><span class="p">.</span><span class="nf">Pop</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">stack1</span><span class="p">)</span>
+	<span class="nx">stack1</span><span class="p">.</span><span class="nf">Pop</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">stack1</span><span class="p">)</span>
+	<span class="nx">stack1</span><span class="p">.</span><span class="nf">Push</span><span class="p">()</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">stack1</span><span class="p">)</span>
+
+<span class="p">}</span>
+
+</code></pre></div>]]></content>
+		</item>
 		
 		<item>
 			<title>Go算法学习 找出缺失的整数</title>
@@ -98,14 +179,10 @@
 <span class="c1">//题目：一个无序数组里有99个不重复正整数，范围从1到100，唯独缺少一个整数。如何找出这个缺失的整数？
 </span><span class="c1"></span><span class="kd">func</span>  <span class="nf">findInt1</span><span class="p">(</span><span class="nx">a</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">)</span> <span class="kt">int</span>  <span class="p">{</span>
 	<span class="nx">sum</span> <span class="o">:=</span> <span class="mi">0</span>
-	<span class="nx">sumA</span> <span class="o">:=</span> <span class="mi">0</span>
 	<span class="k">for</span> <span class="nx">i</span><span class="o">:=</span> <span class="mi">0</span> <span class="p">;</span><span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">l</span><span class="o">-</span><span class="mi">1</span> <span class="p">;</span><span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
 		<span class="nx">sum</span><span class="o">+=</span><span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
 	<span class="p">}</span>
-	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">1</span> <span class="p">;</span><span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">l</span><span class="o">+</span><span class="mi">1</span> <span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
-		<span class="nx">sumA</span> <span class="o">+=</span><span class="nx">i</span>
-	<span class="p">}</span>
-	<span class="k">return</span> <span class="nx">sumA</span><span class="o">-</span><span class="nx">sum</span>
+	<span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="nx">l</span><span class="p">)</span><span class="o">*</span><span class="nx">l</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="nx">sum</span>
 <span class="p">}</span>
 
 <span class="c1">//题目扩展：一个无序数组里有若干个正整数，范围从1到100，其中99个整数都出现了偶数次，

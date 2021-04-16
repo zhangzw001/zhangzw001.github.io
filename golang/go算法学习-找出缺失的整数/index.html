@@ -12,7 +12,7 @@
 实现代码 package main import ( &#34;fmt&#34; &#34;math/rand&#34; &#34;time&#34; ) var ( a []int b []int c []int l = 100 r = rand.New(rand.NewSource(time.Now().UnixNano())) ) func init() { // 1~10 随机数 	tmp := r.Intn(l-1)&#43;1 // 在生成一个不等于tmp的随机数 	var tmp2 int for tmp2 == 0 || tmp2 == tmp { tmp2 = r.Intn(l-1)&#43;1 } fmt.Println(tmp,tmp2) for i:=1 ;i &lt;=l;i&#43;&#43; { if i == tmp { b = append(b, i) continue } a = append(a, i) b = append(b, i) b = append(b, i) } for i:=1 ;i &lt;=l;i&#43;&#43; { if i == tmp ||i == tmp2 { c = append(c,i) continue } c = append(c,i) c = append(c,i) } //fmt.">
 <meta itemprop="datePublished" content="2021-04-15T18:09:46+08:00" />
 <meta itemprop="dateModified" content="2021-04-15T18:09:46+08:00" />
-<meta itemprop="wordCount" content="305">
+<meta itemprop="wordCount" content="289">
 
 
 
@@ -157,14 +157,10 @@
 <span class="c1">//题目：一个无序数组里有99个不重复正整数，范围从1到100，唯独缺少一个整数。如何找出这个缺失的整数？
 </span><span class="c1"></span><span class="kd">func</span>  <span class="nf">findInt1</span><span class="p">(</span><span class="nx">a</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">)</span> <span class="kt">int</span>  <span class="p">{</span>
 	<span class="nx">sum</span> <span class="o">:=</span> <span class="mi">0</span>
-	<span class="nx">sumA</span> <span class="o">:=</span> <span class="mi">0</span>
 	<span class="k">for</span> <span class="nx">i</span><span class="o">:=</span> <span class="mi">0</span> <span class="p">;</span><span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">l</span><span class="o">-</span><span class="mi">1</span> <span class="p">;</span><span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
 		<span class="nx">sum</span><span class="o">+=</span><span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
 	<span class="p">}</span>
-	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">1</span> <span class="p">;</span><span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">l</span><span class="o">+</span><span class="mi">1</span> <span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
-		<span class="nx">sumA</span> <span class="o">+=</span><span class="nx">i</span>
-	<span class="p">}</span>
-	<span class="k">return</span> <span class="nx">sumA</span><span class="o">-</span><span class="nx">sum</span>
+	<span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="nx">l</span><span class="p">)</span><span class="o">*</span><span class="nx">l</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="nx">sum</span>
 <span class="p">}</span>
 
 <span class="c1">//题目扩展：一个无序数组里有若干个正整数，范围从1到100，其中99个整数都出现了偶数次，
@@ -219,7 +215,7 @@
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/golang">golang</a></span><span class="tag"><a href="https://k1s.club/tags/%E7%AE%97%E6%B3%95">算法</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>305 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>289 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2021-04-15 18:09 &#43;0800</p>
 			</footer>
 		</article>
@@ -236,6 +232,9 @@
 </nav>
 		</aside>
 		<div class="post-nav thin">
+			<a class="next-post" href="https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>Go算法学习 最小栈的实现</span>
+			</a>
 			<a class="prev-post" href="https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-goroutine%E6%B3%84%E9%9C%B2/">
 				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Go学习 Goroutine泄露</span>
 			</a>
