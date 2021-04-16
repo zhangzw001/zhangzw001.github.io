@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 16 Apr 2021 10:09:37 +0800</lastBuildDate><atom:link href="https://k1s.club/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 16 Apr 2021 15:56:59 +0800</lastBuildDate><atom:link href="https://k1s.club/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go算法学习 辗转相除法</title>
+      <link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</link>
+      <pubDate>Fri, 16 Apr 2021 15:56:59 +0800</pubDate>
+      
+      <guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</guid>
+      <description>&lt;p&gt;go&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>Go算法学习 最小栈的实现</title>
       <link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</link>

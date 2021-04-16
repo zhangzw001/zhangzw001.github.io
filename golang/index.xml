@@ -6,8 +6,105 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Fri, 16 Apr 2021 10:09:37 +0800</lastBuildDate>
+		<lastBuildDate>Fri, 16 Apr 2021 15:56:59 +0800</lastBuildDate>
 		<atom:link href="https://k1s.club/golang/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Go算法学习 辗转相除法</title>
+			<link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</link>
+			<pubDate>Fri, 16 Apr 2021 15:56:59 +0800</pubDate>
+			
+			<guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</guid>
+			<description>&lt;p&gt;go&lt;/p&gt;</description>
+			<content type="html"><![CDATA[<p>go</p>
+<p>原文: <a href="https://mp.weixin.qq.com/s?__biz=MzIxMjE5MTE1Nw==&amp;mid=2653189913&amp;idx=1&amp;sn=8667ba0170aef9b6c34713ce8cea60a8&amp;chksm=8c9905c3bbee8cd56d079bb0a436a46a18eb43061bc9390483f6cca692760f01cb575241ffff&amp;scene=21#wechat_redirect">程序员小灰 辗转相除法 更相减损术</a></p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&#34;fmt&#34;</span>
+<span class="p">)</span>
+
+<span class="c1">// 求最大公约数, 两个数都能整除的最大整数
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">MaxMin</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">a</span> <span class="p">&gt;</span> <span class="nx">b</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">a</span>
+<span class="p">}</span>
+
+<span class="c1">// 1. 暴力 O(min(a,b))
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">getGreatestCommonDivisor</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+	<span class="nx">max</span><span class="p">,</span> <span class="nx">min</span> <span class="o">:=</span> <span class="nf">MaxMin</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">max</span><span class="o">%</span><span class="nx">min</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">min</span>
+	<span class="p">}</span>
+	<span class="nx">i</span> <span class="o">:=</span> <span class="nx">min</span>
+	<span class="k">for</span> <span class="nx">a</span><span class="o">%</span><span class="nx">i</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">b</span><span class="o">%</span><span class="nx">i</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">i</span><span class="o">--</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">i</span>
+<span class="p">}</span>
+
+<span class="c1">// 2. 辗转相除法 O(log(max(a,b)))
+</span><span class="c1">// 两个数的最大公约数 = 大数对小数取余结果 和小数 的最大公约数
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">getGreatestCommonDivisor2</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+	<span class="nx">m</span><span class="p">,</span> <span class="nx">n</span> <span class="o">:=</span> <span class="nf">MaxMin</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span>
+	<span class="c1">//取余
+</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">m</span><span class="o">%</span><span class="nx">n</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">m</span><span class="p">,</span> <span class="nx">n</span> <span class="p">=</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">m</span><span class="o">%</span><span class="nx">n</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">n</span>
+<span class="p">}</span>
+
+<span class="c1">// 3. 更相减损术(出自算术九章) O(max(a,b))
+</span><span class="c1">// 两个数的最大公约数 = 大数减小数结果 和小数的最大公约数
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">getGreatestCommonDivisor3</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+	<span class="nx">m</span><span class="p">,</span> <span class="nx">n</span> <span class="o">:=</span> <span class="nf">MaxMin</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span>
+	<span class="k">for</span> <span class="nx">m</span><span class="o">!=</span><span class="nx">n</span>  <span class="p">{</span>
+		<span class="nx">m</span><span class="p">,</span> <span class="nx">n</span> <span class="p">=</span> <span class="nf">MaxMin</span><span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">m</span><span class="o">-</span><span class="nx">n</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">n</span>
+<span class="p">}</span>
+
+<span class="c1">// 4. 更相减损术+移位操作
+</span><span class="c1">// gcb(a,b)代表 a,b的最大公约数
+</span><span class="c1">// 4.1 a,b都是偶数: 	gcb(a,b) = 2 * gcb(a/2,b/2)	= 2 * gcb(a&gt;&gt;1,b&gt;&gt;1)
+</span><span class="c1">// 4.2 a,b是奇偶: 	gcb(a,b) = gcb(a,b/2)		= gcb(a,b&gt;&gt;1)
+</span><span class="c1">// 4.3 a,b是偶奇: 	gcb(a,b) = 2 * gcb(a/2,b)	= gcb(a&gt;&gt;1,b)
+</span><span class="c1">// 4.4 a,b都是奇数: 	gcb(a,b) = gcb((a-b)/2,b)	= gcb((a-b)&gt;&gt;1,b)  因为a-b必然是偶数
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">getGreatestCommonDivisor4</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+	<span class="nx">m</span><span class="p">,</span> <span class="nx">n</span> <span class="o">:=</span> <span class="nf">MaxMin</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span>
+
+	<span class="kd">var</span> <span class="nx">gcb</span> <span class="kd">func</span><span class="p">(</span><span class="nx">m</span><span class="p">,</span><span class="nx">n</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span>
+	<span class="nx">gcb</span> <span class="p">=</span> <span class="kd">func</span><span class="p">(</span><span class="nx">m</span><span class="p">,</span> <span class="nx">n</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">m</span> <span class="o">==</span> <span class="nx">n</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="nx">n</span>
+		<span class="p">}</span><span class="k">else</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="nx">m</span><span class="o">&amp;</span><span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">n</span><span class="o">&amp;</span><span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span> <span class="c1">// 偶 偶
+</span><span class="c1"></span>				<span class="k">return</span> <span class="nf">gcb</span><span class="p">(</span><span class="nx">m</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">,</span><span class="nx">n</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span>
+			<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nx">m</span><span class="o">&amp;</span><span class="mi">1</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="nx">n</span><span class="o">&amp;</span><span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span> <span class="c1">// 奇 偶
+</span><span class="c1"></span>				<span class="k">return</span> <span class="nf">gcb</span><span class="p">(</span><span class="nf">MaxMin</span><span class="p">(</span><span class="nx">m</span><span class="p">,</span><span class="nx">n</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">))</span>
+			<span class="p">}</span><span class="k">else</span> <span class="k">if</span> <span class="nx">m</span><span class="o">&amp;</span><span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">n</span><span class="o">&amp;</span><span class="mi">1</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">{</span>	<span class="c1">// 偶 奇
+</span><span class="c1"></span>				<span class="k">return</span> <span class="nf">gcb</span><span class="p">(</span><span class="nf">MaxMin</span><span class="p">(</span><span class="nx">m</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">,</span><span class="nx">n</span><span class="p">))</span>
+			<span class="p">}</span><span class="k">else</span> <span class="p">{</span>	<span class="c1">// 奇 奇
+</span><span class="c1"></span>				<span class="k">return</span> <span class="nf">gcb</span><span class="p">(</span><span class="nf">MaxMin</span><span class="p">((</span><span class="nx">m</span><span class="o">-</span><span class="nx">n</span><span class="p">)</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">,</span><span class="nx">n</span><span class="p">))</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="nx">n</span> <span class="p">=</span> <span class="nf">gcb</span><span class="p">(</span><span class="nx">m</span><span class="p">,</span><span class="nx">n</span> <span class="p">)</span>
+	<span class="k">return</span> <span class="nx">n</span>
+<span class="p">}</span>
+
+
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nf">getGreatestCommonDivisor</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">768</span><span class="p">))</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nf">getGreatestCommonDivisor2</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">768</span><span class="p">))</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nf">getGreatestCommonDivisor3</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">248</span><span class="p">))</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nf">getGreatestCommonDivisor4</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">248</span><span class="p">))</span>
+<span class="p">}</span>
+
+</code></pre></div>]]></content>
+		</item>
 		
 		<item>
 			<title>Go算法学习 最小栈的实现</title>
