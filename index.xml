@@ -7,14 +7,24 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 16 Apr 2021 15:56:59 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 23 Apr 2021 09:27:50 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go算法学习 回溯 分割回文串</title>
+      <link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</link>
+      <pubDate>Fri, 23 Apr 2021 09:27:50 +0800</pubDate>
+      
+      <guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</guid>
+      <description>说明  纯暴力搜索, 通常可以抽象为N叉树, 树的深度就是递归的深度
+  组合问题(不强调顺序) 1234 =&amp;gt; 12,13,14,23,24,34 切割问题(分割回文串) aab =&amp;gt; [a,a,b],[aa,b] 子集问题 排列问题(强调顺序) 1234 =&amp;gt; 12,13,14,21,23,24&amp;hellip; 棋盘问题(N皇后,数独)  回溯算法模板 func backtracking(参数) { if (终止条件) { 存放结果; return; } for (选择：本层集合中元素（树中节点孩子的数量就是集合的大小）) { 处理节点; backtracking(路径，选择列表); // 递归  回溯，撤销处理结果 } } 参考文献  力扣题目：131.分割回文串 代码随想录视频 回溯算法-分割回文串（对应力扣题目：131.分割回文串） 代码随想录图文 回溯算法：分割回文串  代码 package main import ( &amp;#34;fmt&amp;#34; ) //分割回文串 //给你一个字符串 s，请你将 s 分割成一些子串，使每个子串都是 回文串 。返回 s 所有可能的分割方案。 // //回文串 是正着读和反着读都一样的字符串。 // // // //示例 1： // //输入：s = &amp;#34;aab&amp;#34; //输出：[[&amp;#34;a&amp;#34;,&amp;#34;a&amp;#34;,&amp;#34;b&amp;#34;],[&amp;#34;aa&amp;#34;,&amp;#34;b&amp;#34;]] //示例 2： // //输入：s = &amp;#34;a&amp;#34; //输出：[[&amp;#34;a&amp;#34;]] // // //提示： // //1 &amp;lt;= s.</description>
+    </item>
+    
     <item>
       <title>Go算法学习 辗转相除法</title>
       <link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</link>
       <pubDate>Fri, 16 Apr 2021 15:56:59 +0800</pubDate>
       
       <guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</guid>
-      <description>&lt;p&gt;go&lt;/p&gt;</description>
+      <description></description>
     </item>
     
     <item>
@@ -23,7 +33,7 @@
       <pubDate>Fri, 16 Apr 2021 10:09:37 +0800</pubDate>
       
       <guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</guid>
-      <description>&lt;p&gt;go&lt;/p&gt;</description>
+      <description></description>
     </item>
     
     <item>
@@ -96,16 +106,6 @@
       <guid>https://k1s.club/golang/gee%E5%AD%A6%E4%B9%A0-%E8%B7%AF%E7%94%B1trie%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99/</guid>
       <description>github地址: github.com/zhangzw001/learnGee
  路由分析测试 package gee import ( &amp;#34;reflect&amp;#34; &amp;#34;testing&amp;#34; ) func TestParsePattern(t *testing.T) { tests := []struct { patterns string parts []string ok bool }{ {&amp;#34;/test/v1/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;v1&amp;#34;, &amp;#34;add&amp;#34;},true }, {&amp;#34;/test/*name/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;*name&amp;#34;},true}, {&amp;#34;/test/:name&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;},true }, {&amp;#34;/test/:name/abc&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;, &amp;#34;abc&amp;#34;},true}, {&amp;#34;/test/v1/add&amp;#34;, []string{&amp;#34;testv1&amp;#34;, &amp;#34;add&amp;#34;},false }, {&amp;#34;/test/*name/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;*name&amp;#34;,&amp;#34;add&amp;#34;},false}, {&amp;#34;/test/:name&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:&amp;#34;,&amp;#34;name&amp;#34;},false }, {&amp;#34;/test/:name/abc&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;},false}, } m := make(map[string][]string) for _, test := range tests { m[test.patterns] = test.parts p := parsePattern(test.</description>
-    </item>
-    
-    <item>
-      <title>Gin学习 简单记录form数据获取源码解读</title>
-      <link>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</link>
-      <pubDate>Wed, 13 Jan 2021 14:24:43 +0800</pubDate>
-      
-      <guid>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</guid>
-      <description>http.request form 数据测试 func main() { e := gin.Default() e.Any(&amp;#34;/test&amp;#34;,func(c *gin.Context) { // 获取所有参数 	_ = c.Request.ParseForm() // log.Println(c.Request.Header[&amp;#34;Content-Type&amp;#34;]) 	// get form 参数, c.Request.URL.Query, err = url.ParseQuery 	log.Println(c.Request.URL.Query()) //log.Println(url.ParseQuery(c.Request.URL.RawQuery)) 	// post form 参数 	log.Println(c.Request.PostForm) // form 参数 	log.Println(c.Request.Form) }) e.Run(&amp;#34;localhost:8123&amp;#34;) }  请求日志
- # curl -XPOST &amp;quot;http://localhost:8123/test&amp;quot; -d &amp;quot;abc=123&amp;amp;q=123&amp;amp;ccc=123123&amp;quot; 2021/01/13 14:31:30 map[] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] [GIN] 2021/01/13 - 14:31:30 | 200 | 339.</description>
     </item>
     
   </channel>
