@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Leetcodes on zhangzw</title>
-    <link>https://k1s.club/leetcode/</link>
+    <link>https://zhangzw001.github.io/leetcode/</link>
     <description>Recent content in Leetcodes on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 06 Nov 2020 18:30:36 +0800</lastBuildDate><atom:link href="https://k1s.club/leetcode/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 06 Nov 2020 18:30:36 +0800</lastBuildDate><atom:link href="https://zhangzw001.github.io/leetcode/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>1356 根据数字二进制下1的数目排序</title>
-      <link>https://k1s.club/leetcode/1356-%E6%A0%B9%E6%8D%AE%E6%95%B0%E5%AD%97%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%B8%8B1%E7%9A%84%E6%95%B0%E7%9B%AE%E6%8E%92%E5%BA%8F/</link>
+      <link>https://zhangzw001.github.io/leetcode/1356-%E6%A0%B9%E6%8D%AE%E6%95%B0%E5%AD%97%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%B8%8B1%E7%9A%84%E6%95%B0%E7%9B%AE%E6%8E%92%E5%BA%8F/</link>
       <pubDate>Fri, 06 Nov 2020 18:30:36 +0800</pubDate>
       
-      <guid>https://k1s.club/leetcode/1356-%E6%A0%B9%E6%8D%AE%E6%95%B0%E5%AD%97%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%B8%8B1%E7%9A%84%E6%95%B0%E7%9B%AE%E6%8E%92%E5%BA%8F/</guid>
+      <guid>https://zhangzw001.github.io/leetcode/1356-%E6%A0%B9%E6%8D%AE%E6%95%B0%E5%AD%97%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%B8%8B1%E7%9A%84%E6%95%B0%E7%9B%AE%E6%8E%92%E5%BA%8F/</guid>
       <description>题目链接: sort-integers-by-the-number-of-1-bits
  题目简介 给你一个整数数组 arr 。请你将数组中的元素按照其二进制表示中数字 1 的数目升序排序。
 如果存在多个数字二进制中 1 的数目相同，则必须将它们按照数值大小升序排列。

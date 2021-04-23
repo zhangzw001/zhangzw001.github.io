@@ -2,36 +2,36 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>特效 on zhangzw</title>
-    <link>https://k1s.club/tags/%E7%89%B9%E6%95%88/</link>
+    <link>https://zhangzw001.github.io/tags/%E7%89%B9%E6%95%88/</link>
     <description>Recent content in 特效 on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 07 Aug 2020 16:00:08 +0000</lastBuildDate><atom:link href="https://k1s.club/tags/%E7%89%B9%E6%95%88/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 07 Aug 2020 16:00:08 +0000</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/%E7%89%B9%E6%95%88/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>hexo部署到coding.net开启静态网站</title>
-      <link>https://k1s.club/posts/53-hexo%E9%83%A8%E7%BD%B2%E5%88%B0coding-net%E5%BC%80%E5%90%AF%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</link>
+      <link>https://zhangzw001.github.io/posts/53-hexo%E9%83%A8%E7%BD%B2%E5%88%B0coding-net%E5%BC%80%E5%90%AF%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</link>
       <pubDate>Fri, 07 Aug 2020 16:00:08 +0000</pubDate>
       
-      <guid>https://k1s.club/posts/53-hexo%E9%83%A8%E7%BD%B2%E5%88%B0coding-net%E5%BC%80%E5%90%AF%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</guid>
+      <guid>https://zhangzw001.github.io/posts/53-hexo%E9%83%A8%E7%BD%B2%E5%88%B0coding-net%E5%BC%80%E5%90%AF%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</guid>
       <description>&lt;p&gt;由于访问github会比较慢,百度抓取问题等, hexo同时部署到coding.net并开启静态网站&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>hexo添加看板娘</title>
-      <link>https://k1s.club/posts/5-hexo%E6%B7%BB%E5%8A%A0%E7%9C%8B%E6%9D%BF%E5%A8%98/</link>
+      <link>https://zhangzw001.github.io/posts/5-hexo%E6%B7%BB%E5%8A%A0%E7%9C%8B%E6%9D%BF%E5%A8%98/</link>
       <pubDate>Tue, 24 Sep 2019 17:46:17 +0000</pubDate>
       
-      <guid>https://k1s.club/posts/5-hexo%E6%B7%BB%E5%8A%A0%E7%9C%8B%E6%9D%BF%E5%A8%98/</guid>
+      <guid>https://zhangzw001.github.io/posts/5-hexo%E6%B7%BB%E5%8A%A0%E7%9C%8B%E6%9D%BF%E5%A8%98/</guid>
       <description>&lt;h3 id=&#34;hexo6-左下角添加看板娘&#34;&gt;hexo6 左下角添加看板娘&lt;/h3&gt;</description>
     </item>
     
     <item>
       <title>hexo鼠标移动和鼠标点击特效</title>
-      <link>https://k1s.club/posts/4-hexo%E9%BC%A0%E6%A0%87%E7%A7%BB%E5%8A%A8%E5%92%8C%E9%BC%A0%E6%A0%87%E7%82%B9%E5%87%BB%E7%89%B9%E6%95%88/</link>
+      <link>https://zhangzw001.github.io/posts/4-hexo%E9%BC%A0%E6%A0%87%E7%A7%BB%E5%8A%A8%E5%92%8C%E9%BC%A0%E6%A0%87%E7%82%B9%E5%87%BB%E7%89%B9%E6%95%88/</link>
       <pubDate>Tue, 24 Sep 2019 16:34:36 +0000</pubDate>
       
-      <guid>https://k1s.club/posts/4-hexo%E9%BC%A0%E6%A0%87%E7%A7%BB%E5%8A%A8%E5%92%8C%E9%BC%A0%E6%A0%87%E7%82%B9%E5%87%BB%E7%89%B9%E6%95%88/</guid>
+      <guid>https://zhangzw001.github.io/posts/4-hexo%E9%BC%A0%E6%A0%87%E7%A7%BB%E5%8A%A8%E5%92%8C%E9%BC%A0%E6%A0%87%E7%82%B9%E5%87%BB%E7%89%B9%E6%95%88/</guid>
       <description>hexo6 鼠标添加点击出现桃心的特效 来自: Next主题个性化
 所需要的js文件  未压缩  ! function(e, t, a) { function n() { c( &amp;quot;.heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: &#39;&#39;;width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}&amp;quot;), o(), r() } function r() { for (var e = 0; e &amp;lt; d.length; e++) d[e].alpha &amp;lt;= 0 ? (t.body.removeChild(d[e].el), d.splice(e, 1)) : (d[e].y--, d[e].scale += .004, d[e].alpha -= .013, d[e].el.style.cssText = &amp;quot;left:&amp;quot; + d[e].x + &amp;quot;px;top:&amp;quot; + d[e].</description>
     </item>

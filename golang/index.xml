@@ -1,20 +1,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 	<channel>
 		<title>Golangs on zhangzw</title>
-		<link>https://k1s.club/golang/</link>
+		<link>https://zhangzw001.github.io/golang/</link>
 		<description>Recent content in Golangs on zhangzw</description>
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
 		<lastBuildDate>Fri, 23 Apr 2021 09:27:50 +0800</lastBuildDate>
-		<atom:link href="https://k1s.club/golang/index.xml" rel="self" type="application/rss+xml" />
+		<atom:link href="https://zhangzw001.github.io/golang/index.xml" rel="self" type="application/rss+xml" />
 		
 		<item>
 			<title>Go算法学习 回溯 分割回文串</title>
-			<link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</link>
+			<link>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</link>
 			<pubDate>Fri, 23 Apr 2021 09:27:50 +0800</pubDate>
 			
-			<guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</guid>
+			<guid>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</guid>
 			<description>说明  纯暴力搜索, 通常可以抽象为N叉树, 树的深度就是递归的深度
   组合问题(不强调顺序) 1234 =&amp;gt; 12,13,14,23,24,34 切割问题(分割回文串) aab =&amp;gt; [a,a,b],[aa,b] 子集问题 排列问题(强调顺序) 1234 =&amp;gt; 12,13,14,21,23,24&amp;hellip; 棋盘问题(N皇后,数独)  回溯算法模板 func backtracking(参数) { if (终止条件) { 存放结果; return; } for (选择：本层集合中元素（树中节点孩子的数量就是集合的大小）) { 处理节点; backtracking(路径，选择列表); // 递归  回溯，撤销处理结果 } } 参考文献  力扣题目：131.分割回文串 代码随想录视频 回溯算法-分割回文串（对应力扣题目：131.分割回文串） 代码随想录图文 回溯算法：分割回文串  代码 package main import ( &amp;#34;fmt&amp;#34; ) //分割回文串 //给你一个字符串 s，请你将 s 分割成一些子串，使每个子串都是 回文串 。返回 s 所有可能的分割方案。 // //回文串 是正着读和反着读都一样的字符串。 // // // //示例 1： // //输入：s = &amp;#34;aab&amp;#34; //输出：[[&amp;#34;a&amp;#34;,&amp;#34;a&amp;#34;,&amp;#34;b&amp;#34;],[&amp;#34;aa&amp;#34;,&amp;#34;b&amp;#34;]] //示例 2： // //输入：s = &amp;#34;a&amp;#34; //输出：[[&amp;#34;a&amp;#34;]] // // //提示： // //1 &amp;lt;= s.</description>
 			<content type="html"><![CDATA[<h3 id="说明">说明</h3>
@@ -161,10 +161,10 @@
 		
 		<item>
 			<title>Go算法学习 辗转相除法</title>
-			<link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</link>
+			<link>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</link>
 			<pubDate>Fri, 16 Apr 2021 15:56:59 +0800</pubDate>
 			
-			<guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</guid>
+			<guid>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</guid>
 			<description></description>
 			<content type="html"><![CDATA[<p>原文: <a href="https://mp.weixin.qq.com/s?__biz=MzIxMjE5MTE1Nw==&amp;mid=2653189913&amp;idx=1&amp;sn=8667ba0170aef9b6c34713ce8cea60a8&amp;chksm=8c9905c3bbee8cd56d079bb0a436a46a18eb43061bc9390483f6cca692760f01cb575241ffff&amp;scene=21#wechat_redirect">程序员小灰 辗转相除法 更相减损术</a></p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
@@ -257,10 +257,10 @@
 		
 		<item>
 			<title>Go算法学习 最小栈的实现</title>
-			<link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</link>
+			<link>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</link>
 			<pubDate>Fri, 16 Apr 2021 10:09:37 +0800</pubDate>
 			
-			<guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</guid>
+			<guid>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</guid>
 			<description></description>
 			<content type="html"><![CDATA[<p>原文: <a href="https://mp.weixin.qq.com/s?__biz=MzIxMjE5MTE1Nw==&amp;mid=2653190073&amp;idx=1&amp;sn=c20c002127e2ce3fe0c71a00aee70806&amp;chksm=8c990563bbee8c75521c54ea8eb44b009ad07266b1e5fbf22926baf9a7b7302c7e4f7657dbb8&amp;scene=21#wechat_redirect">程序员小灰 最小栈的实现</a></p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
@@ -337,10 +337,10 @@
 		
 		<item>
 			<title>Go算法学习 找出缺失的整数</title>
-			<link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%89%BE%E5%87%BA%E7%BC%BA%E5%A4%B1%E7%9A%84%E6%95%B4%E6%95%B0/</link>
+			<link>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%89%BE%E5%87%BA%E7%BC%BA%E5%A4%B1%E7%9A%84%E6%95%B4%E6%95%B0/</link>
 			<pubDate>Thu, 15 Apr 2021 18:09:46 +0800</pubDate>
 			
-			<guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%89%BE%E5%87%BA%E7%BC%BA%E5%A4%B1%E7%9A%84%E6%95%B4%E6%95%B0/</guid>
+			<guid>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%89%BE%E5%87%BA%E7%BC%BA%E5%A4%B1%E7%9A%84%E6%95%B4%E6%95%B0/</guid>
 			<description>原文: 程序员小灰 找出缺失的整数
 实现代码 package main import ( &amp;#34;fmt&amp;#34; &amp;#34;math/rand&amp;#34; &amp;#34;time&amp;#34; ) var ( a []int b []int c []int l = 100 r = rand.New(rand.NewSource(time.Now().UnixNano())) ) func init() { // 1~10 随机数 	tmp := r.Intn(l-1)+1 // 在生成一个不等于tmp的随机数 	var tmp2 int for tmp2 == 0 || tmp2 == tmp { tmp2 = r.Intn(l-1)+1 } fmt.Println(tmp,tmp2) for i:=1 ;i &amp;lt;=l;i++ { if i == tmp { b = append(b, i) continue } a = append(a, i) b = append(b, i) b = append(b, i) } for i:=1 ;i &amp;lt;=l;i++ { if i == tmp ||i == tmp2 { c = append(c,i) continue } c = append(c,i) c = append(c,i) } //fmt.</description>
 			<content type="html"><![CDATA[<p>原文: <a href="https://mp.weixin.qq.com/s?__biz=MzIxMjE5MTE1Nw==&amp;mid=2653189951&amp;idx=1&amp;sn=0181c95484b67d108672235b14e5ebbb&amp;chksm=8c9905e5bbee8cf3362ccc4c7e091caa18b5783183ce4475b6f011c09c1cb03847ea4cb5220c&amp;scene=21#wechat_redirect">程序员小灰 找出缺失的整数</a></p>
@@ -478,10 +478,10 @@
 		
 		<item>
 			<title>Go学习 Goroutine泄露</title>
-			<link>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-goroutine%E6%B3%84%E9%9C%B2/</link>
+			<link>https://zhangzw001.github.io/golang/go%E5%AD%A6%E4%B9%A0-goroutine%E6%B3%84%E9%9C%B2/</link>
 			<pubDate>Thu, 25 Feb 2021 10:43:52 +0800</pubDate>
 			
-			<guid>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-goroutine%E6%B3%84%E9%9C%B2/</guid>
+			<guid>https://zhangzw001.github.io/golang/go%E5%AD%A6%E4%B9%A0-goroutine%E6%B3%84%E9%9C%B2/</guid>
 			<description>&lt;p&gt;goroutine 泄露常见说明&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>goroutine 泄露常见说明</p>
 <blockquote>
@@ -579,10 +579,10 @@
 		
 		<item>
 			<title>Go源码学习 Sort包Search方法</title>
-			<link>https://k1s.club/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</link>
+			<link>https://zhangzw001.github.io/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</link>
 			<pubDate>Mon, 25 Jan 2021 14:54:22 +0800</pubDate>
 			
-			<guid>https://k1s.club/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</guid>
+			<guid>https://zhangzw001.github.io/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</guid>
 			<description>&lt;p&gt;Sort包Search方法的实践说明&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>Sort包Search方法的实践说明</p>
 <h3 id="首先查看示例">首先查看示例</h3>
@@ -633,10 +633,10 @@
 		
 		<item>
 			<title>Go学习 并发的实现原理</title>
-			<link>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-%E5%B9%B6%E5%8F%91%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</link>
+			<link>https://zhangzw001.github.io/golang/go%E5%AD%A6%E4%B9%A0-%E5%B9%B6%E5%8F%91%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</link>
 			<pubDate>Thu, 14 Jan 2021 17:49:48 +0800</pubDate>
 			
-			<guid>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-%E5%B9%B6%E5%8F%91%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</guid>
+			<guid>https://zhangzw001.github.io/golang/go%E5%AD%A6%E4%B9%A0-%E5%B9%B6%E5%8F%91%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</guid>
 			<description>&lt;p&gt;go&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>go</p>
 <ul>
@@ -679,10 +679,10 @@ POSIX的thread API虽然能够提供丰富的API，例如配置自己的CPU亲�
 		
 		<item>
 			<title>Gee学习-路由trie测试编写</title>
-			<link>https://k1s.club/golang/gee%E5%AD%A6%E4%B9%A0-%E8%B7%AF%E7%94%B1trie%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99/</link>
+			<link>https://zhangzw001.github.io/golang/gee%E5%AD%A6%E4%B9%A0-%E8%B7%AF%E7%94%B1trie%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99/</link>
 			<pubDate>Thu, 14 Jan 2021 11:32:54 +0800</pubDate>
 			
-			<guid>https://k1s.club/golang/gee%E5%AD%A6%E4%B9%A0-%E8%B7%AF%E7%94%B1trie%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99/</guid>
+			<guid>https://zhangzw001.github.io/golang/gee%E5%AD%A6%E4%B9%A0-%E8%B7%AF%E7%94%B1trie%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99/</guid>
 			<description>github地址: github.com/zhangzw001/learnGee
  路由分析测试 package gee import ( &amp;#34;reflect&amp;#34; &amp;#34;testing&amp;#34; ) func TestParsePattern(t *testing.T) { tests := []struct { patterns string parts []string ok bool }{ {&amp;#34;/test/v1/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;v1&amp;#34;, &amp;#34;add&amp;#34;},true }, {&amp;#34;/test/*name/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;*name&amp;#34;},true}, {&amp;#34;/test/:name&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;},true }, {&amp;#34;/test/:name/abc&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;, &amp;#34;abc&amp;#34;},true}, {&amp;#34;/test/v1/add&amp;#34;, []string{&amp;#34;testv1&amp;#34;, &amp;#34;add&amp;#34;},false }, {&amp;#34;/test/*name/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;*name&amp;#34;,&amp;#34;add&amp;#34;},false}, {&amp;#34;/test/:name&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:&amp;#34;,&amp;#34;name&amp;#34;},false }, {&amp;#34;/test/:name/abc&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;},false}, } m := make(map[string][]string) for _, test := range tests { m[test.patterns] = test.parts p := parsePattern(test.</description>
 			<content type="html"><![CDATA[<p>github地址: <a href="github.com/zhangzw001/learnGee">github.com/zhangzw001/learnGee</a></p>
@@ -988,10 +988,10 @@ POSIX的thread API虽然能够提供丰富的API，例如配置自己的CPU亲�
 		
 		<item>
 			<title>Gin学习 简单记录form数据获取源码解读</title>
-			<link>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</link>
+			<link>https://zhangzw001.github.io/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</link>
 			<pubDate>Wed, 13 Jan 2021 14:24:43 +0800</pubDate>
 			
-			<guid>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</guid>
+			<guid>https://zhangzw001.github.io/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</guid>
 			<description>http.request form 数据测试 func main() { e := gin.Default() e.Any(&amp;#34;/test&amp;#34;,func(c *gin.Context) { // 获取所有参数 	_ = c.Request.ParseForm() // log.Println(c.Request.Header[&amp;#34;Content-Type&amp;#34;]) 	// get form 参数, c.Request.URL.Query, err = url.ParseQuery 	log.Println(c.Request.URL.Query()) //log.Println(url.ParseQuery(c.Request.URL.RawQuery)) 	// post form 参数 	log.Println(c.Request.PostForm) // form 参数 	log.Println(c.Request.Form) }) e.Run(&amp;#34;localhost:8123&amp;#34;) }  请求日志
  # curl -XPOST &amp;quot;http://localhost:8123/test&amp;quot; -d &amp;quot;abc=123&amp;amp;q=123&amp;amp;ccc=123123&amp;quot; 2021/01/13 14:31:30 map[] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] [GIN] 2021/01/13 - 14:31:30 | 200 | 339.</description>
 			<content type="html"><![CDATA[<h3 id="httprequest-form-数据测试">http.request form 数据测试</h3>
@@ -1183,10 +1183,10 @@ POSIX的thread API虽然能够提供丰富的API，例如配置自己的CPU亲�
 		
 		<item>
 			<title>Gin学习 Validator</title>
-			<link>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-validator/</link>
+			<link>https://zhangzw001.github.io/golang/gin%E5%AD%A6%E4%B9%A0-validator/</link>
 			<pubDate>Tue, 12 Jan 2021 10:17:46 +0800</pubDate>
 			
-			<guid>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-validator/</guid>
+			<guid>https://zhangzw001.github.io/golang/gin%E5%AD%A6%E4%B9%A0-validator/</guid>
 			<description>&lt;p&gt;记录一下Gin学习验证器和翻译器模块&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>记录一下Gin学习验证器和翻译器模块</p>
 <ul>
@@ -1623,10 +1623,10 @@ POSIX的thread API虽然能够提供丰富的API，例如配置自己的CPU亲�
 		
 		<item>
 			<title>Google资深工程师深度讲解Go语言 Elastic简单使用</title>
-			<link>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-elastic%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</link>
+			<link>https://zhangzw001.github.io/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-elastic%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</link>
 			<pubDate>Wed, 06 Jan 2021 14:27:27 +0800</pubDate>
 			
-			<guid>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-elastic%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</guid>
+			<guid>https://zhangzw001.github.io/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-elastic%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</guid>
 			<description></description>
 			<content type="html"><![CDATA[<h3 id="elastic-检查查询">elastic 检查查询</h3>
 <pre><code># 查询 女, 已购房 年龄小于22岁
@@ -1636,10 +1636,10 @@ http://172.16.76.220:9200/crawler/youyuan/_search?q=女  AND 已购房  AND Payl
 		
 		<item>
 			<title>Google资深工程师深度讲解Go语言 单任务爬虫</title>
-			<link>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-%E5%8D%95%E4%BB%BB%E5%8A%A1%E7%88%AC%E8%99%AB/</link>
+			<link>https://zhangzw001.github.io/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-%E5%8D%95%E4%BB%BB%E5%8A%A1%E7%88%AC%E8%99%AB/</link>
 			<pubDate>Mon, 21 Dec 2020 18:03:36 +0800</pubDate>
 			
-			<guid>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-%E5%8D%95%E4%BB%BB%E5%8A%A1%E7%88%AC%E8%99%AB/</guid>
+			<guid>https://zhangzw001.github.io/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-%E5%8D%95%E4%BB%BB%E5%8A%A1%E7%88%AC%E8%99%AB/</guid>
 			<description>&lt;p&gt;由于教程的代码在zhenai.com更新之后无法访问,所以记录下代码改动&lt;/p&gt;</description>
 			<content type="html"><![CDATA[<p>由于教程的代码在zhenai.com更新之后无法访问,所以记录下代码改动</p>
 <h3 id="问题说明">问题说明</h3>
@@ -1725,10 +1725,10 @@ http://172.16.76.220:9200/crawler/youyuan/_search?q=女  AND 已购房  AND Payl
 		
 		<item>
 			<title>Google资深工程师深度讲解Go语言-广度优先算法学习-迷宫</title>
-			<link>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-%E5%B9%BF%E5%BA%A6%E6%B7%B1%E5%BA%A6%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BF%B7%E5%AE%AB/</link>
+			<link>https://zhangzw001.github.io/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-%E5%B9%BF%E5%BA%A6%E6%B7%B1%E5%BA%A6%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BF%B7%E5%AE%AB/</link>
 			<pubDate>Fri, 18 Dec 2020 18:00:44 +0800</pubDate>
 			
-			<guid>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-%E5%B9%BF%E5%BA%A6%E6%B7%B1%E5%BA%A6%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BF%B7%E5%AE%AB/</guid>
+			<guid>https://zhangzw001.github.io/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-%E5%B9%BF%E5%BA%A6%E6%B7%B1%E5%BA%A6%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BF%B7%E5%AE%AB/</guid>
 			<description>这里学习了Google吱声工程师深度讲解go语言-迷宫广度优先算法以记录
 算法说明 图源: 图解迷宫算法（广度优先遍历)
 首先看一张迷宫图, 左右黄色0 表示起始点, 0 表示可以行走, 1表示墙体 迷宫的广度优先算法的意思是, 可以通过0 发现四个方向的1, 然后在通过四个1 发现所有的2, 所有的2探索完 , 在探索3&amp;hellip; 以此类推&amp;hellip; 这里每个点都有三种状态:  未发现 已发现未探索 已探索  最终我们能探索到这样的结果图: 下面是详细代码 代码结构 ── maze ├── maze.go └── maze.in maze.in文件 6 5 0 1 0 0 0 0 0 0 1 0 0 1 0 1 0 1 1 1 0 0 0 1 0 0 1 0 1 0 0 0 maze.go package main import ( &amp;#34;fmt&amp;#34; &amp;#34;log&amp;#34; &amp;#34;os&amp;#34; ) /* maze.</description>

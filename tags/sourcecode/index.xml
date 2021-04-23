@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>sourceCode on zhangzw</title>
-    <link>https://k1s.club/tags/sourcecode/</link>
+    <link>https://zhangzw001.github.io/tags/sourcecode/</link>
     <description>Recent content in sourceCode on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Mon, 25 Jan 2021 14:54:22 +0800</lastBuildDate><atom:link href="https://k1s.club/tags/sourcecode/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 25 Jan 2021 14:54:22 +0800</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/sourcecode/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Go源码学习 Sort包Search方法</title>
-      <link>https://k1s.club/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</link>
+      <link>https://zhangzw001.github.io/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</link>
       <pubDate>Mon, 25 Jan 2021 14:54:22 +0800</pubDate>
       
-      <guid>https://k1s.club/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</guid>
+      <guid>https://zhangzw001.github.io/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</guid>
       <description>&lt;p&gt;Sort包Search方法的实践说明&lt;/p&gt;</description>
     </item>
     

@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>cephfs on zhangzw</title>
-    <link>https://k1s.club/tags/cephfs/</link>
+    <link>https://zhangzw001.github.io/tags/cephfs/</link>
     <description>Recent content in cephfs on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Thu, 26 Sep 2019 11:13:40 +0000</lastBuildDate><atom:link href="https://k1s.club/tags/cephfs/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 26 Sep 2019 11:13:40 +0000</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/cephfs/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>ceph安装部署</title>
-      <link>https://k1s.club/posts/6-ceph%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/</link>
+      <link>https://zhangzw001.github.io/posts/6-ceph%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/</link>
       <pubDate>Thu, 26 Sep 2019 11:13:40 +0000</pubDate>
       
-      <guid>https://k1s.club/posts/6-ceph%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/</guid>
+      <guid>https://zhangzw001.github.io/posts/6-ceph%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/</guid>
       <description>Ceph是一个统一的分布式存储系统，设计初衷是提供较好的性能、可靠性和可扩展性。
 简单了解什么是块存储/对象存储/文件系统存储？ ceph 目前提供对象存储（RADOSGW）、块存储RDB以及 CephFS 文件系统这 3 种功能。对于这3种功能介绍，分别如下：
   对象存储，也就是通常意义的键值存储，其接口就是简单的GET、PUT、DEL 和其他扩展，代表主要有 Swift 、S3 以及 Gluster 等；

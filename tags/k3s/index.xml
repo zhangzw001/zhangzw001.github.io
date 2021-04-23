@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>k3s on zhangzw</title>
-    <link>https://k1s.club/tags/k3s/</link>
+    <link>https://zhangzw001.github.io/tags/k3s/</link>
     <description>Recent content in k3s on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 03 Dec 2019 16:06:28 +0000</lastBuildDate><atom:link href="https://k1s.club/tags/k3s/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 03 Dec 2019 16:06:28 +0000</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/k3s/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>k3s安装配置</title>
-      <link>https://k1s.club/posts/29-k3s%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</link>
+      <link>https://zhangzw001.github.io/posts/29-k3s%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</link>
       <pubDate>Tue, 03 Dec 2019 16:06:28 +0000</pubDate>
       
-      <guid>https://k1s.club/posts/29-k3s%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</guid>
+      <guid>https://zhangzw001.github.io/posts/29-k3s%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</guid>
       <description>体验轻量级k8s集群,适用于低配个人开发测试使用
  k3s, 5 less than k8s   详情参考官方: k3s github地址
 准备  1 selinux 关闭  getenforce # 本次关闭 setenforce 0 # 重启后关闭 sed -i &#39;/SELINUX=enforcing/s/enforcing/disabled/&#39; /etc/sysconfig/selinux  2 关闭swap(可选)  # 本次关闭 swapoff on # 重启后关闭 sed -i &#39;/swap/s@^/@#/@&#39; /etc/fstab  3 关闭firewalld(必须)  systemctl stop firewalld.service systemctl disable firewalld.service  4 在内核3.10,4.16,5.2,5.3 都正常运行  Step 1: 安装K3S集群 # 下载k3s 二进制文件打开各版本点击详情可以查询k3s版本对应的k8s版本(https://github.com/rancher/k3s/releases) wget https://github.com/rancher/k3s/releases/download/v1.0.0/k3s k3s v1.0.0 -&amp;gt; k8s1.16.3 # https://github.</description>
@@ -21,19 +21,19 @@
     
     <item>
       <title>k3s1.16部署nginx&#43;php5.2.17</title>
-      <link>https://k1s.club/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</link>
+      <link>https://zhangzw001.github.io/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</link>
       <pubDate>Tue, 03 Dec 2019 11:46:42 +0000</pubDate>
       
-      <guid>https://k1s.club/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</guid>
+      <guid>https://zhangzw001.github.io/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</guid>
       <description>&lt;p&gt;老项目是用php5.2.17的,自己编译打包镜像简单部署&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>k3s集群部署项目报挂载nfs错误</title>
-      <link>https://k1s.club/posts/30-k3s%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E6%8A%A5%E6%8C%82%E8%BD%BDnfs%E9%94%99%E8%AF%AF/</link>
+      <link>https://zhangzw001.github.io/posts/30-k3s%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E6%8A%A5%E6%8C%82%E8%BD%BDnfs%E9%94%99%E8%AF%AF/</link>
       <pubDate>Mon, 25 Nov 2019 17:37:23 +0000</pubDate>
       
-      <guid>https://k1s.club/posts/30-k3s%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E6%8A%A5%E6%8C%82%E8%BD%BDnfs%E9%94%99%E8%AF%AF/</guid>
+      <guid>https://zhangzw001.github.io/posts/30-k3s%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E6%8A%A5%E6%8C%82%E8%BD%BDnfs%E9%94%99%E8%AF%AF/</guid>
       <description>体验轻量级k8s集群遇到一些nfs问题
   部署服务器查看describe信息如下: Mounting command: systemd-run Mounting arguments: --description=Kubernetes transient mount for /var/lib/kubelet/pods/369daaef-1e90-446b-92ce-3d562f94b429/volumes/kubernetes.io~nfs/pvc-f462c606-5796-4c48-8928-7822f3fa0605 --scope -- mount -t nfs 192.168.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 /var/lib/kubelet/pods/369daaef-1e90-446b-92ce-3d562f94b429/volumes/kubernetes.io~nfs/pvc-f462c606-5796-4c48-8928-7822f3fa0605 Output: Running scope as unit run-14829.scope. mount: 文件系统类型错误、选项错误、192.168.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 上有坏超级块、 缺少代码页或助手程序，或其他错误 (对某些文件系统(如 nfs、cifs) 您可能需要 一款 /sbin/mount.&amp;lt;类型&amp;gt; 助手程序)   分析  猜测1 可能是nfs的系统格式和集群node节点文件格式不同  # 查看发现nfs是ext4, 然后集群中其他的磁盘都是xfs df -T|egrep -v &amp;quot;contai|var|overl&amp;quot; 所以新挂了块磁盘,格式化为xfs然后再次实验,发现错误同样...  猜测2 可能是客户端无法识别nfs格式  # 做个测试 mkdir /tmp/abc mount -t nfs 192.168.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 /tmp/abc # 果然报错 mount: wrong fs type, bad option, bad superblock on 192.</description>
     </item>

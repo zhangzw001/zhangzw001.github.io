@@ -23,7 +23,7 @@
   https://www.cnblogs.com/Sinte-Beuve/p/11739196.html https://www.qikqiak.com/post/gitlab-ci-k8s-cluster-feature/   环境版本统计 1 gitlab/gitlab-runner 0.15.0 2 helm 2.16 3 k8s 1.16.4 4 gitlab 11.5 5 CentOS Linux release 7.7 /kernel 5.2  小节
  1. gitlab 通过admin管理页面的runner配置, 安装gitlab-runner, 安装方式可以是二进制, docker 或k8s (这里是k8s) 2. gitlab 项目目录的 Operations -&gt; kubernetes -&gt; Add Kubernetes Cluster -&gt; Add existing cluster 是结合k8s, 每个项目都需要设置一个k8s集群,k8s集群需要配置rbac权限 3. ci 在提交到私有harbor上是需要验证账号密码, 私有仓库拉取也需要验证  安装方法一   k8s yaml直接部署 gitlab-ci-token-secret.yaml  具体token值 请查看 gitlab的admin页面-&gt; Overview -&gt; Runners 查看, 然后base64加密" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://k1s.club/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/" />
+<meta property="og:url" content="https://zhangzw001.github.io/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/" />
 <meta property="article:published_time" content="2020-04-23T16:20:33+00:00" />
 <meta property="article:modified_time" content="2020-04-23T16:20:33+00:00" />
 <meta name="twitter:card" content="summary"/>
@@ -40,7 +40,7 @@
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>gitlab-ci与k8s结合</title>
-	<link rel="stylesheet" href="https://k1s.club/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	<link rel="stylesheet" href="https://zhangzw001.github.io/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
 	
 </head>
 
@@ -50,11 +50,11 @@
 		<div class="hdr-wrapper section-inner">
 			<div class="hdr-left">
 				<div class="site-branding">
-					<a href="https://k1s.club">zhangzw</a>
+					<a href="https://zhangzw001.github.io">zhangzw</a>
 				</div>
 				<nav class="site-nav hide-in-mobile">
-					<a href="https://k1s.club/golang/">golang</a>
-					<a href="https://k1s.club/posts/">文章</a>
+					<a href="https://zhangzw001.github.io/golang/">golang</a>
+					<a href="https://zhangzw001.github.io/posts/">文章</a>
 				</nav>
 			</div>
 			<div class="hdr-right hdr-icons">
@@ -64,9 +64,9 @@
 	</header>
 	<div id="mobile-menu" class="animated fast">
 		<ul>
-			<li><a href="https://k1s.club/posts/">文章</a></li>
-			<li><a href="https://k1s.club/tags/">标签</a></li>
-			<li><a href="https://k1s.club/about/">关于</a></li>
+			<li><a href="https://zhangzw001.github.io/posts/">文章</a></li>
+			<li><a href="https://zhangzw001.github.io/tags/">标签</a></li>
+			<li><a href="https://zhangzw001.github.io/about/">关于</a></li>
 		</ul>
 	</div>
 
@@ -696,7 +696,7 @@ ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock 
 			<hr class="post-end">
 			<footer class="post-info">
 				<p>
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://k1s.club/tags/gitlab-runner">gitlab-runner</a></span><span class="tag"><a href="https://k1s.club/tags/k8s">k8s</a></span>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://zhangzw001.github.io/tags/gitlab-runner">gitlab-runner</a></span><span class="tag"><a href="https://zhangzw001.github.io/tags/k8s">k8s</a></span>
 				</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1257 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-04-24 00:20 &#43;0800</p>
@@ -727,10 +727,10 @@ ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock 
 </nav>
 		</aside>
 		<div class="post-nav thin">
-			<a class="next-post" href="https://k1s.club/posts/46-docker%E5%AE%89%E8%A3%85nginx%E7%AC%AC%E4%B8%89%E6%96%B9%E6%A8%A1%E5%9D%97/">
+			<a class="next-post" href="https://zhangzw001.github.io/posts/46-docker%E5%AE%89%E8%A3%85nginx%E7%AC%AC%E4%B8%89%E6%96%B9%E6%A8%A1%E5%9D%97/">
 				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>docker安装nginx第三方模块</span>
 			</a>
-			<a class="prev-post" href="https://k1s.club/posts/44-k8s%E9%83%A8%E7%BD%B2fluentd-kafka-logstash-es/">
+			<a class="prev-post" href="https://zhangzw001.github.io/posts/44-k8s%E9%83%A8%E7%BD%B2fluentd-kafka-logstash-es/">
 				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>k8s部署fluentd&#43;kafka&#43;logstash&#43;es</span>
 			</a>
 		</div>
@@ -747,14 +747,14 @@ ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock 
 	</main>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2019 - 2021 <a href="https://k1s.club">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>&copy; 2019 - 2021 <a href="https://zhangzw001.github.io">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
 		<p>
-			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://k1s.club/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://zhangzw001.github.io/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>
 	</footer>
 
 
-	<script src="https://k1s.club/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+	<script src="https://zhangzw001.github.io/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
 <script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {

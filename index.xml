@@ -2,65 +2,65 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>zhangzw</title>
-    <link>https://k1s.club/</link>
+    <link>https://zhangzw001.github.io/</link>
     <description>Recent content on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 23 Apr 2021 09:27:50 +0800</lastBuildDate><atom:link href="https://k1s.club/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 23 Apr 2021 09:27:50 +0800</lastBuildDate><atom:link href="https://zhangzw001.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Go算法学习 回溯 分割回文串</title>
-      <link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</link>
+      <link>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</link>
       <pubDate>Fri, 23 Apr 2021 09:27:50 +0800</pubDate>
       
-      <guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</guid>
+      <guid>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</guid>
       <description>说明  纯暴力搜索, 通常可以抽象为N叉树, 树的深度就是递归的深度
   组合问题(不强调顺序) 1234 =&amp;gt; 12,13,14,23,24,34 切割问题(分割回文串) aab =&amp;gt; [a,a,b],[aa,b] 子集问题 排列问题(强调顺序) 1234 =&amp;gt; 12,13,14,21,23,24&amp;hellip; 棋盘问题(N皇后,数独)  回溯算法模板 func backtracking(参数) { if (终止条件) { 存放结果; return; } for (选择：本层集合中元素（树中节点孩子的数量就是集合的大小）) { 处理节点; backtracking(路径，选择列表); // 递归  回溯，撤销处理结果 } } 参考文献  力扣题目：131.分割回文串 代码随想录视频 回溯算法-分割回文串（对应力扣题目：131.分割回文串） 代码随想录图文 回溯算法：分割回文串  代码 package main import ( &amp;#34;fmt&amp;#34; ) //分割回文串 //给你一个字符串 s，请你将 s 分割成一些子串，使每个子串都是 回文串 。返回 s 所有可能的分割方案。 // //回文串 是正着读和反着读都一样的字符串。 // // // //示例 1： // //输入：s = &amp;#34;aab&amp;#34; //输出：[[&amp;#34;a&amp;#34;,&amp;#34;a&amp;#34;,&amp;#34;b&amp;#34;],[&amp;#34;aa&amp;#34;,&amp;#34;b&amp;#34;]] //示例 2： // //输入：s = &amp;#34;a&amp;#34; //输出：[[&amp;#34;a&amp;#34;]] // // //提示： // //1 &amp;lt;= s.</description>
     </item>
     
     <item>
       <title>Go算法学习 辗转相除法</title>
-      <link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</link>
+      <link>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</link>
       <pubDate>Fri, 16 Apr 2021 15:56:59 +0800</pubDate>
       
-      <guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</guid>
+      <guid>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Go算法学习 最小栈的实现</title>
-      <link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</link>
+      <link>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</link>
       <pubDate>Fri, 16 Apr 2021 10:09:37 +0800</pubDate>
       
-      <guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</guid>
+      <guid>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Go算法学习 找出缺失的整数</title>
-      <link>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%89%BE%E5%87%BA%E7%BC%BA%E5%A4%B1%E7%9A%84%E6%95%B4%E6%95%B0/</link>
+      <link>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%89%BE%E5%87%BA%E7%BC%BA%E5%A4%B1%E7%9A%84%E6%95%B4%E6%95%B0/</link>
       <pubDate>Thu, 15 Apr 2021 18:09:46 +0800</pubDate>
       
-      <guid>https://k1s.club/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%89%BE%E5%87%BA%E7%BC%BA%E5%A4%B1%E7%9A%84%E6%95%B4%E6%95%B0/</guid>
+      <guid>https://zhangzw001.github.io/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%89%BE%E5%87%BA%E7%BC%BA%E5%A4%B1%E7%9A%84%E6%95%B4%E6%95%B0/</guid>
       <description>原文: 程序员小灰 找出缺失的整数
 实现代码 package main import ( &amp;#34;fmt&amp;#34; &amp;#34;math/rand&amp;#34; &amp;#34;time&amp;#34; ) var ( a []int b []int c []int l = 100 r = rand.New(rand.NewSource(time.Now().UnixNano())) ) func init() { // 1~10 随机数 	tmp := r.Intn(l-1)+1 // 在生成一个不等于tmp的随机数 	var tmp2 int for tmp2 == 0 || tmp2 == tmp { tmp2 = r.Intn(l-1)+1 } fmt.Println(tmp,tmp2) for i:=1 ;i &amp;lt;=l;i++ { if i == tmp { b = append(b, i) continue } a = append(a, i) b = append(b, i) b = append(b, i) } for i:=1 ;i &amp;lt;=l;i++ { if i == tmp ||i == tmp2 { c = append(c,i) continue } c = append(c,i) c = append(c,i) } //fmt.</description>
     </item>
     
     <item>
       <title>Go学习 Goroutine泄露</title>
-      <link>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-goroutine%E6%B3%84%E9%9C%B2/</link>
+      <link>https://zhangzw001.github.io/golang/go%E5%AD%A6%E4%B9%A0-goroutine%E6%B3%84%E9%9C%B2/</link>
       <pubDate>Thu, 25 Feb 2021 10:43:52 +0800</pubDate>
       
-      <guid>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-goroutine%E6%B3%84%E9%9C%B2/</guid>
+      <guid>https://zhangzw001.github.io/golang/go%E5%AD%A6%E4%B9%A0-goroutine%E6%B3%84%E9%9C%B2/</guid>
       <description>&lt;p&gt;goroutine 泄露常见说明&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Docker部署jira8全家桶破解</title>
-      <link>https://k1s.club/posts/65-docker%E9%83%A8%E7%BD%B2jira8%E5%85%A8%E5%AE%B6%E6%A1%B6%E7%A0%B4%E8%A7%A3/</link>
+      <link>https://zhangzw001.github.io/posts/65-docker%E9%83%A8%E7%BD%B2jira8%E5%85%A8%E5%AE%B6%E6%A1%B6%E7%A0%B4%E8%A7%A3/</link>
       <pubDate>Wed, 27 Jan 2021 18:13:13 +0800</pubDate>
       
-      <guid>https://k1s.club/posts/65-docker%E9%83%A8%E7%BD%B2jira8%E5%85%A8%E5%AE%B6%E6%A1%B6%E7%A0%B4%E8%A7%A3/</guid>
+      <guid>https://zhangzw001.github.io/posts/65-docker%E9%83%A8%E7%BD%B2jira8%E5%85%A8%E5%AE%B6%E6%A1%B6%E7%A0%B4%E8%A7%A3/</guid>
       <description>参考文档
    通过atlassian-agent.jar全家桶破解: https://www.cnblogs.com/zhmiao/p/10620903.html
   通过altassian-agent.jar全家桶破解插件(超详细 推荐): https://www.dqzboy.com/atlassian全家桶以及插件破解详细教程
@@ -71,19 +71,19 @@
     
     <item>
       <title>Go源码学习 Sort包Search方法</title>
-      <link>https://k1s.club/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</link>
+      <link>https://zhangzw001.github.io/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</link>
       <pubDate>Mon, 25 Jan 2021 14:54:22 +0800</pubDate>
       
-      <guid>https://k1s.club/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</guid>
+      <guid>https://zhangzw001.github.io/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</guid>
       <description>&lt;p&gt;Sort包Search方法的实践说明&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Mysql5.7-alter锁表问题</title>
-      <link>https://k1s.club/posts/64-mysql5.7-alter%E9%94%81%E8%A1%A8%E9%97%AE%E9%A2%98/</link>
+      <link>https://zhangzw001.github.io/posts/64-mysql5.7-alter%E9%94%81%E8%A1%A8%E9%97%AE%E9%A2%98/</link>
       <pubDate>Tue, 19 Jan 2021 11:28:39 +0800</pubDate>
       
-      <guid>https://k1s.club/posts/64-mysql5.7-alter%E9%94%81%E8%A1%A8%E9%97%AE%E9%A2%98/</guid>
+      <guid>https://zhangzw001.github.io/posts/64-mysql5.7-alter%E9%94%81%E8%A1%A8%E9%97%AE%E9%A2%98/</guid>
       <description>由于需要更新 my_test_table 的 style字段 由 tinyint(2) 为 int(10)  由于认为 mysql5.6和5.7 alter table 不会锁表, 因此在执行时 导致了锁表无法 update my_test_table
   根据官方说明 Changing the column data type 不支持 online ddl
   https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html  新增临时表做测试 准备临时表, 导入部分数据 -- 主库执行 create table my_test_table_tmp_20210119 like my_test_table; show create table my_test_table\G ENGINE=InnoDB AUTO_INCREMENT=48544733 DEFAULT CHARSET=utf8 COMMENT=&amp;#39;测试表&amp;#39; alter table my_test_table_tmp_20210119 AUTO_INCREMENT=49000000; 测试执行alter table 修改字段data type是否会锁表 -- 首先终端1 执行 alter alter table my_test_table_tmp_20210119 modify style int(10) not null default 0 comment &amp;#39;下单方式&amp;#39;; -- 首先终端2 执行 update(是会卡住) update my_test_table_tmp_20210119 set status =1 limit 1; -- 查看 processlist (如下图,出现Waiting for table metadata lock) show full processlist 开始测试 pt-online-schema-change 工具  参考文档: https://www.</description>
@@ -91,19 +91,19 @@
     
     <item>
       <title>Go学习 并发的实现原理</title>
-      <link>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-%E5%B9%B6%E5%8F%91%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</link>
+      <link>https://zhangzw001.github.io/golang/go%E5%AD%A6%E4%B9%A0-%E5%B9%B6%E5%8F%91%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</link>
       <pubDate>Thu, 14 Jan 2021 17:49:48 +0800</pubDate>
       
-      <guid>https://k1s.club/golang/go%E5%AD%A6%E4%B9%A0-%E5%B9%B6%E5%8F%91%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</guid>
+      <guid>https://zhangzw001.github.io/golang/go%E5%AD%A6%E4%B9%A0-%E5%B9%B6%E5%8F%91%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</guid>
       <description>&lt;p&gt;go&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Gee学习-路由trie测试编写</title>
-      <link>https://k1s.club/golang/gee%E5%AD%A6%E4%B9%A0-%E8%B7%AF%E7%94%B1trie%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99/</link>
+      <link>https://zhangzw001.github.io/golang/gee%E5%AD%A6%E4%B9%A0-%E8%B7%AF%E7%94%B1trie%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99/</link>
       <pubDate>Thu, 14 Jan 2021 11:32:54 +0800</pubDate>
       
-      <guid>https://k1s.club/golang/gee%E5%AD%A6%E4%B9%A0-%E8%B7%AF%E7%94%B1trie%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99/</guid>
+      <guid>https://zhangzw001.github.io/golang/gee%E5%AD%A6%E4%B9%A0-%E8%B7%AF%E7%94%B1trie%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99/</guid>
       <description>github地址: github.com/zhangzw001/learnGee
  路由分析测试 package gee import ( &amp;#34;reflect&amp;#34; &amp;#34;testing&amp;#34; ) func TestParsePattern(t *testing.T) { tests := []struct { patterns string parts []string ok bool }{ {&amp;#34;/test/v1/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;v1&amp;#34;, &amp;#34;add&amp;#34;},true }, {&amp;#34;/test/*name/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;*name&amp;#34;},true}, {&amp;#34;/test/:name&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;},true }, {&amp;#34;/test/:name/abc&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;, &amp;#34;abc&amp;#34;},true}, {&amp;#34;/test/v1/add&amp;#34;, []string{&amp;#34;testv1&amp;#34;, &amp;#34;add&amp;#34;},false }, {&amp;#34;/test/*name/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;*name&amp;#34;,&amp;#34;add&amp;#34;},false}, {&amp;#34;/test/:name&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:&amp;#34;,&amp;#34;name&amp;#34;},false }, {&amp;#34;/test/:name/abc&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;},false}, } m := make(map[string][]string) for _, test := range tests { m[test.patterns] = test.parts p := parsePattern(test.</description>
     </item>

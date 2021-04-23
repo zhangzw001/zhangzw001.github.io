@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>untagged on zhangzw</title>
-    <link>https://k1s.club/tags/untagged/</link>
+    <link>https://zhangzw001.github.io/tags/untagged/</link>
     <description>Recent content in untagged on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Wed, 27 Jan 2021 18:13:13 +0800</lastBuildDate><atom:link href="https://k1s.club/tags/untagged/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 27 Jan 2021 18:13:13 +0800</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/untagged/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Docker部署jira8全家桶破解</title>
-      <link>https://k1s.club/posts/65-docker%E9%83%A8%E7%BD%B2jira8%E5%85%A8%E5%AE%B6%E6%A1%B6%E7%A0%B4%E8%A7%A3/</link>
+      <link>https://zhangzw001.github.io/posts/65-docker%E9%83%A8%E7%BD%B2jira8%E5%85%A8%E5%AE%B6%E6%A1%B6%E7%A0%B4%E8%A7%A3/</link>
       <pubDate>Wed, 27 Jan 2021 18:13:13 +0800</pubDate>
       
-      <guid>https://k1s.club/posts/65-docker%E9%83%A8%E7%BD%B2jira8%E5%85%A8%E5%AE%B6%E6%A1%B6%E7%A0%B4%E8%A7%A3/</guid>
+      <guid>https://zhangzw001.github.io/posts/65-docker%E9%83%A8%E7%BD%B2jira8%E5%85%A8%E5%AE%B6%E6%A1%B6%E7%A0%B4%E8%A7%A3/</guid>
       <description>参考文档
    通过atlassian-agent.jar全家桶破解: https://www.cnblogs.com/zhmiao/p/10620903.html
   通过altassian-agent.jar全家桶破解插件(超详细 推荐): https://www.dqzboy.com/atlassian全家桶以及插件破解详细教程
@@ -24,28 +24,28 @@
     
     <item>
       <title>Gin学习 Validator</title>
-      <link>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-validator/</link>
+      <link>https://zhangzw001.github.io/golang/gin%E5%AD%A6%E4%B9%A0-validator/</link>
       <pubDate>Tue, 12 Jan 2021 10:17:46 +0800</pubDate>
       
-      <guid>https://k1s.club/golang/gin%E5%AD%A6%E4%B9%A0-validator/</guid>
+      <guid>https://zhangzw001.github.io/golang/gin%E5%AD%A6%E4%B9%A0-validator/</guid>
       <description>&lt;p&gt;记录一下Gin学习验证器和翻译器模块&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Google资深工程师深度讲解Go语言 Elastic简单使用</title>
-      <link>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-elastic%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</link>
+      <link>https://zhangzw001.github.io/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-elastic%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</link>
       <pubDate>Wed, 06 Jan 2021 14:27:27 +0800</pubDate>
       
-      <guid>https://k1s.club/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-elastic%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</guid>
+      <guid>https://zhangzw001.github.io/golang/google%E8%B5%84%E6%B7%B1%E5%B7%A5%E7%A8%8B%E5%B8%88%E6%B7%B1%E5%BA%A6%E8%AE%B2%E8%A7%A3go%E8%AF%AD%E8%A8%80-elastic%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Gitlab-Ce的https开启问题</title>
-      <link>https://k1s.club/posts/63-gitlab-ce%E7%9A%84https%E5%BC%80%E5%90%AF%E9%97%AE%E9%A2%98/</link>
+      <link>https://zhangzw001.github.io/posts/63-gitlab-ce%E7%9A%84https%E5%BC%80%E5%90%AF%E9%97%AE%E9%A2%98/</link>
       <pubDate>Tue, 15 Dec 2020 11:15:52 +0800</pubDate>
       
-      <guid>https://k1s.club/posts/63-gitlab-ce%E7%9A%84https%E5%BC%80%E5%90%AF%E9%97%AE%E9%A2%98/</guid>
+      <guid>https://zhangzw001.github.io/posts/63-gitlab-ce%E7%9A%84https%E5%BC%80%E5%90%AF%E9%97%AE%E9%A2%98/</guid>
       <description>前言
  首先需要开启https并不会因为之前没有开启, 之前已经是https访问, 通过nginx反向代理到gitlab-ce:10080端口
 但是由于新版Chrome浏览器对于https的域名内部post调用http时 会提示不安全
@@ -57,10 +57,10 @@
     
     <item>
       <title>Goland快捷键记录</title>
-      <link>https://k1s.club/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/</link>
+      <link>https://zhangzw001.github.io/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/</link>
       <pubDate>Tue, 20 Oct 2020 16:42:57 +0800</pubDate>
       
-      <guid>https://k1s.club/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/</guid>
+      <guid>https://zhangzw001.github.io/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/</guid>
       <description>1. 记录一些常见的goland快捷键(mac) 1. command + alt + ← | → // 回退|前进 到上次浏览的位置  2. command d | x // 复制行 |删除行  3. command b = command + 单击 // 快速打开光标处的类或方法  4. command alt l // 重新格式化代码  5. 代码折叠和展开 - command shift + / - // 代码全部展开 / 折叠 (项目所有go文件全部展开/折叠) - command alt + / - // 代码递归展开 / 折叠 (所选内容行内全部展开/折叠) - command + / - // 代码展开 / 折叠 (所选内容展开/折叠)  6.</description>
     </item>
     
