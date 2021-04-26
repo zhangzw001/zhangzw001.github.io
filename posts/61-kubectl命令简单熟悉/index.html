@@ -19,7 +19,7 @@
 <meta property="og:title" content="Kubectl命令简单熟悉" />
 <meta property="og:description" content="kubectl命令熟悉 # 创建namespace kubectl create ns test # 查看namespace kubectl get ns # 命令创建deployment kubectl create deployment my-nginx --image=nginx --replicas=1 -n test # 命令删除deployment kubectl delete deployments.apps my-nginx -n test # 容器执行命令 kubectl exec -ti deployments.apps/nginx -n test -- nginx -v nginx version: nginx/1.16.0 # 通过yaml创建deployment kubectl apply -f nginx.yaml --record # 通过新增或修改注释方式更新deployment kubectl patch -f nginx.yaml -p &#34;{\&#34;spec\&#34;:{\&#34;template\&#34;:{\&#34;metadata\&#34;:{\&#34;annotations\&#34;:{\&#34;test-last-updated\&#34;:\&#34;$(date &#43;&#39;%F %T&#39;)\&#34;}}}}}&#34; # 修改image kubectl set image deployment/nginx nginx=nginx:1.16.0 -n test # 滚动升级 kubectl scale deployment nginx --replicas=2 -n test # 加上--record history就能看到变更信息(但感觉左右不大) kubectl rollout history deployment nginx -n test # describe 其实更详细 kubectl describe deployment nginx -n test # 查看yaml配置 kubectl get deployment." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://zhangzw001.github.io/posts/61-kubectl%E5%91%BD%E4%BB%A4%E7%AE%80%E5%8D%95%E7%86%9F%E6%82%89/" />
+<meta property="og:url" content="https://www.ngirl.xyz/posts/61-kubectl%E5%91%BD%E4%BB%A4%E7%AE%80%E5%8D%95%E7%86%9F%E6%82%89/" />
 <meta property="article:published_time" content="2020-10-29T11:15:58+08:00" />
 <meta property="article:modified_time" content="2020-10-29T11:15:58+08:00" />
 <meta name="twitter:card" content="summary"/>
@@ -34,7 +34,7 @@
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>Kubectl命令简单熟悉</title>
-	<link rel="stylesheet" href="https://zhangzw001.github.io/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	<link rel="stylesheet" href="https://www.ngirl.xyz/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
 	
 </head>
 
@@ -44,11 +44,11 @@
 		<div class="hdr-wrapper section-inner">
 			<div class="hdr-left">
 				<div class="site-branding">
-					<a href="https://zhangzw001.github.io">zhangzw</a>
+					<a href="https://www.ngirl.xyz">zhangzw</a>
 				</div>
 				<nav class="site-nav hide-in-mobile">
-					<a href="https://zhangzw001.github.io/golang/">golang</a>
-					<a href="https://zhangzw001.github.io/posts/">文章</a>
+					<a href="https://www.ngirl.xyz/golang/">golang</a>
+					<a href="https://www.ngirl.xyz/posts/">文章</a>
 				</nav>
 			</div>
 			<div class="hdr-right hdr-icons">
@@ -58,9 +58,9 @@
 	</header>
 	<div id="mobile-menu" class="animated fast">
 		<ul>
-			<li><a href="https://zhangzw001.github.io/posts/">文章</a></li>
-			<li><a href="https://zhangzw001.github.io/tags/">标签</a></li>
-			<li><a href="https://zhangzw001.github.io/about/">关于</a></li>
+			<li><a href="https://www.ngirl.xyz/posts/">文章</a></li>
+			<li><a href="https://www.ngirl.xyz/tags/">标签</a></li>
+			<li><a href="https://www.ngirl.xyz/about/">关于</a></li>
 		</ul>
 	</div>
 
@@ -165,7 +165,7 @@ kubectl create service nodeport nginx --tcp<span class="o">=</span>31112:80 -n <
 			<hr class="post-end">
 			<footer class="post-info">
 				<p>
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://zhangzw001.github.io/tags/kubectl">kubectl</a></span>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/kubectl">kubectl</a></span>
 				</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>182 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-10-29 11:15 &#43;0800</p>
@@ -185,10 +185,10 @@ kubectl create service nodeport nginx --tcp<span class="o">=</span>31112:80 -n <
 </nav>
 		</aside>
 		<div class="post-nav thin">
-			<a class="next-post" href="https://zhangzw001.github.io/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/">
+			<a class="next-post" href="https://www.ngirl.xyz/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/">
 				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>k8s遇到的一些问题统计总结</span>
 			</a>
-			<a class="prev-post" href="https://zhangzw001.github.io/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/">
+			<a class="prev-post" href="https://www.ngirl.xyz/posts/60-goland%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%AE%B0%E5%BD%95/">
 				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Goland快捷键记录</span>
 			</a>
 		</div>
@@ -205,14 +205,14 @@ kubectl create service nodeport nginx --tcp<span class="o">=</span>31112:80 -n <
 	</main>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2019 - 2021 <a href="https://zhangzw001.github.io">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>&copy; 2019 - 2021 <a href="https://www.ngirl.xyz">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
 		<p>
-			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://zhangzw001.github.io/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://www.ngirl.xyz/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>
 	</footer>
 
 
-	<script src="https://zhangzw001.github.io/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+	<script src="https://www.ngirl.xyz/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
 <script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {

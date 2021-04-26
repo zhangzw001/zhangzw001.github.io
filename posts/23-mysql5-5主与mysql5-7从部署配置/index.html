@@ -25,7 +25,7 @@
  mysql5.5升级到mysql5.7   采用mysql5.5数据目录升级为mysql5.7 1 从mysql5.5的从库 copy /data数据 2 修改新的mysql5.7配置文件 my.cnf，添加datadir，指向5.5数据目录 3 新安装数据库执行(本次不需要执行) /usr/local/mysql57/bin/mysqld --defaults-file=/etc/my57.cnf --initialize-insecure --user=mysql --basedir=/usr/local/mysql --datadir=/disk/u01 4 启动mysql 5 此时数据目录还是5.5的，需要执行mysql_upgrade进行升级，在执行表修复前，需要确认一个参数innodb_file_per_table，mysql官网对该参数的解释如下 该参数在5.5版本默认为OFF，所有表和索引都导入一个共享文件中，名为ibdata1,但在5.6.7及以后版本，改参数被默认设置为ON，即每张表都有对应的表和索引存储文件，每个schema下，每个frm文件都有对应的ibd文件。 在执行mysql_upgrade时，会修复系统表，并且如果该参数在5.5和5.7版本均使用默认值，则会将之前共享表和索引的存储方式改为每张表单独存储表和索引的形式，故会出现拷贝复制的操作，如果数据量比较大，则用时就会很长， 使用nnodb_file_per_table=1，及表和索引单独存储的优缺点，可查看mysql官网介绍。 6 使用mysql_upgrade检测并修复表 /usr/local/mysql57/bin/mysql_upgrade -S /disk/u01/mysql.sock  以上已经完成对mysql5.5数据升级 在mysql5.7运行的功能
   配置mysql5.5主与mysql5.7从   将msyql5.7作为mysql5.5的从库  # 从库执行, POS位置以 show master status\G 查询为准 stop slave; SET GLOBAL read_only=0; reset slave all; CHANGE MASTER TO MASTER_HOST=&#39;db_master.prod.zhangzw.com&#39;,MASTER_PORT=3306,MASTER_USER=&#39;xxx&#39;,MASTER_PASSWORD=&#39;xxx&#39;,MASTER_LOG_FILE=&#39;m1-master-bin.000001&#39;,MASTER_LOG_POS=107; start slave; 在主库测试创建表, 查看是否会同步到mysql5.7从库 create table tutorials_tbl( tutorial_id INT NOT NULL AUTO_INCREMENT, tutorial_title VARCHAR(100) NOT NULL, tutorial_author VARCHAR(40) NOT NULL, submission_date DATE, PRIMARY KEY ( tutorial_id ) );  修改mysql5." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://zhangzw001.github.io/posts/23-mysql5-5%E4%B8%BB%E4%B8%8Emysql5-7%E4%BB%8E%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE/" />
+<meta property="og:url" content="https://www.ngirl.xyz/posts/23-mysql5-5%E4%B8%BB%E4%B8%8Emysql5-7%E4%BB%8E%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE/" />
 <meta property="article:published_time" content="2019-10-29T14:56:55+00:00" />
 <meta property="article:modified_time" content="2019-10-29T14:56:55+00:00" />
 <meta name="twitter:card" content="summary"/>
@@ -43,7 +43,7 @@
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>mysql5.5主与mysql5.7从部署配置</title>
-	<link rel="stylesheet" href="https://zhangzw001.github.io/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	<link rel="stylesheet" href="https://www.ngirl.xyz/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
 	
 </head>
 
@@ -53,11 +53,11 @@
 		<div class="hdr-wrapper section-inner">
 			<div class="hdr-left">
 				<div class="site-branding">
-					<a href="https://zhangzw001.github.io">zhangzw</a>
+					<a href="https://www.ngirl.xyz">zhangzw</a>
 				</div>
 				<nav class="site-nav hide-in-mobile">
-					<a href="https://zhangzw001.github.io/golang/">golang</a>
-					<a href="https://zhangzw001.github.io/posts/">文章</a>
+					<a href="https://www.ngirl.xyz/golang/">golang</a>
+					<a href="https://www.ngirl.xyz/posts/">文章</a>
 				</nav>
 			</div>
 			<div class="hdr-right hdr-icons">
@@ -67,9 +67,9 @@
 	</header>
 	<div id="mobile-menu" class="animated fast">
 		<ul>
-			<li><a href="https://zhangzw001.github.io/posts/">文章</a></li>
-			<li><a href="https://zhangzw001.github.io/tags/">标签</a></li>
-			<li><a href="https://zhangzw001.github.io/about/">关于</a></li>
+			<li><a href="https://www.ngirl.xyz/posts/">文章</a></li>
+			<li><a href="https://www.ngirl.xyz/tags/">标签</a></li>
+			<li><a href="https://www.ngirl.xyz/about/">关于</a></li>
 		</ul>
 	</div>
 
@@ -401,7 +401,7 @@ max_allowed_packet = 32M
 			<hr class="post-end">
 			<footer class="post-info">
 				<p>
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://zhangzw001.github.io/tags/mysql">mysql</a></span><span class="tag"><a href="https://zhangzw001.github.io/tags/mysql5.7">mysql5.7</a></span>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/mysql">mysql</a></span><span class="tag"><a href="https://www.ngirl.xyz/tags/mysql5.7">mysql5.7</a></span>
 				</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>697 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-10-29 22:56 &#43;0800</p>
@@ -429,10 +429,10 @@ max_allowed_packet = 32M
 </nav>
 		</aside>
 		<div class="post-nav thin">
-			<a class="next-post" href="https://zhangzw001.github.io/posts/24-filebeat7%E6%94%B6%E9%9B%86mysql%E6%85%A2%E6%97%A5%E5%BF%97%E5%88%B0es/">
+			<a class="next-post" href="https://www.ngirl.xyz/posts/24-filebeat7%E6%94%B6%E9%9B%86mysql%E6%85%A2%E6%97%A5%E5%BF%97%E5%88%B0es/">
 				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>filebeat7收集mysql慢日志到es</span>
 			</a>
-			<a class="prev-post" href="https://zhangzw001.github.io/posts/22-es%E9%9B%86%E7%BE%A4%E7%A3%81%E7%9B%98%E6%89%A9%E5%AE%B9/">
+			<a class="prev-post" href="https://www.ngirl.xyz/posts/22-es%E9%9B%86%E7%BE%A4%E7%A3%81%E7%9B%98%E6%89%A9%E5%AE%B9/">
 				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>es5集群磁盘扩容</span>
 			</a>
 		</div>
@@ -449,14 +449,14 @@ max_allowed_packet = 32M
 	</main>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2019 - 2021 <a href="https://zhangzw001.github.io">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>&copy; 2019 - 2021 <a href="https://www.ngirl.xyz">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
 		<p>
-			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://zhangzw001.github.io/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://www.ngirl.xyz/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>
 	</footer>
 
 
-	<script src="https://zhangzw001.github.io/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+	<script src="https://www.ngirl.xyz/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
 <script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {

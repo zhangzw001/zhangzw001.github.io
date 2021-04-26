@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>ip on zhangzw</title>
-    <link>https://zhangzw001.github.io/tags/ip/</link>
+    <link>https://www.ngirl.xyz/tags/ip/</link>
     <description>Recent content in ip on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Thu, 27 Feb 2020 11:48:51 +0000</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/ip/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 27 Feb 2020 11:48:51 +0000</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/ip/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>centos单网卡配置多ip的几种方法</title>
-      <link>https://zhangzw001.github.io/posts/36-centos%E5%8D%95%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE%E5%A4%9Aip%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95/</link>
+      <link>https://www.ngirl.xyz/posts/36-centos%E5%8D%95%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE%E5%A4%9Aip%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95/</link>
       <pubDate>Thu, 27 Feb 2020 11:48:51 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/36-centos%E5%8D%95%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE%E5%A4%9Aip%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95/</guid>
+      <guid>https://www.ngirl.xyz/posts/36-centos%E5%8D%95%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE%E5%A4%9Aip%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95/</guid>
       <description>centos单网卡配置多ip的几种方法
   方法一 新建IP别名  临时设置, 不需要重启
  ifconfig enp0s3:1 192.168.53.109/24 ifconfig enp0s3:1 down  配置文件设置, 需要重启

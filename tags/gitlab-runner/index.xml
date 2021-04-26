@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>gitlab-runner on zhangzw</title>
-    <link>https://zhangzw001.github.io/tags/gitlab-runner/</link>
+    <link>https://www.ngirl.xyz/tags/gitlab-runner/</link>
     <description>Recent content in gitlab-runner on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Thu, 23 Apr 2020 16:20:33 +0000</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/gitlab-runner/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 23 Apr 2020 16:20:33 +0000</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/gitlab-runner/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>gitlab-ci与k8s结合</title>
-      <link>https://zhangzw001.github.io/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/</link>
+      <link>https://www.ngirl.xyz/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/</link>
       <pubDate>Thu, 23 Apr 2020 16:20:33 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/</guid>
+      <guid>https://www.ngirl.xyz/posts/45-gitlab-ci%E4%B8%8Ek8s%E7%BB%93%E5%90%88/</guid>
       <description>本文介绍如何通过gitlab-ci整合k8s实现流水线部署
   https://www.cnblogs.com/Sinte-Beuve/p/11739196.html https://www.qikqiak.com/post/gitlab-ci-k8s-cluster-feature/   环境版本统计 1 gitlab/gitlab-runner 0.15.0 2 helm 2.16 3 k8s 1.16.4 4 gitlab 11.5 5 CentOS Linux release 7.7 /kernel 5.2  小节
  1. gitlab 通过admin管理页面的runner配置, 安装gitlab-runner, 安装方式可以是二进制, docker 或k8s (这里是k8s) 2. gitlab 项目目录的 Operations -&amp;gt; kubernetes -&amp;gt; Add Kubernetes Cluster -&amp;gt; Add existing cluster 是结合k8s, 每个项目都需要设置一个k8s集群,k8s集群需要配置rbac权限 3. ci 在提交到私有harbor上是需要验证账号密码, 私有仓库拉取也需要验证  安装方法一   k8s yaml直接部署 gitlab-ci-token-secret.yaml  具体token值 请查看 gitlab的admin页面-&amp;gt; Overview -&amp;gt; Runners 查看, 然后base64加密</description>

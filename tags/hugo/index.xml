@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>hugo on zhangzw</title>
-    <link>https://zhangzw001.github.io/tags/hugo/</link>
+    <link>https://www.ngirl.xyz/tags/hugo/</link>
     <description>Recent content in hugo on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 16 Oct 2020 17:01:36 +0800</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 16 Oct 2020 17:01:36 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Hugo博客使用记录</title>
-      <link>https://zhangzw001.github.io/posts/58-hugo%E5%8D%9A%E5%AE%A2%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/</link>
+      <link>https://www.ngirl.xyz/posts/58-hugo%E5%8D%9A%E5%AE%A2%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/</link>
       <pubDate>Fri, 16 Oct 2020 17:01:36 +0800</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/58-hugo%E5%8D%9A%E5%AE%A2%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/</guid>
+      <guid>https://www.ngirl.xyz/posts/58-hugo%E5%8D%9A%E5%AE%A2%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/</guid>
       <description>&lt;p&gt;由于hexo生成博客整的很慢, 而且很占cpu, 甚至导致老mac卡死了&amp;hellip; hugo真的很香&lt;/p&gt;</description>
     </item>
     

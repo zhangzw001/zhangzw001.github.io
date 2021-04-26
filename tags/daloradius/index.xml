@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>daloradius on zhangzw</title>
-    <link>https://zhangzw001.github.io/tags/daloradius/</link>
+    <link>https://www.ngirl.xyz/tags/daloradius/</link>
     <description>Recent content in daloradius on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Mon, 27 Jul 2020 10:19:25 +0000</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/daloradius/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 27 Jul 2020 10:19:25 +0000</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/daloradius/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>k8s搭建radius</title>
-      <link>https://zhangzw001.github.io/posts/51-k8s%E6%90%AD%E5%BB%BAradius/</link>
+      <link>https://www.ngirl.xyz/posts/51-k8s%E6%90%AD%E5%BB%BAradius/</link>
       <pubDate>Mon, 27 Jul 2020 10:19:25 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/51-k8s%E6%90%AD%E5%BB%BAradius/</guid>
+      <guid>https://www.ngirl.xyz/posts/51-k8s%E6%90%AD%E5%BB%BAradius/</guid>
       <description>搭建lnmp+freeradius的账号认证服务
   一 记录 docker: 17.03.2-ce k8s: 1.15.11 php: 7.0.13 mysql: 5.6 freeraidus: 3.0.21 daloradius: 1.1-2 / 08 Aug 2019  配置修改简单说明:
  1. 数据库创建说明 create database radius; grant all on radius.* to radius@&#39;%&#39; identified by &#39;xxx&#39;; flush privileges; # 导入表结构 mysql -hk8s-db-t.xxx.com -P3326 -uradius -p &amp;lt; mods-config/sql/main/mysql/schema.sql mysql -hk8s-db-t.xxx.com -P3326 -uradius -p &amp;lt; daloradius-php/contrib/db/mysql-daloradius.sql mysql -hk8s-db-t.xxx.com -P3326 -uradius -p &amp;lt; daloradius-php/contrib/db/fr2-mysql-daloradius-and-freeradius.sql 2. 修改freeRADIUS配置 vim /etc/raddb/radiusd.conf # 这里我是配合nginx,php统一路径 logdir = /nginx_logs 3.</description>

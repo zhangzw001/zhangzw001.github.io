@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>gin on zhangzw</title>
-    <link>https://zhangzw001.github.io/tags/gin/</link>
+    <link>https://www.ngirl.xyz/tags/gin/</link>
     <description>Recent content in gin on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Thu, 15 Oct 2020 14:16:49 +0000</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/gin/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 15 Oct 2020 14:16:49 +0000</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/gin/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>gin记录说明</title>
-      <link>https://zhangzw001.github.io/posts/57-gin%E8%AE%B0%E5%BD%95%E8%AF%B4%E6%98%8E/</link>
+      <link>https://www.ngirl.xyz/posts/57-gin%E8%AE%B0%E5%BD%95%E8%AF%B4%E6%98%8E/</link>
       <pubDate>Thu, 15 Oct 2020 14:16:49 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/57-gin%E8%AE%B0%E5%BD%95%E8%AF%B4%E6%98%8E/</guid>
+      <guid>https://www.ngirl.xyz/posts/57-gin%E8%AE%B0%E5%BD%95%E8%AF%B4%E6%98%8E/</guid>
       <description>简单记录一些gin框架学习遇到的一些问题
  ### 1. unknown driver &#34;mysql&#34; (forgotten import?) ``` _ &#34;github.com/go-sql-driver/mysql&#34; ``` </description>
     </item>

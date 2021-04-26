@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>http流量复制工具 on zhangzw</title>
-    <link>https://zhangzw001.github.io/tags/http%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6%E5%B7%A5%E5%85%B7/</link>
+    <link>https://www.ngirl.xyz/tags/http%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6%E5%B7%A5%E5%85%B7/</link>
     <description>Recent content in http流量复制工具 on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Mon, 28 Oct 2019 14:04:37 +0000</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/http%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6%E5%B7%A5%E5%85%B7/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 28 Oct 2019 14:04:37 +0000</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/http%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6%E5%B7%A5%E5%85%B7/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>流量复制工具gor</title>
-      <link>https://zhangzw001.github.io/posts/21-%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6%E5%B7%A5%E5%85%B7gor/</link>
+      <link>https://www.ngirl.xyz/posts/21-%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6%E5%B7%A5%E5%85%B7gor/</link>
       <pubDate>Mon, 28 Oct 2019 14:04:37 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/21-%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6%E5%B7%A5%E5%85%B7gor/</guid>
+      <guid>https://www.ngirl.xyz/posts/21-%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6%E5%B7%A5%E5%85%B7gor/</guid>
       <description>Gor 是一款go语言实现的简单的http流量复制工具，它的主要目的是使你的生产环境HTTP真实流量在测试环境和预发布环境重现
  流量复制工具   下载安装 github下载地址: https://github.com/buger/goreplay/releases
 tar -xvf gor_1.0.0_x64.tar.gz mv gor /usr/bin/ which gor 命令 1 保存请求到文件 # 将本机所有80请求保存到gor-20171120_0.log文件(注意会生成很多文件) gor --input-raw :80 --output-file gor-%Y%m%d.log # --output-file-append 会生成gor-20171120.log文件 gor --input-raw :80 --output-file gor-%Y%m%d.log --output-file-append 2 根据文件回放请求 # 镜像qps回放 gor --input-file gor-aaaa-20171120.log --output-http aaaa-dev.test.com # 两倍镜像qps回放 gor --input-file &amp;quot;gor-aaaa-20171120.log|200%&amp;quot; --output-http aaaa-dev.test.com 3 过滤url后保存请求到文件 # 排除s.test.com的请求 gor --input-raw :80 --output-file gor-%Y%m%d.log --output-file-append --http-disallow-header &amp;quot;Host: s.test.com&amp;quot; --http-disallow-header &amp;quot;Host: www.test.com&amp;quot; --http-disallow-header &amp;quot;Host: bbs.</description>

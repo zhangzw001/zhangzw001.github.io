@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>raid on zhangzw</title>
-    <link>https://zhangzw001.github.io/tags/raid/</link>
+    <link>https://www.ngirl.xyz/tags/raid/</link>
     <description>Recent content in raid on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Thu, 27 Feb 2020 09:54:38 +0000</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/raid/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 27 Feb 2020 09:54:38 +0000</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/raid/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>raid1盘数据迁移</title>
-      <link>https://zhangzw001.github.io/posts/35-raid1%E7%9B%98%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB/</link>
+      <link>https://www.ngirl.xyz/posts/35-raid1%E7%9B%98%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB/</link>
       <pubDate>Thu, 27 Feb 2020 09:54:38 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/35-raid1%E7%9B%98%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB/</guid>
+      <guid>https://www.ngirl.xyz/posts/35-raid1%E7%9B%98%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB/</guid>
       <description>dell PowerEdge 1950 服务器两块盘做raid1的linux操作系统, 开机后无限重启的一次数据迁移
    考虑到raid1数据是互为备份,直接取一块盘应该能够拿到所有数据
   首先对dell PowerEdge 1950 服务器 开机, 在提示ctrl +c的页面上进入sas页面, 进入选中磁盘后回车, 然后选择 SAS Topology页面, 可以看到是两块盘做的raid1   raid1 信息确认完毕

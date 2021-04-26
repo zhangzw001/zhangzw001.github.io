@@ -2,99 +2,99 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on zhangzw</title>
-    <link>https://zhangzw001.github.io/tags/</link>
+    <link>https://www.ngirl.xyz/tags/</link>
     <description>Recent content in Tags on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 23 Apr 2021 09:27:50 +0800</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 23 Apr 2021 09:27:50 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>golang</title>
-      <link>https://zhangzw001.github.io/tags/golang/</link>
+      <link>https://www.ngirl.xyz/tags/golang/</link>
       <pubDate>Fri, 23 Apr 2021 09:27:50 +0800</pubDate>
       
-      <guid>https://zhangzw001.github.io/tags/golang/</guid>
+      <guid>https://www.ngirl.xyz/tags/golang/</guid>
       <description></description>
     </item>
     
     <item>
       <title>算法</title>
-      <link>https://zhangzw001.github.io/tags/%E7%AE%97%E6%B3%95/</link>
+      <link>https://www.ngirl.xyz/tags/%E7%AE%97%E6%B3%95/</link>
       <pubDate>Fri, 23 Apr 2021 09:27:50 +0800</pubDate>
       
-      <guid>https://zhangzw001.github.io/tags/%E7%AE%97%E6%B3%95/</guid>
+      <guid>https://www.ngirl.xyz/tags/%E7%AE%97%E6%B3%95/</guid>
       <description></description>
     </item>
     
     <item>
       <title>goroutine</title>
-      <link>https://zhangzw001.github.io/tags/goroutine/</link>
+      <link>https://www.ngirl.xyz/tags/goroutine/</link>
       <pubDate>Thu, 25 Feb 2021 10:43:52 +0800</pubDate>
       
-      <guid>https://zhangzw001.github.io/tags/goroutine/</guid>
+      <guid>https://www.ngirl.xyz/tags/goroutine/</guid>
       <description></description>
     </item>
     
     <item>
       <title>untagged</title>
-      <link>https://zhangzw001.github.io/tags/untagged/</link>
+      <link>https://www.ngirl.xyz/tags/untagged/</link>
       <pubDate>Wed, 27 Jan 2021 18:13:13 +0800</pubDate>
       
-      <guid>https://zhangzw001.github.io/tags/untagged/</guid>
+      <guid>https://www.ngirl.xyz/tags/untagged/</guid>
       <description></description>
     </item>
     
     <item>
       <title>sourceCode</title>
-      <link>https://zhangzw001.github.io/tags/sourcecode/</link>
+      <link>https://www.ngirl.xyz/tags/sourcecode/</link>
       <pubDate>Mon, 25 Jan 2021 14:54:22 +0800</pubDate>
       
-      <guid>https://zhangzw001.github.io/tags/sourcecode/</guid>
+      <guid>https://www.ngirl.xyz/tags/sourcecode/</guid>
       <description></description>
     </item>
     
     <item>
       <title>mysql</title>
-      <link>https://zhangzw001.github.io/tags/mysql/</link>
+      <link>https://www.ngirl.xyz/tags/mysql/</link>
       <pubDate>Tue, 19 Jan 2021 11:28:39 +0800</pubDate>
       
-      <guid>https://zhangzw001.github.io/tags/mysql/</guid>
+      <guid>https://www.ngirl.xyz/tags/mysql/</guid>
       <description></description>
     </item>
     
     <item>
       <title>linux</title>
-      <link>https://zhangzw001.github.io/tags/linux/</link>
+      <link>https://www.ngirl.xyz/tags/linux/</link>
       <pubDate>Tue, 08 Dec 2020 17:42:54 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/tags/linux/</guid>
+      <guid>https://www.ngirl.xyz/tags/linux/</guid>
       <description></description>
     </item>
     
     <item>
       <title>tcp</title>
-      <link>https://zhangzw001.github.io/tags/tcp/</link>
+      <link>https://www.ngirl.xyz/tags/tcp/</link>
       <pubDate>Fri, 13 Nov 2020 17:28:38 +0800</pubDate>
       
-      <guid>https://zhangzw001.github.io/tags/tcp/</guid>
+      <guid>https://www.ngirl.xyz/tags/tcp/</guid>
       <description></description>
     </item>
     
     <item>
       <title>tcpdump</title>
-      <link>https://zhangzw001.github.io/tags/tcpdump/</link>
+      <link>https://www.ngirl.xyz/tags/tcpdump/</link>
       <pubDate>Fri, 13 Nov 2020 17:28:38 +0800</pubDate>
       
-      <guid>https://zhangzw001.github.io/tags/tcpdump/</guid>
+      <guid>https://www.ngirl.xyz/tags/tcpdump/</guid>
       <description></description>
     </item>
     
     <item>
       <title>k8s</title>
-      <link>https://zhangzw001.github.io/tags/k8s/</link>
+      <link>https://www.ngirl.xyz/tags/k8s/</link>
       <pubDate>Tue, 10 Nov 2020 14:06:41 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/tags/k8s/</guid>
+      <guid>https://www.ngirl.xyz/tags/k8s/</guid>
       <description></description>
     </item>
     

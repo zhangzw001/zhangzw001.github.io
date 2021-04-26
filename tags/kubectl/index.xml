@@ -2,27 +2,27 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>kubectl on zhangzw</title>
-    <link>https://zhangzw001.github.io/tags/kubectl/</link>
+    <link>https://www.ngirl.xyz/tags/kubectl/</link>
     <description>Recent content in kubectl on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Thu, 29 Oct 2020 11:15:58 +0800</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/kubectl/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 29 Oct 2020 11:15:58 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/kubectl/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Kubectl命令简单熟悉</title>
-      <link>https://zhangzw001.github.io/posts/61-kubectl%E5%91%BD%E4%BB%A4%E7%AE%80%E5%8D%95%E7%86%9F%E6%82%89/</link>
+      <link>https://www.ngirl.xyz/posts/61-kubectl%E5%91%BD%E4%BB%A4%E7%AE%80%E5%8D%95%E7%86%9F%E6%82%89/</link>
       <pubDate>Thu, 29 Oct 2020 11:15:58 +0800</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/61-kubectl%E5%91%BD%E4%BB%A4%E7%AE%80%E5%8D%95%E7%86%9F%E6%82%89/</guid>
+      <guid>https://www.ngirl.xyz/posts/61-kubectl%E5%91%BD%E4%BB%A4%E7%AE%80%E5%8D%95%E7%86%9F%E6%82%89/</guid>
       <description>kubectl命令熟悉 # 创建namespace kubectl create ns test # 查看namespace kubectl get ns # 命令创建deployment kubectl create deployment my-nginx --image=nginx --replicas=1 -n test # 命令删除deployment kubectl delete deployments.apps my-nginx -n test # 容器执行命令 kubectl exec -ti deployments.apps/nginx -n test -- nginx -v nginx version: nginx/1.16.0 # 通过yaml创建deployment kubectl apply -f nginx.yaml --record # 通过新增或修改注释方式更新deployment kubectl patch -f nginx.yaml -p &amp;#34;{\&amp;#34;spec\&amp;#34;:{\&amp;#34;template\&amp;#34;:{\&amp;#34;metadata\&amp;#34;:{\&amp;#34;annotations\&amp;#34;:{\&amp;#34;test-last-updated\&amp;#34;:\&amp;#34;$(date +&amp;#39;%F %T&amp;#39;)\&amp;#34;}}}}}&amp;#34; # 修改image kubectl set image deployment/nginx nginx=nginx:1.16.0 -n test # 滚动升级 kubectl scale deployment nginx --replicas=2 -n test # 加上--record history就能看到变更信息(但感觉左右不大) kubectl rollout history deployment nginx -n test # describe 其实更详细 kubectl describe deployment nginx -n test # 查看yaml配置 kubectl get deployment.</description>
     </item>
     
     <item>
       <title>k8s一些命令总结</title>
-      <link>https://zhangzw001.github.io/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</link>
+      <link>https://www.ngirl.xyz/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</link>
       <pubDate>Thu, 05 Dec 2019 09:25:59 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</guid>
+      <guid>https://www.ngirl.xyz/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</guid>
       <description>记录一些kubectl命令
 kubectl命令表
   常用命令 # 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111 kubectl proxy --address=&#39;192.168.1.111&#39; -p 10000 --accept-hosts=&#39;^172.*$&#39; # 查看api类型 kubectl api-versions # 让master也运行pod（默认master不运行pod,单机会用到） kubectl taint nodes --all node-role.kubernetes.io/master- # patch补丁, 强制更新 kubectl patch -f deployment.yaml -p &amp;quot;{\&amp;quot;spec\&amp;quot;:{\&amp;quot;template\&amp;quot;:{\&amp;quot;metadata\&amp;quot;:{\&amp;quot;annotations\&amp;quot;:{\&amp;quot;ci-last-updated\&amp;quot;:\&amp;quot;$(date +&#39;%s&#39;)\&amp;quot;}}}}}&amp;quot; # 端口转发 kubectl -n default port-forward service/prometheus-server 30080:80   scale 使用 # 通过将rc的副本数重新设置为0后，再将副本数设置为2，达到重启nginx的效果。 kubectl scale deployment bq-front1 --replicas=0 -n web kubectl scale deployment bq-front1 --replicas=2 -n web   metrics 相关 # 查看node 资源 kubectl top nodes # 查看pods 资源 kubectl top pods -n php-dev # 获取metrics接口所有数据 kubectl get --raw /metrics # patch强制更新(慎用) kubectl patch -f deployment.</description>

@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>storageclass on zhangzw</title>
-    <link>https://zhangzw001.github.io/tags/storageclass/</link>
+    <link>https://www.ngirl.xyz/tags/storageclass/</link>
     <description>Recent content in storageclass on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Thu, 26 Sep 2019 14:12:49 +0000</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/storageclass/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 26 Sep 2019 14:12:49 +0000</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/storageclass/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>k8s部署storageclass动态创建pv(nfs&amp;rbd)</title>
-      <link>https://zhangzw001.github.io/posts/7-k8s%E9%83%A8%E7%BD%B2storageclass%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BApv-nfs-rbd/</link>
+      <link>https://www.ngirl.xyz/posts/7-k8s%E9%83%A8%E7%BD%B2storageclass%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BApv-nfs-rbd/</link>
       <pubDate>Thu, 26 Sep 2019 14:12:49 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/7-k8s%E9%83%A8%E7%BD%B2storageclass%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BApv-nfs-rbd/</guid>
+      <guid>https://www.ngirl.xyz/posts/7-k8s%E9%83%A8%E7%BD%B2storageclass%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BApv-nfs-rbd/</guid>
       <description>考虑到k8s存储的问题, 本机目录挂载存在太大局限性, 多node多pod的服务存储急迫需要共享存储, 这里简单应用k8s storageclass nfs和rbd存储
 第一部分 nfs 这里单节点简单配置nfs(高并发可采用nfs+rsync+inotify或Sersync)  高并发参考
  NFS高可用(NFS+keepalive+Sersync) inotify+rsync实时备份总结

@@ -2,45 +2,45 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>nginx on zhangzw</title>
-    <link>https://zhangzw001.github.io/tags/nginx/</link>
+    <link>https://www.ngirl.xyz/tags/nginx/</link>
     <description>Recent content in nginx on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Wed, 18 Mar 2020 18:26:35 +0000</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/nginx/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 18 Mar 2020 18:26:35 +0000</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/nginx/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>记一次跨域的nginx配置问题</title>
-      <link>https://zhangzw001.github.io/posts/40-%E8%AE%B0%E4%B8%80%E6%AC%A1%E8%B7%A8%E5%9F%9F%E7%9A%84nginx%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/</link>
+      <link>https://www.ngirl.xyz/posts/40-%E8%AE%B0%E4%B8%80%E6%AC%A1%E8%B7%A8%E5%9F%9F%E7%9A%84nginx%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/</link>
       <pubDate>Wed, 18 Mar 2020 18:26:35 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/40-%E8%AE%B0%E4%B8%80%E6%AC%A1%E8%B7%A8%E5%9F%9F%E7%9A%84nginx%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/</guid>
+      <guid>https://www.ngirl.xyz/posts/40-%E8%AE%B0%E4%B8%80%E6%AC%A1%E8%B7%A8%E5%9F%9F%E7%9A%84nginx%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/</guid>
       <description>&lt;p&gt;nginx跨域的Access-Control-Allow-Origin的配置 和多域名配置的问题&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>记一次nginx的request_time 和upstream_response_time差值很大问题</title>
-      <link>https://zhangzw001.github.io/posts/39-%E8%AE%B0%E4%B8%80%E6%AC%A1nginx%E7%9A%84request-time-%E5%92%8Cupstream-response-time%E5%B7%AE%E5%80%BC%E5%BE%88%E5%A4%A7%E9%97%AE%E9%A2%98/</link>
+      <link>https://www.ngirl.xyz/posts/39-%E8%AE%B0%E4%B8%80%E6%AC%A1nginx%E7%9A%84request-time-%E5%92%8Cupstream-response-time%E5%B7%AE%E5%80%BC%E5%BE%88%E5%A4%A7%E9%97%AE%E9%A2%98/</link>
       <pubDate>Wed, 18 Mar 2020 10:43:34 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/39-%E8%AE%B0%E4%B8%80%E6%AC%A1nginx%E7%9A%84request-time-%E5%92%8Cupstream-response-time%E5%B7%AE%E5%80%BC%E5%BE%88%E5%A4%A7%E9%97%AE%E9%A2%98/</guid>
+      <guid>https://www.ngirl.xyz/posts/39-%E8%AE%B0%E4%B8%80%E6%AC%A1nginx%E7%9A%84request-time-%E5%92%8Cupstream-response-time%E5%B7%AE%E5%80%BC%E5%BE%88%E5%A4%A7%E9%97%AE%E9%A2%98/</guid>
       <description>&lt;p&gt;遇到一个接口, 经过了nginx反向代理,request_time时间是60s+, upstream_response_time 在0.5s左右&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>k3s1.16部署nginx&#43;php5.2.17</title>
-      <link>https://zhangzw001.github.io/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</link>
+      <link>https://www.ngirl.xyz/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</link>
       <pubDate>Tue, 03 Dec 2019 11:46:42 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</guid>
+      <guid>https://www.ngirl.xyz/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</guid>
       <description>&lt;p&gt;老项目是用php5.2.17的,自己编译打包镜像简单部署&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>centos6安装nginx1.16&#43;php7.2</title>
-      <link>https://zhangzw001.github.io/posts/10-centos6%E5%AE%89%E8%A3%85nginx1-16-php7-2/</link>
+      <link>https://www.ngirl.xyz/posts/10-centos6%E5%AE%89%E8%A3%85nginx1-16-php7-2/</link>
       <pubDate>Fri, 27 Sep 2019 14:39:07 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/10-centos6%E5%AE%89%E8%A3%85nginx1-16-php7-2/</guid>
+      <guid>https://www.ngirl.xyz/posts/10-centos6%E5%AE%89%E8%A3%85nginx1-16-php7-2/</guid>
       <description>记录简单的安装nginx和php的配置,仅供参考
 先准备环境 # 更新源 mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-6.repo yum clean all yum makecache yum install -y epel-release # 安装一些依赖包 yum -y install gcc make cmake ncurses-devel libxml2-devel libtool-ltdl-devel gcc-c++ autoconf automake bison zlib-devel openssl-devel pcre-devel libxml2 libxml2-devel libcurl libcurl-devel autoconf automake libtool-ltdl libtool-ltdl-devel libjpeg libjpeg-turbo-devel libmcrypt-devel libpng-devel centos6编译安装nginx #首先官网下载1.16 cd /usr/local/src/ wget http://nginx.org/download/nginx-1.16.0.tar.gz tar -xvf nginx-1.16.0.tar.gz # 编译简单的模块 ./configure --prefix=/usr/local/nginx/ --with-http_ssl_module --with-http_stub_status_module --with-http_stub_status_module make -j4 make install # 通过启动脚本启动 chmod +x /etc/init.</description>
     </item>

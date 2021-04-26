@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>mysql on zhangzw</title>
-    <link>https://zhangzw001.github.io/tags/mysql/</link>
+    <link>https://www.ngirl.xyz/tags/mysql/</link>
     <description>Recent content in mysql on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 19 Jan 2021 11:28:39 +0800</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/mysql/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 19 Jan 2021 11:28:39 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/mysql/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Mysql5.7-alter锁表问题</title>
-      <link>https://zhangzw001.github.io/posts/64-mysql5.7-alter%E9%94%81%E8%A1%A8%E9%97%AE%E9%A2%98/</link>
+      <link>https://www.ngirl.xyz/posts/64-mysql5.7-alter%E9%94%81%E8%A1%A8%E9%97%AE%E9%A2%98/</link>
       <pubDate>Tue, 19 Jan 2021 11:28:39 +0800</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/64-mysql5.7-alter%E9%94%81%E8%A1%A8%E9%97%AE%E9%A2%98/</guid>
+      <guid>https://www.ngirl.xyz/posts/64-mysql5.7-alter%E9%94%81%E8%A1%A8%E9%97%AE%E9%A2%98/</guid>
       <description>由于需要更新 my_test_table 的 style字段 由 tinyint(2) 为 int(10)  由于认为 mysql5.6和5.7 alter table 不会锁表, 因此在执行时 导致了锁表无法 update my_test_table
   根据官方说明 Changing the column data type 不支持 online ddl
   https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html  新增临时表做测试 准备临时表, 导入部分数据 -- 主库执行 create table my_test_table_tmp_20210119 like my_test_table; show create table my_test_table\G ENGINE=InnoDB AUTO_INCREMENT=48544733 DEFAULT CHARSET=utf8 COMMENT=&amp;#39;测试表&amp;#39; alter table my_test_table_tmp_20210119 AUTO_INCREMENT=49000000; 测试执行alter table 修改字段data type是否会锁表 -- 首先终端1 执行 alter alter table my_test_table_tmp_20210119 modify style int(10) not null default 0 comment &amp;#39;下单方式&amp;#39;; -- 首先终端2 执行 update(是会卡住) update my_test_table_tmp_20210119 set status =1 limit 1; -- 查看 processlist (如下图,出现Waiting for table metadata lock) show full processlist 开始测试 pt-online-schema-change 工具  参考文档: https://www.</description>
@@ -21,10 +21,10 @@
     
     <item>
       <title>mysql5.5主与mysql5.7从部署配置</title>
-      <link>https://zhangzw001.github.io/posts/23-mysql5-5%E4%B8%BB%E4%B8%8Emysql5-7%E4%BB%8E%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE/</link>
+      <link>https://www.ngirl.xyz/posts/23-mysql5-5%E4%B8%BB%E4%B8%8Emysql5-7%E4%BB%8E%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE/</link>
       <pubDate>Tue, 29 Oct 2019 14:56:55 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/23-mysql5-5%E4%B8%BB%E4%B8%8Emysql5-7%E4%BB%8E%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE/</guid>
+      <guid>https://www.ngirl.xyz/posts/23-mysql5-5%E4%B8%BB%E4%B8%8Emysql5-7%E4%BB%8E%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE/</guid>
       <description>由于需要将旧版mysql5.5的数据同步到新mysql5.7, 并且会对部分表分库
 参考教程: mysql从5.5直接升级到5.7
  mysql5.5升级到mysql5.7   采用mysql5.5数据目录升级为mysql5.7 1 从mysql5.5的从库 copy /data数据 2 修改新的mysql5.7配置文件 my.cnf，添加datadir，指向5.5数据目录 3 新安装数据库执行(本次不需要执行) /usr/local/mysql57/bin/mysqld --defaults-file=/etc/my57.cnf --initialize-insecure --user=mysql --basedir=/usr/local/mysql --datadir=/disk/u01 4 启动mysql 5 此时数据目录还是5.5的，需要执行mysql_upgrade进行升级，在执行表修复前，需要确认一个参数innodb_file_per_table，mysql官网对该参数的解释如下 该参数在5.5版本默认为OFF，所有表和索引都导入一个共享文件中，名为ibdata1,但在5.6.7及以后版本，改参数被默认设置为ON，即每张表都有对应的表和索引存储文件，每个schema下，每个frm文件都有对应的ibd文件。 在执行mysql_upgrade时，会修复系统表，并且如果该参数在5.5和5.7版本均使用默认值，则会将之前共享表和索引的存储方式改为每张表单独存储表和索引的形式，故会出现拷贝复制的操作，如果数据量比较大，则用时就会很长， 使用nnodb_file_per_table=1，及表和索引单独存储的优缺点，可查看mysql官网介绍。 6 使用mysql_upgrade检测并修复表 /usr/local/mysql57/bin/mysql_upgrade -S /disk/u01/mysql.sock  以上已经完成对mysql5.5数据升级 在mysql5.7运行的功能
@@ -33,10 +33,10 @@
     
     <item>
       <title>k8s搭建mysql5.7.24主从</title>
-      <link>https://zhangzw001.github.io/posts/20-k8s%E6%90%AD%E5%BB%BAmysql5-7-24%E4%B8%BB%E4%BB%8E/</link>
+      <link>https://www.ngirl.xyz/posts/20-k8s%E6%90%AD%E5%BB%BAmysql5-7-24%E4%B8%BB%E4%BB%8E/</link>
       <pubDate>Thu, 24 Oct 2019 18:35:00 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/20-k8s%E6%90%AD%E5%BB%BAmysql5-7-24%E4%B8%BB%E4%BB%8E/</guid>
+      <guid>https://www.ngirl.xyz/posts/20-k8s%E6%90%AD%E5%BB%BAmysql5-7-24%E4%B8%BB%E4%BB%8E/</guid>
       <description>k8s上简单部署mysql5.7.24主从
  k8s搭建mysql5.7.24主从   参考文档 利用Kubernetes搭建mysql主从复制集群 官方dockerfile
 从hub.docker.com拉取官方镜像 docker pull mysql:5.7.24  build镜像   主库master的Dockerfile from mysql:5.7.24 run sed -i &#39;/\[mysqld\]/a server-id=1\nlog-bin&#39; /etc/mysql/mysql.conf.d/mysqld.cnf COPY docker-entrypoint.sh /usr/local/bin/ 主库的docker-entrypoint.sh  先从初始镜像取 或者从github对应版本上  docker run -dti mysql:5.7.24 /bin/bash docker cp 2bfa6209d120c23:/usr/local/bin/docker-entrypoint.sh .  修改docker-entrypoint.sh  fi # 添加以下内容 echo &amp;quot;CREATE USER &#39;$MYSQL_REPLICATION_USER&#39;@&#39;%&#39; IDENTIFIED BY &#39;$MYSQL_REPLICATION_PASSWORD&#39; ;&amp;quot; | &amp;quot;${mysql[@]}&amp;quot; echo &amp;quot;GRANT REPLICATION SLAVE ON *.* TO &#39;$MYSQL_REPLICATION_USER&#39;@&#39;%&#39; IDENTIFIED BY &#39;$MYSQL_REPLICATION_PASSWORD&#39; ;&amp;quot; | &amp;quot;${mysql[@]}&amp;quot; echo &amp;quot;FLUSH PRIVILEGES ;&amp;quot; | &amp;quot;${mysql[@]}&amp;quot; # 添加以上内容 echo ls /docker-entrypoint-initdb.</description>
@@ -44,29 +44,29 @@
     
     <item>
       <title>mysql5.5目录copy方式迁移</title>
-      <link>https://zhangzw001.github.io/posts/14-mysql%E7%9B%AE%E5%BD%95copy%E6%96%B9%E5%BC%8F%E8%BF%81%E7%A7%BB/</link>
+      <link>https://www.ngirl.xyz/posts/14-mysql%E7%9B%AE%E5%BD%95copy%E6%96%B9%E5%BC%8F%E8%BF%81%E7%A7%BB/</link>
       <pubDate>Tue, 15 Oct 2019 10:44:27 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/14-mysql%E7%9B%AE%E5%BD%95copy%E6%96%B9%E5%BC%8F%E8%BF%81%E7%A7%BB/</guid>
+      <guid>https://www.ngirl.xyz/posts/14-mysql%E7%9B%AE%E5%BD%95copy%E6%96%B9%E5%BC%8F%E8%BF%81%E7%A7%BB/</guid>
       <description>&lt;p&gt;从现有的一台 从库 全copy data目录到2台新机器上, 再配置mysql主从&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>mysql简单记录</title>
-      <link>https://zhangzw001.github.io/posts/11-mysql%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</link>
+      <link>https://www.ngirl.xyz/posts/11-mysql%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</link>
       <pubDate>Thu, 10 Oct 2019 10:40:20 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/11-mysql%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</guid>
+      <guid>https://www.ngirl.xyz/posts/11-mysql%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</guid>
       <description>简单记录一些mysql知识点
   ### 三大范式 - 列不可再分: 服务名,服务描述 - 属性完全依赖主键:	服务名依赖于服务ID - 属性直接依赖主键: HTTP,TCP,GRPC 规则各为一张表   SQL 语句主要可以划分为以下 3 个类别 DDL（Data Definition Languages）语句：数据定义语言，这些语句定义了不同的数据段、数据库、表、列、索引等数据库对象的定义。常用的语句关键字主要包括 create、drop、alter等。 DML（Data Manipulation Language）语句：数据操纵语句，用于添加、删除、更新和查询数据库记录，并检查数据完整性，常用的语句关键字主要包括 insert、delete、udpate 和select 等。(增添改查） DCL（Data Control Language）语句：数据控制语句，用于控制不同数据段直接的许可和访问级别的语句。这些语句定义了数据库、表、字段、用户的访问权限和安全级别。主要的语句关键字包括 grant、revoke 等。   清空表 删除表信息的方式有两种 : truncate table table_name; delete * from table_name; 注 : truncate操作中的table可以省略，delete操作中的*可以省略 truncate、delete 清空表数据的区别 : 1&amp;gt; truncate 是整体删除 (速度较快)，delete是逐条删除 (速度较慢) 2&amp;gt; truncate 不写服务器 log，delete 写服务器 log，也就是 truncate 效率比 delete高的原因 3&amp;gt; truncate 不激活trigger (触发器)，但是会重置Identity (标识列、自增字段)，相当于自增列会被置为初始值，又重新从1开始记录，而不是接着原来的 ID数。而 delete 删除以后，identity 依旧是接着被删除的最近的那一条记录ID加1后进行记录。如果只需删除表中的部分记录，只能使用 DELETE语句配合 where条件   备份 # 全量锁表备份(不可写) mysqldump --lock-all-tables --all-databases &amp;gt; ALLDB.</description>
     </item>
     
     <item>
       <title>mysql5.7二进制部署</title>
-      <link>https://zhangzw001.github.io/posts/8-mysql5-7%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2/</link>
+      <link>https://www.ngirl.xyz/posts/8-mysql5-7%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2/</link>
       <pubDate>Thu, 26 Sep 2019 15:11:05 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/8-mysql5-7%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2/</guid>
+      <guid>https://www.ngirl.xyz/posts/8-mysql5-7%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2/</guid>
       <description>二进制方式部署mysql5.7
  下载glibc二进制包 #打开下载页面, 可能会有小版本更新(注意：选择操作系统时选Linux-Generic） https://dev.mysql.com/downloads/mysql/5.7.html#downloads # 最新的可能有小版本变化 wget https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz 安装配置 tar -xvf mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz mv mysql-5.7.24-linux-glibc2.12-x86_64 /usr/local/ cd /usr/local/ # 我的镜像是安装过5.5mysql, 所以需要mv一下 mv mysql mysql-5.5.37 # 由于以前安装过php指定了该mysq目录, 这可能导致以前安装的php缺少libmysqlclient.so.18 ln -s /usr/local/mysql-5.5.37/lib/libmysqlclient.so.18 /usr/local/mysql-5.7.24-linux-glibc2.12-x86_64/lib/libmysqlclient.so.18 ln -s mysql-5.7.24-linux-glibc2.12-x86_64 mysql # 添加启动文件 \cp mysql/support-files/mysql.server /etc/init.d/mysqld echo &amp;quot;PATH=$PATH:/usr/local/mysql/bin/&amp;quot; &amp;gt;&amp;gt;~/.bashrc # 可选 wget http://centos.mirrors.ucloud.cn/centos/6/os/x86_64/Packages/numactl-2.0.9-2.el6.x86_64.rpm yum localinstall numactl-2.0.9-2.el6.x86_64.rpm \rm numactl-2.0.9-2.el6.x86_64.rpm useradd mysql # 配置下mysql的数据目录 cd /data/ mkdir u01 mkdir u02 chown -R mysql.mysql u01 chown -R mysql.</description>
     </item>

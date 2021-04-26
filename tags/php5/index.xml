@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>php5 on zhangzw</title>
-    <link>https://zhangzw001.github.io/tags/php5/</link>
+    <link>https://www.ngirl.xyz/tags/php5/</link>
     <description>Recent content in php5 on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 03 Dec 2019 11:46:42 +0000</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/php5/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 03 Dec 2019 11:46:42 +0000</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/php5/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>k3s1.16部署nginx&#43;php5.2.17</title>
-      <link>https://zhangzw001.github.io/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</link>
+      <link>https://www.ngirl.xyz/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</link>
       <pubDate>Tue, 03 Dec 2019 11:46:42 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</guid>
+      <guid>https://www.ngirl.xyz/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</guid>
       <description>&lt;p&gt;老项目是用php5.2.17的,自己编译打包镜像简单部署&lt;/p&gt;</description>
     </item>
     

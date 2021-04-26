@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>istio on zhangzw</title>
-    <link>https://zhangzw001.github.io/tags/istio/</link>
+    <link>https://www.ngirl.xyz/tags/istio/</link>
     <description>Recent content in istio on zhangzw</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 04 Aug 2020 16:22:10 +0000</lastBuildDate><atom:link href="https://zhangzw001.github.io/tags/istio/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 04 Aug 2020 16:22:10 +0000</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/istio/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>istio环境下配置nginx&#43;php</title>
-      <link>https://zhangzw001.github.io/posts/52-istio%E6%B5%8B%E8%AF%95nginx-php%E9%A1%B9%E7%9B%AE/</link>
+      <link>https://www.ngirl.xyz/posts/52-istio%E6%B5%8B%E8%AF%95nginx-php%E9%A1%B9%E7%9B%AE/</link>
       <pubDate>Tue, 04 Aug 2020 16:22:10 +0000</pubDate>
       
-      <guid>https://zhangzw001.github.io/posts/52-istio%E6%B5%8B%E8%AF%95nginx-php%E9%A1%B9%E7%9B%AE/</guid>
+      <guid>https://www.ngirl.xyz/posts/52-istio%E6%B5%8B%E8%AF%95nginx-php%E9%A1%B9%E7%9B%AE/</guid>
       <description>&lt;p&gt;将nginx+php的环境结合istio的智能路由功能做一个简单实践&lt;/p&gt;</description>
     </item>
     
