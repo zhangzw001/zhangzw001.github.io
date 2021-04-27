@@ -7,7 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 23 Apr 2021 09:27:50 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 27 Apr 2021 11:21:41 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go算法学习 二叉树 迭代统一遍历写法</title>
+      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E4%BA%8C%E5%8F%89%E6%A0%91-%E8%BF%AD%E4%BB%A3%E7%BB%9F%E4%B8%80%E9%81%8D%E5%8E%86%E5%86%99%E6%B3%95/</link>
+      <pubDate>Tue, 27 Apr 2021 11:21:41 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E4%BA%8C%E5%8F%89%E6%A0%91-%E8%BF%AD%E4%BB%A3%E7%BB%9F%E4%B8%80%E9%81%8D%E5%8E%86%E5%86%99%E6%B3%95/</guid>
+      <description>说明 首先二叉树有三种遍历,针对根节点遍历顺序分别是 前序,中序, 后续
+ 前序: 中 左 右 中序: 左 中 右 后续: 左 右 中  遍历的写法分为两种:
+ 递归 迭代  二叉树结构体 type TreeNode struct { Val int Left *TreeNode Right *TreeNode } 1. 递归  递归比较简单, 代码如下:
+  1.1 前序遍历 (中 左 右)  func preorderTraversal(root *TreeNode) []int { var result []int var Traversal func( *TreeNode) Traversal = func(node *TreeNode) { if node == nil { return } result = append(result, node.</description>
+    </item>
+    
     <item>
       <title>Go算法学习 回溯 分割回文串</title>
       <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</link>

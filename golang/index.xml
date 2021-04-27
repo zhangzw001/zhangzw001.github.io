@@ -6,8 +6,293 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Fri, 23 Apr 2021 09:27:50 +0800</lastBuildDate>
+		<lastBuildDate>Tue, 27 Apr 2021 11:21:41 +0800</lastBuildDate>
 		<atom:link href="https://www.ngirl.xyz/golang/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Go算法学习 二叉树 迭代统一遍历写法</title>
+			<link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E4%BA%8C%E5%8F%89%E6%A0%91-%E8%BF%AD%E4%BB%A3%E7%BB%9F%E4%B8%80%E9%81%8D%E5%8E%86%E5%86%99%E6%B3%95/</link>
+			<pubDate>Tue, 27 Apr 2021 11:21:41 +0800</pubDate>
+			
+			<guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E4%BA%8C%E5%8F%89%E6%A0%91-%E8%BF%AD%E4%BB%A3%E7%BB%9F%E4%B8%80%E9%81%8D%E5%8E%86%E5%86%99%E6%B3%95/</guid>
+			<description>说明 首先二叉树有三种遍历,针对根节点遍历顺序分别是 前序,中序, 后续
+ 前序: 中 左 右 中序: 左 中 右 后续: 左 右 中  遍历的写法分为两种:
+ 递归 迭代  二叉树结构体 type TreeNode struct { Val int Left *TreeNode Right *TreeNode } 1. 递归  递归比较简单, 代码如下:
+  1.1 前序遍历 (中 左 右)  func preorderTraversal(root *TreeNode) []int { var result []int var Traversal func( *TreeNode) Traversal = func(node *TreeNode) { if node == nil { return } result = append(result, node.</description>
+			<content type="html"><![CDATA[<h3 id="说明">说明</h3>
+<p>首先二叉树有三种遍历,针对根节点遍历顺序分别是 前序,中序, 后续</p>
+<ul>
+<li>前序: 中 左 右</li>
+<li>中序: 左 中 右</li>
+<li>后续: 左 右 中</li>
+</ul>
+<p>遍历的写法分为两种:</p>
+<ul>
+<li>递归</li>
+<li>迭代</li>
+</ul>
+<h3 id="二叉树结构体">二叉树结构体</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">TreeNode</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Val</span>   <span class="kt">int</span>
+	<span class="nx">Left</span>  <span class="o">*</span><span class="nx">TreeNode</span>
+	<span class="nx">Right</span> <span class="o">*</span><span class="nx">TreeNode</span>
+<span class="p">}</span>
+
+</code></pre></div><h3 id="1-递归">1. 递归</h3>
+<blockquote>
+<p>递归比较简单, 代码如下:</p>
+</blockquote>
+<ul>
+<li>1.1 前序遍历 (中 左 右)</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">preorderTraversal</span><span class="p">(</span><span class="nx">root</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">result</span> <span class="p">[]</span><span class="kt">int</span>
+	<span class="kd">var</span> <span class="nx">Traversal</span> <span class="kd">func</span><span class="p">(</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span>
+	<span class="nx">Traversal</span> <span class="p">=</span> <span class="kd">func</span><span class="p">(</span><span class="nx">node</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">node</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="k">return</span>
+		<span class="p">}</span>
+		<span class="nx">result</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span><span class="p">)</span> <span class="c1">//1 中
+</span><span class="c1"></span>		<span class="nf">Traversal</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">Left</span><span class="p">)</span>              <span class="c1">//2 左
+</span><span class="c1"></span>		<span class="nf">Traversal</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">Right</span><span class="p">)</span>             <span class="c1">//3 右
+</span><span class="c1"></span>	<span class="p">}</span>
+	<span class="nf">Traversal</span><span class="p">(</span><span class="nx">root</span><span class="p">)</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">result</span>
+<span class="p">}</span>
+</code></pre></div><p><strong>根据1.1 前序遍历 很容易能写出中序遍历 和后序遍历</strong></p>
+<h3 id="2-迭代法">2. 迭代法</h3>
+<blockquote>
+<p>首先这里使用一般的迭代方法</p>
+</blockquote>
+<ul>
+<li>2.1 前序遍历 (中 左 右)</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">preorderTraversal</span><span class="p">(</span><span class="nx">root</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">result</span> <span class="p">[]</span><span class="kt">int</span>
+	<span class="k">if</span> <span class="nx">root</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">result</span>
+	<span class="p">}</span>
+	<span class="nx">stack</span> <span class="o">:=</span> <span class="p">[]</span><span class="o">*</span><span class="nx">TreeNode</span><span class="p">{</span><span class="nx">root</span><span class="p">}</span>
+    <span class="c1">// 迭代循环
+</span><span class="c1"></span>	<span class="k">for</span> <span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+        <span class="c1">// 处理当前节点
+</span><span class="c1"></span>		<span class="nx">node</span> <span class="o">:=</span> <span class="nx">stack</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+		<span class="nx">stack</span> <span class="p">=</span> <span class="nx">stack</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1">// 访问的节点就是 结果集的节点
+</span><span class="c1"></span>		<span class="nx">result</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span><span class="p">)</span>
+        <span class="c1">// 先将右节点 入栈
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Right</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Right</span><span class="p">)</span>
+		<span class="p">}</span>
+        <span class="c1">// 再将左节点 入栈
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Left</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Left</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">result</span>
+<span class="p">}</span>
+</code></pre></div><blockquote>
+<p>前序遍历比较简单, 因为前序遍历的节点 就是结果集的节点, 如果是中序遍历呢?</p>
+<p>由于中序遍历需要找的最左边的节点, 所以每次访问的节点并不是结果集的节点, 那应该怎么弄呢?</p>
+</blockquote>
+<ul>
+<li>2.1 中序遍历 (左 中 右)</li>
+</ul>
+<blockquote>
+<p>由于每次访问的节点并不是要处理的节点, 访问到左边最后一个节点才开始处理
+因此需要将每次遇到的右节点保存到堆栈中</p>
+</blockquote>
+<blockquote>
+<ol>
+<li>
+<p>第一步先找到最左边的节点,并且将访问的节点都存到堆栈中</p>
+</li>
+<li>
+<p>当发现一家到最左边的节点(==nil) 时, 就需要从堆栈中取出最后一个节点(最左边的节点) ,遍历该节点, 并处理他的右节点</p>
+</li>
+<li>
+<p>然后就拿着右节点 继续遍历 1 2步骤</p>
+</li>
+</ol>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">inorderTraversal</span><span class="p">(</span><span class="nx">root</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">result</span> <span class="p">[]</span><span class="kt">int</span>
+	<span class="k">if</span> <span class="nx">root</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">result</span>
+	<span class="p">}</span>
+	<span class="kd">var</span> <span class="nx">stack</span> <span class="p">[]</span><span class="o">*</span><span class="nx">TreeNode</span>
+	<span class="nx">node</span> <span class="o">:=</span> <span class="nx">root</span>
+	<span class="k">for</span> <span class="nx">node</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="o">||</span> <span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">node</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">node</span><span class="p">)</span>
+			<span class="nx">node</span> <span class="p">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Left</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+			<span class="c1">// 已经是最左边的节点了, 就可以推出栈元素了
+</span><span class="c1"></span>			<span class="c1">// 栈最后一个元素, 就是左节点
+</span><span class="c1"></span>			<span class="nx">node</span> <span class="p">=</span> <span class="nx">stack</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+			<span class="nx">stack</span> <span class="p">=</span> <span class="nx">stack</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+			<span class="c1">// 添加左节点的
+</span><span class="c1"></span>			<span class="nx">result</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span><span class="p">)</span>
+			<span class="c1">// 再去遍历右节点
+</span><span class="c1"></span>			<span class="nx">node</span> <span class="p">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Right</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">result</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>2.1 后序遍历 (左 右 中)</li>
+</ul>
+<blockquote>
+<p>对比前序遍历 中 左 右 -&gt; 稍作修改为: 中 右 左, 然后倒序输出</p>
+<ol>
+<li>
+<p>把根节点加入堆栈 , 弹出</p>
+</li>
+<li>
+<p>每次判断先判断右边是否nil,然后判断左边是否nil, 把 右左 顺序加入堆栈, 左右顺序弹出</p>
+</li>
+</ol>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">postorderTraversal</span><span class="p">(</span><span class="nx">root</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">result</span> <span class="p">[]</span><span class="kt">int</span>
+	<span class="k">if</span> <span class="nx">root</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">result</span>
+	<span class="p">}</span>
+	<span class="kd">var</span> <span class="nx">stack</span> <span class="p">[]</span><span class="o">*</span><span class="nx">TreeNode</span>
+	<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">root</span><span class="p">)</span>
+	<span class="k">for</span> <span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">cur</span> <span class="o">:=</span> <span class="nx">stack</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+		<span class="nx">stack</span> <span class="p">=</span> <span class="nx">stack</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+		<span class="nx">result</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">Val</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">Left</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">Left</span><span class="p">)</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">Right</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">Right</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">j</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">j</span><span class="p">;</span> <span class="p">{</span>
+		<span class="nx">result</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">result</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="p">=</span> <span class="nx">result</span><span class="p">[</span><span class="nx">j</span><span class="p">],</span> <span class="nx">result</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+		<span class="nx">i</span><span class="o">++</span>
+		<span class="nx">j</span><span class="o">--</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">result</span>
+<span class="p">}</span>
+</code></pre></div><p>经过以上比较,我们发现<strong>递归写法比较统一,迭代写法很不统一,是否有统一的迭代写法呢?</strong></p>
+<blockquote>
+<p>参考文档</p>
+</blockquote>
+<ul>
+<li><a href="https://leetcode-cn.com/problems/binary-tree-postorder-traversal/solution/bang-ni-dui-er-cha-shu-bu-zai-mi-mang-che-di-chi-t/">来自leetcode 代码随想录 分享</a></li>
+</ul>
+<h3 id="3-迭代法-统一写法版本">3. 迭代法 统一写法版本</h3>
+<ul>
+<li>3.1 先序遍历 ( 中 左 右)</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 统一写法  先序遍历 ( 中 左 右)
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">preorderTraversal</span><span class="p">(</span><span class="nx">root</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">result</span> <span class="p">[]</span><span class="kt">int</span>
+	<span class="nx">stack</span> <span class="o">:=</span> <span class="p">[]</span><span class="o">*</span><span class="nx">TreeNode</span><span class="p">{</span><span class="nx">root</span><span class="p">}</span>
+	<span class="k">for</span> <span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="c1">// 先取一个节点来处理
+</span><span class="c1"></span>		<span class="nx">node</span> <span class="o">:=</span> <span class="nx">stack</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+		<span class="nx">stack</span> <span class="p">=</span> <span class="nx">stack</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+		<span class="c1">// 判断是否用nil标记了
+</span><span class="c1"></span>
+		<span class="k">if</span> <span class="nx">node</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="c1">// 不是标记节点, 就处理该节点
+</span><span class="c1"></span>			<span class="c1">// 怎么处理呢? 就是按照顺序加入到队列中
+</span><span class="c1"></span>			<span class="c1">// 右节点入栈
+</span><span class="c1"></span>			<span class="k">if</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Right</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+				<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Right</span><span class="p">)</span>
+			<span class="p">}</span>
+			<span class="c1">// 左节点入栈
+</span><span class="c1"></span>
+			<span class="k">if</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Left</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+				<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Left</span><span class="p">)</span>
+			<span class="p">}</span>
+			<span class="c1">// 中节点入栈
+</span><span class="c1"></span>			<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">node</span><span class="p">)</span>
+			<span class="c1">// 中节点以及处理,所以标记
+</span><span class="c1"></span>			<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+
+		<span class="p">}</span><span class="k">else</span> <span class="p">{</span><span class="c1">// 如果遇到nil,就弹出并加入结果集
+</span><span class="c1"></span>			<span class="nx">node</span> <span class="p">=</span> <span class="nx">stack</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+			<span class="nx">stack</span> <span class="p">=</span> <span class="nx">stack</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+			<span class="nx">result</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>3.2 中序遍历(左 中 右)</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 迭代的统一写法 , 中序遍历(左 中 右)
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">inorderTraversal11</span><span class="p">(</span><span class="nx">root</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">result</span> <span class="p">[]</span><span class="kt">int</span>
+	<span class="nx">stack</span> <span class="o">:=</span>  <span class="p">[]</span><span class="o">*</span><span class="nx">TreeNode</span><span class="p">{</span><span class="nx">root</span><span class="p">}</span>
+	<span class="k">for</span> <span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="c1">// 首先从队列取出一个接地
+</span><span class="c1"></span>		<span class="nx">inorder</span> <span class="o">:=</span> <span class="nx">stack</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+		<span class="nx">stack</span> <span class="p">=</span> <span class="nx">stack</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+		<span class="c1">// 判断是否为 nil , 不是空说明没有处理过, 因为处理过的节点 紧跟着都加了 nil 标记
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">inorder</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="c1">// 如果右边不是 nil, 就加入到队列
+</span><span class="c1"></span>			<span class="k">if</span> <span class="nx">inorder</span><span class="p">.</span><span class="nx">Right</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+				<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">inorder</span><span class="p">.</span><span class="nx">Right</span><span class="p">)</span>
+			<span class="p">}</span>
+			<span class="c1">// 中间节点加入队列
+</span><span class="c1"></span>			<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">inorder</span><span class="p">)</span>
+			<span class="c1">// 中节点访问过，但是还没有处理，加入空节点做为标记。
+</span><span class="c1"></span>			<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span><span class="kc">nil</span> <span class="p">)</span>
+			<span class="c1">// 如果左边不是 nil, 就加入到队列
+</span><span class="c1"></span>			<span class="k">if</span> <span class="nx">inorder</span><span class="p">.</span><span class="nx">Left</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+				<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">inorder</span><span class="p">.</span><span class="nx">Left</span><span class="p">)</span>
+			<span class="p">}</span>
+		<span class="p">}</span><span class="k">else</span> <span class="p">{</span> <span class="c1">// 空节点, 说明 nil前面的节点是处理过的, 直接添加到 result即可
+</span><span class="c1"></span>			<span class="nx">inorder</span> <span class="p">=</span> <span class="nx">stack</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+			<span class="nx">stack</span> <span class="p">=</span> <span class="nx">stack</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+			<span class="c1">// 结果集
+</span><span class="c1"></span>			<span class="nx">result</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">inorder</span><span class="p">.</span><span class="nx">Val</span><span class="p">)</span>
+		<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span>
+
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>3.3 后序遍历( 左 右 中)</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 统一写法 后序遍历( 左 右 中)
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">postorderTraversal</span><span class="p">(</span><span class="nx">root</span> <span class="o">*</span><span class="nx">TreeNode</span><span class="p">)</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">result</span> <span class="p">[]</span><span class="kt">int</span>
+	<span class="nx">stack</span> <span class="o">:=</span> <span class="p">[]</span><span class="o">*</span><span class="nx">TreeNode</span><span class="p">{</span><span class="nx">root</span><span class="p">}</span>
+	<span class="k">for</span> <span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">node</span> <span class="o">:=</span> <span class="nx">stack</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+		<span class="nx">stack</span> <span class="p">=</span> <span class="nx">stack</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+		<span class="k">if</span> <span class="nx">node</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="c1">// 中节点, nil用于标记
+</span><span class="c1"></span>			<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">node</span><span class="p">,</span><span class="kc">nil</span> <span class="p">)</span>
+			<span class="c1">// 右节点
+</span><span class="c1"></span>			<span class="k">if</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Right</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+				<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Right</span><span class="p">)</span>
+			<span class="p">}</span>
+			<span class="c1">// 左节点
+</span><span class="c1"></span>			<span class="k">if</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Left</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+				<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Left</span><span class="p">)</span>
+			<span class="p">}</span>
+		<span class="p">}</span><span class="k">else</span> <span class="p">{</span><span class="c1">// 遇到标记节点
+</span><span class="c1"></span>			<span class="c1">// 在取一次, 标记节点前面的节点就是需要加入结果集的内容
+</span><span class="c1"></span>			<span class="nx">node</span> <span class="p">=</span> <span class="nx">stack</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+			<span class="nx">stack</span> <span class="p">=</span> <span class="nx">stack</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+			<span class="nx">result</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span>
+
+<span class="p">}</span>
+</code></pre></div>]]></content>
+		</item>
 		
 		<item>
 			<title>Go算法学习 回溯 分割回文串</title>
