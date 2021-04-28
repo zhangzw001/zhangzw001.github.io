@@ -582,7 +582,7 @@ net.ipv4.icmp_echo_ignore_all=1
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 </center>
-### nginx问题: 各种退出信号使用
+<h3 id="nginx问题-各种退出信号使用">nginx问题: 各种退出信号使用</h3>
 <pre><code>1. hup(kill -1):	重新读取配置并是服务配置生效(nginx -s reload)
 2. quit(kill -3): 	优雅关闭进程
 3. kill(kill -9):	强制关闭(必杀)
