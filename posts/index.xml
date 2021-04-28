@@ -421,14 +421,9 @@ java -jar /opt/atlassian/jira/atlassian-agent.jar -d -m test@test.com -n BAT -p 
 </center>
 <h3 id="tcp问题-什么是tcp连接队列">Tcp问题: 什么是tcp连接队列</h3>
 <ul>
-<li><a href="https://blog.cloudflare.com/syn-packet-handling-in-the-wild-zh/"></a></li>
 <li><a href="https://blog.csdn.net/luoyu_/article/details/105361742">TCP SYN队列与Accept队列详解</a></li>
-<li><a href="https://blog.csdn.net/whatday/article/details/107740002">https://blog.csdn.net/whatday/article/details/107740002</a></li>
-<li><a href="http://jm.taobao.org/2017/05/25/525-1/">http://jm.taobao.org/2017/05/25/525-1/</a></li>
-<li><a href="https://blog.huoding.com/2014/08/13/367">https://blog.huoding.com/2014/08/13/367</a></li>
 <li><a href="https://www.cnxct.com/something-about-phpfpm-s-backlog/">TCP SOCKET中backlog参数的用途是什么?</a></li>
-<li><a href="https://blog.csdn.net/chen8238065/article/details/80457150">https://blog.csdn.net/chen8238065/article/details/80457150</a></li>
-<li><a href="http://blog.sina.com.cn/s/blog_9b97be100101lkte.html">http://blog.sina.com.cn/s/blog_9b97be100101lkte.html</a></li>
+<li><a href="https://blog.csdn.net/chen8238065/article/details/80457150">tcp 相关总结</a></li>
 <li><a href="https://blog.csdn.net/weixin_34088838/article/details/92562556?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param">深入理解Linux TCP backlog</a></li>
 </ul>
 <div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">1.	net.ipv4.tcp_max_syn_backlog:		半连接队列,保存SYN_RECV状态的连接<span class="o">(</span>tcp握手第一次完成后, server端会将连接添加到sync queue队列 <span class="o">)</span>
@@ -436,7 +431,7 @@ java -jar /opt/atlassian/jira/atlassian-agent.jar -d -m test@test.com -n BAT -p 
 
 通过netstat -s <span class="p">|</span> egrep <span class="s2">&#34;listen|LISTEN&#34;</span> 查看 是否是半连接队列满了
 <span class="m">667399</span> <span class="nb">times</span> the listen queue of a socket overflowed   <span class="o">(</span>? 这个和TCPBacklogDrop 哪个是全连接队列??<span class="o">)</span>
-<span class="m">667399</span> SYNs to LISTEN sockets ignored 
+<span class="m">667399</span> SYNs to LISTEN sockets ignored
 
 通过netstat -s<span class="p">|</span>grep TCPBacklogDrop 查看 是否是全连接队列满了
     TCPBacklogDrop: <span class="m">1862</span>
@@ -463,7 +458,7 @@ ss -l<span class="p">|</span>grep http
 <pre><code># 这里已php -&gt; mysql 为例:
 php 发syn 给tcp:3306  -&gt; mysql 先存入syn queue队列(开启了syncookie,所以不会满) -&gt; 然后回复php syn+ack -&gt;  php 回复ack之后 进入 established 状态  握手完成  -&gt; 本次tcp连接请求存入 accpet queue队列(也就是listen backlog)  -&gt; 如果队列满了直接忽略, php 超时重传, 如果队列没满 就accept() 成功连接到mysql服务 (max-connections - 1)
 
-由于该数值或高会导致fpm处理不过来,出现504 gateway timeout(110: Connection timed out), 过低会导致高并发无法建立tcp连接(111: Connection refused) 
+由于该数值或高会导致fpm处理不过来,出现504 gateway timeout(110: Connection timed out), 过低会导致高并发无法建立tcp连接(111: Connection refused)
 因此一般设置该值等于QPS
 </code></pre><h3 id="tcp问题-syn-flood-攻击">Tcp问题: syn flood 攻击</h3>
 <ul>
@@ -567,7 +562,7 @@ net.ipv4.icmp_echo_ignore_all=1
 <h3 id="linux问题-文件锁问题">linux问题: 文件锁问题</h3>
 <pre><code>问题描述: php slowlog 出现session_start() 慢
 问题原因: 我们这边有A 和B 两个二级域名,A 会请求 B, 并且由于测试环境在同一台服务器,公用一个php,所以在发生调用的时候同时写了session,而php的sessions配置是默认的file方式, 这就造成了锁的问题
-问题解决: 
+问题解决:
 1. 修改代码部分
 2. php的session配置改成redis
     session.save_handler = redis
@@ -580,7 +575,7 @@ net.ipv4.icmp_echo_ignore_all=1
 <pre><code>问题描述: 开发这边写了个统计脚本, 占用49G内存, 从日志发现脚本已经全部执行完成, 但是php脚本依然存在
 问题原因: 通过 strace -p pid 观察进程, 发现是持续性的做内存释放操作 munmap(0x7f6db77ad000, 266240)          = 0
 持续执行munmap函数是因为一直在释放内存(毕竟49G), 结果 =0 说明内存释放执行函数是返回正常了
-问题解决: 
+问题解决:
 1. 修改代码降低内存
 2. 等待一段时间内存会释放完成(测试80分钟释放完毕)
 </code></pre><hr>
@@ -772,7 +767,7 @@ Context:  http, server, location
 <blockquote>
 <p>可是万万没想到虽然返回了403, 但是也有700字节大小, 大量请求对小带宽来说还是有压力的</p>
 </blockquote>
-<pre><code># 
+<pre><code>#
 server {
         listen       80 default_server;
         listen       [::]:80 default_server;
@@ -845,7 +840,7 @@ server {
 <h3 id="其他问题-修改swap">其他问题: 修改swap</h3>
 <pre><code>dd if=/dev/zero of=/data/swapfilenew bs=4096 count=4096000
 
-swapoff -a 
+swapoff -a
 
 /sbin/mkswap  /data/swapfilenew
 /sbin/swapon  /data/swapfilenew
@@ -885,7 +880,7 @@ vim /etc/fstab
 <pre><code>/usr/php/phpize
 ./configure
 make
-make install 
+make install
 </code></pre><p>显然问题就在这, 这里phpize 和configure会走默认的配置, 默认的配置可能是最新的php7.4(大概是仅仅php命令link到了php7.0)
 因此重新编译如下:</p>
 <pre><code>/usr/php/phpize7.0
