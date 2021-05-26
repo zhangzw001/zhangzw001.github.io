@@ -7,7 +7,25 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 27 Apr 2021 11:21:41 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 26 May 2021 18:01:37 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go算法学习 动态规划 不同路径2</title>
+      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%842/</link>
+      <pubDate>Wed, 26 May 2021 18:01:37 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%842/</guid>
+      <description>show me the code package main import &amp;#34;fmt&amp;#34; //https://github.com/youngyangyang04/leetcode-master/blob/master/problems/0063.%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84II.md //63. 不同路径 II //题目链接：https://leetcode-cn.com/problems/unique-paths-ii/ // //一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为“Start” ）。 // //机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为“Finish”）。 // //现在考虑网格中有障碍物。那么从左上角到右下角将会有多少条不同的路径？  // 同样根据我们 &amp;lt;&amp;lt; 62. 不同路径&amp;gt;&amp;gt; 的分析可以指定 // dp[i][j] 代表的是 (i,j) 坐标到达的所有路径数 // 显然(i,j) 如果是路障, 那么dp[i][j] = 0 是肯定的, 因为无法到达哈  // 那我们先来举例演示一下 // obstacleGrid = [[0,0,0,0],[0,1,0,1],[1,0,0,0],[0,0,0,0]] // [0,0,0,0] // [0,1,0,1] // [1,0,0,0] // [0,0,0,0] // 我们的dp数组同样初始化为: // 二维数组如下: //[1 1 1 1] //[1 0 0 0] //[0 0 0 0] //[0 0 0 0] // 根据有障碍的数组, 按照dp[i][j] = dp[i][j-1] + dp[i-1][j] 来计算可以得到如下: //[1 1 1 1] //[1 0 1 0] //[0 0 1 1] //[0 0 1 2]  // 动态规划五部曲 // 1.</description>
+    </item>
+    
+    <item>
+      <title>Go算法学习 动态规划 不同路径</title>
+      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84/</link>
+      <pubDate>Wed, 26 May 2021 17:17:21 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84/</guid>
+      <description>show me the code package main import &amp;#34;fmt&amp;#34; //https://github.com/youngyangyang04/leetcode-master/blob/master/problems/0062.%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84.md //62.不同路径 //题目链接：https://leetcode-cn.com/problems/unique-paths/ // //一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为 “Start” ）。 // //机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。 // //问总共有多少条不同的路径？ //输入：m = 3, n = 7 输出：28 // //示例 2： 输入：m = 2, n = 3 输出：3 解释： 从左上角开始，总共有 3 条路径可以到达右下角。 // //向右 -&amp;gt; 向右 -&amp;gt; 向下 //向右 -&amp;gt; 向下 -&amp;gt; 向右 //向下 -&amp;gt; 向右 -&amp;gt; 向右 //示例 3： 输入：m = 7, n = 3 输出：28 // //示例 4： 输入：m = 3, n = 3 输出：6 提示： // //1 &amp;lt;= m, n &amp;lt;= 100 //题目数据保证答案小于等于 2 * 10^9  // 动态规划五部曲 // 1.</description>
+    </item>
+    
     <item>
       <title>Go算法学习 二叉树 迭代统一遍历写法</title>
       <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E4%BA%8C%E5%8F%89%E6%A0%91-%E8%BF%AD%E4%BB%A3%E7%BB%9F%E4%B8%80%E9%81%8D%E5%8E%86%E5%86%99%E6%B3%95/</link>
@@ -88,26 +106,6 @@
       
       <guid>https://www.ngirl.xyz/golang/go%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-sort%E5%8C%85search%E6%96%B9%E6%B3%95/</guid>
       <description>&lt;p&gt;Sort包Search方法的实践说明&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Mysql5.7-alter锁表问题</title>
-      <link>https://www.ngirl.xyz/posts/64-mysql5.7-alter%E9%94%81%E8%A1%A8%E9%97%AE%E9%A2%98/</link>
-      <pubDate>Tue, 19 Jan 2021 11:28:39 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/posts/64-mysql5.7-alter%E9%94%81%E8%A1%A8%E9%97%AE%E9%A2%98/</guid>
-      <description>由于需要更新 my_test_table 的 style字段 由 tinyint(2) 为 int(10)  由于认为 mysql5.6和5.7 alter table 不会锁表, 因此在执行时 导致了锁表无法 update my_test_table
-  根据官方说明 Changing the column data type 不支持 online ddl
-  https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html  新增临时表做测试 准备临时表, 导入部分数据 -- 主库执行 create table my_test_table_tmp_20210119 like my_test_table; show create table my_test_table\G ENGINE=InnoDB AUTO_INCREMENT=48544733 DEFAULT CHARSET=utf8 COMMENT=&amp;#39;测试表&amp;#39; alter table my_test_table_tmp_20210119 AUTO_INCREMENT=49000000; 测试执行alter table 修改字段data type是否会锁表 -- 首先终端1 执行 alter alter table my_test_table_tmp_20210119 modify style int(10) not null default 0 comment &amp;#39;下单方式&amp;#39;; -- 首先终端2 执行 update(是会卡住) update my_test_table_tmp_20210119 set status =1 limit 1; -- 查看 processlist (如下图,出现Waiting for table metadata lock) show full processlist 开始测试 pt-online-schema-change 工具  参考文档: https://www.</description>
-    </item>
-    
-    <item>
-      <title>Go学习 并发的实现原理</title>
-      <link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-%E5%B9%B6%E5%8F%91%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</link>
-      <pubDate>Thu, 14 Jan 2021 17:49:48 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-%E5%B9%B6%E5%8F%91%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</guid>
-      <description>&lt;p&gt;go&lt;/p&gt;</description>
     </item>
     
   </channel>

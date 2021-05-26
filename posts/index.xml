@@ -10255,7 +10255,7 @@ default-character-set=utf8
 			
 			<guid>https://www.ngirl.xyz/posts/18-%E6%94%B6%E8%97%8F%E9%93%BE%E6%8E%A5/</guid>
 			<description>记录一些好的网址
- 容器    云原生图书编年史 云原生大佬博客汇总 (2000个) kubernetes 社群分享 QA 汇总 k8s CRD(CustomResourceDefinition)自定义controller sample k8s 集群部署运营实践总结 k8s 创建一个只读的用户权限 kubectl 创建 Pod 背后到底发生了什么？ 白话Kubernetes网络(推荐) 张馆长docker科普 cgroup相关  linux cgroups 简介 cgroups与systemd     Linux服务    MySQL 5.6, 5.7, 8.0版本的新特性大全 nginx+lua实现灰度发布 计算机网络 根域名的知识 常见状态码   golang    go学习指南 go圣经 go-mod学习 go包 go相关源码  《Go 语言编程之旅：一起用 Go 做项目》 vue+go 利用go优越的性能-设计与实现高性能企业级微服务网关     常用的工具网址    不用翻墙就能谷歌 deepl 比谷歌翻译好用的翻译 tableconvert 在线excel转markdown processon 免费在线作图 表情锅 自制表情动图 在线解析 子网掩码换算等   其他文章    Raft 为什么是更易理解的分布式一致性算法 Raft 一步步动态教你理解raft协议 Raft 更多形象化理解 Elasticsearch分布式一致性原理剖析(一)-节点篇   想看的书籍    金字塔原理  </description>
+ 容器    云原生图书编年史 云原生大佬博客汇总 (2000个) kubernetes 社群分享 QA 汇总 k8s CRD(CustomResourceDefinition)自定义controller sample k8s 集群部署运营实践总结 k8s 创建一个只读的用户权限 kubectl 创建 Pod 背后到底发生了什么？ 白话Kubernetes网络(推荐) 张馆长docker科普 cgroup相关  linux cgroups 简介 cgroups与systemd     计算机基础    MySQL 5.6, 5.7, 8.0版本的新特性大全 nginx+lua实现灰度发布 计算机网络 根域名的知识 常见状态码 你管这破玩意叫 IO 多路复用？   golang    go学习指南 go圣经 go-mod学习 go包 go相关源码  《Go 语言编程之旅：一起用 Go 做项目》 vue+go 利用go优越的性能-设计与实现高性能企业级微服务网关     常用的工具网址    不用翻墙就能谷歌 deepl 比谷歌翻译好用的翻译 tableconvert 在线excel转markdown processon 免费在线作图 表情锅 自制表情动图 在线解析 子网掩码换算等   其他文章    Raft 为什么是更易理解的分布式一致性算法 Raft 一步步动态教你理解raft协议 Raft 更多形象化理解 Elasticsearch分布式一致性原理剖析(一)-节点篇   想看的书籍    金字塔原理  </description>
 			<content type="html"><![CDATA[<p>记录一些好的网址</p>
 <!-- more -->
 <center>
@@ -10281,7 +10281,7 @@ default-character-set=utf8
 </ul>
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-<font color="blue" face="黑体" size=5> Linux服务 </font>
+<font color="blue" face="黑体" size=5> 计算机基础 </font>
 </center>
 <ul>
 <li><a href="https://www.linuxidc.com/Linux/2019-09/160664.htm">MySQL 5.6, 5.7, 8.0版本的新特性大全</a></li>
@@ -10289,6 +10289,7 @@ default-character-set=utf8
 <li><a href="https://github.com/CavsZhouyou/Front-End-Interview-Notebook/blob/master/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.md">计算机网络</a></li>
 <li><a href="http://www.ruanyifeng.com/blog/2018/05/root-domain.html">根域名的知识</a></li>
 <li><a href="https://developer.qiniu.com/fusion/kb/1425/the-http-status-code-books">常见状态码</a></li>
+<li><a href="https://mp.weixin.qq.com/s?__biz=Mzk0MjE3NDE0Ng==&amp;mid=2247494866&amp;idx=1&amp;sn=0ebeb60dbc1fd7f9473943df7ce5fd95&amp;chksm=c2c5967ff5b21f69030636334f6a5a7dc52c0f4de9b668f7bac15b2c1a2660ae533dd9878c7c&amp;mpshare=1&amp;scene=1&amp;srcid=0506xrEXVNFE1oPIS2kHcFnE&amp;sharer_sharetime=1620271084754&amp;sharer_shareid=b31dab34e7f27cf6c4fb08ebfbae0c21#rd">你管这破玩意叫 IO 多路复用？</a></li>
 </ul>
 <center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>

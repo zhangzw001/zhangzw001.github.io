@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 27 Apr 2021 11:21:41 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 26 May 2021 17:17:21 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go算法学习 动态规划 不同路径</title>
+      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84/</link>
+      <pubDate>Wed, 26 May 2021 17:17:21 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84/</guid>
+      <description>show me the code package main import &amp;#34;fmt&amp;#34; //https://github.com/youngyangyang04/leetcode-master/blob/master/problems/0062.%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84.md //62.不同路径 //题目链接：https://leetcode-cn.com/problems/unique-paths/ // //一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为 “Start” ）。 // //机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。 // //问总共有多少条不同的路径？ //输入：m = 3, n = 7 输出：28 // //示例 2： 输入：m = 2, n = 3 输出：3 解释： 从左上角开始，总共有 3 条路径可以到达右下角。 // //向右 -&amp;gt; 向右 -&amp;gt; 向下 //向右 -&amp;gt; 向下 -&amp;gt; 向右 //向下 -&amp;gt; 向右 -&amp;gt; 向右 //示例 3： 输入：m = 7, n = 3 输出：28 // //示例 4： 输入：m = 3, n = 3 输出：6 提示： // //1 &amp;lt;= m, n &amp;lt;= 100 //题目数据保证答案小于等于 2 * 10^9  // 动态规划五部曲 // 1.</description>
+    </item>
+    
     <item>
       <title>Go算法学习 二叉树 迭代统一遍历写法</title>
       <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E4%BA%8C%E5%8F%89%E6%A0%91-%E8%BF%AD%E4%BB%A3%E7%BB%9F%E4%B8%80%E9%81%8D%E5%8E%86%E5%86%99%E6%B3%95/</link>
@@ -93,16 +102,6 @@
       <guid>https://www.ngirl.xyz/golang/gee%E5%AD%A6%E4%B9%A0-%E8%B7%AF%E7%94%B1trie%E6%B5%8B%E8%AF%95%E7%BC%96%E5%86%99/</guid>
       <description>github地址: github.com/zhangzw001/learnGee
  路由分析测试 package gee import ( &amp;#34;reflect&amp;#34; &amp;#34;testing&amp;#34; ) func TestParsePattern(t *testing.T) { tests := []struct { patterns string parts []string ok bool }{ {&amp;#34;/test/v1/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;v1&amp;#34;, &amp;#34;add&amp;#34;},true }, {&amp;#34;/test/*name/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;*name&amp;#34;},true}, {&amp;#34;/test/:name&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;},true }, {&amp;#34;/test/:name/abc&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;, &amp;#34;abc&amp;#34;},true}, {&amp;#34;/test/v1/add&amp;#34;, []string{&amp;#34;testv1&amp;#34;, &amp;#34;add&amp;#34;},false }, {&amp;#34;/test/*name/add&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;*name&amp;#34;,&amp;#34;add&amp;#34;},false}, {&amp;#34;/test/:name&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:&amp;#34;,&amp;#34;name&amp;#34;},false }, {&amp;#34;/test/:name/abc&amp;#34;, []string{&amp;#34;test&amp;#34;, &amp;#34;:name&amp;#34;},false}, } m := make(map[string][]string) for _, test := range tests { m[test.patterns] = test.parts p := parsePattern(test.</description>
-    </item>
-    
-    <item>
-      <title>Gin学习 简单记录form数据获取源码解读</title>
-      <link>https://www.ngirl.xyz/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</link>
-      <pubDate>Wed, 13 Jan 2021 14:24:43 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/gin%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95form%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</guid>
-      <description>http.request form 数据测试 func main() { e := gin.Default() e.Any(&amp;#34;/test&amp;#34;,func(c *gin.Context) { // 获取所有参数 	_ = c.Request.ParseForm() // log.Println(c.Request.Header[&amp;#34;Content-Type&amp;#34;]) 	// get form 参数, c.Request.URL.Query, err = url.ParseQuery 	log.Println(c.Request.URL.Query()) //log.Println(url.ParseQuery(c.Request.URL.RawQuery)) 	// post form 参数 	log.Println(c.Request.PostForm) // form 参数 	log.Println(c.Request.Form) }) e.Run(&amp;#34;localhost:8123&amp;#34;) }  请求日志
- # curl -XPOST &amp;quot;http://localhost:8123/test&amp;quot; -d &amp;quot;abc=123&amp;amp;q=123&amp;amp;ccc=123123&amp;quot; 2021/01/13 14:31:30 map[] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] 2021/01/13 14:31:30 map[abc:[123] ccc:[123123] q:[123]] [GIN] 2021/01/13 - 14:31:30 | 200 | 339.</description>
     </item>
     
   </channel>
