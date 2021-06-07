@@ -9,7 +9,7 @@
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
     <lastBuildDate>Mon, 07 Jun 2021 10:06:09 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Go算法学习 动态规划01背包基础</title>
+      <title>Go算法学习 动态规划 01背包基础</title>
       <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%9201%E8%83%8C%E5%8C%85%E5%9F%BA%E7%A1%80/</link>
       <pubDate>Mon, 07 Jun 2021 10:06:09 +0800</pubDate>
       
@@ -17,7 +17,7 @@
       <description>参考文档  carl 背包理论基础01背包 二维dp carl 背包理论基础01背包 一维dp  背包问题分类 01背包例子 题目说明: 有一堆物品, 背包的容量只有j,想要拿走最贵的东西,怎么装? weight := []int{1,3,4} //kg price := []int{15,20,30} //¥  01背包说明: 每个物品只能使用一次
  动态规划五部曲 1. 定义dp数组 这里我们定义一个dp[i][j]的数组 i代表 物品的下标,0,1,2&amp;hellip; j代表 背包的容量,1kg,3kg,4kg&amp;hellip; dp[i][j]代表 可选的i个物品中,容量为j的背包能装下最大为dp[i][j]的价值
  这里i个物品 是有两种状态, 选择 和不选择
- 2. 确定推导公式 首先我们可以想到i个物品的dp[i][j] 是可以由 i-1个物品的情况下, 选择i转入背包 和不装入背包两种情况得到的 那不装入物品i的价值 = dp[i-1][j] 那装入了物品i的价值 = dp[i-1][j-weight[i]] + price[i], 显然装了东西, 背包容量肯定减少, 总价值肯定是增加 那我们dp[i][j] 应该选择哪种情况呢? 答案是选择更大价值的 dp[i][j] = max(dp[i-1][j] , dp[i-1][j-weight[i]] + price[i] )</description>
+ 2. 确定推导公式 首先我们可以想到i个物品的dp[i][j] 是可以由 i-1个物品的情况下, 选择i转入背包 和不装入背包两种情况得到的 那不装入物品i的价值 = dp[i-1][j] 那装入了物品i的价值 = dp[i-1][j-weight[i]] + price[i], 显然装了东西, 背包容量肯定减少, 总价值肯定是增加 那我们dp[i][j] 应该选择哪种情况呢? 答案是选择更大价值的 dp[i][j] = max(dp[i-1][j] , dp[i-1][j-weight[i]] + price[i] ) 3.</description>
     </item>
     
     <item>
