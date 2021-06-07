@@ -8,23 +8,26 @@
 	<meta name="theme-color" content="#494f5c">
 	<meta name="msapplication-TileColor" content="#494f5c">
 <meta itemprop="name" content="Go算法学习 动态规划 分割等和子集">
-<meta itemprop="description" content="show me the code package main import &#34;fmt&#34; //https://github.com/youngyangyang04/leetcode-master/blob/master/problems/0416.%E5%88%86%E5%89%B2%E7%AD%89%E5%92%8C%E5%AD%90%E9%9B%86.md //416. 分割等和子集 //题目链接：https://leetcode-cn.com/problems/partition-equal-subset-sum/ // //题目难易：中等 // //给定一个只包含正整数的非空数组。是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。 // //注意: 每个数组中的元素不会超过 100 数组的大小不会超过 200 // //示例 1: 输入: [1, 5, 11, 5] 输出: true 解释: 数组可以分割成 [1, 5, 5] 和 [11]. 示例 2: 输入: [1, 2, 3, 5] 输出: false 解释: 数组不能分割成两个元素和相等的子集.  // 1. 暴力回溯法 // 1,5,11,5 // 找到所有和=22, 取一半 = 11 // 先取第一个数字: 1,1&#43;5,1&#43;11,1&#43;5|1&#43;5&#43;11,1&#43;5&#43;5|1&#43;11&#43;5 存在==11 // 先取第二个数字: 5&#43;11,5&#43;5 // 先取第三个数字: 11&#43;5 // 先取第四个数字: 5 // 回溯遍历可以得到结果, 但是会超时 // 时间复杂度: O(n*n!">
+<meta itemprop="description" content="dp 一维数组模板  例一
+    \ 重量 价值     物品0 1 15   物品1 3 20   物品2 4 30    for i:=0;i&lt; 物品重量列表长度;i&#43;&#43; { for j:= 背包容量;j &gt;= i物品的重量;j-- { dp[j] = max(dp[j], dp[j- 物品i的重量] &#43; 物品i的价值) } } 物品重量: weight := []int{1,3,4} 物品价值: value := []int{15,20,30} for i:=0;i&lt; len(weight);i&#43;&#43; { for j:= target ;j &gt;= weight[i];j-- { dp[j] = max(dp[j], dp[j- weight[i]] &#43; value[i]) } } # 背包问题简单测试 func bag01() { weight := []int{1, 3, 4} value := []int{15, 20, 30} target := 10 dp := make([]int,target&#43;1) for i := 0; i &lt; len(weight); i&#43;&#43; { for j := target; j &gt;= weight[i]; j-- { dp[j] = max(dp[j], dp[j-weight[i]]&#43;value[i]) } } fmt.">
 <meta itemprop="datePublished" content="2021-05-27T18:36:38+08:00" />
 <meta itemprop="dateModified" content="2021-05-27T18:36:38+08:00" />
-<meta itemprop="wordCount" content="494">
+<meta itemprop="wordCount" content="630">
 
 
 
-<meta itemprop="keywords" content="golang," />
+<meta itemprop="keywords" content="golang,算法,动态规划,dp," />
 <meta property="og:title" content="Go算法学习 动态规划 分割等和子集" />
-<meta property="og:description" content="show me the code package main import &#34;fmt&#34; //https://github.com/youngyangyang04/leetcode-master/blob/master/problems/0416.%E5%88%86%E5%89%B2%E7%AD%89%E5%92%8C%E5%AD%90%E9%9B%86.md //416. 分割等和子集 //题目链接：https://leetcode-cn.com/problems/partition-equal-subset-sum/ // //题目难易：中等 // //给定一个只包含正整数的非空数组。是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。 // //注意: 每个数组中的元素不会超过 100 数组的大小不会超过 200 // //示例 1: 输入: [1, 5, 11, 5] 输出: true 解释: 数组可以分割成 [1, 5, 5] 和 [11]. 示例 2: 输入: [1, 2, 3, 5] 输出: false 解释: 数组不能分割成两个元素和相等的子集.  // 1. 暴力回溯法 // 1,5,11,5 // 找到所有和=22, 取一半 = 11 // 先取第一个数字: 1,1&#43;5,1&#43;11,1&#43;5|1&#43;5&#43;11,1&#43;5&#43;5|1&#43;11&#43;5 存在==11 // 先取第二个数字: 5&#43;11,5&#43;5 // 先取第三个数字: 11&#43;5 // 先取第四个数字: 5 // 回溯遍历可以得到结果, 但是会超时 // 时间复杂度: O(n*n!" />
+<meta property="og:description" content="dp 一维数组模板  例一
+    \ 重量 价值     物品0 1 15   物品1 3 20   物品2 4 30    for i:=0;i&lt; 物品重量列表长度;i&#43;&#43; { for j:= 背包容量;j &gt;= i物品的重量;j-- { dp[j] = max(dp[j], dp[j- 物品i的重量] &#43; 物品i的价值) } } 物品重量: weight := []int{1,3,4} 物品价值: value := []int{15,20,30} for i:=0;i&lt; len(weight);i&#43;&#43; { for j:= target ;j &gt;= weight[i];j-- { dp[j] = max(dp[j], dp[j- weight[i]] &#43; value[i]) } } # 背包问题简单测试 func bag01() { weight := []int{1, 3, 4} value := []int{15, 20, 30} target := 10 dp := make([]int,target&#43;1) for i := 0; i &lt; len(weight); i&#43;&#43; { for j := target; j &gt;= weight[i]; j-- { dp[j] = max(dp[j], dp[j-weight[i]]&#43;value[i]) } } fmt." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E5%88%86%E5%89%B2%E7%AD%89%E5%92%8C%E5%AD%90%E9%9B%86/" />
 <meta property="article:published_time" content="2021-05-27T18:36:38+08:00" />
 <meta property="article:modified_time" content="2021-05-27T18:36:38+08:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Go算法学习 动态规划 分割等和子集"/>
-<meta name="twitter:description" content="show me the code package main import &#34;fmt&#34; //https://github.com/youngyangyang04/leetcode-master/blob/master/problems/0416.%E5%88%86%E5%89%B2%E7%AD%89%E5%92%8C%E5%AD%90%E9%9B%86.md //416. 分割等和子集 //题目链接：https://leetcode-cn.com/problems/partition-equal-subset-sum/ // //题目难易：中等 // //给定一个只包含正整数的非空数组。是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。 // //注意: 每个数组中的元素不会超过 100 数组的大小不会超过 200 // //示例 1: 输入: [1, 5, 11, 5] 输出: true 解释: 数组可以分割成 [1, 5, 5] 和 [11]. 示例 2: 输入: [1, 2, 3, 5] 输出: false 解释: 数组不能分割成两个元素和相等的子集.  // 1. 暴力回溯法 // 1,5,11,5 // 找到所有和=22, 取一半 = 11 // 先取第一个数字: 1,1&#43;5,1&#43;11,1&#43;5|1&#43;5&#43;11,1&#43;5&#43;5|1&#43;11&#43;5 存在==11 // 先取第二个数字: 5&#43;11,5&#43;5 // 先取第三个数字: 11&#43;5 // 先取第四个数字: 5 // 回溯遍历可以得到结果, 但是会超时 // 时间复杂度: O(n*n!"/>
+<meta name="twitter:description" content="dp 一维数组模板  例一
+    \ 重量 价值     物品0 1 15   物品1 3 20   物品2 4 30    for i:=0;i&lt; 物品重量列表长度;i&#43;&#43; { for j:= 背包容量;j &gt;= i物品的重量;j-- { dp[j] = max(dp[j], dp[j- 物品i的重量] &#43; 物品i的价值) } } 物品重量: weight := []int{1,3,4} 物品价值: value := []int{15,20,30} for i:=0;i&lt; len(weight);i&#43;&#43; { for j:= target ;j &gt;= weight[i];j-- { dp[j] = max(dp[j], dp[j- weight[i]] &#43; value[i]) } } # 背包问题简单测试 func bag01() { weight := []int{1, 3, 4} value := []int{15, 20, 30} target := 10 dp := make([]int,target&#43;1) for i := 0; i &lt; len(weight); i&#43;&#43; { for j := target; j &gt;= weight[i]; j-- { dp[j] = max(dp[j], dp[j-weight[i]]&#43;value[i]) } } fmt."/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -73,7 +76,74 @@
 				<h1>Go算法学习 动态规划 分割等和子集</h1>
 			</header>
 			<div class="content">
-				<h3 id="show-me-the-code">show me the code<a href="#show-me-the-code" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+				<h3 id="dp-一维数组模板">dp 一维数组模板<a href="#dp-一维数组模板" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>例一</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>\</th>
+<th>重量</th>
+<th>价值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>物品0</td>
+<td>1</td>
+<td>15</td>
+</tr>
+<tr>
+<td>物品1</td>
+<td>3</td>
+<td>20</td>
+</tr>
+<tr>
+<td>物品2</td>
+<td>4</td>
+<td>30</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="k">for</span> <span class="nx">i</span><span class="o">:=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="p">&lt;</span> <span class="nx">物品重量列表长度</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="nx">j</span><span class="o">:=</span> <span class="nx">背包容量</span><span class="p">;</span><span class="nx">j</span> <span class="o">&gt;=</span> <span class="nx">i物品的重量</span><span class="p">;</span><span class="nx">j</span><span class="o">--</span> <span class="p">{</span>
+        <span class="nx">dp</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="p">=</span> <span class="nf">max</span><span class="p">(</span><span class="nx">dp</span><span class="p">[</span><span class="nx">j</span><span class="p">],</span> <span class="nx">dp</span><span class="p">[</span><span class="nx">j</span><span class="o">-</span> <span class="nx">物品i的重量</span><span class="p">]</span> <span class="o">+</span> <span class="nx">物品i的价值</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">物品重量</span><span class="p">:</span>   <span class="nx">weight</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">}</span>
+<span class="nx">物品价值</span><span class="p">:</span>   <span class="nx">value</span>  <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">15</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">}</span>
+
+<span class="k">for</span> <span class="nx">i</span><span class="o">:=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">weight</span><span class="p">);</span><span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="nx">j</span><span class="o">:=</span> <span class="nx">target</span> <span class="p">;</span><span class="nx">j</span> <span class="o">&gt;=</span> <span class="nx">weight</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span><span class="nx">j</span><span class="o">--</span> <span class="p">{</span>
+        <span class="nx">dp</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="p">=</span> <span class="nf">max</span><span class="p">(</span><span class="nx">dp</span><span class="p">[</span><span class="nx">j</span><span class="p">],</span> <span class="nx">dp</span><span class="p">[</span><span class="nx">j</span><span class="o">-</span> <span class="nx">weight</span><span class="p">[</span><span class="nx">i</span><span class="p">]]</span> <span class="o">+</span> <span class="nx">value</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="err">#</span> <span class="nx">背包问题简单测试</span>
+<span class="kd">func</span> <span class="nf">bag01</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">weight</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">}</span>
+	<span class="nx">value</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">}</span>
+	<span class="nx">target</span> <span class="o">:=</span> <span class="mi">10</span>
+	<span class="nx">dp</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span><span class="nx">target</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">weight</span><span class="p">);</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="k">for</span> <span class="nx">j</span> <span class="o">:=</span> <span class="nx">target</span><span class="p">;</span> <span class="nx">j</span> <span class="o">&gt;=</span> <span class="nx">weight</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span> <span class="nx">j</span><span class="o">--</span> <span class="p">{</span>
+			<span class="nx">dp</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="p">=</span> <span class="nf">max</span><span class="p">(</span><span class="nx">dp</span><span class="p">[</span><span class="nx">j</span><span class="p">],</span> <span class="nx">dp</span><span class="p">[</span><span class="nx">j</span><span class="o">-</span><span class="nx">weight</span><span class="p">[</span><span class="nx">i</span><span class="p">]]</span><span class="o">+</span><span class="nx">value</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">dp</span><span class="p">)</span>    <span class="c1">//[0 15 15 20 35 45 45 50 65 65 65]
+</span><span class="c1"></span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="nf">max</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span>  <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">a</span> <span class="p">&gt;</span> <span class="nx">b</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">a</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">b</span>
+<span class="p">}</span>
+
+</code></pre></div><h3 id="show-me-the-code">show me the code<a href="#show-me-the-code" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
@@ -239,9 +309,9 @@
 			<hr class="post-end">
 			<footer class="post-info">
 				<p>
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/golang">golang</a></span>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/golang">golang</a></span><span class="tag"><a href="https://www.ngirl.xyz/tags/%E7%AE%97%E6%B3%95">算法</a></span><span class="tag"><a href="https://www.ngirl.xyz/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92">动态规划</a></span><span class="tag"><a href="https://www.ngirl.xyz/tags/dp">dp</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>494 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>630 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2021-05-27 18:36 &#43;0800</p>
 			</footer>
 		</article>
@@ -251,6 +321,7 @@
   <ul>
     <li>
       <ul>
+        <li><a href="#dp-一维数组模板">dp 一维数组模板</a></li>
         <li><a href="#show-me-the-code">show me the code</a></li>
       </ul>
     </li>
@@ -258,6 +329,9 @@
 </nav>
 		</aside>
 		<div class="post-nav thin">
+			<a class="next-post" href="https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%9201%E8%83%8C%E5%8C%85%E5%9F%BA%E7%A1%80/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>Go算法学习 动态规划01背包基础</span>
+			</a>
 			<a class="prev-post" href="https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E6%95%B4%E6%95%B0%E6%8B%86%E5%88%86/">
 				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Go算法学习 动态规划 整数拆分</span>
 			</a>

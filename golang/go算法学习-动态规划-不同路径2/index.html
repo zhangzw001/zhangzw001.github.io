@@ -12,27 +12,17 @@
 <meta itemprop="datePublished" content="2021-05-26T18:01:37+08:00" />
 <meta itemprop="dateModified" content="2021-05-26T18:01:37+08:00" />
 <meta itemprop="wordCount" content="242">
-<meta itemprop="image" content="https://www.ngirl.xyz/golang">
-<meta itemprop="image" content="https://www.ngirl.xyz/%E7%AE%97%E6%B3%95">
-<meta itemprop="image" content="https://www.ngirl.xyz/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92">
-<meta itemprop="image" content="https://www.ngirl.xyz/dp">
 
 
 
-<meta itemprop="keywords" content="" />
+<meta itemprop="keywords" content="golang,算法,动态规划,dp," />
 <meta property="og:title" content="Go算法学习 动态规划 不同路径2" />
 <meta property="og:description" content="show me the code package main import &#34;fmt&#34; //https://github.com/youngyangyang04/leetcode-master/blob/master/problems/0063.%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84II.md //63. 不同路径 II //题目链接：https://leetcode-cn.com/problems/unique-paths-ii/ // //一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为“Start” ）。 // //机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为“Finish”）。 // //现在考虑网格中有障碍物。那么从左上角到右下角将会有多少条不同的路径？  // 同样根据我们 &lt;&lt; 62. 不同路径&gt;&gt; 的分析可以指定 // dp[i][j] 代表的是 (i,j) 坐标到达的所有路径数 // 显然(i,j) 如果是路障, 那么dp[i][j] = 0 是肯定的, 因为无法到达哈  // 那我们先来举例演示一下 // obstacleGrid = [[0,0,0,0],[0,1,0,1],[1,0,0,0],[0,0,0,0]] // [0,0,0,0] // [0,1,0,1] // [1,0,0,0] // [0,0,0,0] // 我们的dp数组同样初始化为: // 二维数组如下: //[1 1 1 1] //[1 0 0 0] //[0 0 0 0] //[0 0 0 0] // 根据有障碍的数组, 按照dp[i][j] = dp[i][j-1] &#43; dp[i-1][j] 来计算可以得到如下: //[1 1 1 1] //[1 0 1 0] //[0 0 1 1] //[0 0 1 2]  // 动态规划五部曲 // 1." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%842/" />
-<meta property="og:image" content="https://www.ngirl.xyz/golang" />
-<meta property="og:image" content="https://www.ngirl.xyz/%E7%AE%97%E6%B3%95" />
-<meta property="og:image" content="https://www.ngirl.xyz/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92" />
-<meta property="og:image" content="https://www.ngirl.xyz/dp" />
 <meta property="article:published_time" content="2021-05-26T18:01:37+08:00" />
 <meta property="article:modified_time" content="2021-05-26T18:01:37+08:00" />
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="https://www.ngirl.xyz/golang"/>
-
+<meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Go算法学习 动态规划 不同路径2"/>
 <meta name="twitter:description" content="show me the code package main import &#34;fmt&#34; //https://github.com/youngyangyang04/leetcode-master/blob/master/problems/0063.%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84II.md //63. 不同路径 II //题目链接：https://leetcode-cn.com/problems/unique-paths-ii/ // //一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为“Start” ）。 // //机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为“Finish”）。 // //现在考虑网格中有障碍物。那么从左上角到右下角将会有多少条不同的路径？  // 同样根据我们 &lt;&lt; 62. 不同路径&gt;&gt; 的分析可以指定 // dp[i][j] 代表的是 (i,j) 坐标到达的所有路径数 // 显然(i,j) 如果是路障, 那么dp[i][j] = 0 是肯定的, 因为无法到达哈  // 那我们先来举例演示一下 // obstacleGrid = [[0,0,0,0],[0,1,0,1],[1,0,0,0],[0,0,0,0]] // [0,0,0,0] // [0,1,0,1] // [1,0,0,0] // [0,0,0,0] // 我们的dp数组同样初始化为: // 二维数组如下: //[1 1 1 1] //[1 0 0 0] //[0 0 0 0] //[0 0 0 0] // 根据有障碍的数组, 按照dp[i][j] = dp[i][j-1] &#43; dp[i-1][j] 来计算可以得到如下: //[1 1 1 1] //[1 0 1 0] //[0 0 1 1] //[0 0 1 2]  // 动态规划五部曲 // 1."/>
 
@@ -45,7 +35,7 @@
 
 	<title>Go算法学习 动态规划 不同路径2</title>
 	<link rel="stylesheet" href="https://www.ngirl.xyz/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
-	<style>.bg-img {background-image: url('https://www.ngirl.xyz/golang');}</style>
+	
 </head>
 
 <body id="page">
@@ -62,7 +52,7 @@
 				</nav>
 			</div>
 			<div class="hdr-right hdr-icons">
-				<button id="img-btn" class="hdr-btn" title="Featured Image"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></button><button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+				<button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
 			</div>
 		</div>
 	</header>
@@ -76,7 +66,6 @@
 
 
 
-	<div class="bg-img"></div>
 	<main class="site-main section-inner animated fadeIn faster">
 		<article class="thin">
 			<header class="post-header">
@@ -182,6 +171,9 @@
 
 			<hr class="post-end">
 			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/golang">golang</a></span><span class="tag"><a href="https://www.ngirl.xyz/tags/%E7%AE%97%E6%B3%95">算法</a></span><span class="tag"><a href="https://www.ngirl.xyz/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92">动态规划</a></span><span class="tag"><a href="https://www.ngirl.xyz/tags/dp">dp</a></span>
+				</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>242 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2021-05-26 18:01 &#43;0800</p>
 			</footer>

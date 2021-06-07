@@ -7,7 +7,47 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Wed, 26 May 2021 17:17:21 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/dp/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 07 Jun 2021 10:06:09 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/dp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go算法学习 动态规划01背包基础</title>
+      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%9201%E8%83%8C%E5%8C%85%E5%9F%BA%E7%A1%80/</link>
+      <pubDate>Mon, 07 Jun 2021 10:06:09 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%9201%E8%83%8C%E5%8C%85%E5%9F%BA%E7%A1%80/</guid>
+      <description>参考文档  carl 背包理论基础01背包 二维dp carl 背包理论基础01背包 一维dp  背包问题分类 01背包例子 题目说明: 有一堆物品, 背包的容量只有j,想要拿走最贵的东西,怎么装? weight := []int{1,3,4} //kg price := []int{15,20,30} //¥  01背包说明: 每个物品只能使用一次
+ 动态规划五部曲 1. 定义dp数组 这里我们定义一个dp[i][j]的数组 i代表 物品的下标,0,1,2&amp;hellip; j代表 背包的容量,1kg,3kg,4kg&amp;hellip; dp[i][j]代表 可选的i个物品中,容量为j的背包能装下最大为dp[i][j]的价值
+ 这里i个物品 是有两种状态, 选择 和不选择
+ 2. 确定推导公式 首先我们可以想到i个物品的dp[i][j] 是可以由 i-1个物品的情况下, 选择i转入背包 和不装入背包两种情况得到的 那不装入物品i的价值 = dp[i-1][j] 那装入了物品i的价值 = dp[i-1][j-weight[i]] + price[i], 显然装了东西, 背包容量肯定减少, 总价值肯定是增加 那我们dp[i][j] 应该选择哪种情况呢? 答案是选择更大价值的 dp[i][j] = max(dp[i-1][j] , dp[i-1][j-weight[i]] + price[i] )</description>
+    </item>
+    
+    <item>
+      <title>Go算法学习 动态规划 分割等和子集</title>
+      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E5%88%86%E5%89%B2%E7%AD%89%E5%92%8C%E5%AD%90%E9%9B%86/</link>
+      <pubDate>Thu, 27 May 2021 18:36:38 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E5%88%86%E5%89%B2%E7%AD%89%E5%92%8C%E5%AD%90%E9%9B%86/</guid>
+      <description>dp 一维数组模板  例一
+    \ 重量 价值     物品0 1 15   物品1 3 20   物品2 4 30    for i:=0;i&amp;lt; 物品重量列表长度;i++ { for j:= 背包容量;j &amp;gt;= i物品的重量;j-- { dp[j] = max(dp[j], dp[j- 物品i的重量] + 物品i的价值) } } 物品重量: weight := []int{1,3,4} 物品价值: value := []int{15,20,30} for i:=0;i&amp;lt; len(weight);i++ { for j:= target ;j &amp;gt;= weight[i];j-- { dp[j] = max(dp[j], dp[j- weight[i]] + value[i]) } } # 背包问题简单测试 func bag01() { weight := []int{1, 3, 4} value := []int{15, 20, 30} target := 10 dp := make([]int,target+1) for i := 0; i &amp;lt; len(weight); i++ { for j := target; j &amp;gt;= weight[i]; j-- { dp[j] = max(dp[j], dp[j-weight[i]]+value[i]) } } fmt.</description>
+    </item>
+    
+    <item>
+      <title>Go算法学习 动态规划 整数拆分</title>
+      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E6%95%B4%E6%95%B0%E6%8B%86%E5%88%86/</link>
+      <pubDate>Thu, 27 May 2021 11:07:46 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E6%95%B4%E6%95%B0%E6%8B%86%E5%88%86/</guid>
+      <description>show me the code package main //https://github.com/youngyangyang04/leetcode-master/blob/master/problems/0343.%E6%95%B4%E6%95%B0%E6%8B%86%E5%88%86.md //343. 整数拆分 //题目链接：https://leetcode-cn.com/problems/integer-break/ // //给定一个正整数 n，将其拆分为至少两个正整数的和，并使这些整数的乘积最大化。 返回你可以获得的最大乘积。 // //示例 1: 输入: 2 输出: 1 解释: 2 = 1 + 1, 1 × 1 = 1。 // //示例 2: 输入: 10 输出: 36 解释: 10 = 3 + 3 + 4, 3 × 3 × 4 = 36。 说明: 你可以假设 n 不小于 2 且不大于 58。  // dp[i] 代表 i这个数 拆分得到最大的乘积 // 看看示例 // dp[0],dp[1] 不用考虑, 题目是n大于等于2 // dp[2] = 1 * 1 = 1 只有一个结果  // 1.</description>
+    </item>
+    
+    <item>
+      <title>Go算法学习 动态规划 不同路径2</title>
+      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%842/</link>
+      <pubDate>Wed, 26 May 2021 18:01:37 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%842/</guid>
+      <description>show me the code package main import &amp;#34;fmt&amp;#34; //https://github.com/youngyangyang04/leetcode-master/blob/master/problems/0063.%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84II.md //63. 不同路径 II //题目链接：https://leetcode-cn.com/problems/unique-paths-ii/ // //一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为“Start” ）。 // //机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为“Finish”）。 // //现在考虑网格中有障碍物。那么从左上角到右下角将会有多少条不同的路径？  // 同样根据我们 &amp;lt;&amp;lt; 62. 不同路径&amp;gt;&amp;gt; 的分析可以指定 // dp[i][j] 代表的是 (i,j) 坐标到达的所有路径数 // 显然(i,j) 如果是路障, 那么dp[i][j] = 0 是肯定的, 因为无法到达哈  // 那我们先来举例演示一下 // obstacleGrid = [[0,0,0,0],[0,1,0,1],[1,0,0,0],[0,0,0,0]] // [0,0,0,0] // [0,1,0,1] // [1,0,0,0] // [0,0,0,0] // 我们的dp数组同样初始化为: // 二维数组如下: //[1 1 1 1] //[1 0 0 0] //[0 0 0 0] //[0 0 0 0] // 根据有障碍的数组, 按照dp[i][j] = dp[i][j-1] + dp[i-1][j] 来计算可以得到如下: //[1 1 1 1] //[1 0 1 0] //[0 0 1 1] //[0 0 1 2]  // 动态规划五部曲 // 1.</description>
+    </item>
+    
     <item>
       <title>Go算法学习 动态规划 不同路径</title>
       <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84/</link>
