@@ -6,15 +6,160 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Mon, 07 Jun 2021 10:06:09 +0800</lastBuildDate>
+		<lastBuildDate>Fri, 16 Jul 2021 14:07:27 +0800</lastBuildDate>
 		<atom:link href="https://www.ngirl.xyz/golang/index.xml" rel="self" type="application/rss+xml" />
 		
 		<item>
+			<title>Go算法学习 链表 设计链表</title>
+			<link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E9%93%BE%E8%A1%A8-%E8%AE%BE%E8%AE%A1%E9%93%BE%E8%A1%A8/</link>
+			<pubDate>Fri, 16 Jul 2021 14:07:27 +0800</pubDate>
+			
+			<guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E9%93%BE%E8%A1%A8-%E8%AE%BE%E8%AE%A1%E9%93%BE%E8%A1%A8/</guid>
+			<description>show me the code package main import ( &amp;#34;fmt&amp;#34; ) // https://leetcode-cn.com/problems/design-linked-list/  type MyLinkedList struct { Len int // 判断索引是否有效 	Dummy *Node // 伪头, 第-1号索引, .Next 才是 MyLinkedList的第0号索引的内容 } type Node struct { Val int // value 	Next *Node // 链 } // Constructor Initialize your data structure here. func Constructor() MyLinkedList { return MyLinkedList{ Len: 0, // 不包括伪头, 所以是0 	Dummy: &amp;amp;Node{}, // 初始化伪头 	} } // Get the value of the index-th node in the linked list.</description>
+			<content type="html"><![CDATA[<h3 id="show-me-the-code">show me the code</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&#34;fmt&#34;</span>
+<span class="p">)</span>
+
+<span class="c1">// https://leetcode-cn.com/problems/design-linked-list/
+</span><span class="c1"></span>
+<span class="kd">type</span> <span class="nx">MyLinkedList</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Len</span>   <span class="kt">int</span>   <span class="c1">// 判断索引是否有效
+</span><span class="c1"></span>	<span class="nx">Dummy</span> <span class="o">*</span><span class="nx">Node</span> <span class="c1">// 伪头, 第-1号索引, .Next 才是 MyLinkedList的第0号索引的内容
+</span><span class="c1"></span><span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">Node</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Val</span>  <span class="kt">int</span>   <span class="c1">// value
+</span><span class="c1"></span>	<span class="nx">Next</span> <span class="o">*</span><span class="nx">Node</span> <span class="c1">// 链
+</span><span class="c1"></span><span class="p">}</span>
+
+<span class="c1">// Constructor Initialize your data structure here.
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">Constructor</span><span class="p">()</span> <span class="nx">MyLinkedList</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nx">MyLinkedList</span><span class="p">{</span>
+		<span class="nx">Len</span><span class="p">:</span>   <span class="mi">0</span><span class="p">,</span>       <span class="c1">// 不包括伪头, 所以是0
+</span><span class="c1"></span>		<span class="nx">Dummy</span><span class="p">:</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{},</span> <span class="c1">// 初始化伪头
+</span><span class="c1"></span>	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Get the value of the index-th node in the linked list. If the index is invalid, return -1.
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">my</span> <span class="o">*</span><span class="nx">MyLinkedList</span><span class="p">)</span> <span class="nf">Get</span><span class="p">(</span><span class="nx">index</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+	<span class="c1">// 索引范围是 [0,my.Len),左闭右开
+</span><span class="c1"></span>	<span class="c1">// 所以需要小于my.Len
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">index</span> <span class="o">&gt;=</span> <span class="nx">my</span><span class="p">.</span><span class="nx">Len</span> <span class="o">&amp;&amp;</span> <span class="nx">index</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+	<span class="p">}</span>
+	<span class="c1">// 指向第0号元素
+</span><span class="c1"></span>	<span class="nx">curr</span> <span class="o">:=</span> <span class="nx">my</span><span class="p">.</span><span class="nx">Dummy</span><span class="p">.</span><span class="nx">Next</span>
+	<span class="c1">// 找到索引位置
+</span><span class="c1"></span>	<span class="k">for</span> <span class="p">;</span> <span class="nx">index</span> <span class="p">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">index</span><span class="o">--</span> <span class="p">{</span>
+		<span class="nx">curr</span> <span class="p">=</span> <span class="nx">curr</span><span class="p">.</span><span class="nx">Next</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">curr</span><span class="p">.</span><span class="nx">Val</span>
+<span class="p">}</span>
+
+<span class="c1">// AddAtHead Add a node of value val before the first element of the linked list. After the insertion, the new node will be the first node of the linked list. */
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">my</span> <span class="o">*</span><span class="nx">MyLinkedList</span><span class="p">)</span> <span class="nf">AddAtHead</span><span class="p">(</span><span class="nx">val</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">my</span><span class="p">.</span><span class="nf">AddAtIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">val</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">// AddAtTail Append a node of value val to the last element of the linked list. */
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">my</span> <span class="o">*</span><span class="nx">MyLinkedList</span><span class="p">)</span> <span class="nf">AddAtTail</span><span class="p">(</span><span class="nx">val</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">my</span><span class="p">.</span><span class="nf">AddAtIndex</span><span class="p">(</span><span class="nx">my</span><span class="p">.</span><span class="nx">Len</span><span class="p">,</span> <span class="nx">val</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">// AddAtIndex  Add a node of value val before the index-th node in the linked list. If index equals to the length of linked list, the node will be appended to the end of linked list. If index is greater than the length, the node will not be inserted. */
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">my</span> <span class="o">*</span><span class="nx">MyLinkedList</span><span class="p">)</span> <span class="nf">AddAtIndex</span><span class="p">(</span><span class="nx">index</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">val</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">index</span> <span class="p">&gt;</span> <span class="nx">my</span><span class="p">.</span><span class="nx">Len</span> <span class="o">||</span> <span class="nx">index</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="c1">//  指向第-1号元素(伪头)
+</span><span class="c1"></span>	<span class="nx">pre</span> <span class="o">:=</span> <span class="nx">my</span><span class="p">.</span><span class="nx">Dummy</span>
+	<span class="c1">// 找到需要删除的索引位置的前置节点pre
+</span><span class="c1"></span>	<span class="k">for</span> <span class="p">;</span> <span class="nx">index</span> <span class="p">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">index</span><span class="o">--</span> <span class="p">{</span>
+		<span class="nx">pre</span> <span class="p">=</span> <span class="nx">pre</span><span class="p">.</span><span class="nx">Next</span>
+	<span class="p">}</span>
+	<span class="c1">// 插入
+</span><span class="c1"></span>	<span class="nx">pre</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">Node</span><span class="p">{</span><span class="nx">val</span><span class="p">,</span> <span class="nx">pre</span><span class="p">.</span><span class="nx">Next</span><span class="p">}</span>
+	<span class="nx">my</span><span class="p">.</span><span class="nx">Len</span><span class="o">++</span>
+
+<span class="p">}</span>
+
+<span class="c1">// DeleteAtIndex Delete the index-th node in the linked list, if the index is valid.
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">my</span> <span class="o">*</span><span class="nx">MyLinkedList</span><span class="p">)</span> <span class="nf">DeleteAtIndex</span><span class="p">(</span><span class="nx">index</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">// 索引是从0到my.Len-1的, 所以大于等于 都是直接return
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">index</span> <span class="o">&gt;=</span> <span class="nx">my</span><span class="p">.</span><span class="nx">Len</span> <span class="o">&amp;&amp;</span> <span class="nx">index</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="c1">// 指向第-1号元素(伪头)
+</span><span class="c1"></span>	<span class="nx">pre</span> <span class="o">:=</span> <span class="nx">my</span><span class="p">.</span><span class="nx">Dummy</span>
+	<span class="c1">// 找到需要删除的索引位置的前置节点pre
+</span><span class="c1"></span>	<span class="k">for</span> <span class="p">;</span> <span class="nx">index</span> <span class="p">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">index</span><span class="o">--</span> <span class="p">{</span>
+		<span class="nx">pre</span> <span class="p">=</span> <span class="nx">pre</span><span class="p">.</span><span class="nx">Next</span>
+	<span class="p">}</span>
+	<span class="c1">// 通过前置节点pre 直接删除对应索引的节点
+</span><span class="c1"></span>	<span class="nx">pre</span><span class="p">.</span><span class="nx">Next</span> <span class="p">=</span> <span class="nx">pre</span><span class="p">.</span><span class="nx">Next</span><span class="p">.</span><span class="nx">Next</span>
+	<span class="nx">my</span><span class="p">.</span><span class="nx">Len</span><span class="o">--</span>
+<span class="p">}</span>
+
+<span class="cm">/**
+</span><span class="cm"> * Your MyLinkedList object will be instantiated and called as such:
+</span><span class="cm"> * obj := Constructor();
+</span><span class="cm"> * param_1 := obj.Get(index);
+</span><span class="cm"> * obj.AddAtHead(val);
+</span><span class="cm"> * obj.AddAtTail(val);
+</span><span class="cm"> * obj.AddAtIndex(index,val);
+</span><span class="cm"> * obj.DeleteAtIndex(index);
+</span><span class="cm"> */</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">my</span> <span class="o">*</span><span class="nx">MyLinkedList</span><span class="p">)</span> <span class="nf">Print</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">curr</span> <span class="o">:=</span> <span class="nx">my</span><span class="p">.</span><span class="nx">Dummy</span><span class="p">.</span><span class="nx">Next</span>
+	<span class="k">for</span> <span class="nx">curr</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%v &#34;</span><span class="p">,</span> <span class="nx">curr</span><span class="p">.</span><span class="nx">Val</span><span class="p">)</span>
+		<span class="nx">curr</span> <span class="p">=</span> <span class="nx">curr</span><span class="p">.</span><span class="nx">Next</span>
+	<span class="p">}</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">my</span> <span class="o">*</span><span class="nx">MyLinkedList</span><span class="p">)</span> <span class="nf">Run</span><span class="p">(</span><span class="nx">s</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">val</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">switch</span> <span class="nx">s</span> <span class="p">{</span>
+	<span class="k">case</span> <span class="s">&#34;addAtHead&#34;</span><span class="p">:</span>
+		<span class="nx">my</span><span class="p">.</span><span class="nf">AddAtHead</span><span class="p">(</span><span class="nx">val</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+	<span class="k">case</span> <span class="s">&#34;addAtTail&#34;</span><span class="p">:</span>
+		<span class="nx">my</span><span class="p">.</span><span class="nf">AddAtTail</span><span class="p">(</span><span class="nx">val</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+	<span class="k">case</span> <span class="s">&#34;addAtIndex&#34;</span><span class="p">:</span>
+		<span class="nx">my</span><span class="p">.</span><span class="nf">AddAtIndex</span><span class="p">(</span><span class="nx">val</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">val</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+	<span class="k">case</span> <span class="s">&#34;deleteAtIndex&#34;</span><span class="p">:</span>
+		<span class="nx">my</span><span class="p">.</span><span class="nf">DeleteAtIndex</span><span class="p">(</span><span class="nx">val</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+	<span class="k">case</span> <span class="s">&#34;get&#34;</span><span class="p">:</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">my</span><span class="p">.</span><span class="nf">Get</span><span class="p">(</span><span class="nx">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+	<span class="k">default</span><span class="p">:</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;unknown function &#34;</span><span class="p">,</span> <span class="nx">s</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Run function :&#34;</span><span class="p">,</span> <span class="nx">s</span><span class="p">,</span> <span class="s">&#34;args :&#34;</span><span class="p">,</span> <span class="nx">val</span><span class="p">,</span> <span class="nx">my</span><span class="p">.</span><span class="nx">Len</span><span class="p">)</span>
+
+<span class="p">}</span>
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">func1</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;addAtHead&#34;</span><span class="p">,</span> <span class="s">&#34;addAtTail&#34;</span><span class="p">,</span> <span class="s">&#34;addAtIndex&#34;</span><span class="p">,</span> <span class="s">&#34;get&#34;</span><span class="p">,</span> <span class="s">&#34;deleteAtIndex&#34;</span><span class="p">,</span> <span class="s">&#34;get&#34;</span><span class="p">}</span>
+	<span class="nx">args1</span> <span class="o">:=</span> <span class="p">[][]</span><span class="kt">int</span><span class="p">{{</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="mi">1</span><span class="p">}}</span>
+
+	<span class="nx">myLink</span> <span class="o">:=</span> <span class="nf">Constructor</span><span class="p">()</span>
+	<span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">func1</span> <span class="p">{</span>
+		<span class="nx">myLink</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nx">func1</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">args1</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span>
+		<span class="nx">myLink</span><span class="p">.</span><span class="nf">Print</span><span class="p">()</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div>]]></content>
+		</item>
+		
+		<item>
 			<title>Go算法学习 动态规划 01背包基础</title>
-			<link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%9201%E8%83%8C%E5%8C%85%E5%9F%BA%E7%A1%80/</link>
+			<link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-01%E8%83%8C%E5%8C%85%E5%9F%BA%E7%A1%80/</link>
 			<pubDate>Mon, 07 Jun 2021 10:06:09 +0800</pubDate>
 			
-			<guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%9201%E8%83%8C%E5%8C%85%E5%9F%BA%E7%A1%80/</guid>
+			<guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-01%E8%83%8C%E5%8C%85%E5%9F%BA%E7%A1%80/</guid>
 			<description>参考文档  carl 背包理论基础01背包 二维dp carl 背包理论基础01背包 一维dp  背包问题分类 01背包例子 题目说明: 有一堆物品, 背包的容量只有j,想要拿走最贵的东西,怎么装? weight := []int{1,3,4} //kg price := []int{15,20,30} //¥  01背包说明: 每个物品只能使用一次
  动态规划五部曲 1. 定义dp数组 这里我们定义一个dp[i][j]的数组 i代表 物品的下标,0,1,2&amp;hellip; j代表 背包的容量,1kg,3kg,4kg&amp;hellip; dp[i][j]代表 可选的i个物品中,容量为j的背包能装下最大为dp[i][j]的价值
  这里i个物品 是有两种状态, 选择 和不选择
@@ -872,18 +1017,18 @@ i=2, dp=[0 15 15 20 35]
 		<span class="k">return</span> <span class="nx">result</span>
 	<span class="p">}</span>
 	<span class="nx">stack</span> <span class="o">:=</span> <span class="p">[]</span><span class="o">*</span><span class="nx">TreeNode</span><span class="p">{</span><span class="nx">root</span><span class="p">}</span>
-    <span class="c1">// 迭代循环
+	<span class="c1">// 迭代循环
 </span><span class="c1"></span>	<span class="k">for</span> <span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
-        <span class="c1">// 处理当前节点
+		<span class="c1">// 处理当前节点
 </span><span class="c1"></span>		<span class="nx">node</span> <span class="o">:=</span> <span class="nx">stack</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 		<span class="nx">stack</span> <span class="p">=</span> <span class="nx">stack</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="c1">// 访问的节点就是 结果集的节点
+		<span class="c1">// 访问的节点就是 结果集的节点
 </span><span class="c1"></span>		<span class="nx">result</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Val</span><span class="p">)</span>
-        <span class="c1">// 先将右节点 入栈
+		<span class="c1">// 先将右节点 入栈
 </span><span class="c1"></span>		<span class="k">if</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Right</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
 			<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Right</span><span class="p">)</span>
 		<span class="p">}</span>
-        <span class="c1">// 再将左节点 入栈
+		<span class="c1">// 再将左节点 入栈
 </span><span class="c1"></span>		<span class="k">if</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Left</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
 			<span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">Left</span><span class="p">)</span>
 		<span class="p">}</span>
@@ -907,7 +1052,7 @@ i=2, dp=[0 15 15 20 35]
 <p>第一步先找到最左边的节点,并且将访问的节点都存到堆栈中</p>
 </li>
 <li>
-<p>当发现一家到最左边的节点(==nil) 时, 就需要从堆栈中取出最后一个节点(最左边的节点) ,遍历该节点, 并处理他的右节点</p>
+<p>当发现已经到最左边的节点(==nil) 时, 就需要从堆栈中取出最后一个节点(最左边的节点) ,遍历该节点, 并处理他的右节点</p>
 </li>
 <li>
 <p>然后就拿着右节点 继续遍历 1 2步骤</p>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>链表 on zhangzw</title>
+    <link>https://www.ngirl.xyz/tags/%E9%93%BE%E8%A1%A8/</link>
+    <description>Recent content in 链表 on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Fri, 16 Jul 2021 14:07:27 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/%E9%93%BE%E8%A1%A8/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go算法学习 链表 设计链表</title>
+      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E9%93%BE%E8%A1%A8-%E8%AE%BE%E8%AE%A1%E9%93%BE%E8%A1%A8/</link>
+      <pubDate>Fri, 16 Jul 2021 14:07:27 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E9%93%BE%E8%A1%A8-%E8%AE%BE%E8%AE%A1%E9%93%BE%E8%A1%A8/</guid>
+      <description>show me the code package main import ( &amp;#34;fmt&amp;#34; ) // https://leetcode-cn.com/problems/design-linked-list/  type MyLinkedList struct { Len int // 判断索引是否有效 	Dummy *Node // 伪头, 第-1号索引, .Next 才是 MyLinkedList的第0号索引的内容 } type Node struct { Val int // value 	Next *Node // 链 } // Constructor Initialize your data structure here. func Constructor() MyLinkedList { return MyLinkedList{ Len: 0, // 不包括伪头, 所以是0 	Dummy: &amp;amp;Node{}, // 初始化伪头 	} } // Get the value of the index-th node in the linked list.</description>
+    </item>
+    
+  </channel>
+</rss>

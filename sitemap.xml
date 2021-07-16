@@ -3,42 +3,52 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://www.ngirl.xyz/tags/golang/</loc>
+    <lastmod>2021-07-16T14:07:27+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/golang/</loc>
+    <lastmod>2021-07-16T14:07:27+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E9%93%BE%E8%A1%A8-%E8%AE%BE%E8%AE%A1%E9%93%BE%E8%A1%A8/</loc>
+    <lastmod>2021-07-16T14:07:27+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/tags/</loc>
+    <lastmod>2021-07-16T14:07:27+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/</loc>
+    <lastmod>2021-07-16T14:07:27+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/tags/%E7%AE%97%E6%B3%95/</loc>
+    <lastmod>2021-07-16T14:07:27+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/tags/%E9%93%BE%E8%A1%A8/</loc>
+    <lastmod>2021-07-16T14:07:27+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.ngirl.xyz/tags/dp/</loc>
     <lastmod>2021-06-07T10:06:09+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.ngirl.xyz/tags/golang/</loc>
-    <lastmod>2021-06-07T10:06:09+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.ngirl.xyz/golang/</loc>
-    <lastmod>2021-06-07T10:06:09+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%9201%E8%83%8C%E5%8C%85%E5%9F%BA%E7%A1%80/</loc>
-    <lastmod>2021-06-07T10:06:09+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.ngirl.xyz/tags/</loc>
-    <lastmod>2021-06-07T10:06:09+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.ngirl.xyz/</loc>
+    <loc>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-01%E8%83%8C%E5%8C%85%E5%9F%BA%E7%A1%80/</loc>
     <lastmod>2021-06-07T10:06:09+08:00</lastmod>
   </url>
   
   <url>
     <loc>https://www.ngirl.xyz/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/</loc>
-    <lastmod>2021-06-07T10:06:09+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.ngirl.xyz/tags/%E7%AE%97%E6%B3%95/</loc>
     <lastmod>2021-06-07T10:06:09+08:00</lastmod>
   </url>
   
