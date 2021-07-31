@@ -6,8 +6,2009 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Wed, 27 Jan 2021 18:13:13 +0800</lastBuildDate>
+		<lastBuildDate>Sat, 31 Jul 2021 10:55:50 +0800</lastBuildDate>
 		<atom:link href="https://www.ngirl.xyz/posts/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>67 网络基础</title>
+			<link>https://www.ngirl.xyz/posts/67-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/</link>
+			<pubDate>Sat, 31 Jul 2021 10:55:50 +0800</pubDate>
+			
+			<guid>https://www.ngirl.xyz/posts/67-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/</guid>
+			<description>unix 历史 gnu linux 分支  https://futurist.se/gldt/ https://futurist.se/gldt/2012/02/20/gnulinux-distribution-timeline-12-2/  网桥(2层交换机) &amp;gt; 工作在2层, 使用mac地址 网桥: 桥接两个网络(其实就是两个口的交换机) 交换机: 桥接多个网络 网桥隔离冲突,减少冲突域, 但是不能减少广播 那么怎么解决广播问题呢? -&amp;gt; 逻辑地址:ip包 + 路由器 同一网络内部的通信 会先通过arp广播, 找到通信的ip的mac地址 那么怎么知道ip是本地网络, 还是其他网络: 网络地址 和本机地址 那怎么知道那部分是网络地址, 还是本机地址呢? - 子网掩码 子网掩码可以通过ip地址 取到 网络地址 socket ip:port =&amp;gt; 套接字 套接字就是tcp/ip协议中用于通信的两个端点, 有server socket, client socket TCP : Transmission Control Protocol UDP : User Datagram Protocol  identification(fragment id) : 如果报文过大(1500byte), 服务端只能接受500(需要切片发送), identification 就用来标记是同一个报文
+fragment offset : 就是三个切片的偏移量, 保证切片的顺序</description>
+			<content type="html"><![CDATA[<h3 id="unix-历史">unix 历史</h3>
+<p><img src="/images/67/markdown-img-paste-20210621114801593.png" alt=""></p>
+<h3 id="gnu-linux-分支">gnu linux 分支</h3>
+<ul>
+<li><a href="https://futurist.se/gldt/">https://futurist.se/gldt/</a></li>
+<li><a href="https://futurist.se/gldt/2012/02/20/gnulinux-distribution-timeline-12-2/">https://futurist.se/gldt/2012/02/20/gnulinux-distribution-timeline-12-2/</a></li>
+</ul>
+<p><img src="/images/67/markdown-img-paste-2021062114112618.png" alt=""></p>
+<h3 id="网桥2层交换机">网桥(2层交换机)</h3>
+<pre><code>&gt; 工作在2层, 使用mac地址
+
+网桥: 桥接两个网络(其实就是两个口的交换机)
+交换机: 桥接多个网络
+
+网桥隔离冲突,减少冲突域, 但是不能减少广播
+那么怎么解决广播问题呢?
+
+-&gt; 逻辑地址:ip包 + 路由器
+
+同一网络内部的通信 会先通过arp广播, 找到通信的ip的mac地址
+
+那么怎么知道ip是本地网络, 还是其他网络:
+网络地址 和本机地址
+那怎么知道那部分是网络地址, 还是本机地址呢?  - 子网掩码
+子网掩码可以通过ip地址 取到 网络地址
+
+</code></pre><h3 id="socket">socket</h3>
+<pre><code>ip:port =&gt; 套接字
+套接字就是tcp/ip协议中用于通信的两个端点, 有server socket, client socket
+
+TCP : Transmission Control Protocol
+UDP : User Datagram Protocol
+</code></pre><p><img src="/images/67/markdown-img-paste-20210621164945488.png" alt=""></p>
+<blockquote>
+<p>identification(fragment id) : 如果报文过大(1500byte), 服务端只能接受500(需要切片发送), identification 就用来标记是同一个报文</p>
+<p>fragment offset : 就是三个切片的偏移量, 保证切片的顺序</p>
+<p>Protocol : 上层的协议(tcp,udp,icmp?)</p>
+<p>Data : 应用层header+传输层header+data</p>
+</blockquote>
+<p><img src="/images/67/markdown-img-paste-20210621174204921.png" alt=""></p>
+<blockquote>
+<p>Sequence Number : 序列号</p>
+<p>Acknowledgement Number : 确认号</p>
+<p>URG 紧急位
+ACK 确认位
+PSH 推送位(不能放到缓存,立即发送,优先传输)
+RST 重置位(连接重置, 不需要完全三次握手)
+SYN
+FIN</p>
+<p>Window Size : 协定接收方的缓冲中能容量的报文的个数</p>
+</blockquote>
+<blockquote>
+<p>tcp的有限状态机</p>
+</blockquote>
+<h3 id="tcp">tcp</h3>
+<h4 id="tcp-三次握手">tcp 三次握手</h4>
+<pre><code>1. client -&gt; SYN=1,seq num=x                    -&gt; server
+2. client &lt;- SYN=1,ACK=1,ack num=x+1, seq num=y &lt;- server
+3. client -&gt; ACK=1,ack num=y+1                  &lt;- server
+</code></pre><h4 id="tcp-四次挥手">tcp 四次挥手</h4>
+<p><img src="/images/67/markdown-img-paste-20210629100443918.png" alt=""></p>
+<h4 id="状态">状态</h4>
+<pre><code>client:
+    -&gt;  closed -&gt; syn_send -&gt; established
+        ↑                            ↓
+        time_wait &lt;- fin_wait2 &lt;- fin_wait1
+server:
+    -&gt; listen -&gt; syn_recv -&gt; established
+        ↑                           ↓
+      closed &lt;-   last_ack   &lt;-  close_wait      
+
+</code></pre><h3 id="a-b-c-类">A B C 类</h3>
+<pre><code>A : 0xxxxxxx.X.X.X
+B : 10xxxxxx.X.X.X
+C : 110xxxxx.X.X.X
+
+私有A : 10.X.X.X  10.0.0.0/8
+私有B : 172.0001xxxx.X.X      172.16.0.0/12
+私有C : 192.168.X.X   192.168.0.0/24
+</code></pre><h3 id="网络划分">网络划分</h3>
+<ul>
+<li>划分子网</li>
+<li>合并超网</li>
+</ul>
+<pre><code>需要两个网段有共同的网络id(比如10.0.0.0/8 和172.20.0.0/16 无法合并)
+</code></pre><h3 id="lo-回环网卡">lo 回环网卡</h3>
+<pre><code>永远不会跑到别的机器 127.0.0.1/8  的所有网段ip ,ping都是本机
+ping 127.0.0.1
+ping 127.1.2.3
+
+当然我们可以自己给lo绑定一个ip网段
+ip addr add 1.0.0.1/8
+此时我们ping 1.0.0.1 或 ping 1.1.0.1 都将是ping本机
+</code></pre><h3 id="跨网络通信">跨网络通信</h3>
+<pre><code>1 主机路由: 到达主机ip的路由
+2 网络路由: 到达网段的路由
+3 默认路由: 找不到的路由走默认路由, ipv4配置gateway其实就是添加一天默认路由
+&gt; 优先级: 1 &gt; 2 &gt; 3
+</code></pre><blockquote>
+<p>如下例子:</p>
+</blockquote>
+<pre><code>$ route -n
+Kernel IP routing table
+Destination     Gateway          Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         172.20.100.1     0.0.0.0         UG    100    0        0 em1             //默认路由
+172.20.100.0     0.0.0.0         255.255.252.0   U     100    0        0 em1             //网络路由
+172.17.0.0      0.0.0.0          255.255.0.0     U     0      0        0 docker0
+192.168.0.0     0.0.0.0          255.255.255.0   U     0      0        0 *
+192.168.0.95    0.0.0.0          255.255.255.255 UH    0      0        0 cali40c9bc493ea //主机路由
+192.168.1.0     172.20.100.221   255.255.255.0   UG    0      0        0 tunl0           //非直连网络路由
+</code></pre><h3 id="路由表的构成">路由表的构成</h3>
+<pre><code>1. Destination(目标): 数据包的目标路径
+2. NetMask(子网掩码):  划分网络的子网掩码
+3. Interface(接口):   本路由器的出口(谁发送数据包)
+4. Gateway(网关):
+    1) 直连:  网关不用配置(通常是0.0.0.0),并且路由会自动添加
+    2) 非直连: 下一个路由器 邻近本路由器的网络地址
+</code></pre><p><img src="/images/67/markdown-img-paste-20210618152726982.png" alt=""></p>
+<pre><code># A--- 1 R1 2 --- 3 R2 4 --- 5 R3 6 --- B
+
+0. A 浏览器打开 http://B
+1. A 判断B 和A 是否在同一个网段
+2. A (存在路由 0.0.0.0 gateway:R1 IP1 interfaceA),
+    A 通过arp协议广播找到 IP1的MAC1地址, 然后存入到arp cache中: IP1 -&gt; MAC1
+    此时就可以传输报文给R1:
+    frame:  dest mac: MAC1 ,    src mac: MACA
+    ip:     dest ip : IPB,      src ip : IPA
+    tcp:    dest port:80,       src post:xxxxx , SYN
+3. R1 查路由表(收到数据)
+    网络路由: 0.0.0.0 gateway:R2 IP3 interfaceR1(2)
+
+    R1 通过arp协议广播找到 R2的MAC3地址, 然后存入到arp cache中: IP3 -&gt; MAC3
+    此时就可以传输报文给R2:
+    frame:  dest mac: MAC3 ,    src mac: MAC2  (这里在变, 数据链路层是一段一段的传输的)
+    ip:     dest ip : IPB,      src ip : IPA
+    tcp:    dest port:80,       src post:xxxxx , SYN
+4. R2 查路由表(收到数据)
+    网络路由: 0.0.0.0 gateway:R3 IP5 interfaceR2(4)
+
+    R2 通过arp协议广播找到 R3的MAC5地址, 然后存入到arp cache中: IP5 -&gt; MAC5
+    此时就可以传输报文给R3:
+    frame:  dest mac: MAC5 ,    src mac: MAC4  (这里在变, 数据链路层是一段一段的传输的)
+    ip:     dest ip : IPB,      src ip : IPA
+    tcp:    dest port:80,       src post:xxxxx , SYN
+5. R3 查路由表(收到数据)
+    网络路由: 直连 IPB
+
+    R3 通过arp协议广播找到 B的MACB地址, 然后存入到arp cache中: IPB -&gt; MACB
+    此时就可以传输报文给B:
+    frame:  dest mac: MACB ,    src mac: MAC6  (这里在变, 数据链路层是一段一段的传输的)
+    ip:     dest ip : IPB,      src ip : IPA
+    tcp:    dest port:80,       src post:xxxxx , SYN
+
+</code></pre><h3 id="dhcp">dhcp</h3>
+<pre><code>1 client -&gt; 客户端广播,发现报文 -&gt; server
+2 client &lt;- 服务端广播,提供消息 &lt;- server
+3 client -&gt; 客户端对请求消息做出相应ack -&gt; server
+4 client &lt;- 服务器确认消息,结束交换过程 &lt;- server
+
+&gt; 提前一半时间续约
+</code></pre><h3 id="centos6修改网卡规则不重启更新方法">centos6修改网卡规则不重启更新方法</h3>
+<pre><code># 修改NAME
+vim /etc/udev/rules.d/70-persistent-net.rules
+# 查看 eth0的driver
+ethtool -i eth0
+# 卸载 driver
+modprobe -r ${driverName}
+# ifconfig 就看不到网卡了
+# 重新加载driver
+modprobe ${driverName}
+</code></pre><h3 id="动态路由">动态路由</h3>
+<pre><code>RIP: 根据经过路由器个数判断选择走哪条路线
+OSPF: 根据不同因素选择路线, 考虑路由器个数,带宽大小等等
+BGP:
+
+&gt; linux当做路由器使用,配置工具:
+yum install quagga
+</code></pre><h3 id="路由实验">路由实验</h3>
+<pre><code>ping 10.0.0.100 的时候 ttl=62, 经过了两个路由
+traceroute 10.0.0.100 经过的
+mtr 10.0.0.100
+</code></pre><p><img src="/images/67/markdown-img-paste-20210618181247554.png" alt=""></p>
+<h3 id="路由命令">路由命令</h3>
+<pre><code>route add -net  192.168.10.0/24 gw 172.16.0.6
+</code></pre><h3 id="dhcp-1">dhcp</h3>
+<pre><code>把一个主机接入tcp/ip网络,要配置哪些参数
+    ip/NetMask
+    gateway
+    dns
+
+    参数配置方式
+        静态配置
+        动态分配
+            bootp : boot protocol
+            dhcp : 引入了&quot;租约&quot;的bootp,也可以为特定主机保留固定的地址
+
+dhcp : 动态主机配置协议
+    工作流程(广播)
+        1) client: dhcp discover
+        2) server: dhcp offer(ip/NetMask,gw,...)
+            lease time: 租约期限
+        3) client: dhcp request
+        4) server: dhcp ack
+    续租(单播)
+        剩余时间: 50%,75%,87.5%
+        工作流程
+            dhcp request
+            dhcp ack
+
+            dhcp request
+            dhcp nak
+
+            dhcp discover : 广播
+
+</code></pre>]]></content>
+		</item>
+		
+		<item>
+			<title>66 Linux计算机基础</title>
+			<link>https://www.ngirl.xyz/posts/66-linux%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/</link>
+			<pubDate>Sat, 31 Jul 2021 10:47:24 +0800</pubDate>
+			
+			<guid>https://www.ngirl.xyz/posts/66-linux%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/</guid>
+			<description>计算机基础 进程 process : 运行中的程序的一个副本 进程中断会保存现场,然后不停切换执行不同的进程 保存现场保存在哪呢? task struct : linux内核存储进程信息的固定格式 task list : 链表方式保存 task struct 进程创建 init 父子关系 进程 fork() ,clone() CoW 写时复制, 父进程和子进程一开始都是同样的内存空间,但是需要写数据(成家),就需要分配新内存空间(分家) 子进程必须由父进程关闭: 子进程执行完父进程任务后, 父进程就清理子进程的内存等 进程优先级(priority) 0-139: 1-99 : 实时优先级(数字越大优先级越高) 100-139 : 静态优先级(数字越小优先级越高) Nice值 : 调整nice值来调整优先级,只能变好,只能降低优先级 -20,19(对应100-139) 2*140个运行队列 : 相同优先级放入同样队列, 只需要扫描首部, 当分配的时间达到了,需要中断是,将运行另外一对队列 进程内存 page frame : 内核将物理内存拆分为page frame, 然后程序需要的时候通过page frame 累加在一起, 组成虚拟内存空间段, 提供进程使用 虚拟内存: 内核通过page frame 组成的线性地址空间 物理内存: 实际的物理内存大小, 会被拆分成page frame IPC : inter Process Communication 同一主机上: signal shm : shared memory semerphor : 不同主机上: rpc : remote procecure calling 远程过程调用 socket : https://blog.</description>
+			<content type="html"><![CDATA[<h2 id="计算机基础">计算机基础</h2>
+<h3 id="进程">进程</h3>
+<pre><code>process : 运行中的程序的一个副本
+
+进程中断会保存现场,然后不停切换执行不同的进程
+保存现场保存在哪呢?
+
+task struct : linux内核存储进程信息的固定格式
+task list : 链表方式保存 task struct
+</code></pre><p><img src="/images/66/markdown-img-paste-20210624115848639.png" alt=""></p>
+<pre><code>进程创建
+    init
+        父子关系
+        进程
+            fork() ,clone()
+            CoW 写时复制, 父进程和子进程一开始都是同样的内存空间,但是需要写数据(成家),就需要分配新内存空间(分家)
+        子进程必须由父进程关闭: 子进程执行完父进程任务后, 父进程就清理子进程的内存等
+    进程优先级(priority)
+        0-139:
+            1-99 : 实时优先级(数字越大优先级越高)
+            100-139 : 静态优先级(数字越小优先级越高)
+            Nice值 : 调整nice值来调整优先级,只能变好,只能降低优先级
+                -20,19(对应100-139)
+        2*140个运行队列 : 相同优先级放入同样队列, 只需要扫描首部, 当分配的时间达到了,需要中断是,将运行另外一对队列
+
+    进程内存
+        page frame : 内核将物理内存拆分为page frame, 然后程序需要的时候通过page frame 累加在一起, 组成虚拟内存空间段, 提供进程使用
+        虚拟内存: 内核通过page frame 组成的线性地址空间
+        物理内存: 实际的物理内存大小, 会被拆分成page frame
+
+    IPC : inter Process Communication
+        同一主机上:
+            signal
+            shm : shared memory
+            semerphor :
+        不同主机上:
+            rpc : remote procecure calling 远程过程调用
+            socket : https://blog.csdn.net/pashanhu6402/article/details/96428887
+</code></pre><h4 id="ps">ps</h4>
+<pre><code>ps命令
+    /proc/ 内核状态信息
+        内核参数:
+            可设置器值的参数  /proc/sys/
+            状态变量, 仅查看
+        参数: 模拟成文件系统类型
+    进程:
+        /proc/[0-9]+ :
+            [0-9]+ : pid目录
+
+    三种风格:
+        1   UNIX options, which may be grouped and must be preceded by a dash.
+        2   BSD options, which may be grouped and must not be used with a dash.
+        3   GNU long options, which are preceded by two dashes.
+    启动进程的方式:
+        1. 系统启动过程中自动启动, 与终端无关
+        2. 终端启动, 进程会随终端退出而退出
+
+    选项:
+        1. a : 所有与终端相关的进程
+        2. x : 所有与终端无关的进程
+            $ ps ax|head -1
+            PID TTY      STAT   TIME COMMAND
+            1 ?        Ss    14:26 /usr/lib/systemd/systemd --switched-root --system --deserialize 22
+            2 ?        S      0:00 [kthreadd]
+                带中括号的是内核线程
+        3. u : 以用户为中心  组织状态信息显示
+            # 常用组合1
+            $ ps aux|head -1
+            USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+                1. VSZ 虚拟内存集
+                2. RSS ResIdent Size 常驻内存;
+                3. STAT
+                    R : running
+                    S : Interruptable sleeping
+                    D : UnInterruptable sleeping
+                    T : Stopped
+                    Z : zomble 父进程未清理时就会一直保持僵尸态
+                    + : 前台进程
+                    l : 多线程进程
+                    N : 低优先级进程(nice)
+                    &lt; : 高优先级进程
+                    s : session leader
+        4. -e : 显示所有进程
+        5. -f : 显示完整格式
+            # 常用组合2
+            $ ps -ef |head -1
+            UID        PID  PPID  C STIME TTY          TIME CMD
+        6. -F : 显示完整格式
+            #
+            $ ps -eF |head -1
+            UID        PID  PPID  C    SZ   RSS PSR STIME TTY          TIME CMD
+            C : cpu utillization
+            PSR : 运行在哪个cpu上
+        7 -H : 以层级结构显示进程的相关信息
+            # 常用组合3
+            ps -eFH
+            $ 常用组合4 -eo, axo
+                o field1,field2: 自定义要显示的字段列表, 逗号分隔
+                    常用的field: pid, ni,pri,psr,pcpu,stat,comm,tty,ppid,rtprio
+                    pri : priority 优先级
+                    rtprio read time priority 实时优先级
+                ps axo pid,command
+</code></pre><h4 id="vmstat">vmstat</h4>
+<pre><code>$ vmstat -w 1
+procs -----------------------memory---------------------- ---swap-- -----io---- -system-- --------cpu--------
+ r  b         swpd         free         buff        cache   si   so    bi    bo   in   cs  us  sy  id  wa  st
+</code></pre><pre><code>memory
+    swpd : 交换内存使用总量
+    free : 空闲
+    buff : 用于buffer
+    cache : 用户cache
+swap
+    si (swap in) : 换进,进入swap的速率(kb/s),内存进swap
+    so (swap out): 换出,离开swap的速率(kb/s),swap回内存
+io
+    bi (block in): 从块设备读取到内存的速率(kb/s)
+    bo (block out): 保存数据至块设备的速率
+system
+    in (interrupts) : 中断速率
+    cs (context switch) : 上下文切换速率
+</code></pre><pre><code>-w 宽显示
+-s 显示内存统计数据
+
+</code></pre><h4 id="pmap">pmap</h4>
+<pre><code>pmap 1
+    -x : 显示详细格式信息
+
+另一种查看方式: cat /proc/1/maps
+</code></pre><h4 id="dstat-强大">dstat (强大👍)</h4>
+<pre><code>$ dstat
+You did not select any stats, using -cdngy by default.
+----total-cpu-usage---- -dsk/total- -net/total- ---paging-- ---system--
+usr sys idl wai hiq siq| read  writ| recv  send|  in   out | int   csw
+</code></pre><h3 id="网络客户端">网络客户端</h3>
+<h4 id="hping">hping</h4>
+<h3 id="linux内核">Linux内核</h3>
+<h4 id="内核设计流派">内核设计流派</h4>
+<pre><code>单内核设计: linux
+微内核设计: Winodows,Solaris
+</code></pre><h4 id="linux内核特点">Linux内核特点</h4>
+<pre><code>支持模块化:  *.ko(kernel object)
+&gt; 另外一个对象: *.so(share object)
+
+支持模块运行时动态装载或卸载
+</code></pre><h4 id="组成部分">组成部分</h4>
+<pre><code>核心文件: /boot/vmlinuz-VERSION-release
+ramdisk:
+  - centos5: /boot/initrd-VERSION-release.Img
+    - 工具自动创建: mkinitrd
+  - centos6,7 : /boot/Initramfs-VERSION-release.Img
+    - 工具自动创建: dracut,mkinitrd(只是为了兼容,封装dracut)
+
+模块文件: /lib/modules/VERSION-release
+</code></pre><ul>
+<li>ramdisk</li>
+</ul>
+<pre><code>centos5的 rd=ramdisk, 是把内存当做磁盘使用
+centos6,7的ramfs=ram的文件系统
+ramdisk是把内存当做磁盘使用, 我们知道使用磁盘一般会先加载到内存(buffer/cache),然后在使用, 为了读取更快
+但是ramdisk的模式下磁盘就是内存,读取之前再次加载到buffer就没有意义了
+因此centos6,7 使用ram的文件系统
+
+ramdisk 其实是一个简装版的根文件系统
+</code></pre><h4 id="centos系统mbr启动流程">centos系统mbr启动流程:</h4>
+<pre><code>1. POST: 加电自检; (这是一段cpu在生产的时候烧写的程序)
+    - ROM: CMOS
+        - BIOS: Basic Input and Output System
+    - ROM+RAM: CPU可以访问的寻址空间
+2. Boot Sequence:
+    - 按次序查找各引导设备, 第一个有引导程序的设备即为本次启动要用到的设备(u盘, 磁盘)
+    - bootloader: 引导加载器,就是我们安装到磁盘或者u盘上的程序
+            - Windows : ntloader
+            - Linux:
+            - LILO : LInux LOader (磁盘大于1024柱面无法加载,目前安卓手机)
+            - GRUB : Grand Uniform Bootloader
+                - GRUB 0.X(centos[56]) -&gt; 重名 Grub legacy
+                - GRUB 1.X(centos7) -&gt; 完全重新,重名 Grub2
+                - 功能: 提供一个菜单,允许用户选择要启动的系统或不同的内核版本;把内核装载到RAM的特定空间, 解压,把系统控制权交给内核
+        - MBR : Master Boot Record
+            - 512bytes:
+            - 446bytes : bootloader,代码量小,不支持加载逻辑分区
+            - 64bytes : fat 分区表
+            - 2bytes : 55AA=有效,其他XXXX=无效
+        - GRUB : 由于446bytes太小了, grub重新设计
+            - bootloader : 第1阶段,以前的bootloader目的都是直接读取446bytes装载内核到ram空间,然后控制权交给内核, grub的bootloader作为第一步,主要就是为了第二部,加载/boot/grub,这段程序就可以不受MBR446bytes限制,可以操作性强, 甚至可以提供可交互的ui界面
+            - Partition filesystem driver: 1.5 阶段 ? 为什么需要?
+            - partition : /boot/grub , 第2阶段,此时该步骤的ui界面选择完内核之后,解压,把系统控制权交给内核
+        - 了解 EFI(UEFI) GPT :
+3. 加载Kernel: 内核获得控制权后
+        - 自身初始化
+            - 探测可识别到的所有硬件设备
+            - 加载硬件驱动程序(有可能借助于ramdisk)
+            - 以只读方式挂载跟文件系统(rootfs)
+            - 运行用户控件的第一个应用程序: /sbin/init
+                - init程序的类型
+                - centos5 : SysV init
+                    - 配置文件 : /etc/inittab
+                - centos6 : Upstart
+                    - 配置文件 :
+                        - /etc/inittab 实际不用,兼容5
+                        - /etc/init/*.conf
+                - centos7 : Systemd
+                    - 配置文件: /usr/lib/systemd/system, /etc/systemd/system
+
+
+    系统初始化流程简单总结(内核) : 加电自检POST -&gt; BootSequence(BIOS) -&gt; 引导程序Bootloader(MBR) -&gt; 加载Kernel(ramdisk) -&gt; 挂载rootfs(readonly) -&gt; 初始化/sbin/init
+
+
+4. 初始化 /sbin/init
+    - centos5 : sysV init
+        - 运行级别: 为了系统的运行或维护等目的而设计的机制;
+            - 0-6:
+                - 0 : 关机, shutdown
+                - 1 : 单用户模式(single user): root用户, 无需认证, 维护模式
+                - 2 : 多用户模式(multi user) : 会启动网络功能, 但不会启动NFS, 须认证,维护模式
+                - 3 : 多用户模式(multi user) : 完全功能模式, 无桌面
+                - 4 : 预留模式 : 无特别使用目的, 习惯同3界别功能
+                - 5 : 多用户模式(multi user) : 完全功能模式, 有桌面
+                - 6 : 重启模式
+            - 默认级别: 3,5
+            - 级别切换: init [0-6]
+            - 级别查看: who -r  或 runlevel
+        - 配置文件: /etc/inittab
+            - 每一行定义一种action以及阈值对应的process
+                - id:runlevels:action:process
+                    - id: 一个任务的标识符
+                    - runlevels: 在哪些级别启动此任务
+                    - action : 在什么条件下启动此任务
+                    - process : 程序
+                - actions:
+                    - wait : 等待切换至此任务所在的级别时执行一次 (l0:0:wait:/etc/rc.d/rc 0)
+                    - respawn : 一旦此任务终止时,就自动重新启动 (1:2345:respawn:/sbin/mingetty tty1)
+                    - initdefault : 设定默认运行级别 (id:3:initdefault:)
+                    - sysinit : 设定初始化方式 (si::sysinit:/etc/rc.d/rc.sysinit)
+                - /etc/rc.d/rc
+                    - 该脚本会停止所有/etc/rc.d/rc$runlevel.d/K##*脚本,
+                    - 启动所有/etc/rc.d/rc$runlevel.d/S##*脚本
+                    - K,S 后面的数字表示启动和关闭的顺序
+                - chkconfig : 管控/etc/init.d每个服务脚本在各个级别下的启动或关闭状态
+                    - chkconfig --add nginxd : 添加到chkconfig管理, 即便脚本写成2345, 也会创建0-6级别所有都是Kxxnginxd
+                        - 脚本格式:
+                          - 方法1: 附录1
+                          - 方法2: 附录2
+                    - chkconfig nginxd on : 此时 2345 级别会创建Sxxnginxd
+                    - chkconfig --level 35 nginxd : 修改35
+                    - chkconfig nginxd off: 此时 2345 级别会创建Kxxnginxd
+                    - chkconfig --del nginxd
+                - 系统初始化脚本 : /etc/rc.d/rc.sysinit
+                    - 1. 设置主机名
+                    - 2. 设置欢迎信息
+                    - 3. 挂载udev和selinux
+                    - 4. 挂载/etc/fstab文件中定义的所有文件系统
+                    - 5. 检测根文件系统, 并以读写方式重新挂载根文件系统
+                    - 6 设置系统时钟
+                    - 7 根据/etc/sysctl.conf设定内核参数
+                    - 8 激活lvm 软raid设备
+                    - 9 激活swap设备(/etc/fstab)
+                    - 10 加载额外设备的驱动程序
+                    - 11 清理操作
+
+        系统初始化流程简单总结(用户空间): /sbin/init(/etc/inittab)
+            设置默认运行级别 -&gt; 运行系统初始化脚本, 完成初始化 -&gt; 关闭对应级别下要停止的服务, 启动服务 -&gt; 设置登录终端
+
+    - centos6
+        - init程序: upstart, 但依然命名为/sbin/init
+        - 配置文件: /etc/init/*.conf, /etc/inittab(也会读取, 但仅允许配置允许级别)
+
+    - centos7
+        - init程序: systemd
+        - 配置文件: /usr/lib/systemd/system/*, /etc/systemd/system/*
+        - 完全兼容sysV脚本机制
+
+</code></pre><blockquote>
+<p>附录1</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell"><span class="cp">#!/bin/sh
+</span><span class="cp"></span> <span class="c1">#filename: nginxd</span>
+ <span class="c1"># nginx - this script starts and stops the nginx daemon</span>
+ <span class="c1">#</span>
+ <span class="c1"># chkconfig:   - 85 15</span>
+ <span class="c1"># description:  Nginx is an HTTP(S) server, HTTP(S) reverse \</span>
+ <span class="c1">#               proxy and IMAP/POP3 proxy server</span>
+ <span class="c1"># processname: nginx</span>
+ <span class="c1"># config:      /etc/nginx/nginx.conf</span>
+ <span class="c1"># config:      /etc/sysconfig/nginx</span>
+ <span class="c1"># pidfile:     /var/run/nginx.pid</span>
+
+ <span class="c1"># Source function library.</span>
+ . /etc/rc.d/init.d/functions
+
+ <span class="c1"># Source networking configuration.</span>
+ . /etc/sysconfig/network
+
+</code></pre></div><blockquote>
+<p>附录2</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh"><span class="cp">#! /bin/sh
+</span><span class="cp"></span>
+<span class="c1">### BEGIN INIT INFO</span>
+<span class="c1"># Provides:          php-fpm</span>
+<span class="c1"># Required-Start:    $remote_fs $network</span>
+<span class="c1"># Required-Stop:     $remote_fs $network</span>
+<span class="c1"># Default-Start:     2 3 4 5</span>
+<span class="c1"># Default-Stop:      0 1 6</span>
+<span class="c1"># Short-Description: starts php-fpm</span>
+<span class="c1"># Description:       starts the PHP FastCGI Process Manager daemon</span>
+<span class="c1">### END INIT INFO</span>
+</code></pre></div><h4 id="grub">grub</h4>
+<pre><code>grub : grand unified bootloader
+    - grub 0.x : grub legacy
+    - grub 1.x : grub2
+
+grub legacy:
+    stage1 : MBR
+    stage1_5 : mbr之后的扇区,让stage1中的bootlo能识别stage2所在的分区上的文件系统
+    stage2 : 磁盘分区(/boot/grub)
+
+    配置文件 : /boot/grub/grub.conf &lt;- /etc/grub.conf
+
+    stage2及内核等通常放置于一个基本磁盘分区:
+        (1) 提供菜单,并提供交互式接口
+            e: 编辑模式,用户编辑菜单
+            c: 命令模式,命令接口
+        (2) 加载用户所选择的内核
+            允许传参给内核
+            可隐藏此菜单
+        (3) 为菜单提供保护机制
+            为编辑菜单进行认证
+            为启用内核或操作系统进行认证
+    grub的命令接口:
+        help: 帮助列表
+        find (hd0,0)/vmlinux-两次tab
+        root (hd0,0) 设置 (hd0,0) 为根
+        kernel /vmlinuz-VERSION-release ro root=/dev/vg0/root, z表示压缩格式, 本次启动时用到的内核文件
+        initrd /initrd-VERSION-release.img 或 /initramfs-VERSION-release.img
+        boot 引导启动选定的内核
+</code></pre><h4 id="模块module">模块module</h4>
+<pre><code>内核模块管理 :
+    lsmod: 显示内核已装载模块
+
+    动态装卸载模块 :
+        卸载 : modprobe -r MOD_NAME
+        装载 : modprobe MOD_NAME
+
+        装载 : insmod /path/to/module_file
+        卸载 : rmmod MOD_NAME
+
+    查看某模块的详细信息 :
+        modinfo MOD_NAME
+
+    检查并生成模块间依赖关系的命令 :
+        depmod
+</code></pre><h4 id="sysctl">sysctl</h4>
+<ul>
+<li>/proc</li>
+</ul>
+<pre><code># 路由转发功能
+echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+# 清理cache
+echo 1 &gt; /proc/sys/vm/drop_caches
+# 当前主机名
+cat /proc/sys/kernel/hostname
+# 禁ping
+echo 1 &gt; /proc/sys/net/ipv4/icmp_echo_ignore_all
+</code></pre><ul>
+<li>/sys目录</li>
+</ul>
+<pre><code>sysfs : 输出内核识别出的各硬件设备的相关属性信息
+udev : 通过读取/sys目录的硬件设备信息 按需为硬件设备创建设备文件
+</code></pre><h4 id="编译内核过程">编译内核过程</h4>
+<pre><code>下载到/usr/src/linux-4.19.195.tar.xz
+make menuconfig  配置内核选项
+make
+make modules_install 安装内核模块
+
+screen:
+    打开: screen
+    拆除: ctrl+a,d
+    列表: screen -ls
+    连接至: screen -r screen_id  
+    退出: exit
+</code></pre><h4 id="sytemd">sytemd</h4>
+<ul>
+<li>systemd的新特性</li>
+</ul>
+<pre><code>系统引导时实现服务并行启动
+按需激活进程
+系统状态快照
+基于依赖关系定义的服务控制逻辑
+</code></pre><ul>
+<li>核心概念-unit</li>
+</ul>
+<pre><code>由其相关配置文件进行标识,识别和配置;文件中主要包含了系统服务,监听的socket,保存的快照,init相关的信息
+    /usr/lib/systemd/system
+    /etc/systemd/system
+    /run/systemd/system(不重要)
+unit场均类型:
+    Service uint(x.service): 用于定义系统服务
+    Target unit(x.target) : 用于模拟实现&quot;运行级别&quot;,systemd是没有sysV的runlevel概念
+    Device uint(x.device) : 用于定义内核识别的设备
+    Mount uint(x.mount)   : 用于定义文件系统挂载点
+    Socket uint(x.socket) : 用于表示进程间通信用到的socket文件
+    Snapshot unit(x.snapshot) : 管理系统快照
+    Swap uint(x.swap) : 用于管理标识swap设备
+    AutoMount unit(x.automount): 文件系统自动挂载点设备
+    Path unit(.path) : 用于定义文件系统中的一文件或目录
+
+关键特性:
+    基于socket的激活机制 : socket和程序分离
+    基于bus的激活机制
+    基于device的激活机制
+    基于path的激活机制
+    系统快照: 保存各unit的当前状态信息 于吃酒存储设备中
+    向后兼容sysv init脚本
+        /etc/init.d/ 目录下的文件可以通过systemctl管理
+不兼容:
+    systemctl的命令是固定的
+    非由systemd启动的服务,systemctl无法控制
+
+</code></pre><ul>
+<li>常用命令</li>
+</ul>
+<pre><code># 查看是否激活
+systemctl is-active nginx.service
+# 查看已激活的service
+systemctl list-units --type service
+# 查看所有的服务
+systemctl list-units -t service -a
+
+# 设置开机启动(实际就是链接到: /etc/systemd/system/multi-user.target.wants)
+systemctl enable nginx.service
+# 查看是否能开机自启
+systemctl is-enabled nginx.service
+# 禁止/取消 某服务(就是链接: /etc/systemd/system/nginx.service -&gt; /dev/null)
+systemctl mask nginx.service
+systemctl unmask nginx.service
+
+
+</code></pre><ul>
+<li>管理target units</li>
+</ul>
+<pre><code>runlevel0.target -&gt; poweroff.target
+runlevel1.target -&gt; rescue.target
+runlevel2.target -&gt; multi-user.target
+runlevel3.target -&gt; multi-user.target
+runlevel4.target -&gt; multi-user.target
+runlevel5.target -&gt; graphical.target
+runlevel6.target -&gt; reboot.target
+
+切换级别: init N -&gt; systemctl isolate NAME.target
+
+查看级别: runlevel -&gt;  systemctl list-units -t target
+
+获取默认运行级别 : systemctl get-default
+修改默认运行级别 : systemctl set-default NAME.target
+
+切换紧急救援模式(级别1) : systemctl rescue
+切换紧急emergency模式(不会执行初始化脚本) : systemctl emergency
+
+关机: systemctl halt, systemctl powerof
+重启: systemctl reboot
+骨气: systemctl suspend
+快照: systemctl hybrid-sleep
+快照并挂起: systemctl hybrid-sleep
+</code></pre><ul>
+<li>service unit file</li>
+</ul>
+<pre><code>[Unit] : 定义与unit类型无关的通用选项, 用于提供unit的描述信息, unit的欣慰及依赖关系等
+    Description : 会显示到systemctl status 会显示
+    After : 定义启动顺序关系
+    Wants : 依赖到的其他units(弱依赖,依赖不启动自己可以激活)
+    Requires : 依赖到的其他units(强依赖,依赖不启动自己无法激活)
+    BindsTo : 与Requires类似，它指定的 Unit 如果退出，会导致当前 Unit 停止运行
+
+[Service] : 与Service相关的选项
+    Type : 定义启动时的进程行为。它有以下几种值。
+        Type=simple : 默认值，执行ExecStart指定的命令，启动主进程
+        Type=forking : 以 fork 方式从父进程创建子进程，创建后父进程会立即退出
+        Type=oneshot : 一次性进程，Systemd 会等当前服务退出，再继续往下执行
+        Type=dbus : 当前服务通过D-Bus启动
+        Type=notify : 当前服务启动完毕，会通知Systemd，再继续往下执行
+        Type=idle : 若有其他任务执行完毕，当前服务才会运行
+    ExecStart : 启动当前服务的命令
+    ExecStartPre : 启动当前服务之前执行的命令
+    ExecStartPost : 启动当前服务之后执行的命令
+    ExecReload : 重启当前服务时执行的命令
+    ExecStop : 停止当前服务时执行的命令
+    ExecStopPost : 停止当其服务之后执行的命令
+    RestartSec : 自动重启当前服务间隔的秒数
+    Restart : 定义何种情况 Systemd 会自动重启当前服务，可能的值包括always（总是重启）、on-success、on-failure、on-abnormal、on-abort、on-watchdog
+    TimeoutSec : 定义 Systemd 停止当前服务之前等待的秒数
+    Environment : 指定环境变量
+
+[Install] : 定义由&quot;systemctl enable &quot; 和&quot;disable&quot;命令的时候用到
+    WantedBy : 它的值是一个或多个 Target，当前 Unit 激活时（enable）符号链接会放入/etc/systemd/system目录下面以 Target 名 + .wants后缀构成的子目录中
+    RequiredBy : 它的值是一个或多个 Target，当前 Unit 激活时，符号链接会放入/etc/systemd/system目录下面以 Target 名 + .required后缀构成的子目录中
+    Alias : 当前 Unit 可用于启动的别名
+    Also : 当前 Unit 激活（enable）时，会被同时激活的其他 Unit
+
+&gt; 修改了unit配置需要执行: systemctl daemon-reload
+&gt; 然后reload或restart
+</code></pre><h3 id="运维安全">运维安全</h3>
+<pre><code>客户端通过浏览器访问网页时, 客户端不需要发给服务端证书, 只需要验证服务端的正常(但是对于网银支付可能会需要安装证书,银行自己的CA,比如u盾)
+
+
+ssl : secure sockets layer  
+    netscape 1994
+    v1(没公开), v2(95年,很多漏洞), v3
+tls : transport layer security
+    ietf 1999
+    v1.0 v1.1 v1.2 v1.3
+
+ssl会话主要三步
+    1. 客户端向服务端索要并验证证书
+    2. 双方协商生成&quot;会话密钥&quot;
+    3. 双方采用&quot;会话密钥&quot;进行加密通信
+
+    ssl handshake protocol :
+        第一阶段 客户端发送client hello
+             支持的协议版本, 比如tls v1.2
+             客户端生成一个随机数, 稍后生成&quot;会话密钥&quot;
+             支持的加密算法,比如AES(对称加密算法),RSA(公钥加密算法)
+             支持的压缩算法
+        第二阶段 服务端发送Server hello
+            确认使用的加密通信协议版本, 比如tls v1.2 ;
+            服务端生成一个随机数, 稍后生成&quot;会话密钥&quot;
+            确认使用的加密方法, 比如 RSA
+            服务端发送证书
+            [如果需要验证客户端证书,会索要客户端证书...]
+        第三阶段:
+            客户端验证服务器证书(发证机构,完整性,持有者,有效期,吊销列表)
+            客户端发送以下信息给服务端
+                一个随机数
+                编码变更通知,表示随后的信息将用双方商定的加密方式和密钥发送
+                客户端握手结束通知
+        第四阶段:
+            服务端收到客户端发来的第三个随机数经过pre-master-key 混合后,计算生成本次所得到的的&quot;会话密钥&quot;
+            向客户端发送如下信息
+                编码变更通知,表示随后的信息将用双方商定的加密方式和密钥发送
+                服务端握手结束通知
+
+PKI: 公钥基础设施
+    签证机构 CA
+    注册机构 RA
+    证书吊销列表 CRL
+    证书存取库
+
+openssl
+    组件
+        libcrypto,libssl,openssl
+
+    openssl (多子命令):
+        Standard commands
+        Message Digest commands (see the `dgst' command for more details)
+        Cipher commands (see the `enc' command for more details)
+
+    对称加密
+        工具: openssl enc, gpg
+        支持算法: des3,aes,
+        openssl enc 命令:
+            加密解密:
+            # -e encode
+            # -a base64 编码
+            ~]# openssl enc -e -des3 -a  -in b  -out b.encode
+            ~]# openssl enc -d -des3 -a  -in b.encode  -out b.decode
+    单向加密
+        工具: openssl dgst, md5sum,sha1sum,sha224sum...
+        dgst命令:
+            ~]# md5sum b
+                e6f443c6566d585113d137e0992d8391  b
+            ~]# openssl dgst -md5 b
+                MD5(b)= e6f443c6566d585113d137e0992d8391
+    生成用户密码:
+        工具: passwd, openssl passwd
+
+        ~]# openssl passwd -1 -salt 123
+            $1$123$ai3PKcU9Q7J3tIviFBaqN0
+    随机数生成
+        工具 openssl rand
+        ~]# openssl rand -base64 32
+        ~]# openssl rand -hex 10
+    公钥加密:
+        工具: openssl rsautl, gpg
+        加密解密:
+            算法: RSA , ELGamal
+        数字签名:
+            算法: RSA, DSA, ELGamal
+        密钥交换
+            算法: DH
+
+        生成密钥对:
+            # 放到括号代表是子shell执行的, 不影响当前shell的umask
+            # umask 077 会让默认的644-077 =600权限
+            生成私钥: ~]# (umask 077 ; openssl genrsa -out server.key 2048)
+            提取公钥: ~]# openssl rsa -in server.key -pubout -out server.pub
+
+
+linux的随机生成器:
+    /dev/random : 仅从熵池中返回随机数, 随机数用尽,(阻塞)
+    /dev/urandom : 仅从熵池中返回随机数, 随机数用尽,会利用软件生成伪随机数,(非阻塞,但不安全)
+    熵池 :
+        内核的空间
+        来源:
+            硬盘IO中断时间间隔
+            键盘IO中断时间间隔
+
+CA :
+    建立私有CA:
+        工具: openssl, openca
+    openssl :
+        配置文件: /etc/pki/tls/openssl.cnf
+        步骤:
+            1. 生成私钥;
+                ~]# (umask 077; openssl genrsa -out /etc/pki/CA/private/cakey.pem 4096)
+            2. 生成自签证书;
+                # -new : 生成新证书部署请求
+                # -x509 : 生成自签格式证书,专用于创建私有CA
+                # -key : 生成请求用到的私有路径, 会提取公钥
+                # -out : 生成的请求文件路径, 如果是自签操作将直接生成签署过的正式
+                ~]# openssl req -new -x509 -key /etc/pki/CA/private/cakey.pem -out /etc/pki/CA/cacert.pem -days 3650
+            3. 提供CA所需的目录及文件:
+                ~]# mkdir -p /etc/pki/CA/{certs,crl,newcerts}
+                ~]# touch  /etc/pki/CA/{serial,index.txt}
+                ~]# echo 01 &gt; /etc/pki/CA/serial
+    要用到证书进行安全通信的服务器, 需要向CA请求签署证书:
+        步骤
+            1) 生成私钥:
+                ~]# (umask 077; openssl genrsa -out /etc/nginx/ssl/server.key 2048)
+            2) 生成证书签署请求
+                ~]# openssl req -new -key /etc/nginx/ssl/server.key -out /etc/nginx/ssl/server.csr -days 365
+
+            3) 在CA服务器签署证书:
+                ~]# openssl -ca in /etc/nginx/ssl/server.csr -out /etc/pki/CA/certs/server.crt -days 365
+
+            4) 查看证书的信息:
+                ~]# openssl -x509 -in /etc/pki/CA/certs/server.crt -noout -serial -subject
+
+</code></pre><h3 id="dns">DNS</h3>
+<h4 id="说明">说明</h4>
+<pre><code>DNS: Domain Name Service : 应用层协议
+    C/S: 53/udp(解析),53/tcp(区域传送)
+tld : TOP level domain
+
+DNS名解析方式:
+    名称-&gt; ip : 正向解析
+    ip -&gt; 名称: 反向解析
+    注意: 二者非同一空间,非为同一棵树,两个完全独立的存储方式
+DNS 解析过程:
+    例如: 请求www.baidu.com
+        1. 首先客户端会查找自己的host文件,
+        2. 如果host没有, 就请求本地缓存,
+        3. 如果缓存没有, 就请求/etc/resolv.conf的dns服务器
+            3.1 dns服务器查找自己的域是否负责,是否能解析
+            3.2 dns服务器如果不能解析,同样查找dns本地缓存,
+            3.3 dns本地缓存也找不到,就去根域名查找-&gt;com服务器-&gt;baidu服务器-&gt;找到www.baidu.com 的解析条目
+        4. /etc/resolv.conf的dns服务器拿到请求之后,返回给客户端
+</code></pre><blockquote>
+<p>反向解析树:
+<img src="/images/66/markdown-img-paste-20210628102440183.png" alt=""></p>
+</blockquote>
+<pre><code>~]# dig -x 114.114.114.114
+114.114.114.114.in-addr.arpa. 524 IN	PTR	public1.114dns.com.
+</code></pre><h4 id="基础">基础</h4>
+<pre><code>区域(zone)和域(domain)
+    区域是物理概念, 域是逻辑概念
+    magedu.com域:
+        正向解析区域
+        反向解析区域
+区域数据库文件
+    资源记录  : Resource Record
+        类型 : A, AAAA, PTR, SOA , NS, CNAME, MX
+        SOA : Start Of Authority ,起始授权记录;一个区域解析库只能有一个SOA记录,必须在第一条 (岛名)
+        NS  : Name Service , 域名服务记录; 可以有多个(岛主)
+        A   : Address , 地址记录, FQDN-&gt;IPv4 (32位)
+        AAAA: Address FQDN-&gt;IPv6 (128位)
+        CNAME: Canonical Name, 别名
+        PTR : Pointer, IP-&gt;FQDN
+        MX  : Mail Exchanger, 邮件交换器,可以多个
+            优先级: 0-99, 数字越小优先级越高;
+
+    资源记录的定义格式:
+        域名: name [TTL] IN  RR_TYPE value
+        SOA :
+            name: 当前区域的名字; &quot;magedu.com.&quot; 或者&quot;3.2.1.in-addr.arpa.&quot; (最后一个点不能少);
+            value: 多部分
+                1): 当前区域的区域名称(也可以使用主DNS服务器名称);
+                2): 当前区域管理的邮箱地址; 但地址中不能使用@符号,一般使用点号替代
+                3): (主从服务协调属性的定义以及否定答案的TTL)
+                    例如:
+                        magedu.com. 86400 IN SOA magedu.com. admin.magedu.com. (
+                            2017010801; serial 序列号
+                            2H ; refresh 刷新时长
+                            10M ; retry 重试时长
+                            1w ; expire 过期时长
+                            1D ; negative answer ttl 否定答案的ttl
+
+                        )
+        NS :
+            name: 当前区域的区域名称
+            value: 当前区域的某DNS服务器的名字, 例如ns.magedu.com. ;
+                注意: 一个区域可以有多个ns记录
+            例如:
+                magedu.com. 86400 IN NS ns1.magedu.com.
+                magedu.com. 86400 IN NS ns2.magedu.com.
+        MX:
+            name : 当前区域的区域名称
+            value : 当前区域某邮件交换器的主机名;
+                注意: MX记录可以有多个, 每个记录的value之前应该有一个数字, 表示优先级;
+            例如:
+                magedu.com. 86400 IN MX 10 mx1.magedu.com.
+                magedu.com. 86400 IN MX 20 mx2.magedu.com.
+        A :
+            name: 某FQDN
+            value: ipv4地址
+            例如:
+                www.magedu.com. IN A 1.1.1.1
+                                IN A 1.1.1.2 (可以省略www.magedu.com.)
+        PTR :
+            name : ip地址, ip反过来写+.in-addr.arpa.
+            value : FQDN
+            例如:
+                4.3.2.1.in-addr.arpa. IN PTR www.magedu.com.
+        CNAME:
+            name: FQDN格式的别名
+            value : FQDN
+            例如:
+                web.magedu.com. IN CNAME www.magedu.com.
+
+    注意:
+        1) TTL 可以从全局继承;
+        2) @表示当前区域的名称;
+        3) 相邻的两个记录其name相同时 第二个可以省略
+        4) 对于正向区域来说, MX,NS等记录的value为一个FQDN,此FQDN应该有一个A记录
+</code></pre><h4 id="bind">bind</h4>
+<pre><code>BIND: Berkeley Internet Name Domain 伯克利互联网名称域, ISC维护
+程序包:
+    bind-libs: (yum info bind-libs) 被bind和bind-utils包中的程序共同用到的;
+    bind-utils : bind 客户端程序集, 例如: dig,host,nslookup等;
+    bind: 提供dns server程序, 测试程序;
+    bind-chroot : 选装, 让named运行于jail模式下
+配置文件: rpm -lq bind|head -10
+    主: /etc/named.conf
+    其他:
+        /etc/named.iscdlv.key
+        /etc/named.rfc1912.zones
+        /etc/named.root.key
+    解析库文件:
+        /var/named目录下:
+            一般名字为: ZONE_NAME.zone
+        注意:
+            1) 可以配置多个区域提供解析
+            2) 根区域解析库文件: /var/named/named.ca
+            3) 正向解析localhost区域解析库文件: /var/named/named.localhost
+               反向解析localhost区域解析库文件: /var/named/named.loopback
+    rndc: remote name domain contoller
+        127.0.0.1:953/tcp
+    主配置文件格式:
+        全局配置段:
+            options{...}
+        日志配置段
+            logging{...}
+        区域配置段
+            zone{...} : 那些由本级负责解析的区域, 或者转发的区域
+
+            注意: 每个配置语句 必须分号结尾;
+
+        缓存名称服务器的配置:
+            监听能与外部主机通信的地址;
+                listen-on port 53 { 172.16.76.220;127.0.0.1; };
+            学习时,建议关闭
+                dnssec-enable no;
+                dnssec-validation no;
+                dnssec-lookaside no;
+            关闭仅允许本地查询:(注释以下内容)
+                allow-query     { localhost; };
+        检查配置文件语法错误:
+            /usr/sbin/named-checkconf [/etc/named.conf]
+        启动:
+            systemctl start named
+
+        测试工具
+            dig : dig [-t RR_TYPE] name [@SERVER] [query options]
+
+                查询选项:
+                    +[no]trace : 跟踪解析过程
+                    +[no]recurese : 进行递归解析;
+
+                    # 追踪查询解析的全过程
+                    dig +trace -t A www.baidu.com
+                注意: 反向解析测试
+                    dig -x 140.205.41.17
+
+                模拟完全区域传送:
+                    dig -t axfr DOMAIN [@SERVER]
+            host : host [-t RR_TYPE] name [SERVER]
+            nslookup : nslookup [-options] [name] [server]
+                &gt; 交互式
+                &gt; server 114.114.114.114
+                &gt; set q=A
+
+            rndc命令: named 服务控制命令
+                status : 统计
+                flush  : 清空缓存
+                reload [zone]
+
+
+        配置解析一个正向区域:
+            1) 定义区域:
+                zone &quot;ZONE_NAME&quot; IN {
+                    type {master|slave|hint|forward};    //主|从|跟|转发
+                    file &quot;ZONE_NAME.zone&quot;;
+                };
+
+                ~]# tail -4 /etc/named.rfc1912.zones
+                zone &quot;test.com&quot; IN {
+                	type master;
+                	file &quot;test.com.zone&quot;;
+                };
+
+                注意: 区域名字即域名
+
+            2) 建立区域数据文件(/var/named, 内容主要是A记录)
+                ~]# cat /var/named/test.com.zone
+                $TTL 600
+                $ORIGIN test.com.               //后面简写的结果自动追加该内容
+                @   IN SOA @  mail.test.com. (    // @ 代表 test.com.
+                        2021062801 1H 10M 3D 1D )
+                    IN NS    ns1                    // 这里可以简写, 不能带.
+                    IN NS    ns2.test.com.          // 必须最后一位加.
+                    IN MX 10 mx1                    
+                    IN MX 20 mx2.test.com.      
+                ns1 IN A     172.16.76.220
+                ns2 IN A     172.16.76.220
+                mx1 IN A     172.16.76.220
+                mx2 IN A     172.16.76.220
+                www IN A     172.16.76.220
+                web IN CNAME www
+
+                ~]# chmod 640 test.com.zone
+                ~]# chown :named test.com.zone
+            3) 检查zone配置
+                ~]# named-checkzone test.com /var/named/test.com.zone
+                ~]# systemctl reload named
+
+        配置解析一个反向区域:
+            1) 定义区域:
+                zone &quot;ZONE_NAME&quot; IN {
+                    type {master|slave|hint|forward};    //主|从|跟|转发
+                    file &quot;ZONE_NAME.zone&quot;;
+                };
+                注意: 反向域名的名字
+                    反写的网段地址: .in-addr.arpa
+                    76.16.172.in-addr.arpa
+
+            2) 建立区域数据文件(/var/named, 内容主要是A记录)
+            ~]# cat /var/named/172.16.76.zone
+                $TTL 600
+                $ORIGIN 76.16.172.in-addr.arpa.               //后面简写的结果自动追加该内容
+                @   IN SOA @  mail.test.com. (    // @ 代表 test.com.
+                        2021062801 1H 10M 3D 1D )
+                    IN NS    ns1                    // 这里可以简写, 不能带.
+                    IN NS    ns2.test.com.          // 必须最后一位加.
+                220 IN PTR   ns1.test.com.  
+                220 IN PTR   ns2.test.com.         
+
+</code></pre><h4 id="bind主从">bind主从</h4>
+<blockquote>
+<p>仅仅是某个区域级别作为从</p>
+</blockquote>
+<pre><code>如何配置从区域:
+  On Slave:
+    1) 定义区域;
+        zone &quot;ZONE_NAME&quot; IN {
+            type slave;
+            file &quot;slaves/ZONE_NAME.zone&quot;;
+            master { master_ip; };
+        配置语法检查: named-checkconf
+    2) 重载
+        rndc reload 或者systemctl reload named
+    }
+  On Master :
+    1) 确保区域数据文件中 为每个从服务器配置NS记录,并且在正向区域文件中需要配置NS记录的A记录, 且A记录地址就是从服务器ip
+            @   IN SOA @  mail.test.com. (    // @ 代表 test.com.
+                2021062802 1H 10M 3D 1D )
+                IN NS    ns2
+            ns2 IN A     172.16.76.221
+
+        &gt; 序列号+1,改变了序列号, 从库才更新
+    2) 重载
+
+手工传送配置:( 从172.16.76.220上同步配置 )
+    ~]# dig -t axfr test.com @172.16.76.220
+</code></pre><h4 id="子域授权">子域授权</h4>
+<blockquote>
+<p>magedu.com -&gt; ops.magedu.com</p>
+</blockquote>
+<pre><code>正向解析区域授权子域的方法:
+    ops.magedu.com.      IN NS ns1.ops.magedu.com.
+    ns1.ops.magedu.com.  IN A  IPAddress1
+    ops.magedu.com.      IN NS ns2.ops.magedu.com.
+    ns2.ops.magedu.com.  IN A  IPAddress2
+
+定义转发:
+    注意: 被转发的服务器, 必须允许为当前服务器做递归
+    1) 区域转发: 仅转发某特定区域
+        zone &quot;ZONE_NAME&quot; {
+            type forward;
+            forward { first|only };
+            forwarders { server_ip; };
+        };
+
+        first: 首先转发,找不到, 就自己去迭代找根
+        only: 只转发,一般是内部使用的域名
+
+    2) 全局转发: 只要不是自己的都转发
+        编辑named.conf-&gt;options{
+            forward only;
+            forwarders { server_ip; }
+        }
+</code></pre><h4 id="bind中的安全相关的配置">bind中的安全相关的配置</h4>
+<pre><code>acl : 访问控制列表; 把一个或多个地址归并为一个命名的结合,随后通过此名称即可对此结合内的所有主机统一调用;
+    配置文件: /etc/named.conf
+    acl acl_name {
+        ip;
+        net/prelen;
+    }
+    示例:
+        acl mynet {
+            172.16.0.0/16;
+            192.168.0.1/24;
+        }
+bind四个内置的acl
+    none:
+    any: 任意
+    local: 本机
+    localnet : 本机所在的ip所属的网络
+访问控制指令:(options,zone)
+    allow-query { mynet; }; 允许查询的主机; 白名单
+    allow-transfer { myslaves; }; 允许向那些主机做区域传送;默认是所有; 应该配置为从服务器
+    allow-recursion { mynet; }; 允许哪些主机向当前dns服务器进行递归查询(recursion yes 会修改成允许所有)
+    allow-update { none; }; DDNS,允许动态更新区域数据库文件中的内容;
+</code></pre><h4 id="bind-view-">bind view :</h4>
+<pre><code>视图:
+    view VIEW_NAME {
+        zone
+        zone
+    }
+    # 比如根据ip(电信的),访问该视图
+    view internal {
+        match-clients { 172.16.0.0/8; };
+        zone &quot;magedu.com&quot; IN {
+            type master;
+            file &quot;magedu.com/internal&quot;;
+        };
+    };
+    # 视图会按照配置顺序,没有匹配到的走该视图
+    view external {
+        match-cients { any; };
+        zone &quot;magedu.com&quot; IN {
+            type master;
+            file &quot;magedu.com/external&quot;;
+        };
+    }
+</code></pre><h3 id="http协议">http协议</h3>
+<h4 id="tcp协议的特性">TCP协议的特性</h4>
+<pre><code>建立连接:
+将数据打包成段: 校验和(CRC32)
+确认,重传和超时:
+排序: 逻辑序号
+流量控制: 滑动窗口win
+拥塞控制: 慢启动和拥塞避免算法
+</code></pre><h4 id="http-hyper-text-transfer-protocol-文本协议">http: hyper text transfer protocol ,文本协议</h4>
+<pre><code>&gt; html: hyper text mark language 超文本标记语言
+&gt; css : Cascading style sheet
+&gt; js : javascript, 客户端脚本;
+
+文本协议:  将内容编码成ascii传输, 但是对于图片使用文本协议直接传输会乱码
+协议版本:
+    http/0.9 : 原型版本,功能简陋
+        method : 仅get
+    http/1.0 : cache, MIME, method,
+        MIME : Multipurpose Internet Mail Extesion  可以传输非文本内容,
+        method : get, post, head, put, delete, trace , options
+    http/1.1 : 增强了缓存功能;
+    SPDY     : Google
+    http/2   : rfc
+
+http工作模式:
+    http请求报文: request
+    http响应报文: response
+        一次http事务: 请求 &lt;--&gt; 响应
+    web资源: web resource
+        静态资源(无需服务端做出额外处理)
+        动态资源(服务端需要通过执行程序做出处理,而后发送给客户端的是程序的运行结果)
+    URI = URL+URN
+    资源的标识机制: URL (Uniform Resource Locator)
+</code></pre><h3 id="iptables-包过滤型的防火墙">iptables: 包过滤型的防火墙</h3>
+<pre><code>5个钩子:
+    1. prerouting : 在入路由之前
+    2. 入route(两种情况)
+        2.1 input: 路由到本机的请求
+            2.1.1 output : 本机请求返回出去的
+        2.2 forward: 路由转发到其他机器的请求
+    3. 出route
+    4. postrouting : 出路由之后
+</code></pre><p>-&gt; prerouting -&gt; route -&gt; input -&gt; output -&gt;  route -&gt;  postrouting -&gt;
+\     -&gt; forward  -&gt;     /
+<img src="/images/66/markdown-img-paste-20210629112733417.png" alt=""></p>
+<h4 id="理论说明">理论说明</h4>
+<pre><code>Firewall:
+    主机防火墙：
+    网络防火墙：
+
+    软件防火墙(软件逻辑)
+    硬件防火墙(硬件和软件逻辑)
+
+iptables: 网络层防火墙
+	iptables/netfilter
+
+	ipfw --&gt; ipchains --&gt; iptables
+		让用户编写规则
+
+	netfilter: framework
+		hook function
+			PREROUTING：路由前
+			INPUT：到达本机内部的报文必经之路
+			FORWARD：由本机转发的报文必经之路
+			OUTPUT：由本机发出的报文的必经之路
+			POSTROUTING：路由后
+
+    规则的功能：
+		raw, mangle, nat, filter
+
+		filter: 过滤，定义是否允许通过防火墙
+		nat: 地址转换，启用connection_track;(目的是为了隐藏内部主机)
+			SNAT 源地址转换
+			DNAT 目标地址
+			PNAT 目标端口
+		mangle: 拆解报文,作出修改, 重新封装
+		raw: 关闭nat表上启用的连接追踪功能； 连接追踪表,
+
+    表和链的对应关系：
+        raw: PREROUTING, OUTPUT
+        mangle: PREROUTING, INPUT, FORWARD, OUTPUT, POSTROUTING
+        nat: PREROUTING（SNAT），POSTROUTING（DNAT），[INPUT，] OUTPUT
+        filter: INPUT, FORWARD, OUTPUT
+
+    数据报文流程：
+        跟本机内部进程通信：
+            进入：PREROUTING, INPUT
+            出去：OUTPUT, POSTROUTING
+
+        由本机转发：
+            PREROUTING, FORWARD, POSTROUTING
+
+
+        数据报文的流向：
+            源IP和目标IP由流向决定；
+            流入报文经由路径：PREROUTING --&gt; INPUT
+            流出报文经由路径：OUTPUT --&gt; POSTROUTING
+            转发报文经由路径：PREROUTING --&gt; FORWARD --&gt; POSTROUTING
+
+    总结：iptables/netfilter
+        5个钩子：生成5个内置链
+</code></pre><p><img src="/images/66/markdown-img-paste-20210629150606899.png" alt=""></p>
+<h4 id="iptables-使用">iptables 使用</h4>
+<p><img src="/images/66/markdown-img-paste-2021062917492962.png" alt=""></p>
+<pre><code>
+iptables: 用户空间的工具，写规则，并自动发往netfilter，立即生效； 规则都是写在链上
+netfilter: 接收并生效规则；
+
+链: 链上的规则次序, 即为检查的次序,因此隐含一定的应用法则
+    1) 同类规则(访问同一应用), 匹配范围小的放上面
+    2) 不同类规则(访问不同应用),匹配到报文频率较大的放上面
+    3) 将那些可由一条规则描述的多个规则合并
+    4) 设置默认策略
+
+基本语法：
+    高度模块化,由诸多扩展模块实现其检测条件或处理动作的定义
+        rpm -ql iptables :
+            ipv6: /usr/lib64/xtables/libip6t
+            ipv4: /usr/lib64/xtables/libipt,/usr/lib64/xtables/libxt
+
+
+    iptables [-t TABLE] COMMAND CHAIN  CRETIRIA -j TARGET
+    Iptables [-t table] COMMAND chain [-m matchname [per-match-options]] - targetname [per-target-options]
+
+    -t TABLE:
+        nat, mangle, raw, filter
+        默认为filter
+
+    COMMAND: 管理命令
+        链：
+            -N：new, 自建一条链
+                iptables -N in_web_rules
+            -X: delete, 删除一条自定义的空链
+                注意: 仅能删除用户自定义的 引用计数为0的空的链;
+                iptables -X in_web_rules
+            -P：policy，设置默认策略，对filter表来讲，默认规则为ACCEPT或DROP；
+            -E：重命名自定义链
+                iptables -E in_web_rules in_web_rules2
+
+        链中的规则：
+            -A: append 追加
+            -I: insert 插入,指明位置,省略表示第一条
+            -D: delete
+                1) 指定规则序号
+                    iptables -D FORWARD 1
+                2) 指定规则本身
+            -R: replace
+            -F：flush, 清空规则链；
+            -Z：zero，计数器归零
+
+        查询：
+            -L
+                -n: 数字格式显示主机地址和端口；
+                -v: 详细格式，-vv, -vvv
+                --line-numbers: 显示规则编号
+
+                    pkts bytes  target     prot opt in        out         source               destination
+                    包数 字节数   目标       协议  流入的接口  流出的接口   源地址               目标地址
+
+                -x: exactly，不要对计数器的计数结果做单位换算，而显示其精确值
+
+                例如:( L是命令, 必须放在最后, 其他的是修饰L的)
+                    iptables -n nat -nvxL --line-numbers
+                    iptables -nxvL INPUT --line-numbers
+
+    iptables [-t TABLE] -A 链名 匹配条件 -j 处理目标
+        匹配条件：
+            通用匹配: 无需加载任何模块
+                [!] -s 地址：指定报文源IP地址匹配的范围；可以是IP，也可以是网络地址；可使用!取反；
+                    --src, --source
+                [!] -d 地址：指定报文目标IP地址匹配的范围；
+                    --dst, --destination
+                [!] -p 协议：指定匹配报文的协议类型，一般有三种tcp, udp和icmp;
+                [!] -i INTERFACE: 数据报文流入的接口；PREROUTING, INPUT, FORWARD
+                [!] -o INTERFACE: 数据报文流出的接口；OUTPUT, FORWARD, POSTROUITING
+
+                例如:
+                    # 设置默认只能被172.16.0.0/16 网段访问
+                    iptables -t filter -A INPUT -s 172.16.0.0/16 -d 172.16.76.220 -p tcp -j ACCEPT
+                    # 设置默认只能访问172.16.0.0/16 网段
+                    iptables -t filter -A OUTPUT -s 172.16.76.220 -d 172.16.0.0/16 -p tcp -j ACCEPT
+                    # 设置默认入口和出口为DROP
+                    iptables -P INPUT DROP
+                    iptables -P OUTPUT DROP
+
+                    # 仅允许172.16.76.0/24 网段ping
+                    iptables -A INPUT ! -s 172.16.76.0/24 -d 172.16.76.220 -p icmp -j DROP
+
+            扩展匹配
+                隐式扩展：当使用-p {tcp|udp|icmp}中的一种时，可以直接使用扩展专用选项；
+                    -p tcp:
+                        [!] --sport PORT[-PORT]: 指定源端口,可以是范围
+                        [!] --dport PORT[-PORT]: 指定目标端口,可以是范围
+                        [!] --tcp-flags mask comp
+                            例如:
+                                # 三次握手的第一次: FIN=1,ACK=0,FIN=0,RST=0
+                                &quot;--tcp-flags SYN,ACK,FIN,RST FIN&quot; : 表示第一个参数四个表示位是需要检查的, 第二个参数FIN则必须是1
+                        [!] --syn : 常用,简写; 相当于&quot;--tcp-flags SYN,ACK,FIN,RST FIN&quot;
+
+                    -p udp:
+                        [!] --sport
+                        [!] --dport
+                    -p icmp
+                        [!] --icmp-type 8 : ping 的请求包
+                        [!] --icmp-type 0 : ping 的返回包
+
+                        例如:
+                            # 我们想要让局域网可以ping本机, 但是不允许本机ping外网
+                            #1. 首先加上禁止规则
+                            iptables -A INPUT -d 172.16.76.220 -p icmp -j REJECT
+                            iptables -A OUTPUT -s 172.16.76.220 -p icmp -j REJECT
+                            #2. 首先允许 接收 --icmp-type 8 的请求 (此时ping数据只能进不能出)
+                            iptables -I INPUT 1 -s 172.16.76.0/24 -d 172.16.76.220 -p icmp --icmp-type 8 -j ACCEPT
+                            #3. 再允许出
+                            iptables -I OUTPUT 1 -s 172.16.76.220 -d 172.16.76.0/24 -p icmp --icmp-type 0 -j ACCEPT
+
+                显式扩展(装入模块)：必须明确说明使用哪个模块进行扩展，而后才能使用其扩展专用选项；
+                    -m 扩展模块名称
+
+                    模块：iptables，netfilter各拥有一部分代码
+
+                    1. multiport: 多端口匹配
+                        可用于匹配非连续或连续端口；最多指定15个端口；
+
+                        专用选项：
+                            [!] --source-ports, --sports port[,port,port:port]
+                            [!] --destination-ports, --dports
+                            [!] --ports
+
+                        例子：
+                            ~]# iptables -I INPUT -d 172.16.100.7 -p tcp -m multiport --dports 22,80 -j ACCEPT
+                            ~]# iptables -I OUTPUT -s 172.16.100.7 -p tcp -m multiport --sports 22,80 -j ACCEPT
+                            ~]# iptables -I INPUT -s 172.16.0.0/16 -d 172.16.100.7 -p tcp -m multiport --dports 30000:31000,22,80 -j ACCEPT
+
+                    2. iprange: 匹配指定范围内的地址；
+                        匹配一段连续的地址而非整个网络时有用；
+
+                        专用选项：
+                            [!] --src-ragne IP[-IP]
+                            [!] --dst-range
+
+                        ~]# iptables -A INPUT -d 172.16.100.7 -p tcp --dport 23 -m iprange --src-range 172.16.100.1-172.16.100.100 -j ACCEPT
+                        ~]# iptables -A OUTPUT -s 172.16.100.7 -p tcp --sport 23 -m iprange --dst-range 172.16.100.1-172.16.100.100 -j ACCEPT
+
+                    3. time: 基于时间做访问控制
+                        专用选项：
+                            --datestart YYYY[-MM][-DD[Thh[:mm[:ss]]]]
+                            --datestop
+
+                            [!] --timestart hh:mm[:ss]
+                            [!] --timestop hh:mm[:ss]
+
+                            --weekdays day[,day]
+                                Mon, Tue,
+                            --kerneltz : 使用内核配置的时区而非默认的UTC ;
+
+                            ~]# iptables -I INPUT -d 172.16.100.7 -p tcp --dport 80 -m time --timestart 08:20 --timestop 18:40 --weekdays Mon,Tue,Thu,Fri -j REJECT
+                            ~]# iptables -I INPUT -d 172.16.100.7 -p tcp --dport 80 -m time --timestart 08:20 --timestop 18:40 --weekdays 1,2,3,4,5 --kerneltz -j REJECT
+
+                    4. string: 字符串匹配，能够检测报文应用层中的字符串
+                        注意: 只能检测明文, 对于https,ssh协议的编码的无法过滤
+
+                        字符匹配检查高效算法
+                            kmp, bm
+
+                        专用选项：
+                            --algo {kmp|bm}
+                            [!] --string &quot;STRING&quot;
+                            [!] --hex-string &quot;HEX_STRING&quot;: HEX_STRING为编码成16进制格式的字串；
+
+                        ~]# iptables -I OUTPUT -m string --algo kmp --string &quot;sex&quot; -j DROP
+
+                    5. connlimit: 连接数限制，对每IP所能够发起并发连接数做限制；
+                        专用选项：
+                            [!] --connlimit-above [n] 大于等于 拒绝
+                            [!] --connlimit-upto [n]  小于等于允许
+                            ~]# iptables -I INPUT -d 172.16.76.220 -p tcp --dport 22 -m connlimit --connlimit-above 2 -j DROP
+                            ~]# iptables -R INPUT 1 -s 172.16.0.0/16 -d 172.16.76.220 -p tcp --dport 22 -m connlimit --connlimit-upto 2 -j ACCEPT
+
+                    6. limit: 速率限制; 限制的是每秒的报文
+
+                        注意: 令牌桶的方式限制速率, 比如发5个令牌, 拿一个通过一个,没有令牌了就阻塞
+
+                        专用选项：
+                            --limit n[/second|/minute|/hour|/day]
+                            --limit-burst n
+
+                        例子：
+                        # iptables -A INPUT -d 172.16.76.220 -p icmp --icmp-type 8 -m limit --limit 20/minute --limit-burst 5 -j ACCEPT
+                        # 限制 本机某tcp服务接收新请求的速率: 使用--syn + -m limit
+
+                    7. state: 状态检查,连接追踪
+                        &gt; 内核内存空间保存 客户端的访问记录
+
+						专用选项：
+							--state
+
+						连接追踪中的状态：
+							NEW: 新建立一个会话(跟协议无关, 可以追踪tcp,udp,icmp )
+							ESTABLISHED：已建立的连接
+                            UNTRACKED: 未追踪的
+							RELATED: 有关联关系的连接
+							INVALID: 无法识别的连接
+
+
+						调整连接追踪功能所能容纳的连接的最大数目：
+							/proc/sys/net/nf_conntrack_max
+
+						当前追踪的所有连接
+							/proc/net/nf_conntrack
+
+						不同协议或连接类型追踪时的属性：
+							/proc/sys/net/netfilter目录：
+
+						放行被动模式下的FTP服务：
+							1、装载模块/lib/modules/KERNEL_VERSION/kernel/net/netfilter/
+								模块：nf_conntrack_ftp
+                                命令: modprobe nf_conntrack_ftp
+
+							2、放行请求报文：
+							 	1）放行NEW状态对21端口请求的报文；
+							 	2) 放行ESTABLISHED以及RELATED状态的报文
+
+							 3、旅行响应报文：
+							 	(1) 放行ESTABLISHED以及RELATED状态的报文
+
+                        例如:
+                            ~]# iptables -A INPUT -d 172.16.76.220 -p tcp -m multiport --dports 22,8011,80,3306 -m state --state NEW -j ACCEPT
+                            ~]# iptables -A INPUT -d 172.16.76.220 -p tcp -m state --state ESTABLISHED,RELATED -j ACCEPT
+                            ~]# iptables -A OUTPUT -s 172.16.76.220 -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+        处理动作:
+            基本处理动作: ACCEPT, DROP
+            扩展处理动作: REJECT, RETURN , LOG, REDIRECT ,...
+                REJECT:
+                    --reject-with type
+                    The type  given  can  be  icmp-net-unreachable,  icmp-host-unreachable,  icmp-port-unreachable,  icmp-proto-unreachable,  icmp-net-prohibited,icmp-host-prohibited,  or  icmp-admin-prohibited  (*), which return the appropriate ICMP error message (icmp-port-unreachable is the default).
+
+                LOG :
+                    --log-level
+                    --log-prefix
+                    默认日志保存于/var/log/message
+                    ~]# iptables -R INPUT 1 -d 172.16.76.220 -p tcp ! --dport 22 -j LOG --log-prefix &quot;mylog &quot; --log-level 2
+            用户自定义链:
+
+                ~]# iptables -N in_ping_rules
+                ~]# iptables -A in_ping_rules -s 172.16.76.0/24 -d 172.16.76.220 -p icmp --icmp-type 8 -j ACCEPT
+                ~]# iptables -A in_ping_rules  -d 172.16.76.220 -p icmp  -j REJECT
+                ~]# iptables -A INPUT -d 172.16.76.220 -j in_ping_rules
+
+
+    centos6:
+        保存启用中的规则于规则文件中：
+                1、# iptables-save &gt; /etc/sysconfig/iptables
+                2、# service iptables save
+
+        生效规则文件中的规则：
+                1、# iptables-restore &lt; /etc/sysconfig/iptables
+                2、# service iptables restart
+                    执行的操作：清空现有规则，读取并生效规则文件中的规则
+    centos7:
+        1) 自定义unit file, 进行iptables-restore
+        2) firewalld服务
+        3) 自定义脚本
+
+</code></pre><h4 id="练习">练习</h4>
+<pre><code>
+练习：INPUT和OUTPUT默认策略为DROP；
+
+	1、限制本地主机的web服务器在周一不允许访问；新请求的速率不能超过100个每秒；web服务器包含了admin字符串的页面不允许访问；web服务器仅允许响应报文离开本机；
+		iptables -I INPUT -d 172.16.76.220 -p tcp -m multiport --dports 8011,80,443 -m time --weekdays 2,3,4,5,6,7 -j ACCEPT  
+
+        iptables -I INPUT -d 172.16.76.220 -p tcp -m multiport --dports 8011,80,443 -m state --state NEW -m limit --limit 100/second -j ACCEPT
+
+        iptables -I INPUT -d 172.16.76.220 -p tcp -m multiport --dports 8011,80,443 -m string --algo kmp --string &quot;admin&quot; -j REJECT
+
+        iptables -I OUTPUT -s 172.16.76.220 -tcp -m multiport --dports 8011,80,443 -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+	2、在工作时间，即周一到周五的8:30-18:00，开放本机的ftp服务给172.16.0.0网络中的主机访问；数据下载请求的次数每分钟不得超过5个；
+        iptables -I  INPUT 3 -s 172.16.0.0/16 -d 172.16.76.220 -p tcp -m multiport --dports 21,1024:65535 -m time --timestart 8:30 --timestop 18:00 --kerneltz -j ACCEPT  
+
+        iptables -I INPUT 4 -s 172.16.0.0/16 -d 172.16.76.220 -p tcp -m multiport --dports 1024: -m limit --limit 5/minute -j ACCEPT
+
+	3、开放本机的ssh服务给172.16.x.1-172.16.x.100中的主机，x为你的座位号，新请求建立的速率一分钟不得超过2个；仅允许响应报文通过其服务端口离开本机；
+
+        iptables -I INPUT -p tcp -m iprange --src-range 172.16.x.1-172.16.x.100 -m state --state NEW -m limit --limit 2/minute -j ACCEPT
+        iptables -I OUTPUT -p tcp --sport 22 -j ACCEPT
+
+	4、拒绝TCP标志位全部为1及全部为0的报文访问本机；
+        iptales -I INPUT -d 172.16.76.220 -p tcp --tcp-flags SYN,ACK,FIN,RST SYN,ACK,FIN,RST  -j REJECT
+        iptales -I INPUT -d 172.16.76.220 -p tcp --tcp-flags SYN,ACK,FIN,RST   -j REJECT
+
+        [root@centos7 ~]#iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP
+        [root@centos7 ~]#iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP
+
+	5、允许本机ping别的主机；但不开放别的主机ping本机；
+
+        iptables -I INPUT -p icmp --icmp-type 8 -j REJECT
+        iptables -I INPUT -p icmp --icmp-type 0 -j ACCEPT  
+        iptables -I OUTPUT  -p icmp --icmp-type 8 -j ACCEPT
+
+
+
+
+
+	练习：判断下述规则的意义：
+	# iptables -N clean_in
+        创建自定义链 clean_in
+	# iptables -A clean_in -d 255.255.255.255 -p icmp -j DROP
+        自定义链clean_in 最后一行追加规则, 禁止目标地址是255.255.255.255的icmp报文
+	# iptables -A clean_in -d 172.16.255.255 -p icmp -j DROP
+        禁止目标地址是172.16.255.255的icmp报文
+	# iptables -A clean_in -p tcp ! --syn -m state --state NEW -j DROP
+        所有新建连接 不是三次握手第一次的 都拒绝
+	# iptables -A clean_in -p tcp --tcp-flags ALL ALL -j DROP
+        拒绝tcp报文标志位是全1的报文
+	# iptables -A clean_in -p tcp --tcp-flags ALL NONE -j DROP
+        拒绝tcp报文标志位是全0的报文
+	# iptables -A clean_in -d 172.16.100.7 -j RETURN
+        目标地址是172.16.100.7的直接返回
+	# iptables -A INPUT -d 172.16.100.7 -j clean_in
+        目标地址是172.16.100.7 的匹配自定义链clean_in中的规则
+
+	# iptables -A INPUT  -i lo -j ACCEPT
+        本地回环网卡输入请求全部通过
+	# iptables -A OUTPUT -o lo -j ACCEPT
+        本地回环网卡输出请求全部通过
+
+
+	# iptables -A INPUT  -i eth0 -m multiport -p tcp --dports 53,113,135,137,139,445 -j DROP
+        本地eth0网卡 53,113,135,137,139,445端口的tcp请求全部拒绝
+	# iptables -A INPUT  -i eth0 -m multiport -p udp --dports 53,113,135,137,139,445 -j DROP
+        本地eth0网卡 53,113,135,137,139,445端口的udp请求全部拒绝
+	# iptables -A INPUT  -i eth0 -p udp --dport 1026 -j DROP
+        本地eth0网卡 1026端口的udp请求拒绝
+	# iptables -A INPUT  -p icmp -m limit --limit 10/second -j ACCEPT
+        仅允许每秒10次的ping报文
+</code></pre><h4 id="命令总结">命令总结</h4>
+<pre><code>iptables:
+    [-t table ] COMMAND [chain] rule-specification
+        -m matchname [per-match-options]
+        -t targetname [per-target-options]
+        [options]
+    匹配条件：
+    	基本匹配条件：-s，-d，-p，-m-，-扩展匹配条件：
+    		隐式扩展：
+    	 		-p tcp: --dport, --sport, -tcp-flags,--syn
+    	 		-p udp:--dport,--sport
+    	 		-p imcp:--icmp-type
+    		显式扩展：
+    	 		multiport: --sports, --dports
+    	 		iprange: --src-range,-dst-range
+    	 		time: -timestart, -timestop, --weekdays, -monthdays, --datestart,--datestop
+    	 		string: --algo {bm kmp), --string
+    	 		connlimit: --connlimit-upto, -connllimit-above
+    	 		limit: --limit, --limit-burst
+    	 		state: --state
+    	 			NEW, ESTABLISHED, RELATED, INVALID, UNTRACKED
+
+    Target:
+    	-j:
+    		ACCEPT/DROP
+    		REJECT: --reject-with
+    		LOG: --log-level, -log-prefix
+            自定义链
+            RETURN
+</code></pre><h4 id="iptables-forward链">iptables forward链</h4>
+<p><img src="/images/66/markdown-img-paste-20210702134647247.png" alt=""></p>
+<pre><code>iptalbes -A FORWARD -j REJECT
+# 因为forward 在入和出都是经过的链路
+iptables -I FORWARD -s 192.168.10.0/24 -p tcp --dport 80 -j ACCEPT
+iptables -I FORWARD -d 192.168.10.0/24 -p tcp --dport 80 -j ACCEPT
+
+#  默认设置允许出
+iptables -I FORWARD -m state --state ESTABLISHED -j ACCEPT
+# 允许网络 192.168.10.0/24 访问 (172.16.0.67) 80 端口
+iptables -I FORWARD -s 192.168.10.0/24 -p tcp --dport 80 -m state --state NEW -j ACCEPT
+# 允许 访问192.168.10.2的80
+iptables -I FORWARD -d 192.168.10.2 -p tcp --dprot 80 -m state --state NEW -j ACCEPT
+</code></pre><h4 id="iptables-nat">iptables NAT</h4>
+<pre><code>为了解决内网ip不暴露给外网
+同事解决了ipv4不足的问题
+
+# SNAT : 客户端出去的时候, 路由修改源ip地址(保护客户端的本地ip)
+# DNAT : 服务端被请求的时候, 服务端的路由修改报文的目的ip(保护服务端的内网ip)
+# PAT  : 端口地址转换(更多是修改目标端口)
+
+DNAT 是应该在iptables的哪个链路修改呢?
+比如 client =&gt; server -&gt; prerouting -&gt; router -&gt; input   ❌这就会路由本机请求了
+                                |            \_&gt; forward ❌这就是直接路由了, 只是修改mac地址
+                                 \_&gt; ✅ 在pretouring的时候修改就可以了
+
+SNAT 应该是在iptables  POSTROUTING的时候修改
+
+
+    SNAT
+        --to-sourece 转到静态ip
+        --random  实现负载均衡
+        --persistent
+    MASQUERADE (SNAT功能, 动态ip的场景)
+    DNAT
+        --to-destination [addr:port] 转到静态ip
+        --random  实现负载均衡
+        --persistent
+    REDIRECT
+        --to-ports port
+
+&gt; 但是现在我们都不使用iptables来实现了,有专门的lvs
+
+&gt; 注意: 虽然路由器上没有监听对应的端口来转发, 但是它在内核已经具有了转发功能, 不需要在用户态假装开启了某个端口作为转发
+
+</code></pre><p><img src="/images/66/markdown-img-paste-20210702134647247.png" alt=""></p>
+<pre><code># 例子 隐藏内部网络客户端ip -&gt; SNAT
+iptables -t nat -A POSTROUTING -s 192.168.10.0/24 -j SNAT --to-source 172.16.0.6
+</code></pre><p><img src="/images/66/markdown-img-paste-20210702143310515.png" alt=""></p>
+<pre><code># 例子 因此内部往来服务器ip -&gt; DNAT
+iptables -t nat -A PREROUTING -d 172.16.0.67 -p tcp --dport 80 -j DNAT --to-destination 192.168.10.2
+# 此时如果要拒绝, 由于dnat已经修改了目标地址,所以-d 不是172, 而是192
+iptables -A FORWARD -s 172.16.0.200 -p tcp --dport 80 -d 192.168.10.2 -j REJECT
+</code></pre><h3 id="io模型">IO模型</h3>
+<pre><code>I/O模型：
+    模型:
+	   阻塞型、 一般io阻塞是不可中断的状态
+       非阻塞型、
+       复用型、
+       信号驱动型、
+       异步
+
+    一次文件O请求，都会由两阶段组成：
+       第一步：等待数据，即数据从磁盘到内核内存(消耗时间)
+       第二步：复制数据，即数据内核内存到进程内存
+
+       注意:
+           阻塞型: 第一步和第二步 都是阻塞
+           非阻塞型: 第一步非阻塞,第二步是阻塞
+
+	同步/异步：
+		关注消息通知机制
+		消息通知：
+			同步：等待对方返回消息
+			异步：被调用者通过状态、通知或回调机制通知调用者被调用者的运行状态
+	阻塞/非阻塞：
+		关注调用者在等待结果返回之前所处的状态
+			阻塞： blocking，调用结果返回之前，调用者被挂起
+			非阻塞： nonblocking，调用结果返回之前，调用者不会被挂起
+
+	复用型io调用：
+        &gt; 在特殊的组件上阻塞,io复用器可以帮助某个用户进程监控io阻塞, 只不过不会阻塞用户进程, 阻塞的位置不同
+ 		select(): 最高并发1024
+ 		poll():
+
+        event-driven: (信号驱动型)
+            epoll(linux): libevent
+            kqueue(bsd)
+            /dev/poll(solaris)
+</code></pre><p><img src="/images/66/markdown-img-paste-2021070215362884.png" alt=""></p>
+<h3 id="缓存">缓存</h3>
+<pre><code>二八模型
+使用线上数据先对缓存进行压测, 等待缓存服务器warm up
+
+缓存命中率
+    页面命中率
+    字节命中率
+缓存与否
+    私有数据
+    公共数据
+缓存模式
+    代理式缓存:
+        未命中, 缓存服务器去找后端RS
+        http+缓存 (squid,varnish )
+        squid 和varnish的关系就像 apache 和nginx
+    旁挂式缓存:
+        未命中, 客户端自己去找后端RS
+        专用缓存(memorycache,redis )
+
+
+cache-response-directive =
+      &quot;public&quot;                               
+    | &quot;private&quot; [ &quot;=&quot; &lt;&quot;&gt; 1#field-name &lt;&quot;&gt; ]
+    | &quot;no-cache&quot; [ &quot;=&quot; &lt;&quot;&gt; 1#field-name &lt;&quot;&gt; ] ,可以缓存,但是响应给客户端之前需要请求服务端条件式验证缓存是否有效,
+    | &quot;no-store&quot;   , 不允许存储响应内容于缓存中                         
+    | &quot;no-transform&quot;                         
+    | &quot;must-revalidate&quot; 同 no-cache                     
+    | &quot;proxy-revalidate&quot;                    
+    | &quot;max-age&quot; &quot;=&quot; delta-seconds            
+    | &quot;s-maxage&quot; &quot;=&quot; delta-seconds           
+    | cache-extension            
+</code></pre><p><img src="/images/66/markdown-img-paste-20210709182934970.png" alt=""></p>
+<p><img src="/images/66/markdown-img-paste-20210709183834825.png" alt="">
+<img src="/images/66/markdown-img-paste-20210709183933301.png" alt="">
+<img src="/images/66/markdown-img-paste-20210709184000155.png" alt=""></p>
+<h4 id="varnish">varnish</h4>
+<pre><code>操作符:
+    ==,!=,~,&gt;,&gt;=,&lt;,&lt;=
+    逻辑 &amp;&amp;,||,!
+    赋值 =
+
+内建变量
+    req.*   : 客户端发来的请求报文
+        (be)req.http.*
+            req.http.User-Agent ~ &quot;chrome&quot;
+            req.http.Cookie
+            (be)req.http.Reffer
+            (be)req.http.HEADERS
+        (be)req.request : 请求方法
+        (be)req.url  请求url
+        (be)req.proto
+        (be)req.backend
+    resp.*   : varnish发送给client
+        (be)resp.http.HEADERS
+        (be)resp.status
+        (be)resp.backend.name backend主机名
+        (be)resp.ttl
+        (be)resp.proto
+    bereq.*  : 由varnish发给backend主机的httpd请求
+    beresp.* : 由backend响应给varnish的报文
+    obj.*    : 保存在缓存空间的缓存对象
+        ojb.hits
+        obj.ttl
+    server.*
+        server.ip
+        server.hostname
+    client.*
+        client.ip
+内建函数
+    regsub(str,regex,sub)
+    regsuball(str,regex,sub)
+    ban(boolean expression)
+    hash_data(input)
+client side :
+    vcl_deliver: 直接发送客户端
+    vcl_pipe: 没有匹配到的规则
+    vcl_pass:
+
+</code></pre><ul>
+<li>
+<p>内置变量是否可以修改
+<img src="/images/66/markdown-img-paste-20210712110939380.png" alt=""></p>
+</li>
+<li>
+<p>示例1 obj.hits 内建变量</p>
+</li>
+</ul>
+<pre><code>sub vcl_deliver {
+    if (obj.hits &gt; 0 ) {
+        set resp.http.X-cache = &quot;Hit via &quot;+server.ip;
+        set resp.http.X-hit-count =  &quot;Hit &quot;+obj.hits ;
+    } else {
+        set resp.http.X-cache = &quot;Miss from &quot;+server.ip;
+    }
+}
+</code></pre><ul>
+<li>示例2 是否区分大小写</li>
+</ul>
+<pre><code>sub vcl_recv {
+    # 禁用curl请求
+    if (req.http.User-Agent ~ &quot;(?i)curl&quot;) {
+		return(synth(403));
+	}
+    # login或者admin开头的不缓存
+    if (req.url ~ &quot;(?i)^/(login|admin)&quot; ) {
+    		return(pass);
+    	}
+}
+
+</code></pre><ul>
+<li>示例3 特定类型的资源,例如公开的图片等,取消其私有标识,并强行设定其可以由varnish缓存的时长</li>
+</ul>
+<pre><code>sub vcl_backend_response {
+    if (beresp.http.Cache-Control !~ &quot;(?i)s-maxage&quot;) {
+        if (bereq.url ~ &quot;(?i)\.(jpg|jpeg|png|gif|css|js)&quot;) {
+            unset beresp.http.Set-Cookie ;
+            set beresp.ttl = 3600s;
+        }
+    }
+}
+</code></pre><ul>
+<li>示例4 透传真实客户端ip</li>
+</ul>
+<pre><code>#
+sub vcl_recv {
+    # 是否是新连接
+    if (req.restarts == 0) {
+        if (req.http.X-Fowarded-For) {
+            set req.http.X-Forwarded-For = req.http.X-Forwarded-For + &quot;,&quot;+client.ip;
+        }else {
+            set req.http.X-Forwarded-For = client.ip;
+        }
+    }
+}
+</code></pre><ul>
+<li>示例5 清理缓存,修建方式</li>
+</ul>
+<blockquote>
+<p><a href="https://book.varnish-software.com/4.0/chapters/Cache_Invalidation.html">https://book.varnish-software.com/4.0/chapters/Cache_Invalidation.html</a></p>
+</blockquote>
+<ul>
+<li>purge配置</li>
+</ul>
+<pre><code>#定义允许清理缓存的IP
+acl purgeip {
+    &quot;127.0.0.1&quot;;
+    &quot;localhost&quot;;
+    &quot;10.10.53.197&quot;;
+}
+
+sub vcl_recv {
+     #匹配清理缓存的请求
+     if (req.method == &quot;PURGE&quot;) {
+        #如果发起请求的客户端IP 不是在acl purge里面定义的 就拒绝
+         if (client.ip ~ purgeip) {
+	            return (purge);  #清除缓存
+         }
+         return (synth(405, &quot;This IP is not allowed to send PURGE requests.&quot;));
+     }
+sub vcl_purge {
+     return (synth(200, &quot;Purged&quot;));
+}
+
+# 测试
+curl -X PURGE http://xxx
+</code></pre><ul>
+<li>banning配置</li>
+</ul>
+<pre><code>1. 命令行执行(临时批量操作)
+# 清理^/javascript的缓存
+ban req.url ~ ^/javascript
+# 请求 .js结尾的缓存
+ban req.url ~ .js$
+
+2. 写入到配置文件,使用ban() 函数
+sub vcl_recv {
+    if (req.method == &quot;BAN&quot;) {
+        ban(&quot;req.http.host == &quot; + req.http.host + &quot; &amp;&amp; req.url == &quot; + req.url);
+        # Throw a synthetic page so the request won't go to the backend.
+        return(synth(200, &quot;Ban added&quot;));
+    }
+}
+# 然后执行命令
+# 清理http://www.ngirl.xyz/javascript 的所有缓存
+ban req.http.host == &quot;www.ngirl.xyz&quot; &amp;&amp; req.url == &quot;/javascript&quot;
+
+</code></pre><ul>
+<li>配置多个后端服务器</li>
+</ul>
+<pre><code>backend imgsrv1 {
+    .host = &quot;192.168.0.11&quot;;
+    .port = &quot;80&quot;;
+}
+backend imgsrv2 {
+    .host = &quot;192.168.0.12&quot;;
+    .port = &quot;80&quot;;
+}
+backend appsrv1 {
+    .host = &quot;192.168.0.111&quot;;
+    .port = &quot;80&quot;;
+}
+backend appsrv2 {
+    .host = &quot;192.168.0.112&quot;;
+    .port = &quot;80&quot;;
+}
+sub vcl_init {
+    new imgsrvs = directors.random();
+    imgsrvs.add_backend(imgsrv1,10);
+    imgsrvs.add_backend(imgsrv2,10);
+
+    new appsrvs = directors.round_robin();
+    imgsrvs.add_backend(appsrv1);
+    imgsrvs.add_backend(appsrv2);
+
+    ...
+}
+
+sub vcl_recv {
+    if (req.url ~ &quot;(?i)\.(js|css)$&quot;) {
+        set req.backend_hint = staticksrv.backend();
+    }
+    if (req.url ~ &quot;(?i)\.(jpg|jpeg|png|gif)&quot;) {
+        set req.backend_hint = imgsrvs.backend();
+    } else {
+        set req.backend_hint = appsrvs.backend();
+    }
+}
+</code></pre><ul>
+<li>基于cookie的session sticky</li>
+</ul>
+<pre><code>sub vcl_init {
+    new h = directors.hash();
+    h.add_backend(one, 1);   // backend 'one' with weight '1'
+    h.add_backend(two, 1);   // backend 'two' with weight '1'
+}
+
+sub vcl_recv {
+    // pick a backend based on the cookie header of the client
+    set req.backend_hint = h.backend(req.http.cookie);
+}
+</code></pre><ul>
+<li>官方示例地址</li>
+</ul>
+<ul>
+<li><a href="https://book.varnish-software.com/4.0/chapters/Cache_Invalidation.html">配置缓存修减</a></li>
+<li><a href="https://book.varnish-software.com/4.0/chapters/Saving_a_Request.html">配置多个后端服务器</a></li>
+</ul>
+]]></content>
+		</item>
 		
 		<item>
 			<title>Docker部署jira8全家桶破解</title>

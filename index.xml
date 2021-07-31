@@ -7,7 +7,26 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 16 Jul 2021 14:07:27 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 31 Jul 2021 10:55:50 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>67 网络基础</title>
+      <link>https://www.ngirl.xyz/posts/67-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/</link>
+      <pubDate>Sat, 31 Jul 2021 10:55:50 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/posts/67-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/</guid>
+      <description>unix 历史 gnu linux 分支  https://futurist.se/gldt/ https://futurist.se/gldt/2012/02/20/gnulinux-distribution-timeline-12-2/  网桥(2层交换机) &amp;gt; 工作在2层, 使用mac地址 网桥: 桥接两个网络(其实就是两个口的交换机) 交换机: 桥接多个网络 网桥隔离冲突,减少冲突域, 但是不能减少广播 那么怎么解决广播问题呢? -&amp;gt; 逻辑地址:ip包 + 路由器 同一网络内部的通信 会先通过arp广播, 找到通信的ip的mac地址 那么怎么知道ip是本地网络, 还是其他网络: 网络地址 和本机地址 那怎么知道那部分是网络地址, 还是本机地址呢? - 子网掩码 子网掩码可以通过ip地址 取到 网络地址 socket ip:port =&amp;gt; 套接字 套接字就是tcp/ip协议中用于通信的两个端点, 有server socket, client socket TCP : Transmission Control Protocol UDP : User Datagram Protocol  identification(fragment id) : 如果报文过大(1500byte), 服务端只能接受500(需要切片发送), identification 就用来标记是同一个报文
+fragment offset : 就是三个切片的偏移量, 保证切片的顺序</description>
+    </item>
+    
+    <item>
+      <title>66 Linux计算机基础</title>
+      <link>https://www.ngirl.xyz/posts/66-linux%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/</link>
+      <pubDate>Sat, 31 Jul 2021 10:47:24 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/posts/66-linux%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/</guid>
+      <description>计算机基础 进程 process : 运行中的程序的一个副本 进程中断会保存现场,然后不停切换执行不同的进程 保存现场保存在哪呢? task struct : linux内核存储进程信息的固定格式 task list : 链表方式保存 task struct 进程创建 init 父子关系 进程 fork() ,clone() CoW 写时复制, 父进程和子进程一开始都是同样的内存空间,但是需要写数据(成家),就需要分配新内存空间(分家) 子进程必须由父进程关闭: 子进程执行完父进程任务后, 父进程就清理子进程的内存等 进程优先级(priority) 0-139: 1-99 : 实时优先级(数字越大优先级越高) 100-139 : 静态优先级(数字越小优先级越高) Nice值 : 调整nice值来调整优先级,只能变好,只能降低优先级 -20,19(对应100-139) 2*140个运行队列 : 相同优先级放入同样队列, 只需要扫描首部, 当分配的时间达到了,需要中断是,将运行另外一对队列 进程内存 page frame : 内核将物理内存拆分为page frame, 然后程序需要的时候通过page frame 累加在一起, 组成虚拟内存空间段, 提供进程使用 虚拟内存: 内核通过page frame 组成的线性地址空间 物理内存: 实际的物理内存大小, 会被拆分成page frame IPC : inter Process Communication 同一主机上: signal shm : shared memory semerphor : 不同主机上: rpc : remote procecure calling 远程过程调用 socket : https://blog.</description>
+    </item>
+    
     <item>
       <title>Go算法学习 链表 设计链表</title>
       <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E9%93%BE%E8%A1%A8-%E8%AE%BE%E8%AE%A1%E9%93%BE%E8%A1%A8/</link>
@@ -86,24 +105,6 @@
       <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</guid>
       <description>说明  纯暴力搜索, 通常可以抽象为N叉树, 树的深度就是递归的深度
   组合问题(不强调顺序) 1234 =&amp;gt; 12,13,14,23,24,34 切割问题(分割回文串) aab =&amp;gt; [a,a,b],[aa,b] 子集问题 排列问题(强调顺序) 1234 =&amp;gt; 12,13,14,21,23,24&amp;hellip; 棋盘问题(N皇后,数独)  回溯算法模板 func backtracking(参数) { if (终止条件) { 存放结果; return; } for (选择：本层集合中元素（树中节点孩子的数量就是集合的大小）) { 处理节点; backtracking(路径，选择列表); // 递归  回溯，撤销处理结果 } } 参考文献  力扣题目: 77.组合 力扣题目: 39.组合总和 力扣题目: 131.分割回文串 代码随想录视频 回溯算法-理论（对应力扣题目：77.组合） 代码随想录视频 回溯算法-组合（对应力扣题目：77.组合） 代码随想录视频 回溯算法-组合剪枝（对应力扣题目：77.组合） 代码随想录视频 回溯算法-分割回文串（对应力扣题目：131.分割回文串） 代码随想录图文 回溯算法：分割回文串  例一 77. 组合 //77. 组合 //给定两个整数 n 和 k，返回 1 .</description>
-    </item>
-    
-    <item>
-      <title>Go算法学习 辗转相除法</title>
-      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</link>
-      <pubDate>Fri, 16 Apr 2021 15:56:59 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Go算法学习 最小栈的实现</title>
-      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</link>
-      <pubDate>Fri, 16 Apr 2021 10:09:37 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</guid>
-      <description></description>
     </item>
     
   </channel>
