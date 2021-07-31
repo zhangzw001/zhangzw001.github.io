@@ -7,7 +7,7 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<meta name="theme-color" content="#494f5c">
 	<meta name="msapplication-TileColor" content="#494f5c">
-<meta itemprop="name" content="67 网络基础">
+<meta itemprop="name" content="网络基础">
 <meta itemprop="description" content="unix 历史 gnu linux 分支  https://futurist.se/gldt/ https://futurist.se/gldt/2012/02/20/gnulinux-distribution-timeline-12-2/  网桥(2层交换机) &gt; 工作在2层, 使用mac地址 网桥: 桥接两个网络(其实就是两个口的交换机) 交换机: 桥接多个网络 网桥隔离冲突,减少冲突域, 但是不能减少广播 那么怎么解决广播问题呢? -&gt; 逻辑地址:ip包 &#43; 路由器 同一网络内部的通信 会先通过arp广播, 找到通信的ip的mac地址 那么怎么知道ip是本地网络, 还是其他网络: 网络地址 和本机地址 那怎么知道那部分是网络地址, 还是本机地址呢? - 子网掩码 子网掩码可以通过ip地址 取到 网络地址 socket ip:port =&gt; 套接字 套接字就是tcp/ip协议中用于通信的两个端点, 有server socket, client socket TCP : Transmission Control Protocol UDP : User Datagram Protocol  identification(fragment id) : 如果报文过大(1500byte), 服务端只能接受500(需要切片发送), identification 就用来标记是同一个报文
 fragment offset : 就是三个切片的偏移量, 保证切片的顺序">
 <meta itemprop="datePublished" content="2021-07-31T10:55:50+08:00" />
@@ -17,7 +17,7 @@ fragment offset : 就是三个切片的偏移量, 保证切片的顺序">
 
 
 <meta itemprop="keywords" content="linux," />
-<meta property="og:title" content="67 网络基础" />
+<meta property="og:title" content="网络基础" />
 <meta property="og:description" content="unix 历史 gnu linux 分支  https://futurist.se/gldt/ https://futurist.se/gldt/2012/02/20/gnulinux-distribution-timeline-12-2/  网桥(2层交换机) &gt; 工作在2层, 使用mac地址 网桥: 桥接两个网络(其实就是两个口的交换机) 交换机: 桥接多个网络 网桥隔离冲突,减少冲突域, 但是不能减少广播 那么怎么解决广播问题呢? -&gt; 逻辑地址:ip包 &#43; 路由器 同一网络内部的通信 会先通过arp广播, 找到通信的ip的mac地址 那么怎么知道ip是本地网络, 还是其他网络: 网络地址 和本机地址 那怎么知道那部分是网络地址, 还是本机地址呢? - 子网掩码 子网掩码可以通过ip地址 取到 网络地址 socket ip:port =&gt; 套接字 套接字就是tcp/ip协议中用于通信的两个端点, 有server socket, client socket TCP : Transmission Control Protocol UDP : User Datagram Protocol  identification(fragment id) : 如果报文过大(1500byte), 服务端只能接受500(需要切片发送), identification 就用来标记是同一个报文
 fragment offset : 就是三个切片的偏移量, 保证切片的顺序" />
 <meta property="og:type" content="article" />
@@ -25,7 +25,7 @@ fragment offset : 就是三个切片的偏移量, 保证切片的顺序" />
 <meta property="article:published_time" content="2021-07-31T10:55:50+08:00" />
 <meta property="article:modified_time" content="2021-07-31T10:55:50+08:00" />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="67 网络基础"/>
+<meta name="twitter:title" content="网络基础"/>
 <meta name="twitter:description" content="unix 历史 gnu linux 分支  https://futurist.se/gldt/ https://futurist.se/gldt/2012/02/20/gnulinux-distribution-timeline-12-2/  网桥(2层交换机) &gt; 工作在2层, 使用mac地址 网桥: 桥接两个网络(其实就是两个口的交换机) 交换机: 桥接多个网络 网桥隔离冲突,减少冲突域, 但是不能减少广播 那么怎么解决广播问题呢? -&gt; 逻辑地址:ip包 &#43; 路由器 同一网络内部的通信 会先通过arp广播, 找到通信的ip的mac地址 那么怎么知道ip是本地网络, 还是其他网络: 网络地址 和本机地址 那怎么知道那部分是网络地址, 还是本机地址呢? - 子网掩码 子网掩码可以通过ip地址 取到 网络地址 socket ip:port =&gt; 套接字 套接字就是tcp/ip协议中用于通信的两个端点, 有server socket, client socket TCP : Transmission Control Protocol UDP : User Datagram Protocol  identification(fragment id) : 如果报文过大(1500byte), 服务端只能接受500(需要切片发送), identification 就用来标记是同一个报文
 fragment offset : 就是三个切片的偏移量, 保证切片的顺序"/>
 
@@ -36,7 +36,7 @@ fragment offset : 就是三个切片的偏移量, 保证切片的顺序"/>
 	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
 	<link rel="shortcut icon" href="/favicon.ico">
 
-	<title>67 网络基础</title>
+	<title>网络基础</title>
 	<link rel="stylesheet" href="https://www.ngirl.xyz/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
 	
 </head>
@@ -73,7 +73,7 @@ fragment offset : 就是三个切片的偏移量, 保证切片的顺序"/>
 		<article class="thin">
 			<header class="post-header">
 				<div class="post-meta"><span>Jul 31, 2021</span></div>
-				<h1>67 网络基础</h1>
+				<h1>网络基础</h1>
 			</header>
 			<div class="content">
 				<h3 id="unix-历史">unix 历史<a href="#unix-历史" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
@@ -332,7 +332,7 @@ dhcp : 动态主机配置协议
 		</aside>
 		<div class="post-nav thin">
 			<a class="prev-post" href="https://www.ngirl.xyz/posts/66-linux%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">
-				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>66 Linux计算机基础</span>
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Linux计算机基础</span>
 			</a>
 		</div>
 		<div id="comments" class="thin">

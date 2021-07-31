@@ -3,11 +3,6 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://www.ngirl.xyz/posts/67-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/</loc>
-    <lastmod>2021-07-31T10:55:50+08:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.ngirl.xyz/tags/linux/</loc>
     <lastmod>2021-07-31T10:55:50+08:00</lastmod>
   </url>
@@ -24,6 +19,11 @@
   
   <url>
     <loc>https://www.ngirl.xyz/</loc>
+    <lastmod>2021-07-31T10:55:50+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/posts/67-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/</loc>
     <lastmod>2021-07-31T10:55:50+08:00</lastmod>
   </url>
   
