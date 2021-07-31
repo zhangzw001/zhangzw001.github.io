@@ -1246,9 +1246,10 @@ http工作模式:
         2.2 forward: 路由转发到其他机器的请求
     3. 出route
     4. postrouting : 出路由之后
-</code></pre><p>-&gt; prerouting -&gt; route -&gt; input -&gt; output -&gt;  route -&gt;  postrouting -&gt;
-\     -&gt; forward  -&gt;     /
-<img src="/images/66/markdown-img-paste-20210629112733417.png" alt=""></p>
+
+-&gt; prerouting -&gt; route -&gt; input -&gt; output -&gt;  route -&gt;  postrouting -&gt;
+                    \     -&gt; forward  -&gt;     /
+</code></pre><p><img src="/images/66/markdown-img-paste-20210629112733417.png" alt=""></p>
 <h4 id="理论说明">理论说明</h4>
 <pre><code>Firewall:
     主机防火墙：
@@ -1793,8 +1794,8 @@ cache-response-directive =
     | cache-extension            
 </code></pre><p><img src="/images/66/markdown-img-paste-20210709182934970.png" alt=""></p>
 <p><img src="/images/66/markdown-img-paste-20210709183834825.png" alt="">
-<img src="/images/66/markdown-img-paste-20210709183933301.png" alt="">
-<img src="/images/66/markdown-img-paste-20210709184000155.png" alt=""></p>
+<img src="/images/66/markdown-img-paste-20210709184000155.png" alt="">
+<img src="/images/66/markdown-img-paste-20210709183933301.png" alt=""></p>
 <h4 id="varnish">varnish</h4>
 <pre><code>操作符:
     ==,!=,~,&gt;,&gt;=,&lt;,&lt;=
