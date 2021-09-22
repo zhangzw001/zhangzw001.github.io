@@ -3190,6 +3190,15 @@ kubectl create –f ca-update.yaml
 <pre><code>systemctl daemon-reload
 systemctl enable kubelet
 systemctl restart kubelet
+</code></pre><p>如果证书过期</p>
+<pre><code># 重新生成证书
+kubeadm alpha certs renew all
+# 查看有效期
+kubeadm alpha certs check-expiration
+# 覆盖配置文件
+mv $HOME/.kube/config $HOME/.kube/config.old
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+# 重启kube-apiserver,kube-controller,kube-scheduler,etcd
 </code></pre><center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 </center>
@@ -3207,8 +3216,6 @@ systemctl restart kubelet
 </code></pre><p>显然我的pod可以使用1个核cpu, 那这个平均cpu是等于啥呢?</p>
 <p>cpu-percent = 1000m/resources.request.cpu =&gt; 1000m/1m =100000%</p>
 <p>-_-!!!</p>
-<p>稍微解释下,为啥我要设置request.cpu=1m:
-比如单机4核k8s,我启动了1个pod,limit是4cpu,那么我request.cpu其实默认也是1, 所以集群就已经预留了4cpu, 此时如果在启动pod, 在配置limit的时候就无法成功启动pod,因为核心不够了,都给那什么玩意了&hellip;(当然这样改动也的确会出现过度分配)</p>
 <blockquote>
 <p>因此建议 修改requests.cpu=500m,  &ndash;cpu-percent可设范围: 0~200% ,或者低一些 250m -&gt; 0~400%</p>
 </blockquote>
@@ -3220,7 +3227,7 @@ request.cpu 必须设置, 这个是对比的对象</p>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 </center>
 <h3 id="7-k8s1162metrics-v035-deployment重启之后hpa就失效无法获取到数据">7 k8s1.16.2+metrics v0.3.5 deployment重启之后hpa就失效,无法获取到数据</h3>
-<pre><code>The HPA was unable to compute the replica count: unable to get metrics for resource cpu: no metrics returned from resource metrics API 
+<pre><code>The HPA was unable to compute the replica count: unable to get metrics for resource cpu: no metrics returned from resource metrics API
 </code></pre><center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 </center>
@@ -3272,7 +3279,31 @@ broadcast 10.244.0.0 dev cni0 src 10.244.0.1 uid <span class="m">0</span>
 <li>docker在 1.13 版本之后，将系统iptables 中 FORWARD 链的默认策略设置为 DROP: <a href="https://github.com/moby/moby/issues/14041">https://github.com/moby/moby/issues/14041</a></li>
 <li>docker&amp;k8s填坑记 nodeport 无法访问: <a href="https://www.cnblogs.com/tylerzhou/p/10975062.html">https://www.cnblogs.com/tylerzhou/p/10975062.html</a></li>
 </ul>
-]]></content>
+<h3 id="10-部署服务器查看describe信息如下">10 部署服务器查看describe信息如下:</h3>
+<pre><code>Mounting command: systemd-run
+Mounting arguments: --description=Kubernetes transient mount for /var/lib/kubelet/pods/369daaef-1e90-446b-92ce-3d562f94b429/volumes/kubernetes.io~nfs/pvc-f462c606-5796-4c48-8928-7822f3fa0605 --scope -- mount -t nfs 172.16.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 /var/lib/kubelet/pods/369daaef-1e90-446b-92ce-3d562f94b429/volumes/kubernetes.io~nfs/pvc-f462c606-5796-4c48-8928-7822f3fa0605
+Output: Running scope as unit run-14829.scope.
+mount: 文件系统类型错误、选项错误、172.16.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 上有坏超级块、
+       缺少代码页或助手程序，或其他错误
+       (对某些文件系统(如 nfs、cifs) 您可能需要
+       一款 /sbin/mount.&lt;类型&gt; 助手程序)
+</code></pre><p>可能是客户端无法识别nfs格式</p>
+<pre><code># 做个测试
+mkdir /tmp/abc
+mount -t nfs 172.16.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 /tmp/abc
+
+
+# 果然报错
+mount: wrong fs type, bad option, bad superblock on 172.16.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-plugins,
+       missing codepage or helper program, or other error
+       (for several filesystems (e.g. nfs, cifs) you might
+       need a /sbin/mount.&lt;type&gt; helper program)
+
+       In some cases useful info is found in syslog - try
+       dmesg | tail or so.
+</code></pre><p>所以安装了nfs即可</p>
+<pre><code>yum install nfs
+</code></pre>]]></content>
 		</item>
 		
 		<item>
