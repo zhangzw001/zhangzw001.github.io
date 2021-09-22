@@ -9,6 +9,30 @@
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
     <lastBuildDate>Fri, 16 Jul 2021 14:07:27 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>linux遇到一些问题统计</title>
+      <link>https://www.ngirl.xyz/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
+      <pubDate>Tue, 08 Dec 2020 17:42:54 +0000</pubDate>
+      
+      <guid>https://www.ngirl.xyz/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
+      <description>记录一些Linux,nginx或其他服务一些问题
+  分布式问题: 分布式算法 Basic paxos 算法 1. 获取一个Proposal ID n，为了保证Proposal ID唯一，可采用时间戳+Server ID生成； 2. Proposer向所有Acceptors广播Prepare(n)请求； 3. Acceptor比较n和minProposal，如果n&amp;gt;minProposal，minProposal=n，并且将 acceptedProposal 和 acceptedValue 返回； 4. Proposer接收到过半数回复后，如果发现有acceptedValue返回，将所有回复中acceptedProposal最大的acceptedValue作为本次提案的value，否则可以任意决定本次提案的value； 5. 到这里可以进入第二阶段，广播Accept (n,value) 到所有节点； 6. Acceptor比较n和minProposal，如果n&amp;gt;=minProposal，则acceptedProposal=minProposal=n，acceptedValue=value，本地持久化后，返回；否则，返回minProposal。 7. 提议者接收到过半数请求后，如果发现有返回值result &amp;gt;n，表示有更新的提议，跳转到1；否则value达成一致。 Multi-Paxos 算法  为了解决实际应用中连续多值传输的高效性,改进了Basix Paxos为Multi-Paxos:
+ 1. 针对每一个要确定的值，运行一次Paxos算法实例（Instance），形成决议。每一个Paxos实例使用唯一的Instance ID标识。 2. 在所有Proposers中选举一个Leader，由Leader唯一地提交Proposal给Acceptors进行表决。这样没有Proposer竞争，解决了活锁问题。在系统中仅有一个Leader进行Value提交的情况下，Prepare阶段就可以跳过，从而将两阶段变为一阶段，提高效率。 raft  为了更简便理解和实现,改进了Multi-Paxos 为raft
+ 1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的) 2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选. 而multi-paxos 是随意的 所以raft 可以看成是简化版本的multi paxos(这里multi-paxos 因为允许并发的写log, 因此不存在一个最新, 最全的日志节点, 因此只能这么做.</description>
+    </item>
+    
+    <item>
+      <title>k8s遇到的一些问题统计总结</title>
+      <link>https://www.ngirl.xyz/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
+      <pubDate>Tue, 10 Nov 2020 14:06:41 +0000</pubDate>
+      
+      <guid>https://www.ngirl.xyz/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
+      <description>不定时更新,文章可能比较散乱,&amp;gt;_&amp;lt;
+  1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
+  deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
+ # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从`hub.</description>
+    </item>
+    
+    <item>
       <title>Go算法学习 链表 设计链表</title>
       <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E9%93%BE%E8%A1%A8-%E8%AE%BE%E8%AE%A1%E9%93%BE%E8%A1%A8/</link>
       <pubDate>Fri, 16 Jul 2021 14:07:27 +0800</pubDate>
@@ -86,24 +110,6 @@
       <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</guid>
       <description>说明  纯暴力搜索, 通常可以抽象为N叉树, 树的深度就是递归的深度
   组合问题(不强调顺序) 1234 =&amp;gt; 12,13,14,23,24,34 切割问题(分割回文串) aab =&amp;gt; [a,a,b],[aa,b] 子集问题 排列问题(强调顺序) 1234 =&amp;gt; 12,13,14,21,23,24&amp;hellip; 棋盘问题(N皇后,数独)  回溯算法模板 func backtracking(参数) { if (终止条件) { 存放结果; return; } for (选择：本层集合中元素（树中节点孩子的数量就是集合的大小）) { 处理节点; backtracking(路径，选择列表); // 递归  回溯，撤销处理结果 } } 参考文献  力扣题目: 77.组合 力扣题目: 39.组合总和 力扣题目: 131.分割回文串 代码随想录视频 回溯算法-理论（对应力扣题目：77.组合） 代码随想录视频 回溯算法-组合（对应力扣题目：77.组合） 代码随想录视频 回溯算法-组合剪枝（对应力扣题目：77.组合） 代码随想录视频 回溯算法-分割回文串（对应力扣题目：131.分割回文串） 代码随想录图文 回溯算法：分割回文串  例一 77. 组合 //77. 组合 //给定两个整数 n 和 k，返回 1 .</description>
-    </item>
-    
-    <item>
-      <title>Go算法学习 辗转相除法</title>
-      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</link>
-      <pubDate>Fri, 16 Apr 2021 15:56:59 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Go算法学习 最小栈的实现</title>
-      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</link>
-      <pubDate>Fri, 16 Apr 2021 10:09:37 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</guid>
-      <description></description>
     </item>
     
   </channel>

@@ -10,6 +10,765 @@
 		<atom:link href="https://www.ngirl.xyz/posts/index.xml" rel="self" type="application/rss+xml" />
 		
 		<item>
+			<title>linux遇到一些问题统计</title>
+			<link>https://www.ngirl.xyz/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
+			<pubDate>Tue, 08 Dec 2020 17:42:54 +0000</pubDate>
+			
+			<guid>https://www.ngirl.xyz/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
+			<description>记录一些Linux,nginx或其他服务一些问题
+  分布式问题: 分布式算法 Basic paxos 算法 1. 获取一个Proposal ID n，为了保证Proposal ID唯一，可采用时间戳+Server ID生成； 2. Proposer向所有Acceptors广播Prepare(n)请求； 3. Acceptor比较n和minProposal，如果n&amp;gt;minProposal，minProposal=n，并且将 acceptedProposal 和 acceptedValue 返回； 4. Proposer接收到过半数回复后，如果发现有acceptedValue返回，将所有回复中acceptedProposal最大的acceptedValue作为本次提案的value，否则可以任意决定本次提案的value； 5. 到这里可以进入第二阶段，广播Accept (n,value) 到所有节点； 6. Acceptor比较n和minProposal，如果n&amp;gt;=minProposal，则acceptedProposal=minProposal=n，acceptedValue=value，本地持久化后，返回；否则，返回minProposal。 7. 提议者接收到过半数请求后，如果发现有返回值result &amp;gt;n，表示有更新的提议，跳转到1；否则value达成一致。 Multi-Paxos 算法  为了解决实际应用中连续多值传输的高效性,改进了Basix Paxos为Multi-Paxos:
+ 1. 针对每一个要确定的值，运行一次Paxos算法实例（Instance），形成决议。每一个Paxos实例使用唯一的Instance ID标识。 2. 在所有Proposers中选举一个Leader，由Leader唯一地提交Proposal给Acceptors进行表决。这样没有Proposer竞争，解决了活锁问题。在系统中仅有一个Leader进行Value提交的情况下，Prepare阶段就可以跳过，从而将两阶段变为一阶段，提高效率。 raft  为了更简便理解和实现,改进了Multi-Paxos 为raft
+ 1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的) 2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选. 而multi-paxos 是随意的 所以raft 可以看成是简化版本的multi paxos(这里multi-paxos 因为允许并发的写log, 因此不存在一个最新, 最全的日志节点, 因此只能这么做.</description>
+			<content type="html"><![CDATA[<p>记录一些Linux,nginx或其他服务一些问题</p>
+<!-- more -->
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="分布式问题-分布式算法">分布式问题: 分布式算法</h3>
+<h4 id="basic-paxos-算法">Basic paxos 算法</h4>
+<pre><code>1. 获取一个Proposal ID n，为了保证Proposal ID唯一，可采用时间戳+Server ID生成；
+2. Proposer向所有Acceptors广播Prepare(n)请求；
+3. Acceptor比较n和minProposal，如果n&gt;minProposal，minProposal=n，并且将 acceptedProposal 和 acceptedValue 返回；
+4. Proposer接收到过半数回复后，如果发现有acceptedValue返回，将所有回复中acceptedProposal最大的acceptedValue作为本次提案的value，否则可以任意决定本次提案的value；
+5. 到这里可以进入第二阶段，广播Accept (n,value) 到所有节点；
+6. Acceptor比较n和minProposal，如果n&gt;=minProposal，则acceptedProposal=minProposal=n，acceptedValue=value，本地持久化后，返回；否则，返回minProposal。
+7. 提议者接收到过半数请求后，如果发现有返回值result &gt;n，表示有更新的提议，跳转到1；否则value达成一致。
+</code></pre><h4 id="multi-paxos-算法">Multi-Paxos 算法</h4>
+<blockquote>
+<p>为了解决实际应用中连续多值传输的高效性,改进了Basix Paxos为Multi-Paxos:</p>
+</blockquote>
+<pre><code>1. 针对每一个要确定的值，运行一次Paxos算法实例（Instance），形成决议。每一个Paxos实例使用唯一的Instance ID标识。
+2. 在所有Proposers中选举一个Leader，由Leader唯一地提交Proposal给Acceptors进行表决。这样没有Proposer竞争，解决了活锁问题。在系统中仅有一个Leader进行Value提交的情况下，Prepare阶段就可以跳过，从而将两阶段变为一阶段，提高效率。
+
+</code></pre><h4 id="raft">raft</h4>
+<blockquote>
+<p>为了更简便理解和实现,改进了Multi-Paxos 为raft</p>
+</blockquote>
+<pre><code>1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的)
+2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选. 而multi-paxos 是随意的 所以raft 可以看成是简化版本的multi paxos(这里multi-paxos 因为允许并发的写log, 因此不存在一个最新, 最全的日志节点, 因此只能这么做. 这样带来的麻烦就是选主以后, 需要将主里面没有的log 给补全, 并执行commit 过程)
+
+</code></pre><h3 id="分布式问题-单线程和多线程问题">分布式问题: 单线程和多线程问题</h3>
+<h4 id="redis6多线程说明">redis6多线程说明</h4>
+<ul>
+<li>多线程方式</li>
+</ul>
+<pre><code>1. memcached的多线程方式是master-work, work是独立完成所有操作包括执行操作
+2. redis的多线程方式也是master-work,但是仅仅是io和内存方面的慢操作是通过work进程执行, work进程和master间通过管道通信,最后执行操作都是在master进程执行
+
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="tcp问题-什么是tcp连接队列">Tcp问题: 什么是tcp连接队列</h3>
+<ul>
+<li><a href="https://blog.csdn.net/luoyu_/article/details/105361742">TCP SYN队列与Accept队列详解</a></li>
+<li><a href="https://www.cnxct.com/something-about-phpfpm-s-backlog/">TCP SOCKET中backlog参数的用途是什么?</a></li>
+<li><a href="https://blog.csdn.net/chen8238065/article/details/80457150">tcp 相关总结</a></li>
+<li><a href="https://blog.csdn.net/weixin_34088838/article/details/92562556?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param">深入理解Linux TCP backlog</a></li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">1.	net.ipv4.tcp_max_syn_backlog:		半连接队列,保存SYN_RECV状态的连接<span class="o">(</span>tcp握手第一次完成后, server端会将连接添加到sync queue队列 <span class="o">)</span>
+2.	min<span class="o">(</span>net.core.somaxconn,backlog<span class="o">)</span>: 	全连接队列,保存ESTABLISHED状态的连接<span class="o">(</span>tcp握手第三次完成周, server端会将连接添加到accept queue队列<span class="o">)</span>
+
+通过netstat -s <span class="p">|</span> egrep <span class="s2">&#34;listen|LISTEN&#34;</span> 查看 是否是半连接队列满了
+<span class="m">667399</span> <span class="nb">times</span> the listen queue of a socket overflowed   <span class="o">(</span>? 这个和TCPBacklogDrop 哪个是全连接队列??<span class="o">)</span>
+<span class="m">667399</span> SYNs to LISTEN sockets ignored
+
+通过netstat -s<span class="p">|</span>grep TCPBacklogDrop 查看 是否是全连接队列满了
+    TCPBacklogDrop: <span class="m">1862</span>
+
+以上也可以用 nstat -a -z 命令
+
+另外如果全连接满了处理方式是 直接丢弃, 如果修改为1 则表示发送reset包给客户端
+cat cat /proc/sys/net/ipv4/tcp_abort_on_overflow
+<span class="m">0</span>
+
+通过ss -l可以查到到nginx的默认backlog 是511
+ss -l<span class="p">|</span>grep http
+
+通过修改nginx配置增加该值,reload nginx<span class="o">(</span>前提是已经修改了net.core.somaxconn<span class="o">)</span>
+ listen  <span class="m">80</span> <span class="nv">backlog</span><span class="o">=</span>4096<span class="p">;</span>
+ listen <span class="m">443</span> ssl <span class="nv">backlog</span><span class="o">=</span>4096<span class="p">;</span>
+
+</code></pre></div><p><img src="/images/tcp3.png" alt="三次握手图">
+<img src="/images/tcp-queue.png" alt="tcp队列图">
+<img src="/images/tcp-queue2.png" alt="tcp队列图2"></p>
+<blockquote>
+<p>结论</p>
+</blockquote>
+<pre><code># 这里已php -&gt; mysql 为例:
+php 发syn 给tcp:3306  -&gt; mysql 先存入syn queue队列(开启了syncookie,所以不会满) -&gt; 然后回复php syn+ack -&gt;  php 回复ack之后 进入 established 状态  握手完成  -&gt; 本次tcp连接请求存入 accpet queue队列(也就是listen backlog)  -&gt; 如果队列满了直接忽略, php 超时重传, 如果队列没满 就accept() 成功连接到mysql服务 (max-connections - 1)
+
+由于该数值或高会导致fpm处理不过来,出现504 gateway timeout(110: Connection timed out), 过低会导致高并发无法建立tcp连接(111: Connection refused)
+因此一般设置该值等于QPS
+</code></pre><h3 id="tcp问题-syn-flood-攻击">Tcp问题: syn flood 攻击</h3>
+<ul>
+<li><a href="https://www.cnblogs.com/zengkefu/p/5606696.html">https://www.cnblogs.com/zengkefu/p/5606696.html</a></li>
+</ul>
+<pre><code>&gt; Sep  9 12:04:01 db kernel: possible SYN flooding on port 3306. Sending cookies.
+
+这种程序可以通过不存在的ip去发送tcp请求到server, server就会回复ack, 但是由于服务器不存在, 所以就一直重试, 导致占用tcp连接, 如果正常请求进来,则由于syn queue队列满了, 就忽略了正常的tcp请求, 无法提供服务
+
+</code></pre><h3 id="linux问题-tcpdump抓包tcp-ack为1">linux问题: tcpdump抓包tcp ack为1</h3>
+<ul>
+<li>执行命令监听: tcpdump -n port 80 (想要详细信息加 -vv)</li>
+</ul>
+<blockquote>
+<p>客户端 telnet x.x.x.x 80</p>
+</blockquote>
+<p>日志如下:</p>
+<pre><code>tcpdump  -n port 80
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes
+11:16:40.689157 IP 192.168.54.141.53444 &gt; 192.168.53.106.http: Flags [SEW], seq 1306124348, win 65535, options [mss 1460,nop,wscale 5,nop,nop,TS val 458678777 ecr 0,sackOK,eol], length 0
+11:16:40.689724 IP 192.168.53.106.http &gt; 192.168.54.141.53444: Flags [S.E], seq 1553518959, ack 1306124349, win 64308, options [mss 1410,sackOK,TS val 4208119240 ecr 458678777,nop,wscale 7], length 0
+11:16:40.690320 IP 192.168.54.141.53444 &gt; 192.168.53.106.http: Flags [.], ack 1, win 4106, options [nop,nop,TS val 458678778 ecr 4208119240], length 0
+</code></pre><p>这里第一和第二次握手都没有问题, 第三次 ack 1, 并非是seq+1</p>
+<p>这里提一下ACK, ACK 是确认值, ack 是确认编号, 第一次握手ACK=0,在第二次握手开始ACK=1, 而ack是=seq+1(收到的随机数+1)</p>
+<p>那么这里ack 1 是啥呢?  &hellip; 应该就是默认tcpdump 显示成相对值了, 通过-S 参数会显示绝对值</p>
+<ul>
+<li>执行命令监听: tcpdump -S  -n port 80</li>
+</ul>
+<pre><code>tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes
+11:16:54.806628 IP 192.168.54.141.53516 &gt; 192.168.53.106.http: Flags [S], seq 316359286, win 65535, options [mss 1460,nop,wscale 5,nop,nop,TS val 458692791 ecr 0,sackOK,eol], length 0
+11:16:54.806861 IP 192.168.53.106.http &gt; 192.168.54.141.53516: Flags [S.], seq 1113466641, ack 316359287, win 64308, options [mss 1410,sackOK,TS val 4208133357 ecr 458692791,nop,wscale 7], length 0
+11:16:54.807576 IP 192.168.54.141.53516 &gt; 192.168.53.106.http: Flags [.], ack 1113466642, win 4106, options [nop,nop,TS val 458692792 ecr 4208133357], length 0
+</code></pre><p>三次握手图
+<img src="/images/tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%9B%BE.png" alt="三次握手图"></p>
+<p>四次挥手图
+<img src="/images/tcp%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B%E5%9B%BE.png" alt="四次挥手图"></p>
+<h3 id="linux问题-一次dnsmasq迁移问题">Linux问题: 一次dnsmasq迁移问题</h3>
+<blockquote>
+<p>网卡配置如下</p>
+</blockquote>
+<pre><code>DEVICE=em1
+HWADDR=x
+TYPE=Ethernet
+UUID=x
+ONBOOT=yes
+NM_CONTROLLED=yes
+BOOTPROTO=static
+IPADDR0=172.16.76.100
+PREFIX0=24
+GATEWAY=172.16.76.1
+DNS1=172.16.76.100
+DNS2=172.16.76.101
+</code></pre><blockquote>
+<p>这里有个大问题, 由于本身就是dns服务器, 但配置的DNS1居然是本机, 这导致service network restart 的时候会去修改 /etc/resolv.conf 的配置为 DNS1 和DNS2的ip, 此时dns服务器将无法解析外网域名</p>
+</blockquote>
+<blockquote>
+<p>因此正确的配置是</p>
+</blockquote>
+<pre><code>DNS1=119.29.29.29
+DNS2=223.5.5.5
+DNS3=114.114.114.114
+</code></pre><hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="linux问题-升级内核">Linux问题: 升级内核</h3>
+<pre><code>rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+
+# 查看可升级的内核
+yum --disablerepo=&quot;*&quot; --enablerepo=&quot;elrepo-kernel&quot; list available
+yum --enablerepo=elrepo-kernel install kernel-ml
+
+# 查看已经安装的内核
+cat /boot/grub2/grub.cfg |grep menuentry
+
+# 设置5.3的为默认
+grub2-set-default 'CentOS Linux (5.3.13-1.el7.elrepo.x86_64) 7 (Core)'
+
+# grub2-editenv list
+saved_entry=CentOS Linux (5.3.13-1.el7.elrepo.x86_64) 7 (Core)
+</code></pre><hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="linux问题-禁ping">linux问题: 禁ping</h3>
+<pre><code># 一次性修改
+echo 1 &gt; /proc/sys/net/ipv4/icmp_echo_ignore_all
+
+# 开机自动修改
+echo 1 &gt; /proc/sys/net/ipv4/icmp_echo_ignore_all
+
+# 永久禁用,加入到/etc/sysctl.conf
+net.ipv4.icmp_echo_ignore_all=1
+</code></pre><hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="linux问题-文件锁问题">linux问题: 文件锁问题</h3>
+<pre><code>问题描述: php slowlog 出现session_start() 慢
+问题原因: 我们这边有A 和B 两个二级域名,A 会请求 B, 并且由于测试环境在同一台服务器,公用一个php,所以在发生调用的时候同时写了session,而php的sessions配置是默认的file方式, 这就造成了锁的问题
+问题解决:
+1. 修改代码部分
+2. php的session配置改成redis
+    session.save_handler = redis
+    session.save_path = &quot;tcp://x.x.x.x:xxxx&quot;
+</code></pre><hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="linux问题-内存释放问题">linux问题: 内存释放问题</h3>
+<pre><code>问题描述: 开发这边写了个统计脚本, 占用49G内存, 从日志发现脚本已经全部执行完成, 但是php脚本依然存在
+问题原因: 通过 strace -p pid 观察进程, 发现是持续性的做内存释放操作 munmap(0x7f6db77ad000, 266240)          = 0
+持续执行munmap函数是因为一直在释放内存(毕竟49G), 结果 =0 说明内存释放执行函数是返回正常了
+问题解决:
+1. 修改代码降低内存
+2. 等待一段时间内存会释放完成(测试80分钟释放完毕)
+</code></pre><hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="nginx问题-各种退出信号使用">nginx问题: 各种退出信号使用</h3>
+<pre><code>1. hup(kill -1):	重新读取配置并是服务配置生效(nginx -s reload)
+2. quit(kill -3): 	优雅关闭进程
+3. kill(kill -9):	强制关闭(必杀)
+4. usr1(kill -10):	重新打开服务(通常用nginx日志分割)
+5. usr2(kill -12):	平滑升级到新版本的程序
+6. term(kill -15):	强制关闭(先清理善后)
+</code></pre><h3 id="nginx问题-单域名通过cookie跳转不同后端">nginx问题: 单域名通过cookie跳转不同后端</h3>
+<ul>
+<li>
+<ol>
+<li>浏览器访问 supervisor.xxxx.com?to=1 , 然后在访问 supervisor.xxxx.com 会请求到common队列</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>浏览器访问 supervisor.xxxx.com?to=2 , 然后在访问 supervisor.xxxx.com 会请求到test队列</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>curl请求方式:
+<code>curl &quot;http://supervisor.xxxx.com/index.html?action=restartall&quot; --cookie &quot;bqxserver=test&quot;</code></li>
+</ol>
+</li>
+</ul>
+<pre><code>server {
+        listen 80 ;
+        charset utf-8;
+        server_name supervisor.xxxx.com;
+
+        location / {
+           if ($arg_to = &quot;1&quot;){
+                 add_header Set-Cookie &quot;bqxserver=common&quot;;
+                 add_header Content-Type &quot;text/plain;charset=utf-8&quot;;
+                 return 200 &quot;当前的数据服务器位置:common supervisor&quot;;
+                }
+           if ($arg_to = &quot;2&quot;){
+                 add_header Set-Cookie &quot;bqxserver=test&quot;;
+                 add_header Content-Type &quot;text/plain;charset=utf-8&quot;;
+                 return 200 &quot;当前的数据服务器位置:test supervisor&quot;;
+                }
+            set $proxy_name '127.0.0.1:32019';
+            if ($cookie_bqxserver = &quot;test&quot;){
+                set $proxy_name  '127.0.0.1:32020';
+            }
+            if ($cookie_bqxserver = &quot;common&quot;){
+                set $proxy_name  '127.0.0.1:32019';
+            }
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header HOST $http_host;
+                proxy_set_header X-NginX-Proxy true;
+                proxy_set_header X-Forwarded-Host $host;
+                proxy_set_header X-Forwarded-Server $host;
+                proxy_pass http://$proxy_name;
+  }
+}
+</code></pre><h3 id="nginx问题-提示tmp无权限问题">nginx问题: 提示tmp无权限问题</h3>
+<pre><code>2020/12/08 17:14:52 [crit] 111455#0: *1842 open() &quot;/var/lib/nginx/tmp/client_body/0000001489&quot; failed (13: Permission denied), client: 10.10.154.36, server: xxx.com, request: &quot;POST /?xxx HTTP/1.0&quot;, host: &quot;xxx.com&quot;, referrer: &quot;http://&quot;
+</code></pre><p>首先由于该环境nginx配置修改了用户由 nginx用户 变成nobody用户的原因, 导致改目录无权限写入&hellip;</p>
+<p>知道问题了, 那为啥会写到这个目录呢?需要看下面两个参数</p>
+<pre><code>client_max_body_size	1m;
+client_body_buffer_size 16k;
+</code></pre><p><code>client_max_body_size</code> 默认 1M，表示 客户端请求服务器最大允许大小，在<code>Content-Length</code>请求头中指定。如果请求的正文数据大于<code>client_max_body_size</code>，HTTP协议会报错 <code>413 Request Entity Too Large</code>。</p>
+<p>那这里为啥会写tmp目录呢?</p>
+<p>看下<code>client_body_buffer_size</code>, 默认 16k , 小于这个值会直接写入内存,  但如果 <code>client_body_buffer_size</code> 请求数据 &lt; <code>client_max_body_size</code> , 那么此时就会写临时目录,默认<code>/var/lib/nginx/tmp/client_body</code></p>
+<h3 id="nginx问题-http_x_real_ip问题">nginx问题: http_x_real_ip问题</h3>
+<p>nginx的反向代理服务器一般都需要加上 <code>proxy_set_header X-Real-IP $remote_addr;</code>, 为啥需要加上这个呢?</p>
+<p>比如我有如下架构代理:
+<a href="http://www.test.com">www.test.com</a>(clientip: 1.1.1.1) -&gt; proxy1(2.1.1.1) -&gt; proxy2(2.1.1.2) -&gt; real server(2.1.1.3)</p>
+<p>因为不加的话<code>$http_x_real_ip</code> 会一直是空, 并且在反向代理服务器后端的real server 同样是空
+这一点和<code>$http_x_forwarded_for</code> 不同,比如在<code>proxy1</code>上为空, 但是在<code>proxy2</code>之后的服务器上不为空</p>
+<p>加了之后就是真实客户端ip了吗?</p>
+<ul>
+<li>proxy1服务器: (2.1.1.1)</li>
+</ul>
+<pre><code>1. $remote_addr = 1.1.1.1
+2. $http_x_real_ip = 空
+3. $http_x_forwarded_for = 空
+</code></pre><ul>
+<li>proxy2服务器: (2.1.1.2)</li>
+</ul>
+<pre><code>1. $remote_addr = 2.1.1.1
+2. $http_x_real_ip = 1.1.1.1
+3. $http_x_forwarded_for = 1.1.1.1
+</code></pre><ul>
+<li>real server服务器: (2.1.1.3)</li>
+</ul>
+<pre><code>1. $remote_addr = 2.1.1.2
+2. $http_x_real_ip = 2.1.1.1
+3. $http_x_forwarded_for = 1.1.1.1,2.1.1.1
+</code></pre><p>一般来说 当有多个代理时候，可以在第一个反向代理上配置<code>proxy_set_header X-Real-IP $remote_addr</code> 获取真实客户端IP</p>
+<p>如此看来假如整个请求,反向代理只有一层, 没有proxy2, real server获取<code>$http_x_real_ip</code> 和<code>$http_x_forwarded_for</code>是一样的, 就是真实客户端ip</p>
+<p>但显然即便我们反向代理只有一层,  在proxy1之前,互联网中可能还有反向代理, 例如经过cdn之后, 例如他人代理 都将隐藏真实ip.</p>
+<h3 id="nginx问题-nginx-if条件的实现">nginx问题: nginx if条件&amp;&amp;的实现</h3>
+<ul>
+<li>1 允许所有人访问 a.php|b.php|c.php|d.php|e.php</li>
+<li>2 仅允许127.0.0.1|172.16.0.2 ip可以访问 aa.php|bb.php</li>
+</ul>
+<pre><code>set $flag &quot;allow&quot;;
+# 以下php 所有人可以访问
+if ( $fastcgi_script_name ~ (a.php|b.php|c.php|d.php|e.php) ) {
+        set $flag &quot;allow_php_ip&quot;;
+}
+
+# 以下php 仅固定ip可以访问
+if ($fastcgi_script_name ~ (aa.php|bb.php)) {
+        set $flag &quot;${flag}_php&quot;;
+}
+
+if ( $proxy_add_x_forwarded_for ~ (127.0.0.1|172.16.0.2)) {
+        set $flag &quot;${flag}_ip&quot;;
+}
+# 写包含是 $flag 可能为 &quot;allow_php_ip_ip&quot; (在允许的ip服务器(127.0.0.1)上访问 /a.php)
+if ( $flag !~ &quot;allow_php_ip&quot; ) {
+        return 403;
+}
+</code></pre><hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="nginx问题-静态文件分离">nginx问题: 静态文件分离</h3>
+<p>对于一般的nginx+php的方式, 我们php采用nobody用户,而代码/lumen采用web-www用户, 这样的好处是页面访问到/lumen时是nobody用户, 是无法修改代码的</p>
+<p>可能我们需求是上用户upload图片等, 这时候就可能被传上某个a.php, 这就有可能被代码注入(一般来说图片是放cdn,配置单独域名回源的,这里是直接存在项目目录)</p>
+<p>所以为了防止代码注入,我们需要限制upload目录的访问权限</p>
+<pre><code># nginx配置如下
+        location ~ /images/.*\.(gif|jpg|jpeg|png)$ {
+            root /lumen/storage/uploads/;
+        }
+
+</code></pre><p>这样我们图片传到 /lumen/storage/uploads/images/ 目录, 访问是 <a href="http://www.xxx.com/images/x.png">www.xxx.com/images/x.png</a> 来访问 且不允许其他类型文件访问.</p>
+<hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="nginx问题-root-和alias">nginx问题: root 和alias</h3>
+<p>在配置文件映射的时候，如果使用了正则表达式，那么可能会出现无法访问文件，nginx可能会将所有的
+文件都映射成为文件夹，导致文件映射失败的情况出现；</p>
+<ul>
+<li>root的例子</li>
+</ul>
+<pre><code>location /a/ {
+	root /lumen/public;
+}
+这里实际访问的路径: www.xxx.com/a/ -&gt; /lumen/public/a/
+</code></pre><ul>
+<li>alias的例子</li>
+</ul>
+<pre><code># 注意这里目录最后加上/
+location /a/ {
+        alias /lumen/public/;
+}
+这里实际访问的路径: www.xxx.com/a/ -&gt; /lumen/public/
+</code></pre><hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="nginx问题-隐藏版本信息">nginx问题: 隐藏版本信息</h3>
+<pre><code>Syntax:  server_tokens on | off | build | string;
+Default:  server_tokens on;
+Context:  http, server, location
+</code></pre><hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="nginx问题-日志出现encode内容如何查看">nginx问题: 日志出现encode内容如何查看</h3>
+<pre><code># python2 执行decode
+&gt;&gt;&gt; print &quot;\x22content\x22\x0D\x0A\x0D\x0A\xE8\x8A\x8A\xE8\x8A\x8A\xE8\xBF\x98\xE6\x80\x95\xE5\xA6\x9E\xE5\xA6\x9E\xE4\xB8\x8D\xE8\x80\x81\xE5\xAE\x9E\xEF\xBC\x8C\xE7\x89\xB9\xE5\x9C\xB0\xE8\xBF\x87\xE6\x9D\xA5\xE8\xA7\x86\xE5\xAF\x9F\xE4\xB8\x80\xE4\xB8\x8B\x0D\x0A&quot;.decode('utf-8')
+</code></pre><hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="nginx问题-default配置未设置">nginx问题: default配置未设置</h3>
+<p>nginx 未设置default时, 如果直接访问服务器外网ip, 会去请求到第一个匹配的server段, 有可能会请求到后端的服务器的内容, 这很有可能暴露我们不想暴露的服务
+一般来说开头添加如下配置</p>
+<pre><code>    server {
+        listen       80 default_server;
+        listen       [::]:80 default_server;
+        server_name  _;
+        deny all;
+	}
+</code></pre><p>nginx 配置已经配置域名方式访问, 如果访问ip会返回403, 正常来说返回403已经不会对服务器造成压力了</p>
+<blockquote>
+<p>可是万万没想到虽然返回了403, 但是也有700字节大小, 大量请求对小带宽来说还是有压力的</p>
+</blockquote>
+<pre><code>#
+server {
+        listen       80 default_server;
+        listen       [::]:80 default_server;
+        server_name  _;
+        return 499;
+   }
+
+#其他location,if配置,
+if ($host != a.example.com) {
+    return 499;
+}
+
+</code></pre><hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="nginx问题-nginx111以前trace_id-生成">nginx问题: nginx1.11以前trace_id 生成</h3>
+<ul>
+<li>如果是前端(upstream)</li>
+</ul>
+<pre><code>log_format  server_name_main '&quot;$request_trace_id&quot; [ $host $request_time ] ' '[ $upstream_addr $upstream_response_time ] ' '$status ' '$remote_addr - $remote_user [$time_local] &quot;$request&quot; '  '$body_bytes_sent &quot;$http_referer&quot; '
+                     '&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot; &quot;$bytes_sent&quot;'    '{$request_body}' ;
+...
+
+server {
+        set $request_trace_id $pid$connection$bytes_sent$msec;
+        if ( $http_x_request_id != &quot;&quot; ){
+                set $request_trace_id $http_x_request_id;
+        }
+        add_header  Bq_F_Traceid $request_trace_id;
+
+	# 一定要写到location中, 因为proxy_pass
+	location / {
+
+		proxy_pass http://xxxx;
+                proxy_set_header  X-Request-Id        $request_trace_id;
+
+	}
+}
+</code></pre><ul>
+<li>如果是后端节点</li>
+</ul>
+<pre><code># 一定要写到server段, 否则后端可能报404错误
+server {
+	listen 80;
+    	server_name  openapi-community-alpha.zhangzw.com ;
+
+        set $request_trace_id $pid$connection$bytes_sent$msec;
+        if ( $http_x_request_id != &quot;&quot; ){
+                set $request_trace_id $http_x_request_id;
+        }
+        add_header  Bq_X_Traceid $request_trace_id;
+
+	location / {
+		try_files $uri $uri/ /index.php?$query_string;
+	}
+}
+</code></pre><hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="网络问题-转发正代和反代">网络问题: 转发,正代和反代</h3>
+<pre><code>1. 正代: 内网客户端172.16.88.88想要访问google,通过浏览器配置代理服务器ip(172.16.88.2:1080) 去访问google, 代理服务器和客户端在同一个局域网
+2. 反代: 内网服务端10.10.88.88上有http服务,通过配置代理服务器(10.10.88.2:80 外网地址:1.1.1.1:80)绑定域名www.googoo.com对外提供服务, 代理服务器和服务端在同一个局域网
+3. 转发: 只是数据转发, 不会重新建立tcp连接,代理是需要与上游和下游都建立tcp连接
+</code></pre><hr>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="其他问题-修改swap">其他问题: 修改swap</h3>
+<pre><code>dd if=/dev/zero of=/data/swapfilenew bs=4096 count=4096000
+
+swapoff -a
+
+/sbin/mkswap  /data/swapfilenew
+/sbin/swapon  /data/swapfilenew
+
+vim /etc/fstab
+/data/swapfilenew none swap defaults 0 0
+</code></pre><h3 id="其他问题-jenkins-ui特别慢-jobs数量100">其他问题: jenkins ui特别慢 (jobs数量100+)</h3>
+<p>原文: <a href="https://www.coder.work/article/6390497">jenkins GUI非常慢-浏览器缓存清除后很快</a></p>
+<pre><code>系统管理 -&gt; 全局安全配置 -&gt; 勾选 Disable remember me
+</code></pre><h3 id="其他问题-postgresql时区修改">其他问题: postgreSql时区修改</h3>
+<h4 id="docker启动通过变量传入">docker启动通过变量传入</h4>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w">
+</span><span class="w">        </span><span class="nt">TZ</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;PRC&#39;</span><span class="w">
+</span><span class="w">        </span><span class="nt">PGTZ</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;PRC&#39;</span><span class="w">
+</span></code></pre></div><h4 id="直接修改配置文件">直接修改配置文件</h4>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">vim /var/lib/pgsql/9.4/data/postgresql.conf
+<span class="nv">log_timezone</span> <span class="o">=</span> <span class="s1">&#39;PRC&#39;</span>
+<span class="nv">timezone</span> <span class="o">=</span> <span class="s1">&#39;PRC&#39;</span>
+</code></pre></div><h3 id="其他问题-kafka和rocketmq比较">其他问题: kafka和rocketMQ比较</h3>
+<ul>
+<li><a href="https://blog.csdn.net/lppl010_/article/details/86662346">阿里 RocketMQ 优势对比</a></li>
+</ul>
+<p>RocketMQ 是对kafka的一种优化, kafka中的每个topic的每个分区都会对应一个物理文件, 但topic数量越多时, 分区分散更明显,就会导致磁盘IO成为瓶颈, 而rocketMQ所有的消息是保存在同一个物理文件中, topic和分区数对rocketMQ只是逻辑上的概念, 因此随着topic增加, kafka性能急剧下降, rocketMQ影响不大</p>
+<h3 id="其他问题-记录一个php扩展动态安装的错误问题">其他问题: 记录一个php扩展动态安装的错误问题</h3>
+<p>同事在自己的vagrant安装php7.0的mongodb1.7.5扩展,但是添加到ini的时候报错如下:</p>
+<pre><code>undefined symbol: zend_string_init_interned
+</code></pre><ul>
+<li>分析</li>
+</ul>
+<pre><code>1 首先扩展被安装到 /usr/lib/php/20180731目录
+2 报错显示无法加载的动态库
+</code></pre><ul>
+<li>问题1 由于php7.0的extension_dir配置查看发现是/usr/lib/php/20151012,所以改动态编译并未生成到正确的路径</li>
+<li>问题2 该报错可能是动态库不能识别问题</li>
+</ul>
+<p>经过确认该环境安装了多个php版本, 最新的是php7.4, 而php命令默认是link到php7.0, 但是动态扩展编译的命令如下:</p>
+<pre><code>/usr/php/phpize
+./configure
+make
+make install
+</code></pre><p>显然问题就在这, 这里phpize 和configure会走默认的配置, 默认的配置可能是最新的php7.4(大概是仅仅php命令link到了php7.0)
+因此重新编译如下:</p>
+<pre><code>/usr/php/phpize7.0
+./configure --with-php-config=/path/to/php-config7.0
+make
+make install
+</code></pre>]]></content>
+		</item>
+		
+		<item>
+			<title>k8s遇到的一些问题统计总结</title>
+			<link>https://www.ngirl.xyz/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
+			<pubDate>Tue, 10 Nov 2020 14:06:41 +0000</pubDate>
+			
+			<guid>https://www.ngirl.xyz/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
+			<description>不定时更新,文章可能比较散乱,&amp;gt;_&amp;lt;
+  1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
+  deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
+ # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从`hub.</description>
+			<content type="html"><![CDATA[<p>不定时更新,文章可能比较散乱,&gt;_&lt;</p>
+<!-- more -->
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="1-单机版k8s-pod一直是pending的问题">1. 单机版k8s pod一直是pending的问题</h3>
+<blockquote>
+<p>describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate.
+这是因为master上存在污点,pod不会再改节点上创建
+两种办法:</p>
+</blockquote>
+<ul>
+<li>deploy 的时候加上 容忍该污点</li>
+<li>直接取消master上的污点</li>
+</ul>
+<pre><code># 取消master上污点
+  kubectl taint nodes --all node-role.kubernetes.io/master-
+
+# 查看taint
+kubectl describe node node1
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="2-修改service-node-port-range">2. 修改service-node-port-range</h3>
+<blockquote>
+<p>由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口</p>
+</blockquote>
+<pre><code># kubeadm 1.14 配置
+apiServer:
+  extraArgs:
+    authorization-mode: Node,RBAC
+    service-node-port-range: 79-33000
+
+# kubeadm 1.10配置
+apiServerExtraArgs:
+  service-node-port-range: 79-33000
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="3-traefik断电后重新启动报错-command-traefik-error-field-not-found-node-redirect">3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect</h3>
+<pre><code>看到这个错误猜测可能是用的latest镜像问题, 从`hub.docker.com` 查看更新了v2.0+的版本
+
+将`traefik`的`deployment`配置中 image改成 `traefik:1.7`
+
+重新部署后 问题解
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="4-查看当前集群的customresourcedefinition">4. 查看当前集群的(CustomResourceDefinition)</h3>
+<pre><code># 查看k8s有哪些api
+kubectl api-versions
+
+# 查看当前crd
+kubectl get crd
+
+# 其次查看该api是什么版本
+kubectl describe crd destinationrules.networking.istio.io
+
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="5-启用自动轮换kubelet-证书证书未过期">5. 启用自动轮换kubelet 证书(证书未过期)</h3>
+<p>参考: <a href="https://www.cnblogs.com/skymyyang/p/11093686.html">Kubeadm证书过期时间调整</a></p>
+<p><code>kubelet</code>证书分为server和client两种， k8s 1.9默认启用了client证书的自动轮换，但server证书自动轮换需要用户开启</p>
+<p>增加 kubelet 参数</p>
+<pre><code># 在/etc/systemd/system/kubelet.service.d/10-kubeadm.conf 增加如下参数
+
+Environment=&quot;KUBELET_EXTRA_ARGS=--feature-gates=RotateKubeletServerCertificate=true&quot;
+</code></pre><p>增加 controller-manager 参数</p>
+<pre><code># 在/etc/kubernetes/manifests/kube-controller-manager.yaml 添加如下参数
+  - command:
+    - kube-controller-manager
+    - --experimental-cluster-signing-duration=87600h0m0s
+    - --feature-gates=RotateKubeletServerCertificate=true
+    - ....
+</code></pre><p>创建 rbac 对象
+创建 rbac对象，允许节点轮换kubelet server证书：</p>
+<pre><code>cat &gt; ca-update.yaml &lt;&lt; EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: &quot;true&quot;
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: system:certificates.k8s.io:certificatesigningrequests:selfnodeserver
+rules:
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests/selfnodeserver
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubeadm:node-autoapprove-certificate-server
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:certificates.k8s.io:certificatesigningrequests:selfnodeserver
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: system:nodes
+EOF
+
+kubectl create –f ca-update.yaml
+</code></pre><p>重新启动kubelet</p>
+<pre><code>systemctl daemon-reload
+systemctl enable kubelet
+systemctl restart kubelet
+</code></pre><p>如果证书过期</p>
+<pre><code># 重新生成证书
+kubeadm alpha certs renew all
+# 查看有效期
+kubeadm alpha certs check-expiration
+# 覆盖配置文件
+mv $HOME/.kube/config $HOME/.kube/config.old
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+# 重启kube-apiserver,kube-controller,kube-scheduler,etcd
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="6-hpa的一个cpu-percent百分比问题">6. hpa的一个cpu-percent百分比问题</h3>
+<pre><code>kubectl autoscale deployment php-admintest-nginx-dev --cpu-percent=80 --min=1 --max=2 -n php-dev
+</code></pre><p>例如以上,我希望在平均cpu超过80%时,pod能自动调整为2个</p>
+<p>em&hellip;这没啥问题</p>
+<p>但我做简单ab压测发现, 我把cpu压到了100000% &hellip;</p>
+<p>我的deployment 配置中是这样限制cpu的</p>
+<pre><code>        resources:
+          requests:
+            cpu: &quot;1m&quot;
+          limits:
+            cpu: &quot;1000m&quot;
+</code></pre><p>显然我的pod可以使用1个核cpu, 那这个平均cpu是等于啥呢?</p>
+<p>cpu-percent = 1000m/resources.request.cpu =&gt; 1000m/1m =100000%</p>
+<p>-_-!!!</p>
+<blockquote>
+<p>因此建议 修改requests.cpu=500m,  &ndash;cpu-percent可设范围: 0~200% ,或者低一些 250m -&gt; 0~400%</p>
+</blockquote>
+<p>总结:
+request.cpu 必须设置, 这个是对比的对象</p>
+<p>另外:
+对于扩容而言，这个时间段为3分钟，缩容为5分钟(可以通过 <code>--horizontal-pod-autoscaler-downscale-delay</code> ， <code>--horizontal-pod-autoscaler-upscale-delay 进行调整</code>)。</p>
+<center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="7-k8s1162metrics-v035-deployment重启之后hpa就失效无法获取到数据">7 k8s1.16.2+metrics v0.3.5 deployment重启之后hpa就失效,无法获取到数据</h3>
+<pre><code>The HPA was unable to compute the replica count: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="8-k8s机器进程数达到500多的时候-ssh连接到服务报错-shell-request-failed-on-channel-0">8 k8s机器进程数达到500多的时候, ssh连接到服务报错 shell request failed on channel 0</h3>
+<pre><code>原因：目标主机的系统进程数太小，导致不能连接
+
+解决：需要修改/etc/security/limits.d/20-nproc.conf文件中的值，把4096改大一点，如 65535
+
+#cat /etc/security/limits.d/20-nproc.conf
+*          soft    nproc     4096
+root       soft    nproc     unlimited
+
+重新ssh，即可。
+
+</code></pre><center>
+<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
+</center>
+<h3 id="9-centos8安装k8s118flannel-pod间不通">9 centos8安装k8s1.18+flannel pod间不通</h3>
+<p>在查看到<a href="https://zhangguanzhang.github.io/">馆长</a>的<a href="https://zhangguanzhang.github.io/2020/10/20/kylin-v10-k8s-overlay-error/">银河麒麟arm64系统上k8s集群跨节点不通的一次排查</a>问题, 发下我的flannel网络同样是 <code>lo</code> 也的确启用了 <code>NetworkManager</code>, 不过重启并未有效果</p>
+<blockquote>
+<p>配置如下:</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ ip route get <span class="k">$(</span>ip a s flannel.1 <span class="p">|</span>grep -w inet<span class="p">|</span>awk -F <span class="s1">&#39;inet|/&#39;</span> <span class="s1">&#39;{print $2}&#39;</span><span class="k">)</span>
+<span class="nb">local</span> 10.244.0.0 dev lo src 10.244.0.0 uid <span class="m">0</span>
+    cache &lt;local&gt;
+
+$ route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         10.23.0.1       0.0.0.0         UG    <span class="m">100</span>    <span class="m">0</span>        <span class="m">0</span> eth0
+10.5.27.0       0.0.0.0         255.255.255.0   U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> docker0
+10.23.0.0       0.0.0.0         255.255.0.0     U     <span class="m">100</span>    <span class="m">0</span>        <span class="m">0</span> eth0
+10.244.0.0      0.0.0.0         255.255.255.0   U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> cni0
+10.244.1.0      10.244.1.0      255.255.255.0   UG    <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> flannel.1
+192.168.212.64  0.0.0.0         255.255.255.192 U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> *
+
+</code></pre></div><p>于是我重启</p>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">$ systemctl restart NetworkManager
+
+$ docker restart <span class="k">$(</span>docker ps <span class="p">|</span>grep flanneld<span class="p">|</span>awk <span class="s1">&#39;{print $1}&#39;</span><span class="k">)</span>
+
+$ ip route get <span class="k">$(</span>ip a s flannel.1 <span class="p">|</span>grep -w inet<span class="p">|</span>awk -F <span class="s1">&#39;inet|/&#39;</span> <span class="s1">&#39;{print $2}&#39;</span><span class="k">)</span>
+broadcast 10.244.0.0 dev cni0 src 10.244.0.1 uid <span class="m">0</span>
+    cache &lt;local,brd&gt;
+</code></pre></div><p>但最终我的现象是, master重启后从<code>lo</code>变成了<code>cni0</code>, 但是另外一台node一直无效, 重启容器后又变成<code>lo</code>, 至此<code>pod</code>间网络依然不通</p>
+<p>按照文章<a href="https://zhuanlan.zhihu.com/p/112834020">Centos8.1部署kubernetes1.17 问题 使用iptables打通网络</a> 中描述查看了<code>iptables</code>, 果然<code>Chain FORWARD (policy DROP)</code>, 通过<code>iptables -P FORWARD ACCEPT</code>的确解决了问题, 但显然这并不安全.</p>
+<p>其他链接:</p>
+<ul>
+<li>docker在 1.13 版本之后，将系统iptables 中 FORWARD 链的默认策略设置为 DROP: <a href="https://github.com/moby/moby/issues/14041">https://github.com/moby/moby/issues/14041</a></li>
+<li>docker&amp;k8s填坑记 nodeport 无法访问: <a href="https://www.cnblogs.com/tylerzhou/p/10975062.html">https://www.cnblogs.com/tylerzhou/p/10975062.html</a></li>
+</ul>
+<h3 id="10-部署服务器查看describe信息如下">10 部署服务器查看describe信息如下:</h3>
+<pre><code>Mounting command: systemd-run
+Mounting arguments: --description=Kubernetes transient mount for /var/lib/kubelet/pods/369daaef-1e90-446b-92ce-3d562f94b429/volumes/kubernetes.io~nfs/pvc-f462c606-5796-4c48-8928-7822f3fa0605 --scope -- mount -t nfs 172.16.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 /var/lib/kubelet/pods/369daaef-1e90-446b-92ce-3d562f94b429/volumes/kubernetes.io~nfs/pvc-f462c606-5796-4c48-8928-7822f3fa0605
+Output: Running scope as unit run-14829.scope.
+mount: 文件系统类型错误、选项错误、172.16.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 上有坏超级块、
+       缺少代码页或助手程序，或其他错误
+       (对某些文件系统(如 nfs、cifs) 您可能需要
+       一款 /sbin/mount.&lt;类型&gt; 助手程序)
+</code></pre><p>可能是客户端无法识别nfs格式</p>
+<pre><code># 做个测试
+mkdir /tmp/abc
+mount -t nfs 172.16.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 /tmp/abc
+
+
+# 果然报错
+mount: wrong fs type, bad option, bad superblock on 172.16.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-plugins,
+       missing codepage or helper program, or other error
+       (for several filesystems (e.g. nfs, cifs) you might
+       need a /sbin/mount.&lt;type&gt; helper program)
+
+       In some cases useful info is found in syslog - try
+       dmesg | tail or so.
+</code></pre><p>所以安装了nfs即可</p>
+<pre><code>yum install nfs
+</code></pre>]]></content>
+		</item>
+		
+		<item>
 			<title>网络基础</title>
 			<link>https://www.ngirl.xyz/posts/67-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/</link>
 			<pubDate>Wed, 31 Mar 2021 10:55:50 +0800</pubDate>
@@ -2388,526 +3147,6 @@ java -jar /opt/atlassian/jira/atlassian-agent.jar -d -m test@test.com -n BAT -p 
 		</item>
 		
 		<item>
-			<title>linux遇到一些问题统计</title>
-			<link>https://www.ngirl.xyz/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
-			<pubDate>Tue, 08 Dec 2020 17:42:54 +0000</pubDate>
-			
-			<guid>https://www.ngirl.xyz/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
-			<description>记录一些Linux,nginx或其他服务一些问题
-  分布式问题: 分布式算法 Basic paxos 算法 1. 获取一个Proposal ID n，为了保证Proposal ID唯一，可采用时间戳+Server ID生成； 2. Proposer向所有Acceptors广播Prepare(n)请求； 3. Acceptor比较n和minProposal，如果n&amp;gt;minProposal，minProposal=n，并且将 acceptedProposal 和 acceptedValue 返回； 4. Proposer接收到过半数回复后，如果发现有acceptedValue返回，将所有回复中acceptedProposal最大的acceptedValue作为本次提案的value，否则可以任意决定本次提案的value； 5. 到这里可以进入第二阶段，广播Accept (n,value) 到所有节点； 6. Acceptor比较n和minProposal，如果n&amp;gt;=minProposal，则acceptedProposal=minProposal=n，acceptedValue=value，本地持久化后，返回；否则，返回minProposal。 7. 提议者接收到过半数请求后，如果发现有返回值result &amp;gt;n，表示有更新的提议，跳转到1；否则value达成一致。 Multi-Paxos 算法  为了解决实际应用中连续多值传输的高效性,改进了Basix Paxos为Multi-Paxos:
- 1. 针对每一个要确定的值，运行一次Paxos算法实例（Instance），形成决议。每一个Paxos实例使用唯一的Instance ID标识。 2. 在所有Proposers中选举一个Leader，由Leader唯一地提交Proposal给Acceptors进行表决。这样没有Proposer竞争，解决了活锁问题。在系统中仅有一个Leader进行Value提交的情况下，Prepare阶段就可以跳过，从而将两阶段变为一阶段，提高效率。 raft  为了更简便理解和实现,改进了Multi-Paxos 为raft
- 1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的) 2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选. 而multi-paxos 是随意的 所以raft 可以看成是简化版本的multi paxos(这里multi-paxos 因为允许并发的写log, 因此不存在一个最新, 最全的日志节点, 因此只能这么做.</description>
-			<content type="html"><![CDATA[<p>记录一些Linux,nginx或其他服务一些问题</p>
-<!-- more -->
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="分布式问题-分布式算法">分布式问题: 分布式算法</h3>
-<h4 id="basic-paxos-算法">Basic paxos 算法</h4>
-<pre><code>1. 获取一个Proposal ID n，为了保证Proposal ID唯一，可采用时间戳+Server ID生成；
-2. Proposer向所有Acceptors广播Prepare(n)请求；
-3. Acceptor比较n和minProposal，如果n&gt;minProposal，minProposal=n，并且将 acceptedProposal 和 acceptedValue 返回；
-4. Proposer接收到过半数回复后，如果发现有acceptedValue返回，将所有回复中acceptedProposal最大的acceptedValue作为本次提案的value，否则可以任意决定本次提案的value；
-5. 到这里可以进入第二阶段，广播Accept (n,value) 到所有节点；
-6. Acceptor比较n和minProposal，如果n&gt;=minProposal，则acceptedProposal=minProposal=n，acceptedValue=value，本地持久化后，返回；否则，返回minProposal。
-7. 提议者接收到过半数请求后，如果发现有返回值result &gt;n，表示有更新的提议，跳转到1；否则value达成一致。
-</code></pre><h4 id="multi-paxos-算法">Multi-Paxos 算法</h4>
-<blockquote>
-<p>为了解决实际应用中连续多值传输的高效性,改进了Basix Paxos为Multi-Paxos:</p>
-</blockquote>
-<pre><code>1. 针对每一个要确定的值，运行一次Paxos算法实例（Instance），形成决议。每一个Paxos实例使用唯一的Instance ID标识。
-2. 在所有Proposers中选举一个Leader，由Leader唯一地提交Proposal给Acceptors进行表决。这样没有Proposer竞争，解决了活锁问题。在系统中仅有一个Leader进行Value提交的情况下，Prepare阶段就可以跳过，从而将两阶段变为一阶段，提高效率。
-
-</code></pre><h4 id="raft">raft</h4>
-<blockquote>
-<p>为了更简便理解和实现,改进了Multi-Paxos 为raft</p>
-</blockquote>
-<pre><code>1. 发送的log的是连续的, 也就是说raft 的append 操作必须是连续的. 而paxos 可以并发的. (其实这里并发只是append log 的并发提高, 应用的state machine 还是必须是有序的)
-2. 选主是有限制的, 必须有最新, 最全的日志节点才可以当选. 而multi-paxos 是随意的 所以raft 可以看成是简化版本的multi paxos(这里multi-paxos 因为允许并发的写log, 因此不存在一个最新, 最全的日志节点, 因此只能这么做. 这样带来的麻烦就是选主以后, 需要将主里面没有的log 给补全, 并执行commit 过程)
-
-</code></pre><h3 id="分布式问题-单线程和多线程问题">分布式问题: 单线程和多线程问题</h3>
-<h4 id="redis6多线程说明">redis6多线程说明</h4>
-<ul>
-<li>多线程方式</li>
-</ul>
-<pre><code>1. memcached的多线程方式是master-work, work是独立完成所有操作包括执行操作
-2. redis的多线程方式也是master-work,但是仅仅是io和内存方面的慢操作是通过work进程执行, work进程和master间通过管道通信,最后执行操作都是在master进程执行
-
-</code></pre><center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="tcp问题-什么是tcp连接队列">Tcp问题: 什么是tcp连接队列</h3>
-<ul>
-<li><a href="https://blog.csdn.net/luoyu_/article/details/105361742">TCP SYN队列与Accept队列详解</a></li>
-<li><a href="https://www.cnxct.com/something-about-phpfpm-s-backlog/">TCP SOCKET中backlog参数的用途是什么?</a></li>
-<li><a href="https://blog.csdn.net/chen8238065/article/details/80457150">tcp 相关总结</a></li>
-<li><a href="https://blog.csdn.net/weixin_34088838/article/details/92562556?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param">深入理解Linux TCP backlog</a></li>
-</ul>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">1.	net.ipv4.tcp_max_syn_backlog:		半连接队列,保存SYN_RECV状态的连接<span class="o">(</span>tcp握手第一次完成后, server端会将连接添加到sync queue队列 <span class="o">)</span>
-2.	min<span class="o">(</span>net.core.somaxconn,backlog<span class="o">)</span>: 	全连接队列,保存ESTABLISHED状态的连接<span class="o">(</span>tcp握手第三次完成周, server端会将连接添加到accept queue队列<span class="o">)</span>
-
-通过netstat -s <span class="p">|</span> egrep <span class="s2">&#34;listen|LISTEN&#34;</span> 查看 是否是半连接队列满了
-<span class="m">667399</span> <span class="nb">times</span> the listen queue of a socket overflowed   <span class="o">(</span>? 这个和TCPBacklogDrop 哪个是全连接队列??<span class="o">)</span>
-<span class="m">667399</span> SYNs to LISTEN sockets ignored
-
-通过netstat -s<span class="p">|</span>grep TCPBacklogDrop 查看 是否是全连接队列满了
-    TCPBacklogDrop: <span class="m">1862</span>
-
-以上也可以用 nstat -a -z 命令
-
-另外如果全连接满了处理方式是 直接丢弃, 如果修改为1 则表示发送reset包给客户端
-cat cat /proc/sys/net/ipv4/tcp_abort_on_overflow
-<span class="m">0</span>
-
-通过ss -l可以查到到nginx的默认backlog 是511
-ss -l<span class="p">|</span>grep http
-
-通过修改nginx配置增加该值,reload nginx<span class="o">(</span>前提是已经修改了net.core.somaxconn<span class="o">)</span>
- listen  <span class="m">80</span> <span class="nv">backlog</span><span class="o">=</span>4096<span class="p">;</span>
- listen <span class="m">443</span> ssl <span class="nv">backlog</span><span class="o">=</span>4096<span class="p">;</span>
-
-</code></pre></div><p><img src="/images/tcp3.png" alt="三次握手图">
-<img src="/images/tcp-queue.png" alt="tcp队列图">
-<img src="/images/tcp-queue2.png" alt="tcp队列图2"></p>
-<blockquote>
-<p>结论</p>
-</blockquote>
-<pre><code># 这里已php -&gt; mysql 为例:
-php 发syn 给tcp:3306  -&gt; mysql 先存入syn queue队列(开启了syncookie,所以不会满) -&gt; 然后回复php syn+ack -&gt;  php 回复ack之后 进入 established 状态  握手完成  -&gt; 本次tcp连接请求存入 accpet queue队列(也就是listen backlog)  -&gt; 如果队列满了直接忽略, php 超时重传, 如果队列没满 就accept() 成功连接到mysql服务 (max-connections - 1)
-
-由于该数值或高会导致fpm处理不过来,出现504 gateway timeout(110: Connection timed out), 过低会导致高并发无法建立tcp连接(111: Connection refused)
-因此一般设置该值等于QPS
-</code></pre><h3 id="tcp问题-syn-flood-攻击">Tcp问题: syn flood 攻击</h3>
-<ul>
-<li><a href="https://www.cnblogs.com/zengkefu/p/5606696.html">https://www.cnblogs.com/zengkefu/p/5606696.html</a></li>
-</ul>
-<pre><code>&gt; Sep  9 12:04:01 db kernel: possible SYN flooding on port 3306. Sending cookies.
-
-这种程序可以通过不存在的ip去发送tcp请求到server, server就会回复ack, 但是由于服务器不存在, 所以就一直重试, 导致占用tcp连接, 如果正常请求进来,则由于syn queue队列满了, 就忽略了正常的tcp请求, 无法提供服务
-
-</code></pre><h3 id="linux问题-tcpdump抓包tcp-ack为1">linux问题: tcpdump抓包tcp ack为1</h3>
-<ul>
-<li>执行命令监听: tcpdump -n port 80 (想要详细信息加 -vv)</li>
-</ul>
-<blockquote>
-<p>客户端 telnet x.x.x.x 80</p>
-</blockquote>
-<p>日志如下:</p>
-<pre><code>tcpdump  -n port 80
-tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
-listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes
-11:16:40.689157 IP 192.168.54.141.53444 &gt; 192.168.53.106.http: Flags [SEW], seq 1306124348, win 65535, options [mss 1460,nop,wscale 5,nop,nop,TS val 458678777 ecr 0,sackOK,eol], length 0
-11:16:40.689724 IP 192.168.53.106.http &gt; 192.168.54.141.53444: Flags [S.E], seq 1553518959, ack 1306124349, win 64308, options [mss 1410,sackOK,TS val 4208119240 ecr 458678777,nop,wscale 7], length 0
-11:16:40.690320 IP 192.168.54.141.53444 &gt; 192.168.53.106.http: Flags [.], ack 1, win 4106, options [nop,nop,TS val 458678778 ecr 4208119240], length 0
-</code></pre><p>这里第一和第二次握手都没有问题, 第三次 ack 1, 并非是seq+1</p>
-<p>这里提一下ACK, ACK 是确认值, ack 是确认编号, 第一次握手ACK=0,在第二次握手开始ACK=1, 而ack是=seq+1(收到的随机数+1)</p>
-<p>那么这里ack 1 是啥呢?  &hellip; 应该就是默认tcpdump 显示成相对值了, 通过-S 参数会显示绝对值</p>
-<ul>
-<li>执行命令监听: tcpdump -S  -n port 80</li>
-</ul>
-<pre><code>tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
-listening on enp0s3, link-type EN10MB (Ethernet), capture size 262144 bytes
-11:16:54.806628 IP 192.168.54.141.53516 &gt; 192.168.53.106.http: Flags [S], seq 316359286, win 65535, options [mss 1460,nop,wscale 5,nop,nop,TS val 458692791 ecr 0,sackOK,eol], length 0
-11:16:54.806861 IP 192.168.53.106.http &gt; 192.168.54.141.53516: Flags [S.], seq 1113466641, ack 316359287, win 64308, options [mss 1410,sackOK,TS val 4208133357 ecr 458692791,nop,wscale 7], length 0
-11:16:54.807576 IP 192.168.54.141.53516 &gt; 192.168.53.106.http: Flags [.], ack 1113466642, win 4106, options [nop,nop,TS val 458692792 ecr 4208133357], length 0
-</code></pre><p>三次握手图
-<img src="/images/tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%9B%BE.png" alt="三次握手图"></p>
-<p>四次挥手图
-<img src="/images/tcp%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B%E5%9B%BE.png" alt="四次挥手图"></p>
-<h3 id="linux问题-一次dnsmasq迁移问题">Linux问题: 一次dnsmasq迁移问题</h3>
-<blockquote>
-<p>网卡配置如下</p>
-</blockquote>
-<pre><code>DEVICE=em1
-HWADDR=x
-TYPE=Ethernet
-UUID=x
-ONBOOT=yes
-NM_CONTROLLED=yes
-BOOTPROTO=static
-IPADDR0=172.16.76.100
-PREFIX0=24
-GATEWAY=172.16.76.1
-DNS1=172.16.76.100
-DNS2=172.16.76.101
-</code></pre><blockquote>
-<p>这里有个大问题, 由于本身就是dns服务器, 但配置的DNS1居然是本机, 这导致service network restart 的时候会去修改 /etc/resolv.conf 的配置为 DNS1 和DNS2的ip, 此时dns服务器将无法解析外网域名</p>
-</blockquote>
-<blockquote>
-<p>因此正确的配置是</p>
-</blockquote>
-<pre><code>DNS1=119.29.29.29
-DNS2=223.5.5.5
-DNS3=114.114.114.114
-</code></pre><hr>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="linux问题-升级内核">Linux问题: 升级内核</h3>
-<pre><code>rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
-rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
-
-# 查看可升级的内核
-yum --disablerepo=&quot;*&quot; --enablerepo=&quot;elrepo-kernel&quot; list available
-yum --enablerepo=elrepo-kernel install kernel-ml
-
-# 查看已经安装的内核
-cat /boot/grub2/grub.cfg |grep menuentry
-
-# 设置5.3的为默认
-grub2-set-default 'CentOS Linux (5.3.13-1.el7.elrepo.x86_64) 7 (Core)'
-
-# grub2-editenv list
-saved_entry=CentOS Linux (5.3.13-1.el7.elrepo.x86_64) 7 (Core)
-</code></pre><hr>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="linux问题-禁ping">linux问题: 禁ping</h3>
-<pre><code># 一次性修改
-echo 1 &gt; /proc/sys/net/ipv4/icmp_echo_ignore_all
-
-# 开机自动修改
-echo 1 &gt; /proc/sys/net/ipv4/icmp_echo_ignore_all
-
-# 永久禁用,加入到/etc/sysctl.conf
-net.ipv4.icmp_echo_ignore_all=1
-</code></pre><hr>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="linux问题-文件锁问题">linux问题: 文件锁问题</h3>
-<pre><code>问题描述: php slowlog 出现session_start() 慢
-问题原因: 我们这边有A 和B 两个二级域名,A 会请求 B, 并且由于测试环境在同一台服务器,公用一个php,所以在发生调用的时候同时写了session,而php的sessions配置是默认的file方式, 这就造成了锁的问题
-问题解决:
-1. 修改代码部分
-2. php的session配置改成redis
-    session.save_handler = redis
-    session.save_path = &quot;tcp://x.x.x.x:xxxx&quot;
-</code></pre><hr>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="linux问题-内存释放问题">linux问题: 内存释放问题</h3>
-<pre><code>问题描述: 开发这边写了个统计脚本, 占用49G内存, 从日志发现脚本已经全部执行完成, 但是php脚本依然存在
-问题原因: 通过 strace -p pid 观察进程, 发现是持续性的做内存释放操作 munmap(0x7f6db77ad000, 266240)          = 0
-持续执行munmap函数是因为一直在释放内存(毕竟49G), 结果 =0 说明内存释放执行函数是返回正常了
-问题解决:
-1. 修改代码降低内存
-2. 等待一段时间内存会释放完成(测试80分钟释放完毕)
-</code></pre><hr>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="nginx问题-各种退出信号使用">nginx问题: 各种退出信号使用</h3>
-<pre><code>1. hup(kill -1):	重新读取配置并是服务配置生效(nginx -s reload)
-2. quit(kill -3): 	优雅关闭进程
-3. kill(kill -9):	强制关闭(必杀)
-4. usr1(kill -10):	重新打开服务(通常用nginx日志分割)
-5. usr2(kill -12):	平滑升级到新版本的程序
-6. term(kill -15):	强制关闭(先清理善后)
-</code></pre><h3 id="nginx问题-单域名通过cookie跳转不同后端">nginx问题: 单域名通过cookie跳转不同后端</h3>
-<ul>
-<li>
-<ol>
-<li>浏览器访问 supervisor.xxxx.com?to=1 , 然后在访问 supervisor.xxxx.com 会请求到common队列</li>
-</ol>
-</li>
-<li>
-<ol start="2">
-<li>浏览器访问 supervisor.xxxx.com?to=2 , 然后在访问 supervisor.xxxx.com 会请求到test队列</li>
-</ol>
-</li>
-<li>
-<ol start="3">
-<li>curl请求方式:
-<code>curl &quot;http://supervisor.xxxx.com/index.html?action=restartall&quot; --cookie &quot;bqxserver=test&quot;</code></li>
-</ol>
-</li>
-</ul>
-<pre><code>server {
-        listen 80 ;
-        charset utf-8;
-        server_name supervisor.xxxx.com;
-
-        location / {
-           if ($arg_to = &quot;1&quot;){
-                 add_header Set-Cookie &quot;bqxserver=common&quot;;
-                 add_header Content-Type &quot;text/plain;charset=utf-8&quot;;
-                 return 200 &quot;当前的数据服务器位置:common supervisor&quot;;
-                }
-           if ($arg_to = &quot;2&quot;){
-                 add_header Set-Cookie &quot;bqxserver=test&quot;;
-                 add_header Content-Type &quot;text/plain;charset=utf-8&quot;;
-                 return 200 &quot;当前的数据服务器位置:test supervisor&quot;;
-                }
-            set $proxy_name '127.0.0.1:32019';
-            if ($cookie_bqxserver = &quot;test&quot;){
-                set $proxy_name  '127.0.0.1:32020';
-            }
-            if ($cookie_bqxserver = &quot;common&quot;){
-                set $proxy_name  '127.0.0.1:32019';
-            }
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header HOST $http_host;
-                proxy_set_header X-NginX-Proxy true;
-                proxy_set_header X-Forwarded-Host $host;
-                proxy_set_header X-Forwarded-Server $host;
-                proxy_pass http://$proxy_name;
-  }
-}
-</code></pre><h3 id="nginx问题-提示tmp无权限问题">nginx问题: 提示tmp无权限问题</h3>
-<pre><code>2020/12/08 17:14:52 [crit] 111455#0: *1842 open() &quot;/var/lib/nginx/tmp/client_body/0000001489&quot; failed (13: Permission denied), client: 10.10.154.36, server: xxx.com, request: &quot;POST /?xxx HTTP/1.0&quot;, host: &quot;xxx.com&quot;, referrer: &quot;http://&quot;
-</code></pre><p>首先由于该环境nginx配置修改了用户由 nginx用户 变成nobody用户的原因, 导致改目录无权限写入&hellip;</p>
-<p>知道问题了, 那为啥会写到这个目录呢?需要看下面两个参数</p>
-<pre><code>client_max_body_size	1m;
-client_body_buffer_size 16k;
-</code></pre><p><code>client_max_body_size</code> 默认 1M，表示 客户端请求服务器最大允许大小，在<code>Content-Length</code>请求头中指定。如果请求的正文数据大于<code>client_max_body_size</code>，HTTP协议会报错 <code>413 Request Entity Too Large</code>。</p>
-<p>那这里为啥会写tmp目录呢?</p>
-<p>看下<code>client_body_buffer_size</code>, 默认 16k , 小于这个值会直接写入内存,  但如果 <code>client_body_buffer_size</code> 请求数据 &lt; <code>client_max_body_size</code> , 那么此时就会写临时目录,默认<code>/var/lib/nginx/tmp/client_body</code></p>
-<h3 id="nginx问题-http_x_real_ip问题">nginx问题: http_x_real_ip问题</h3>
-<p>nginx的反向代理服务器一般都需要加上 <code>proxy_set_header X-Real-IP $remote_addr;</code>, 为啥需要加上这个呢?</p>
-<p>比如我有如下架构代理:
-<a href="http://www.test.com">www.test.com</a>(clientip: 1.1.1.1) -&gt; proxy1(2.1.1.1) -&gt; proxy2(2.1.1.2) -&gt; real server(2.1.1.3)</p>
-<p>因为不加的话<code>$http_x_real_ip</code> 会一直是空, 并且在反向代理服务器后端的real server 同样是空
-这一点和<code>$http_x_forwarded_for</code> 不同,比如在<code>proxy1</code>上为空, 但是在<code>proxy2</code>之后的服务器上不为空</p>
-<p>加了之后就是真实客户端ip了吗?</p>
-<ul>
-<li>proxy1服务器: (2.1.1.1)</li>
-</ul>
-<pre><code>1. $remote_addr = 1.1.1.1
-2. $http_x_real_ip = 空
-3. $http_x_forwarded_for = 空
-</code></pre><ul>
-<li>proxy2服务器: (2.1.1.2)</li>
-</ul>
-<pre><code>1. $remote_addr = 2.1.1.1
-2. $http_x_real_ip = 1.1.1.1
-3. $http_x_forwarded_for = 1.1.1.1
-</code></pre><ul>
-<li>real server服务器: (2.1.1.3)</li>
-</ul>
-<pre><code>1. $remote_addr = 2.1.1.2
-2. $http_x_real_ip = 2.1.1.1
-3. $http_x_forwarded_for = 1.1.1.1,2.1.1.1
-</code></pre><p>一般来说 当有多个代理时候，可以在第一个反向代理上配置<code>proxy_set_header X-Real-IP $remote_addr</code> 获取真实客户端IP</p>
-<p>如此看来假如整个请求,反向代理只有一层, 没有proxy2, real server获取<code>$http_x_real_ip</code> 和<code>$http_x_forwarded_for</code>是一样的, 就是真实客户端ip</p>
-<p>但显然即便我们反向代理只有一层,  在proxy1之前,互联网中可能还有反向代理, 例如经过cdn之后, 例如他人代理 都将隐藏真实ip.</p>
-<h3 id="nginx问题-nginx-if条件的实现">nginx问题: nginx if条件&amp;&amp;的实现</h3>
-<ul>
-<li>1 允许所有人访问 a.php|b.php|c.php|d.php|e.php</li>
-<li>2 仅允许127.0.0.1|172.16.0.2 ip可以访问 aa.php|bb.php</li>
-</ul>
-<pre><code>set $flag &quot;allow&quot;;
-# 以下php 所有人可以访问
-if ( $fastcgi_script_name ~ (a.php|b.php|c.php|d.php|e.php) ) {
-        set $flag &quot;allow_php_ip&quot;;
-}
-
-# 以下php 仅固定ip可以访问
-if ($fastcgi_script_name ~ (aa.php|bb.php)) {
-        set $flag &quot;${flag}_php&quot;;
-}
-
-if ( $proxy_add_x_forwarded_for ~ (127.0.0.1|172.16.0.2)) {
-        set $flag &quot;${flag}_ip&quot;;
-}
-# 写包含是 $flag 可能为 &quot;allow_php_ip_ip&quot; (在允许的ip服务器(127.0.0.1)上访问 /a.php)
-if ( $flag !~ &quot;allow_php_ip&quot; ) {
-        return 403;
-}
-</code></pre><hr>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="nginx问题-静态文件分离">nginx问题: 静态文件分离</h3>
-<p>对于一般的nginx+php的方式, 我们php采用nobody用户,而代码/lumen采用web-www用户, 这样的好处是页面访问到/lumen时是nobody用户, 是无法修改代码的</p>
-<p>可能我们需求是上用户upload图片等, 这时候就可能被传上某个a.php, 这就有可能被代码注入(一般来说图片是放cdn,配置单独域名回源的,这里是直接存在项目目录)</p>
-<p>所以为了防止代码注入,我们需要限制upload目录的访问权限</p>
-<pre><code># nginx配置如下
-        location ~ /images/.*\.(gif|jpg|jpeg|png)$ {
-            root /lumen/storage/uploads/;
-        }
-
-</code></pre><p>这样我们图片传到 /lumen/storage/uploads/images/ 目录, 访问是 <a href="http://www.xxx.com/images/x.png">www.xxx.com/images/x.png</a> 来访问 且不允许其他类型文件访问.</p>
-<hr>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="nginx问题-root-和alias">nginx问题: root 和alias</h3>
-<p>在配置文件映射的时候，如果使用了正则表达式，那么可能会出现无法访问文件，nginx可能会将所有的
-文件都映射成为文件夹，导致文件映射失败的情况出现；</p>
-<ul>
-<li>root的例子</li>
-</ul>
-<pre><code>location /a/ {
-	root /lumen/public;
-}
-这里实际访问的路径: www.xxx.com/a/ -&gt; /lumen/public/a/
-</code></pre><ul>
-<li>alias的例子</li>
-</ul>
-<pre><code># 注意这里目录最后加上/
-location /a/ {
-        alias /lumen/public/;
-}
-这里实际访问的路径: www.xxx.com/a/ -&gt; /lumen/public/
-</code></pre><hr>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="nginx问题-隐藏版本信息">nginx问题: 隐藏版本信息</h3>
-<pre><code>Syntax:  server_tokens on | off | build | string;
-Default:  server_tokens on;
-Context:  http, server, location
-</code></pre><hr>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="nginx问题-日志出现encode内容如何查看">nginx问题: 日志出现encode内容如何查看</h3>
-<pre><code># python2 执行decode
-&gt;&gt;&gt; print &quot;\x22content\x22\x0D\x0A\x0D\x0A\xE8\x8A\x8A\xE8\x8A\x8A\xE8\xBF\x98\xE6\x80\x95\xE5\xA6\x9E\xE5\xA6\x9E\xE4\xB8\x8D\xE8\x80\x81\xE5\xAE\x9E\xEF\xBC\x8C\xE7\x89\xB9\xE5\x9C\xB0\xE8\xBF\x87\xE6\x9D\xA5\xE8\xA7\x86\xE5\xAF\x9F\xE4\xB8\x80\xE4\xB8\x8B\x0D\x0A&quot;.decode('utf-8')
-</code></pre><hr>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="nginx问题-default配置未设置">nginx问题: default配置未设置</h3>
-<p>nginx 未设置default时, 如果直接访问服务器外网ip, 会去请求到第一个匹配的server段, 有可能会请求到后端的服务器的内容, 这很有可能暴露我们不想暴露的服务
-一般来说开头添加如下配置</p>
-<pre><code>    server {
-        listen       80 default_server;
-        listen       [::]:80 default_server;
-        server_name  _;
-        deny all;
-	}
-</code></pre><p>nginx 配置已经配置域名方式访问, 如果访问ip会返回403, 正常来说返回403已经不会对服务器造成压力了</p>
-<blockquote>
-<p>可是万万没想到虽然返回了403, 但是也有700字节大小, 大量请求对小带宽来说还是有压力的</p>
-</blockquote>
-<pre><code>#
-server {
-        listen       80 default_server;
-        listen       [::]:80 default_server;
-        server_name  _;
-        return 499;
-   }
-
-#其他location,if配置,
-if ($host != a.example.com) {
-    return 499;
-}
-
-</code></pre><hr>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="nginx问题-nginx111以前trace_id-生成">nginx问题: nginx1.11以前trace_id 生成</h3>
-<ul>
-<li>如果是前端(upstream)</li>
-</ul>
-<pre><code>log_format  server_name_main '&quot;$request_trace_id&quot; [ $host $request_time ] ' '[ $upstream_addr $upstream_response_time ] ' '$status ' '$remote_addr - $remote_user [$time_local] &quot;$request&quot; '  '$body_bytes_sent &quot;$http_referer&quot; '
-                     '&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot; &quot;$bytes_sent&quot;'    '{$request_body}' ;
-...
-
-server {
-        set $request_trace_id $pid$connection$bytes_sent$msec;
-        if ( $http_x_request_id != &quot;&quot; ){
-                set $request_trace_id $http_x_request_id;
-        }
-        add_header  Bq_F_Traceid $request_trace_id;
-
-	# 一定要写到location中, 因为proxy_pass
-	location / {
-
-		proxy_pass http://xxxx;
-                proxy_set_header  X-Request-Id        $request_trace_id;
-
-	}
-}
-</code></pre><ul>
-<li>如果是后端节点</li>
-</ul>
-<pre><code># 一定要写到server段, 否则后端可能报404错误
-server {
-	listen 80;
-    	server_name  openapi-community-alpha.zhangzw.com ;
-
-        set $request_trace_id $pid$connection$bytes_sent$msec;
-        if ( $http_x_request_id != &quot;&quot; ){
-                set $request_trace_id $http_x_request_id;
-        }
-        add_header  Bq_X_Traceid $request_trace_id;
-
-	location / {
-		try_files $uri $uri/ /index.php?$query_string;
-	}
-}
-</code></pre><hr>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="网络问题-转发正代和反代">网络问题: 转发,正代和反代</h3>
-<pre><code>1. 正代: 内网客户端172.16.88.88想要访问google,通过浏览器配置代理服务器ip(172.16.88.2:1080) 去访问google, 代理服务器和客户端在同一个局域网
-2. 反代: 内网服务端10.10.88.88上有http服务,通过配置代理服务器(10.10.88.2:80 外网地址:1.1.1.1:80)绑定域名www.googoo.com对外提供服务, 代理服务器和服务端在同一个局域网
-3. 转发: 只是数据转发, 不会重新建立tcp连接,代理是需要与上游和下游都建立tcp连接
-</code></pre><hr>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="其他问题-修改swap">其他问题: 修改swap</h3>
-<pre><code>dd if=/dev/zero of=/data/swapfilenew bs=4096 count=4096000
-
-swapoff -a
-
-/sbin/mkswap  /data/swapfilenew
-/sbin/swapon  /data/swapfilenew
-
-vim /etc/fstab
-/data/swapfilenew none swap defaults 0 0
-</code></pre><h3 id="其他问题-jenkins-ui特别慢-jobs数量100">其他问题: jenkins ui特别慢 (jobs数量100+)</h3>
-<p>原文: <a href="https://www.coder.work/article/6390497">jenkins GUI非常慢-浏览器缓存清除后很快</a></p>
-<pre><code>系统管理 -&gt; 全局安全配置 -&gt; 勾选 Disable remember me
-</code></pre><h3 id="其他问题-postgresql时区修改">其他问题: postgreSql时区修改</h3>
-<h4 id="docker启动通过变量传入">docker启动通过变量传入</h4>
-<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w">
-</span><span class="w">        </span><span class="nt">TZ</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;PRC&#39;</span><span class="w">
-</span><span class="w">        </span><span class="nt">PGTZ</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;PRC&#39;</span><span class="w">
-</span></code></pre></div><h4 id="直接修改配置文件">直接修改配置文件</h4>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">vim /var/lib/pgsql/9.4/data/postgresql.conf
-<span class="nv">log_timezone</span> <span class="o">=</span> <span class="s1">&#39;PRC&#39;</span>
-<span class="nv">timezone</span> <span class="o">=</span> <span class="s1">&#39;PRC&#39;</span>
-</code></pre></div><h3 id="其他问题-kafka和rocketmq比较">其他问题: kafka和rocketMQ比较</h3>
-<ul>
-<li><a href="https://blog.csdn.net/lppl010_/article/details/86662346">阿里 RocketMQ 优势对比</a></li>
-</ul>
-<p>RocketMQ 是对kafka的一种优化, kafka中的每个topic的每个分区都会对应一个物理文件, 但topic数量越多时, 分区分散更明显,就会导致磁盘IO成为瓶颈, 而rocketMQ所有的消息是保存在同一个物理文件中, topic和分区数对rocketMQ只是逻辑上的概念, 因此随着topic增加, kafka性能急剧下降, rocketMQ影响不大</p>
-<h3 id="其他问题-记录一个php扩展动态安装的错误问题">其他问题: 记录一个php扩展动态安装的错误问题</h3>
-<p>同事在自己的vagrant安装php7.0的mongodb1.7.5扩展,但是添加到ini的时候报错如下:</p>
-<pre><code>undefined symbol: zend_string_init_interned
-</code></pre><ul>
-<li>分析</li>
-</ul>
-<pre><code>1 首先扩展被安装到 /usr/lib/php/20180731目录
-2 报错显示无法加载的动态库
-</code></pre><ul>
-<li>问题1 由于php7.0的extension_dir配置查看发现是/usr/lib/php/20151012,所以改动态编译并未生成到正确的路径</li>
-<li>问题2 该报错可能是动态库不能识别问题</li>
-</ul>
-<p>经过确认该环境安装了多个php版本, 最新的是php7.4, 而php命令默认是link到php7.0, 但是动态扩展编译的命令如下:</p>
-<pre><code>/usr/php/phpize
-./configure
-make
-make install
-</code></pre><p>显然问题就在这, 这里phpize 和configure会走默认的配置, 默认的配置可能是最新的php7.4(大概是仅仅php命令link到了php7.0)
-因此重新编译如下:</p>
-<pre><code>/usr/php/phpize7.0
-./configure --with-php-config=/path/to/php-config7.0
-make
-make install
-</code></pre>]]></content>
-		</item>
-		
-		<item>
 			<title>Tcpdump抓包分析tcp三次握手和四次挥手</title>
 			<link>https://www.ngirl.xyz/posts/62-tcpdump%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/</link>
 			<pubDate>Fri, 13 Nov 2020 17:28:38 +0800</pubDate>
@@ -3065,245 +3304,6 @@ listening on enp0s3, link-type EN10MB <span class="o">(</span>Ethernet<span clas
 <li><a href="https://testerhome.com/topics/22107">Tcpdump 结果说明</a></li>
 </ul>
 ]]></content>
-		</item>
-		
-		<item>
-			<title>k8s遇到的一些问题统计总结</title>
-			<link>https://www.ngirl.xyz/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
-			<pubDate>Tue, 10 Nov 2020 14:06:41 +0000</pubDate>
-			
-			<guid>https://www.ngirl.xyz/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</guid>
-			<description>不定时更新,文章可能比较散乱,&amp;gt;_&amp;lt;
-  1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
-  deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
- # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从`hub.</description>
-			<content type="html"><![CDATA[<p>不定时更新,文章可能比较散乱,&gt;_&lt;</p>
-<!-- more -->
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="1-单机版k8s-pod一直是pending的问题">1. 单机版k8s pod一直是pending的问题</h3>
-<blockquote>
-<p>describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate.
-这是因为master上存在污点,pod不会再改节点上创建
-两种办法:</p>
-</blockquote>
-<ul>
-<li>deploy 的时候加上 容忍该污点</li>
-<li>直接取消master上的污点</li>
-</ul>
-<pre><code># 取消master上污点
-  kubectl taint nodes --all node-role.kubernetes.io/master-
-
-# 查看taint
-kubectl describe node node1
-</code></pre><center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="2-修改service-node-port-range">2. 修改service-node-port-range</h3>
-<blockquote>
-<p>由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口</p>
-</blockquote>
-<pre><code># kubeadm 1.14 配置
-apiServer:
-  extraArgs:
-    authorization-mode: Node,RBAC
-    service-node-port-range: 79-33000
-
-# kubeadm 1.10配置
-apiServerExtraArgs:
-  service-node-port-range: 79-33000
-</code></pre><center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="3-traefik断电后重新启动报错-command-traefik-error-field-not-found-node-redirect">3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect</h3>
-<pre><code>看到这个错误猜测可能是用的latest镜像问题, 从`hub.docker.com` 查看更新了v2.0+的版本
-
-将`traefik`的`deployment`配置中 image改成 `traefik:1.7`
-
-重新部署后 问题解
-</code></pre><center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="4-查看当前集群的customresourcedefinition">4. 查看当前集群的(CustomResourceDefinition)</h3>
-<pre><code># 查看k8s有哪些api
-kubectl api-versions
-
-# 查看当前crd
-kubectl get crd
-
-# 其次查看该api是什么版本
-kubectl describe crd destinationrules.networking.istio.io
-
-</code></pre><center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="5-启用自动轮换kubelet-证书证书未过期">5. 启用自动轮换kubelet 证书(证书未过期)</h3>
-<p>参考: <a href="https://www.cnblogs.com/skymyyang/p/11093686.html">Kubeadm证书过期时间调整</a></p>
-<p><code>kubelet</code>证书分为server和client两种， k8s 1.9默认启用了client证书的自动轮换，但server证书自动轮换需要用户开启</p>
-<p>增加 kubelet 参数</p>
-<pre><code># 在/etc/systemd/system/kubelet.service.d/10-kubeadm.conf 增加如下参数
-
-Environment=&quot;KUBELET_EXTRA_ARGS=--feature-gates=RotateKubeletServerCertificate=true&quot;
-</code></pre><p>增加 controller-manager 参数</p>
-<pre><code># 在/etc/kubernetes/manifests/kube-controller-manager.yaml 添加如下参数
-  - command:
-    - kube-controller-manager
-    - --experimental-cluster-signing-duration=87600h0m0s
-    - --feature-gates=RotateKubeletServerCertificate=true
-    - ....
-</code></pre><p>创建 rbac 对象
-创建 rbac对象，允许节点轮换kubelet server证书：</p>
-<pre><code>cat &gt; ca-update.yaml &lt;&lt; EOF
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  annotations:
-    rbac.authorization.kubernetes.io/autoupdate: &quot;true&quot;
-  labels:
-    kubernetes.io/bootstrapping: rbac-defaults
-  name: system:certificates.k8s.io:certificatesigningrequests:selfnodeserver
-rules:
-- apiGroups:
-  - certificates.k8s.io
-  resources:
-  - certificatesigningrequests/selfnodeserver
-  verbs:
-  - create
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: kubeadm:node-autoapprove-certificate-server
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: system:certificates.k8s.io:certificatesigningrequests:selfnodeserver
-subjects:
-- apiGroup: rbac.authorization.k8s.io
-  kind: Group
-  name: system:nodes
-EOF
-
-kubectl create –f ca-update.yaml
-</code></pre><p>重新启动kubelet</p>
-<pre><code>systemctl daemon-reload
-systemctl enable kubelet
-systemctl restart kubelet
-</code></pre><p>如果证书过期</p>
-<pre><code># 重新生成证书
-kubeadm alpha certs renew all
-# 查看有效期
-kubeadm alpha certs check-expiration
-# 覆盖配置文件
-mv $HOME/.kube/config $HOME/.kube/config.old
-cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-# 重启kube-apiserver,kube-controller,kube-scheduler,etcd
-</code></pre><center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="6-hpa的一个cpu-percent百分比问题">6. hpa的一个cpu-percent百分比问题</h3>
-<pre><code>kubectl autoscale deployment php-admintest-nginx-dev --cpu-percent=80 --min=1 --max=2 -n php-dev
-</code></pre><p>例如以上,我希望在平均cpu超过80%时,pod能自动调整为2个</p>
-<p>em&hellip;这没啥问题</p>
-<p>但我做简单ab压测发现, 我把cpu压到了100000% &hellip;</p>
-<p>我的deployment 配置中是这样限制cpu的</p>
-<pre><code>        resources:
-          requests:
-            cpu: &quot;1m&quot;
-          limits:
-            cpu: &quot;1000m&quot;
-</code></pre><p>显然我的pod可以使用1个核cpu, 那这个平均cpu是等于啥呢?</p>
-<p>cpu-percent = 1000m/resources.request.cpu =&gt; 1000m/1m =100000%</p>
-<p>-_-!!!</p>
-<blockquote>
-<p>因此建议 修改requests.cpu=500m,  &ndash;cpu-percent可设范围: 0~200% ,或者低一些 250m -&gt; 0~400%</p>
-</blockquote>
-<p>总结:
-request.cpu 必须设置, 这个是对比的对象</p>
-<p>另外:
-对于扩容而言，这个时间段为3分钟，缩容为5分钟(可以通过 <code>--horizontal-pod-autoscaler-downscale-delay</code> ， <code>--horizontal-pod-autoscaler-upscale-delay 进行调整</code>)。</p>
-<center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="7-k8s1162metrics-v035-deployment重启之后hpa就失效无法获取到数据">7 k8s1.16.2+metrics v0.3.5 deployment重启之后hpa就失效,无法获取到数据</h3>
-<pre><code>The HPA was unable to compute the replica count: unable to get metrics for resource cpu: no metrics returned from resource metrics API
-</code></pre><center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="8-k8s机器进程数达到500多的时候-ssh连接到服务报错-shell-request-failed-on-channel-0">8 k8s机器进程数达到500多的时候, ssh连接到服务报错 shell request failed on channel 0</h3>
-<pre><code>原因：目标主机的系统进程数太小，导致不能连接
-
-解决：需要修改/etc/security/limits.d/20-nproc.conf文件中的值，把4096改大一点，如 65535
-
-#cat /etc/security/limits.d/20-nproc.conf
-*          soft    nproc     4096
-root       soft    nproc     unlimited
-
-重新ssh，即可。
-
-</code></pre><center>
-<img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
-</center>
-<h3 id="9-centos8安装k8s118flannel-pod间不通">9 centos8安装k8s1.18+flannel pod间不通</h3>
-<p>在查看到<a href="https://zhangguanzhang.github.io/">馆长</a>的<a href="https://zhangguanzhang.github.io/2020/10/20/kylin-v10-k8s-overlay-error/">银河麒麟arm64系统上k8s集群跨节点不通的一次排查</a>问题, 发下我的flannel网络同样是 <code>lo</code> 也的确启用了 <code>NetworkManager</code>, 不过重启并未有效果</p>
-<blockquote>
-<p>配置如下:</p>
-</blockquote>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ ip route get <span class="k">$(</span>ip a s flannel.1 <span class="p">|</span>grep -w inet<span class="p">|</span>awk -F <span class="s1">&#39;inet|/&#39;</span> <span class="s1">&#39;{print $2}&#39;</span><span class="k">)</span>
-<span class="nb">local</span> 10.244.0.0 dev lo src 10.244.0.0 uid <span class="m">0</span>
-    cache &lt;local&gt;
-
-$ route -n
-Kernel IP routing table
-Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-0.0.0.0         10.23.0.1       0.0.0.0         UG    <span class="m">100</span>    <span class="m">0</span>        <span class="m">0</span> eth0
-10.5.27.0       0.0.0.0         255.255.255.0   U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> docker0
-10.23.0.0       0.0.0.0         255.255.0.0     U     <span class="m">100</span>    <span class="m">0</span>        <span class="m">0</span> eth0
-10.244.0.0      0.0.0.0         255.255.255.0   U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> cni0
-10.244.1.0      10.244.1.0      255.255.255.0   UG    <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> flannel.1
-192.168.212.64  0.0.0.0         255.255.255.192 U     <span class="m">0</span>      <span class="m">0</span>        <span class="m">0</span> *
-
-</code></pre></div><p>于是我重启</p>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">$ systemctl restart NetworkManager
-
-$ docker restart <span class="k">$(</span>docker ps <span class="p">|</span>grep flanneld<span class="p">|</span>awk <span class="s1">&#39;{print $1}&#39;</span><span class="k">)</span>
-
-$ ip route get <span class="k">$(</span>ip a s flannel.1 <span class="p">|</span>grep -w inet<span class="p">|</span>awk -F <span class="s1">&#39;inet|/&#39;</span> <span class="s1">&#39;{print $2}&#39;</span><span class="k">)</span>
-broadcast 10.244.0.0 dev cni0 src 10.244.0.1 uid <span class="m">0</span>
-    cache &lt;local,brd&gt;
-</code></pre></div><p>但最终我的现象是, master重启后从<code>lo</code>变成了<code>cni0</code>, 但是另外一台node一直无效, 重启容器后又变成<code>lo</code>, 至此<code>pod</code>间网络依然不通</p>
-<p>按照文章<a href="https://zhuanlan.zhihu.com/p/112834020">Centos8.1部署kubernetes1.17 问题 使用iptables打通网络</a> 中描述查看了<code>iptables</code>, 果然<code>Chain FORWARD (policy DROP)</code>, 通过<code>iptables -P FORWARD ACCEPT</code>的确解决了问题, 但显然这并不安全.</p>
-<p>其他链接:</p>
-<ul>
-<li>docker在 1.13 版本之后，将系统iptables 中 FORWARD 链的默认策略设置为 DROP: <a href="https://github.com/moby/moby/issues/14041">https://github.com/moby/moby/issues/14041</a></li>
-<li>docker&amp;k8s填坑记 nodeport 无法访问: <a href="https://www.cnblogs.com/tylerzhou/p/10975062.html">https://www.cnblogs.com/tylerzhou/p/10975062.html</a></li>
-</ul>
-<h3 id="10-部署服务器查看describe信息如下">10 部署服务器查看describe信息如下:</h3>
-<pre><code>Mounting command: systemd-run
-Mounting arguments: --description=Kubernetes transient mount for /var/lib/kubelet/pods/369daaef-1e90-446b-92ce-3d562f94b429/volumes/kubernetes.io~nfs/pvc-f462c606-5796-4c48-8928-7822f3fa0605 --scope -- mount -t nfs 172.16.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 /var/lib/kubelet/pods/369daaef-1e90-446b-92ce-3d562f94b429/volumes/kubernetes.io~nfs/pvc-f462c606-5796-4c48-8928-7822f3fa0605
-Output: Running scope as unit run-14829.scope.
-mount: 文件系统类型错误、选项错误、172.16.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 上有坏超级块、
-       缺少代码页或助手程序，或其他错误
-       (对某些文件系统(如 nfs、cifs) 您可能需要
-       一款 /sbin/mount.&lt;类型&gt; 助手程序)
-</code></pre><p>可能是客户端无法识别nfs格式</p>
-<pre><code># 做个测试
-mkdir /tmp/abc
-mount -t nfs 172.16.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-es520-2-dev-1-pvc-f462c606-5796-4c48-8928-7822f3fa0605 /tmp/abc
-
-
-# 果然报错
-mount: wrong fs type, bad option, bad superblock on 172.16.x.x:/data-nfs/nfs/k3s/ns-elastic5-es520-2-dev-nfs-plugins,
-       missing codepage or helper program, or other error
-       (for several filesystems (e.g. nfs, cifs) you might
-       need a /sbin/mount.&lt;type&gt; helper program)
-
-       In some cases useful info is found in syslog - try
-       dmesg | tail or so.
-</code></pre><p>所以安装了nfs即可</p>
-<pre><code>yum install nfs
-</code></pre>]]></content>
 		</item>
 		
 		<item>
