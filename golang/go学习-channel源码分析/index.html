@@ -141,23 +141,23 @@
 
 
 </code></pre></div><h3 id="1-channel的初始化和内存分配-runtimemakechan">1. channel的初始化和内存分配-runtime.makechan<a href="#1-channel的初始化和内存分配-runtimemakechan" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-<blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">hchan</span> <span class="kd">struct</span> <span class="p">{</span>
+    <span class="nx">qcount</span>   <span class="kt">uint</span>           <span class="c1">// queue 里面有效用户元素，这个字段是在元素出对，入队改变的；
+</span><span class="c1"></span>    <span class="nx">dataqsiz</span> <span class="kt">uint</span>           <span class="c1">// 初始化的时候赋值，之后不再改变，指明数组 buffer 的大小；
+</span><span class="c1"></span>    <span class="nx">buf</span>      <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="c1">// 指明 buffer 数组的地址，初始化赋值，之后不会再改变；
+</span><span class="c1"></span>    <span class="nx">elemsize</span> <span class="kt">uint16</span>         <span class="c1">// 指明元素的大小，和 dataqsiz 配合使用就能知道 buffer 内存块的大小了；
+</span><span class="c1"></span>    <span class="nx">closed</span>   <span class="kt">uint32</span>
+    <span class="nx">elemtype</span> <span class="o">*</span><span class="nx">_type</span>         <span class="c1">// 元素类型，初始化赋值；
+</span><span class="c1"></span>    <span class="nx">sendx</span>    <span class="kt">uint</span>           <span class="c1">// send index
+</span><span class="c1"></span>    <span class="nx">recvx</span>    <span class="kt">uint</span>           <span class="c1">// receive index
+</span><span class="c1"></span>    <span class="nx">recvq</span>    <span class="nx">waitq</span>          <span class="c1">// 等待 recv 响应的对象列表，抽象成 waiters
+</span><span class="c1"></span>    <span class="nx">sendq</span>    <span class="nx">waitq</span>          <span class="c1">// 等待 sedn 响应的对象列表，抽象成 waiters
+</span><span class="c1"></span>    <span class="nx">lock</span>     <span class="nx">mutex</span>          <span class="c1">// 锁
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><blockquote>
 <p>这是我们初始化channel使用的make方法</p>
 </blockquote>
-<pre><code>type hchan struct {
-    qcount   uint           // queue 里面有效用户元素，这个字段是在元素出对，入队改变的；
-    dataqsiz uint           // 初始化的时候赋值，之后不再改变，指明数组 buffer 的大小；
-    buf      unsafe.Pointer // 指明 buffer 数组的地址，初始化赋值，之后不会再改变；
-    elemsize uint16         // 指明元素的大小，和 dataqsiz 配合使用就能知道 buffer 内存块的大小了；
-    closed   uint32
-    elemtype *_type         // 元素类型，初始化赋值；
-    sendx    uint           // send index
-    recvx    uint           // receive index
-    recvq    waitq          // 等待 recv 响应的对象列表，抽象成 waiters
-    sendq    waitq          // 等待 sedn 响应的对象列表，抽象成 waiters
-    lock     mutex          // 锁
-}
-</code></pre><div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
 <span class="c1">// makechan需要传入的参数也很明显, 就是make(chan int, 2) 中的两个参数
 </span><span class="c1">// chantype=int 和 size=2
 </span><span class="c1">// 这里返回的 *hchan 就是channel的结构体

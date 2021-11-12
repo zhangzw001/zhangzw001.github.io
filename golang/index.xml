@@ -18,45 +18,45 @@
 			<description>在此之前,什么是函数栈? 先了解下几个汇编寄存器 通用寄存器包括: 1. 数据寄存器 AX:累加寄存器 BX:基地址寄存器 CX:计数器寄存器 DX:数据寄存器 2. 指针寄存器 SP:堆栈指针, 栈顶 BP:基址指针, 栈底 IP:指令指针, cpu下一条要执行指令的内存地址 3. 变址寄存器 SI:源变址 DI:目的变址 golang伪寄存器: FP: Frame pointer: arguments and locals.(指向当前frame的起始位置) FP+0 使用形如 symbol+offset(FP) 的方式，引用函数的输入参数。例如 arg0+0(FP)，arg1+8(FP)，使用 FP 不加 symbol 时，无法通过编译，在汇编层面来讲，symbol 并没有什么用，加 symbol 主要是为了提升代码可读性。另外，官方文档虽然将伪寄存器 FP 称之为 frame pointer，实际上它根本不是 frame pointer，按照传统的 x86 的习惯来讲，frame pointer 是指向整个 stack frame 底部的 BP 寄存器。假如当前的 callee 函数是 add，在 add 的代码中引用 FP，该 FP 指向的位置不在 callee 的 stack frame 之内，而是在 caller 的 stack frame 上。 PC: Program counter: jumps and branches.</description>
 			<content type="html"><![CDATA[<h3 id="在此之前什么是函数栈">在此之前,什么是函数栈?</h3>
 <h3 id="先了解下几个汇编寄存器">先了解下几个汇编寄存器</h3>
-<pre><code>通用寄存器包括:
-1. 数据寄存器
-    AX:累加寄存器
-    BX:基地址寄存器
-    CX:计数器寄存器
-    DX:数据寄存器
-2. 指针寄存器
-    SP:堆栈指针, 栈顶
-    BP:基址指针, 栈底
-    IP:指令指针, cpu下一条要执行指令的内存地址
-3. 变址寄存器
-    SI:源变址
-    DI:目的变址
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">通用寄存器包括</span><span class="p">:</span>
+<span class="mf">1.</span> <span class="nx">数据寄存器</span>
+    <span class="nx">AX</span><span class="p">:</span><span class="nx">累加寄存器</span>
+    <span class="nx">BX</span><span class="p">:</span><span class="nx">基地址寄存器</span>
+    <span class="nx">CX</span><span class="p">:</span><span class="nx">计数器寄存器</span>
+    <span class="nx">DX</span><span class="p">:</span><span class="nx">数据寄存器</span>
+<span class="mf">2.</span> <span class="nx">指针寄存器</span>
+    <span class="nx">SP</span><span class="p">:</span><span class="nx">堆栈指针</span><span class="p">,</span> <span class="nx">栈顶</span>
+    <span class="nx">BP</span><span class="p">:</span><span class="nx">基址指针</span><span class="p">,</span> <span class="nx">栈底</span>
+    <span class="nx">IP</span><span class="p">:</span><span class="nx">指令指针</span><span class="p">,</span> <span class="nx">cpu下一条要执行指令的内存地址</span>
+<span class="mf">3.</span> <span class="nx">变址寄存器</span>
+    <span class="nx">SI</span><span class="p">:</span><span class="nx">源变址</span>
+    <span class="nx">DI</span><span class="p">:</span><span class="nx">目的变址</span>
 
-golang伪寄存器:
-FP: Frame pointer: arguments and locals.(指向当前frame的起始位置) FP+0
-    使用形如 symbol+offset(FP) 的方式，引用函数的输入参数。例如 arg0+0(FP)，arg1+8(FP)，使用 FP 不加 symbol 时，无法通过编译，在汇编层面来讲，symbol 并没有什么用，加 symbol 主要是为了提升代码可读性。另外，官方文档虽然将伪寄存器 FP 称之为 frame pointer，实际上它根本不是 frame pointer，按照传统的 x86 的习惯来讲，frame pointer 是指向整个 stack frame 底部的 BP 寄存器。假如当前的 callee 函数是 add，在 add 的代码中引用 FP，该 FP 指向的位置不在 callee 的 stack frame 之内，而是在 caller 的 stack frame 上。
-PC: Program counter: jumps and branches.(指向下一条要执行的指令的位置)
-    实际上就是在体系结构的知识中常见的 pc 寄存器，在 x86 平台下对应 ip 寄存器，amd64 上则是 rip。除了个别跳转之外，手写 plan9 代码与 PC 寄存器打交道的情况较少。
-SB: Static base pointer: global symbols.(指向全局变量的位置,可以看着是程序的起始地址)
-    全局静态基指针，一般用来声明函数或全局变量，在之后的函数知识和示例部分会看到具体用法
-SP: Stack pointer: top of stack.(指向当前栈顶)
-    plan9 的这个 SP 寄存器指向当前栈帧的局部变量的开始位置，使用形如 symbol+offset(SP) 的方式，引用函数的局部变量。offset 的合法取值是 [-framesize, 0)，注意是个左闭右开的区间。假如局部变量都是 8 字节，那么第一个局部变量就可以用 localvar0-8(SP) 来表示。这也是一个词不表意的寄存器。与硬件寄存器 SP 是两个不同的东西，在栈帧 size 为 0 的情况下，伪寄存器 SP 和硬件寄存器 SP 指向同一位置。手写汇编代码时，如果是 symbol+offset(SP) 形式，则表示伪寄存器 SP。如果是 offset(SP) 则表示硬件寄存器 SP。务必注意。对于编译输出(go tool compile -S / go tool objdump)的代码来讲，目前所有的 SP 都是硬件寄存器 SP，无论是否带 symbol。
+<span class="nx">golang伪寄存器</span><span class="p">:</span>
+<span class="nx">FP</span><span class="p">:</span> <span class="nx">Frame</span> <span class="nx">pointer</span><span class="p">:</span> <span class="nx">arguments</span> <span class="nx">and</span> <span class="nx">locals</span><span class="p">.(</span><span class="nx">指向当前frame的起始位置</span><span class="p">)</span> <span class="nx">FP</span><span class="o">+</span><span class="mi">0</span>
+    <span class="nx">使用形如</span> <span class="nx">symbol</span><span class="o">+</span><span class="nf">offset</span><span class="p">(</span><span class="nx">FP</span><span class="p">)</span> <span class="nx">的方式</span><span class="err">，</span><span class="nx">引用函数的输入参数</span><span class="err">。</span><span class="nx">例如</span> <span class="nx">arg0</span><span class="o">+</span><span class="mi">0</span><span class="p">(</span><span class="nx">FP</span><span class="p">)</span><span class="err">，</span><span class="nx">arg1</span><span class="o">+</span><span class="mi">8</span><span class="p">(</span><span class="nx">FP</span><span class="p">)</span><span class="err">，</span><span class="nx">使用</span> <span class="nx">FP</span> <span class="nx">不加</span> <span class="nx">symbol</span> <span class="nx">时</span><span class="err">，</span><span class="nx">无法通过编译</span><span class="err">，</span><span class="nx">在汇编层面来讲</span><span class="err">，</span><span class="nx">symbol</span> <span class="nx">并没有什么用</span><span class="err">，</span><span class="nx">加</span> <span class="nx">symbol</span> <span class="nx">主要是为了提升代码可读性</span><span class="err">。</span><span class="nx">另外</span><span class="err">，</span><span class="nx">官方文档虽然将伪寄存器</span> <span class="nx">FP</span> <span class="nx">称之为</span> <span class="nx">frame</span> <span class="nx">pointer</span><span class="err">，</span><span class="nx">实际上它根本不是</span> <span class="nx">frame</span> <span class="nx">pointer</span><span class="err">，</span><span class="nx">按照传统的</span> <span class="nx">x86</span> <span class="nx">的习惯来讲</span><span class="err">，</span><span class="nx">frame</span> <span class="nx">pointer</span> <span class="nx">是指向整个</span> <span class="nx">stack</span> <span class="nx">frame</span> <span class="nx">底部的</span> <span class="nx">BP</span> <span class="nx">寄存器</span><span class="err">。</span><span class="nx">假如当前的</span> <span class="nx">callee</span> <span class="nx">函数是</span> <span class="nx">add</span><span class="err">，</span><span class="nx">在</span> <span class="nx">add</span> <span class="nx">的代码中引用</span> <span class="nx">FP</span><span class="err">，</span><span class="nx">该</span> <span class="nx">FP</span> <span class="nx">指向的位置不在</span> <span class="nx">callee</span> <span class="nx">的</span> <span class="nx">stack</span> <span class="nx">frame</span> <span class="nx">之内</span><span class="err">，</span><span class="nx">而是在</span> <span class="nx">caller</span> <span class="nx">的</span> <span class="nx">stack</span> <span class="nx">frame</span> <span class="nx">上</span><span class="err">。</span>
+<span class="nx">PC</span><span class="p">:</span> <span class="nx">Program</span> <span class="nx">counter</span><span class="p">:</span> <span class="nx">jumps</span> <span class="nx">and</span> <span class="nx">branches</span><span class="p">.(</span><span class="nx">指向下一条要执行的指令的位置</span><span class="p">)</span>
+    <span class="nx">实际上就是在体系结构的知识中常见的</span> <span class="nx">pc</span> <span class="nx">寄存器</span><span class="err">，</span><span class="nx">在</span> <span class="nx">x86</span> <span class="nx">平台下对应</span> <span class="nx">ip</span> <span class="nx">寄存器</span><span class="err">，</span><span class="nx">amd64</span> <span class="nx">上则是</span> <span class="nx">rip</span><span class="err">。</span><span class="nx">除了个别跳转之外</span><span class="err">，</span><span class="nx">手写</span> <span class="nx">plan9</span> <span class="nx">代码与</span> <span class="nx">PC</span> <span class="nx">寄存器打交道的情况较少</span><span class="err">。</span>
+<span class="nx">SB</span><span class="p">:</span> <span class="nx">Static</span> <span class="nx">base</span> <span class="nx">pointer</span><span class="p">:</span> <span class="nx">global</span> <span class="nx">symbols</span><span class="p">.(</span><span class="nx">指向全局变量的位置</span><span class="p">,</span><span class="nx">可以看着是程序的起始地址</span><span class="p">)</span>
+    <span class="nx">全局静态基指针</span><span class="err">，</span><span class="nx">一般用来声明函数或全局变量</span><span class="err">，</span><span class="nx">在之后的函数知识和示例部分会看到具体用法</span>
+<span class="nx">SP</span><span class="p">:</span> <span class="nx">Stack</span> <span class="nx">pointer</span><span class="p">:</span> <span class="nx">top</span> <span class="nx">of</span> <span class="nx">stack</span><span class="p">.(</span><span class="nx">指向当前栈顶</span><span class="p">)</span>
+    <span class="nx">plan9</span> <span class="nx">的这个</span> <span class="nx">SP</span> <span class="nx">寄存器指向当前栈帧的局部变量的开始位置</span><span class="err">，</span><span class="nx">使用形如</span> <span class="nx">symbol</span><span class="o">+</span><span class="nf">offset</span><span class="p">(</span><span class="nx">SP</span><span class="p">)</span> <span class="nx">的方式</span><span class="err">，</span><span class="nx">引用函数的局部变量</span><span class="err">。</span><span class="nx">offset</span> <span class="nx">的合法取值是</span> <span class="p">[</span><span class="o">-</span><span class="nx">framesize</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="err">，</span><span class="nx">注意是个左闭右开的区间</span><span class="err">。</span><span class="nx">假如局部变量都是</span> <span class="mi">8</span> <span class="nx">字节</span><span class="err">，</span><span class="nx">那么第一个局部变量就可以用</span> <span class="nx">localvar0</span><span class="o">-</span><span class="mi">8</span><span class="p">(</span><span class="nx">SP</span><span class="p">)</span> <span class="nx">来表示</span><span class="err">。</span><span class="nx">这也是一个词不表意的寄存器</span><span class="err">。</span><span class="nx">与硬件寄存器</span> <span class="nx">SP</span> <span class="nx">是两个不同的东西</span><span class="err">，</span><span class="nx">在栈帧</span> <span class="nx">size</span> <span class="nx">为</span> <span class="mi">0</span> <span class="nx">的情况下</span><span class="err">，</span><span class="nx">伪寄存器</span> <span class="nx">SP</span> <span class="nx">和硬件寄存器</span> <span class="nx">SP</span> <span class="nx">指向同一位置</span><span class="err">。</span><span class="nx">手写汇编代码时</span><span class="err">，</span><span class="nx">如果是</span> <span class="nx">symbol</span><span class="o">+</span><span class="nf">offset</span><span class="p">(</span><span class="nx">SP</span><span class="p">)</span> <span class="nx">形式</span><span class="err">，</span><span class="nx">则表示伪寄存器</span> <span class="nx">SP</span><span class="err">。</span><span class="nx">如果是</span> <span class="nf">offset</span><span class="p">(</span><span class="nx">SP</span><span class="p">)</span> <span class="nx">则表示硬件寄存器</span> <span class="nx">SP</span><span class="err">。</span><span class="nx">务必注意</span><span class="err">。</span><span class="nx">对于编译输出</span><span class="p">(</span><span class="k">go</span> <span class="nx">tool</span> <span class="nx">compile</span> <span class="o">-</span><span class="nx">S</span> <span class="o">/</span> <span class="k">go</span> <span class="nx">tool</span> <span class="nx">objdump</span><span class="p">)</span><span class="nx">的代码来讲</span><span class="err">，</span><span class="nx">目前所有的</span> <span class="nx">SP</span> <span class="nx">都是硬件寄存器</span> <span class="nx">SP</span><span class="err">，</span><span class="nx">无论是否带</span> <span class="nx">symbol</span><span class="err">。</span>
 
-汇编指令:
-PUSH: 入栈, 将内容保存栈中,并且SP下移(减小)
-POP: 出栈,读取栈中结果,并且SP上移(增加)
-CALL: 函数调用,这里记录A为调用者,B为被调用者, 代码段读到call指令时,call后面跟的是B的地址,
-    1. call: 入栈call下一条指令地址(因为call执行完,你还得接着call后面的指令继续执行),同时SP下移(入栈了肯定要下移)
-    2. call: IP指令指针跳转到B的地址处
-    3. 执行B函数: 分配B需要的栈大小,比如24字节,直接将SP下移SP-24,分配B函数栈帧大小
-    4. 执行B函数: 入栈BP寄存器中保存的A函数的栈底地址, A的栈底BP值保存在SP+16的位置,后续用于恢复
-    5. 执行B函数: BP改为SP+16,这里假定16个字节是B函数的剩下的指令
-RET: 函数返回
-    6. 执行B函数: 首先需要恢复调用者A的BP,我们第4步入栈了,此时出栈就能得到A函数之前入栈保存的BP值
-    7. 执行B函数: B函数执行完了,肯定要释放栈空间,所以SP+24
-    8. RET: 继续出栈,此时就是第1步入栈的内容,
-    9. RET: 跳转到出栈的地址,就是call调用后的位置
-</code></pre><ul>
+<span class="nx">汇编指令</span><span class="p">:</span>
+<span class="nx">PUSH</span><span class="p">:</span> <span class="nx">入栈</span><span class="p">,</span> <span class="nx">将内容保存栈中</span><span class="p">,</span><span class="nx">并且SP下移</span><span class="p">(</span><span class="nx">减小</span><span class="p">)</span>
+<span class="nx">POP</span><span class="p">:</span> <span class="nx">出栈</span><span class="p">,</span><span class="nx">读取栈中结果</span><span class="p">,</span><span class="nx">并且SP上移</span><span class="p">(</span><span class="nx">增加</span><span class="p">)</span>
+<span class="nx">CALL</span><span class="p">:</span> <span class="nx">函数调用</span><span class="p">,</span><span class="nx">这里记录A为调用者</span><span class="p">,</span><span class="nx">B为被调用者</span><span class="p">,</span> <span class="nx">代码段读到call指令时</span><span class="p">,</span><span class="nx">call后面跟的是B的地址</span><span class="p">,</span>
+    <span class="mf">1.</span> <span class="nx">call</span><span class="p">:</span> <span class="nx">入栈call下一条指令地址</span><span class="p">(</span><span class="nx">因为call执行完</span><span class="p">,</span><span class="nx">你还得接着call后面的指令继续执行</span><span class="p">),</span><span class="nx">同时SP下移</span><span class="p">(</span><span class="nx">入栈了肯定要下移</span><span class="p">)</span>
+    <span class="mf">2.</span> <span class="nx">call</span><span class="p">:</span> <span class="nx">IP指令指针跳转到B的地址处</span>
+    <span class="mf">3.</span> <span class="nx">执行B函数</span><span class="p">:</span> <span class="nx">分配B需要的栈大小</span><span class="p">,</span><span class="nx">比如24字节</span><span class="p">,</span><span class="nx">直接将SP下移SP</span><span class="o">-</span><span class="mi">24</span><span class="p">,</span><span class="nx">分配B函数栈帧大小</span>
+    <span class="mf">4.</span> <span class="nx">执行B函数</span><span class="p">:</span> <span class="nx">入栈BP寄存器中保存的A函数的栈底地址</span><span class="p">,</span> <span class="nx">A的栈底BP值保存在SP</span><span class="o">+</span><span class="mi">16</span><span class="nx">的位置</span><span class="p">,</span><span class="nx">后续用于恢复</span>
+    <span class="mf">5.</span> <span class="nx">执行B函数</span><span class="p">:</span> <span class="nx">BP改为SP</span><span class="o">+</span><span class="mi">16</span><span class="p">,</span><span class="nx">这里假定16个字节是B函数的剩下的指令</span>
+<span class="nx">RET</span><span class="p">:</span> <span class="nx">函数返回</span>
+    <span class="mf">6.</span> <span class="nx">执行B函数</span><span class="p">:</span> <span class="nx">首先需要恢复调用者A的BP</span><span class="p">,</span><span class="nx">我们第4步入栈了</span><span class="p">,</span><span class="nx">此时出栈就能得到A函数之前入栈保存的BP值</span>
+    <span class="mf">7.</span> <span class="nx">执行B函数</span><span class="p">:</span> <span class="nx">B函数执行完了</span><span class="p">,</span><span class="nx">肯定要释放栈空间</span><span class="p">,</span><span class="nx">所以SP</span><span class="o">+</span><span class="mi">24</span>
+    <span class="mf">8.</span> <span class="nx">RET</span><span class="p">:</span> <span class="nx">继续出栈</span><span class="p">,</span><span class="nx">此时就是第1步入栈的内容</span><span class="p">,</span>
+    <span class="mf">9.</span> <span class="nx">RET</span><span class="p">:</span> <span class="nx">跳转到出栈的地址</span><span class="p">,</span><span class="nx">就是call调用后的位置</span>
+</code></pre></div><ul>
 <li><a href="https://www.zhihu.com/zvideo/1308359170928799744">函数栈视频讲解</a></li>
 <li><a href="https://blog.csdn.net/u011555996/article/details/80153141">x86汇编指令说明</a></li>
 </ul>
@@ -65,155 +65,155 @@ RET: 函数返回
 <li>栈,每个goroutine都有自己的栈, 一般顺序为 SP栈顶(低地址)-&gt;存储参数,返回值,局部变量-&gt;BP栈底(高地址)</li>
 <li>栈帧,一个栈由多个栈帧组成, 每个函数对应一段栈帧,栈帧表示着函数间的调用关系</li>
 </ul>
-<pre><code>
-                                       caller                                                                                 
-                                 +------------------+                                                                         
-                                 |                  |                                                                         
-       +----------------------&gt;  --------------------                                                                         
-       |                         |                  |                                                                         
-       |                         | caller parent BP |                                                                         
-       |           BP(pseudo SP) --------------------                                                                         
-       |                         |                  |                                                                         
-       |                         |   Local VarX     |                                                                         
-       |                         --------------------                                                                         
-       |                         |                  |                                                                         
-       |                         |   .......        |                                                                         
-       |                         --------------------                                                                         
-       |                         |                  |                                                                         
-       |                         |   Local VarN     |                                                                         
-                                 --------------------                                                                         
- caller stack frame              |                  |                                                                         
-                                 |   callee arg2    |                                                                         
-       |                         |------------------|                                                                         
-       |                         |                  |                                                                         
-       |                         |   callee arg1    |                                                                         
-       |                         |------------------|                                                                         
-       |                         |                  |                                                                         
-       |                         |   callee arg0    |                                                                         
-       |                         ----------------------------------------------+   FP(virtual register)                       
-       |                         |                  |                          |                                              
-       |                         |   return addr    |  parent return address   |                                              
-       +----------------------&gt;  +------------------+---------------------------    &lt;-------------------------------+         
-                                                    |  caller BP               |                                    |         
-                                                    |  (caller frame pointer)  |                                    |         
-                                     BP(pseudo SP)  ----------------------------                                    |         
-                                                    |                          |                                    |         
-                                                    |     Local Var0           |                                    |         
-                                                    ----------------------------                                    |         
-                                                    |                          |                                              
-                                                    |     Local Var1           |                                              
-                                                    ----------------------------                            callee stack frame
-                                                    |                          |                                              
-                                                    |       .....              |                                              
-                                                    ----------------------------                                    |         
-                                                    |                          |                                    |         
-                                                    |     Local VarN           |                                    |         
-                                  SP(Real Register) ----------------------------                                    |         
-                                                    |                          |                                    |         
-                                                    |                          |                                    |         
-                                                    |                          |                                    |         
-                                                    |                          |                                    |         
-                                                    |                          |                                    |         
-                                                    +--------------------------+    &lt;-------------------------------+         
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+                                       <span class="nx">caller</span>                                                                                 
+                                 <span class="o">+------------------+</span>                                                                         
+                                 <span class="p">|</span>                  <span class="p">|</span>                                                                         
+       <span class="o">+----------------------</span><span class="p">&gt;</span>  <span class="o">--------------------</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>                  <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span> <span class="nx">caller</span> <span class="nx">parent</span> <span class="nx">BP</span> <span class="p">|</span>                                                                         
+       <span class="p">|</span>           <span class="nf">BP</span><span class="p">(</span><span class="nx">pseudo</span> <span class="nx">SP</span><span class="p">)</span> <span class="o">--------------------</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>                  <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>   <span class="nx">Local</span> <span class="nx">VarX</span>     <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="o">--------------------</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>                  <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>   <span class="o">......</span><span class="p">.</span>        <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="o">--------------------</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>                  <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>   <span class="nx">Local</span> <span class="nx">VarN</span>     <span class="p">|</span>                                                                         
+                                 <span class="o">--------------------</span>                                                                         
+ <span class="nx">caller</span> <span class="nx">stack</span> <span class="nx">frame</span>              <span class="p">|</span>                  <span class="p">|</span>                                                                         
+                                 <span class="p">|</span>   <span class="nx">callee</span> <span class="nx">arg2</span>    <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span><span class="o">------------------</span><span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>                  <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>   <span class="nx">callee</span> <span class="nx">arg1</span>    <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span><span class="o">------------------</span><span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>                  <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>   <span class="nx">callee</span> <span class="nx">arg0</span>    <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="o">----------------------------------------------+</span>   <span class="nf">FP</span><span class="p">(</span><span class="nx">virtual</span> <span class="nx">register</span><span class="p">)</span>                       
+       <span class="p">|</span>                         <span class="p">|</span>                  <span class="p">|</span>                          <span class="p">|</span>                                              
+       <span class="p">|</span>                         <span class="p">|</span>   <span class="k">return</span> <span class="nx">addr</span>    <span class="p">|</span>  <span class="nx">parent</span> <span class="k">return</span> <span class="nx">address</span>   <span class="p">|</span>                                              
+       <span class="o">+----------------------</span><span class="p">&gt;</span>  <span class="o">+------------------+---------------------------</span>    <span class="o">&lt;-------------------------------+</span>         
+                                                    <span class="p">|</span>  <span class="nx">caller</span> <span class="nx">BP</span>               <span class="p">|</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>  <span class="p">(</span><span class="nx">caller</span> <span class="nx">frame</span> <span class="nx">pointer</span><span class="p">)</span>  <span class="p">|</span>                                    <span class="p">|</span>         
+                                     <span class="nf">BP</span><span class="p">(</span><span class="nx">pseudo</span> <span class="nx">SP</span><span class="p">)</span>  <span class="o">----------------------------</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>     <span class="nx">Local</span> <span class="nx">Var0</span>           <span class="p">|</span>                                    <span class="p">|</span>         
+                                                    <span class="o">----------------------------</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>                          <span class="p">|</span>                                              
+                                                    <span class="p">|</span>     <span class="nx">Local</span> <span class="nx">Var1</span>           <span class="p">|</span>                                              
+                                                    <span class="o">----------------------------</span>                            <span class="nx">callee</span> <span class="nx">stack</span> <span class="nx">frame</span>
+                                                    <span class="p">|</span>                          <span class="p">|</span>                                              
+                                                    <span class="p">|</span>       <span class="o">...</span><span class="p">..</span>              <span class="p">|</span>                                              
+                                                    <span class="o">----------------------------</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>     <span class="nx">Local</span> <span class="nx">VarN</span>           <span class="p">|</span>                                    <span class="p">|</span>         
+                                  <span class="nf">SP</span><span class="p">(</span><span class="nx">Real</span> <span class="nx">Register</span><span class="p">)</span> <span class="o">----------------------------</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
+                                                    <span class="o">+--------------------------+</span>    <span class="o">&lt;-------------------------------+</span>         
 
-                                                              callee
-</code></pre><ul>
+                                                              <span class="nx">callee</span>
+</code></pre></div><ul>
 <li><a href="https://www.bilibili.com/video/BV1Xb411J7Yk">曹大讲解go plan9汇编 视频</a></li>
 <li><a href="https://github.com/cch123/asmshare/blob/master/layout.md">曹大讲解go plan9汇编 资料</a></li>
 </ul>
 <h3 id="例子1">例子1</h3>
-<pre><code># cat 函数栈.go
-package main
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="err">#</span> <span class="nx">cat</span> <span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span>
+<span class="kn">package</span> <span class="nx">main</span>
 
-// go代码直接实现累加
-func sumGo(rl  []int64) int64 {
-	var a int64
-	for i:=0 ;i &lt;len(rl);i++ {
-		a += rl[i]
-	}
-	return a
-}
+<span class="c1">// go代码直接实现累加
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">sumGo</span><span class="p">(</span><span class="nx">rl</span>  <span class="p">[]</span><span class="kt">int64</span><span class="p">)</span> <span class="kt">int64</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">a</span> <span class="kt">int64</span>
+	<span class="k">for</span> <span class="nx">i</span><span class="o">:=</span><span class="mi">0</span> <span class="p">;</span><span class="nx">i</span> <span class="p">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="nx">rl</span><span class="p">);</span><span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">a</span> <span class="o">+=</span> <span class="nx">rl</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">a</span>
+<span class="p">}</span>
 
-func main() {
-    l := []int64{1,2,3}
-	sumGo(l)
-}
-</code></pre><blockquote>
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">l</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int64</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}</span>
+	<span class="nf">sumGo</span><span class="p">(</span><span class="nx">l</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div><blockquote>
 <p>反编译或者编译的汇编结果看其一即可, 差别不大</p>
 </blockquote>
 <ul>
 <li>反编译看汇编</li>
 </ul>
-<pre><code># 先build生成二进制
-go build 函数栈.go
-# 在反编译
-go tool objdump 函数栈|grep &quot;函数栈.go&quot;
-</code></pre><ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="err">#</span> <span class="nx">先build生成二进制</span>
+<span class="k">go</span> <span class="nx">build</span> <span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span>
+<span class="err">#</span> <span class="nx">在反编译</span>
+<span class="k">go</span> <span class="nx">tool</span> <span class="nx">objdump</span> <span class="nx">函数栈</span><span class="p">|</span><span class="nx">grep</span> <span class="s">&#34;函数栈.go&#34;</span>
+</code></pre></div><ul>
 <li>编译看汇编</li>
 </ul>
-<pre><code>go tool compile -S 函数栈.go|egrep &quot;函数栈.go|funcid&quot;
-&quot;&quot;.sumGo STEXT nosplit size=43 args=0x20 locals=0x0 funcid=0x0
-	0x0000 00000 (函数栈.go:4)	TEXT	&quot;&quot;.sumGo(SB), NOSPLIT|ABIInternal, $0-32
-	0x0000 00000 (函数栈.go:6)	MOVQ	&quot;&quot;.rl+16(SP), AX  // 这里都是物理sp寄存器, AX=len(rl),我们知道slice结构体是struct{array,len,cap},每个字段都是8字节
-	0x0005 00005 (函数栈.go:6)	MOVQ	&quot;&quot;.rl+8(SP), CX   // CX=&amp;rl[0]
-	0x000a 00010 (函数栈.go:6)	XORL	DX, DX    // 相同的值异或肯定都是0,DX=0
-	0x000c 00012 (函数栈.go:6)	XORL	BX, BX    // BX=0
-	0x000e 00014 (函数栈.go:6)	JMP	32            // 跳到 32行 CMPQ	DX, AX
-	0x0010 00016 (函数栈.go:6)	LEAQ	1(DX), SI //装入有效地址, 1(DX)偏移地址存入SI, SI= DX+1 ~ i+1
-	0x0014 00020 (函数栈.go:7)	MOVQ	(CX)(DX*8), DI    // 指针*CX移动i*8字节? 所以 DI=rl[i]
-	0x0018 00024 (函数栈.go:7)	ADDQ	DI, BX    // BX += DI  ~ += rl[i]
-	0x001b 00027 (函数栈.go:6)	MOVQ	SI, DX    // DX = SI ~ i
-	0x001e 00030 (函数栈.go:6)	NOP               // 空操作?
-	0x0020 00032 (函数栈.go:6)	CMPQ	DX, AX    // 比较DX是否小于AX ?
-	0x0023 00035 (函数栈.go:6)	JLT	16            // 小于 就跳转到16行
-	0x0025 00037 (函数栈.go:9)	MOVQ	BX, &quot;&quot;.~r1+32(SP) // 否则 BX结果写到 32(SP)的栈中
-	0x002a 00042 (函数栈.go:9)	RET
-&quot;&quot;.main STEXT nosplit size=14 args=0x0 locals=0x0 funcid=0x0
-	0x0000 00000 (函数栈.go:14)	TEXT	&quot;&quot;.main(SB), NOSPLIT|ABIInternal, $0-0
-	0x0000 00000 (函数栈.go:16)	XORL	AX, AX
-	0x0002 00002 (函数栈.go:6)	JMP	7
-	0x0004 00004 (函数栈.go:6)	INCQ	AX
-	0x0007 00007 (函数栈.go:6)	CMPQ	AX, $3
-	0x000b 00011 (函数栈.go:6)	JLT	4
-	0x000d 00013 (函数栈.go:16)	RET
-</code></pre><h3 id="例子2">例子2</h3>
-<pre><code>//sum_amd64.s
-#include &quot;textflag.h&quot;
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="k">go</span> <span class="nx">tool</span> <span class="nx">compile</span> <span class="o">-</span><span class="nx">S</span> <span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">|</span><span class="nx">egrep</span> <span class="s">&#34;函数栈.go|funcid&#34;</span>
+<span class="s">&#34;&#34;</span><span class="p">.</span><span class="nx">sumGo</span> <span class="nx">STEXT</span> <span class="nx">nosplit</span> <span class="nx">size</span><span class="p">=</span><span class="mi">43</span> <span class="nx">args</span><span class="p">=</span><span class="mh">0x20</span> <span class="nx">locals</span><span class="p">=</span><span class="mh">0x0</span> <span class="nx">funcid</span><span class="p">=</span><span class="mh">0x0</span>
+	<span class="mh">0x0000</span> <span class="mo">00000</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">4</span><span class="p">)</span>	<span class="nx">TEXT</span>	<span class="s">&#34;&#34;</span><span class="p">.</span><span class="nf">sumGo</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">NOSPLIT</span><span class="p">|</span><span class="nx">ABIInternal</span><span class="p">,</span> <span class="err">$</span><span class="mi">0</span><span class="o">-</span><span class="mi">32</span>
+	<span class="mh">0x0000</span> <span class="mo">00000</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">MOVQ</span>	<span class="s">&#34;&#34;</span><span class="p">.</span><span class="nx">rl</span><span class="o">+</span><span class="mi">16</span><span class="p">(</span><span class="nx">SP</span><span class="p">),</span> <span class="nx">AX</span>  <span class="c1">// 这里都是物理sp寄存器, AX=len(rl),我们知道slice结构体是struct{array,len,cap},每个字段都是8字节
+</span><span class="c1"></span>	<span class="mh">0x0005</span> <span class="mo">00005</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">MOVQ</span>	<span class="s">&#34;&#34;</span><span class="p">.</span><span class="nx">rl</span><span class="o">+</span><span class="mi">8</span><span class="p">(</span><span class="nx">SP</span><span class="p">),</span> <span class="nx">CX</span>   <span class="c1">// CX=&amp;rl[0]
+</span><span class="c1"></span>	<span class="mh">0x000a</span> <span class="mo">00010</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">XORL</span>	<span class="nx">DX</span><span class="p">,</span> <span class="nx">DX</span>            <span class="c1">// 相同的值异或肯定都是0,DX=0
+</span><span class="c1"></span>	<span class="mh">0x000c</span> <span class="mo">00012</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">XORL</span>	<span class="nx">BX</span><span class="p">,</span> <span class="nx">BX</span>            <span class="c1">// BX=0
+</span><span class="c1"></span>	<span class="mh">0x000e</span> <span class="mo">00014</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">JMP</span>	<span class="mi">32</span>                    <span class="c1">// 跳到 32行 CMPQ	DX, AX
+</span><span class="c1"></span>	<span class="mh">0x0010</span> <span class="mo">00016</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">LEAQ</span>	<span class="mi">1</span><span class="p">(</span><span class="nx">DX</span><span class="p">),</span> <span class="nx">SI</span>         <span class="c1">//装入有效地址, 1(DX)偏移地址存入SI, SI= DX+1 ~ i+1
+</span><span class="c1"></span>	<span class="mh">0x0014</span> <span class="mo">00020</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">7</span><span class="p">)</span>	<span class="nf">MOVQ</span>	<span class="p">(</span><span class="nx">CX</span><span class="p">)(</span><span class="nx">DX</span><span class="o">*</span><span class="mi">8</span><span class="p">),</span> <span class="nx">DI</span>    <span class="c1">// 指针*CX移动i*8字节? 所以 DI=rl[i]
+</span><span class="c1"></span>	<span class="mh">0x0018</span> <span class="mo">00024</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">7</span><span class="p">)</span>	<span class="nx">ADDQ</span>	<span class="nx">DI</span><span class="p">,</span> <span class="nx">BX</span>            <span class="c1">// BX += DI  ~ += rl[i]
+</span><span class="c1"></span>	<span class="mh">0x001b</span> <span class="mo">00027</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">MOVQ</span>	<span class="nx">SI</span><span class="p">,</span> <span class="nx">DX</span>            <span class="c1">// DX = SI ~ i
+</span><span class="c1"></span>	<span class="mh">0x001e</span> <span class="mo">00030</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">NOP</span>                       <span class="c1">// 空操作?
+</span><span class="c1"></span>	<span class="mh">0x0020</span> <span class="mo">00032</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">CMPQ</span>	<span class="nx">DX</span><span class="p">,</span> <span class="nx">AX</span>            <span class="c1">// 比较DX是否小于AX ?
+</span><span class="c1"></span>	<span class="mh">0x0023</span> <span class="mo">00035</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">JLT</span>	<span class="mi">16</span>                    <span class="c1">// 小于 就跳转到16行
+</span><span class="c1"></span>	<span class="mh">0x0025</span> <span class="mo">00037</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">9</span><span class="p">)</span>	<span class="nx">MOVQ</span>	<span class="nx">BX</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">.</span><span class="err">~</span><span class="nx">r1</span><span class="o">+</span><span class="mi">32</span><span class="p">(</span><span class="nx">SP</span><span class="p">)</span> <span class="c1">// 否则 BX结果写到 32(SP)的栈中
+</span><span class="c1"></span>	<span class="mh">0x002a</span> <span class="mo">00042</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">9</span><span class="p">)</span>	<span class="nx">RET</span>
+<span class="s">&#34;&#34;</span><span class="p">.</span><span class="nx">main</span> <span class="nx">STEXT</span> <span class="nx">nosplit</span> <span class="nx">size</span><span class="p">=</span><span class="mi">14</span> <span class="nx">args</span><span class="p">=</span><span class="mh">0x0</span> <span class="nx">locals</span><span class="p">=</span><span class="mh">0x0</span> <span class="nx">funcid</span><span class="p">=</span><span class="mh">0x0</span>
+	<span class="mh">0x0000</span> <span class="mo">00000</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">14</span><span class="p">)</span>	<span class="nx">TEXT</span>	<span class="s">&#34;&#34;</span><span class="p">.</span><span class="nf">main</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">NOSPLIT</span><span class="p">|</span><span class="nx">ABIInternal</span><span class="p">,</span> <span class="err">$</span><span class="mi">0</span><span class="o">-</span><span class="mi">0</span>
+	<span class="mh">0x0000</span> <span class="mo">00000</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">16</span><span class="p">)</span>	<span class="nx">XORL</span>	<span class="nx">AX</span><span class="p">,</span> <span class="nx">AX</span>
+	<span class="mh">0x0002</span> <span class="mo">00002</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">JMP</span>	<span class="mi">7</span>
+	<span class="mh">0x0004</span> <span class="mo">00004</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">INCQ</span>	<span class="nx">AX</span>
+	<span class="mh">0x0007</span> <span class="mo">00007</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">CMPQ</span>	<span class="nx">AX</span><span class="p">,</span> <span class="err">$</span><span class="mi">3</span>
+	<span class="mh">0x000b</span> <span class="mo">00011</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">JLT</span>	<span class="mi">4</span>
+	<span class="mh">0x000d</span> <span class="mo">00013</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">16</span><span class="p">)</span>	<span class="nx">RET</span>
+</code></pre></div><h3 id="例子2">例子2</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">//sum_amd64.s
+</span><span class="c1"></span><span class="err">#</span><span class="nx">include</span> <span class="s">&#34;textflag.h&#34;</span>
 
-// func sumAsm(sl []int64) int64
-TEXT ·sumAsm(SB), NOSPLIT, $0-32
-    MOVQ $0, SI
-    MOVQ sl+0(FP), BX // &amp;sl[0], addr of the first elem
-    MOVQ sl+8(FP), CX // len(sl)
-    INCQ CX           // CX++, 因为要循环 len 次
+<span class="c1">// func sumAsm(sl []int64) int64
+</span><span class="c1"></span><span class="nx">TEXT</span> <span class="err">·</span><span class="nf">sumAsm</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">NOSPLIT</span><span class="p">,</span> <span class="err">$</span><span class="mi">0</span><span class="o">-</span><span class="mi">32</span>
+    <span class="nx">MOVQ</span> <span class="err">$</span><span class="mi">0</span><span class="p">,</span> <span class="nx">SI</span>
+    <span class="nx">MOVQ</span> <span class="nx">sl</span><span class="o">+</span><span class="mi">0</span><span class="p">(</span><span class="nx">FP</span><span class="p">),</span> <span class="nx">BX</span> <span class="c1">// &amp;sl[0], addr of the first elem
+</span><span class="c1"></span>    <span class="nx">MOVQ</span> <span class="nx">sl</span><span class="o">+</span><span class="mi">8</span><span class="p">(</span><span class="nx">FP</span><span class="p">),</span> <span class="nx">CX</span> <span class="c1">// len(sl)
+</span><span class="c1"></span>    <span class="nx">INCQ</span> <span class="nx">CX</span>           <span class="c1">// CX++, 因为要循环 len 次
+</span><span class="c1"></span>
+<span class="nx">start</span><span class="p">:</span>
+    <span class="nx">DECQ</span> <span class="nx">CX</span>       <span class="c1">// CX--
+</span><span class="c1"></span>    <span class="nx">JZ</span>   <span class="nx">done</span>
+    <span class="nf">ADDQ</span> <span class="p">(</span><span class="nx">BX</span><span class="p">),</span> <span class="nx">SI</span> <span class="c1">// SI += *BX
+</span><span class="c1"></span>    <span class="nx">ADDQ</span> <span class="err">$</span><span class="mi">8</span><span class="p">,</span> <span class="nx">BX</span>   <span class="c1">// 指针移动
+</span><span class="c1"></span>    <span class="nx">JMP</span>  <span class="nx">start</span>
 
-start:
-    DECQ CX       // CX--
-    JZ   done
-    ADDQ (BX), SI // SI += *BX
-    ADDQ $8, BX   // 指针移动
-    JMP  start
+<span class="nx">done</span><span class="p">:</span>
+    <span class="nx">MOVQ</span> <span class="nx">SI</span><span class="p">,</span> <span class="nx">ret</span><span class="o">+</span><span class="mi">24</span><span class="p">(</span><span class="nx">FP</span><span class="p">)</span>
+    <span class="nx">RET</span>
 
-done:
-    MOVQ SI, ret+24(FP)
-    RET
+<span class="c1">// 函数栈.go
+</span><span class="c1">// go plan9实现累加
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">sumAsm</span><span class="p">(</span><span class="nx">rl</span> <span class="p">[]</span><span class="kt">int64</span><span class="p">)</span> <span class="kt">int64</span>
 
-// 函数栈.go
-// go plan9实现累加
-func sumAsm(rl []int64) int64
-
-func main() {
-	l := []int64{1,2,3}
-	// 当前目录执行 go build . , 然后执行二进制文件即可
-	sumAsm(l)
-}
-</code></pre><h3 id="plan9汇编的编写格式">plan9汇编的编写格式</h3>
-<pre><code>                              参数及返回值大小
-                                  |
- TEXT pkgname·add(SB),NOSPLIT,$32-32
-       |        |               |
-      包名     函数名         栈帧大小(局部变量+可能需要的额外调用函数的参数空间的总大小，但不包括调用其它函数时的 ret address 的大小)
-</code></pre>]]></content>
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">l</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int64</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}</span>
+	<span class="c1">// 当前目录执行 go build . , 然后执行二进制文件即可
+</span><span class="c1"></span>	<span class="nf">sumAsm</span><span class="p">(</span><span class="nx">l</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div><h3 id="plan9汇编的编写格式">plan9汇编的编写格式</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">                              <span class="nx">参数及返回值大小</span>
+                                  <span class="p">|</span>
+ <span class="nx">TEXT</span> <span class="nx">pkgname</span><span class="err">·</span><span class="nf">add</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span><span class="nx">NOSPLIT</span><span class="p">,</span><span class="err">$</span><span class="mi">32</span><span class="o">-</span><span class="mi">32</span>
+       <span class="p">|</span>        <span class="p">|</span>               <span class="p">|</span>
+      <span class="nx">包名</span>     <span class="nx">函数名</span>         <span class="nx">栈帧大小</span><span class="p">(</span><span class="nx">局部变量</span><span class="o">+</span><span class="nx">可能需要的额外调用函数的参数空间的总大小</span><span class="err">，</span><span class="nx">但不包括调用其它函数时的</span> <span class="nx">ret</span> <span class="nx">address</span> <span class="nx">的大小</span><span class="p">)</span>
+</code></pre></div>]]></content>
 		</item>
 		
 		<item>
@@ -291,23 +291,23 @@ func main() {
 
 
 </code></pre></div><h3 id="1-channel的初始化和内存分配-runtimemakechan">1. channel的初始化和内存分配-runtime.makechan</h3>
-<blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">hchan</span> <span class="kd">struct</span> <span class="p">{</span>
+    <span class="nx">qcount</span>   <span class="kt">uint</span>           <span class="c1">// queue 里面有效用户元素，这个字段是在元素出对，入队改变的；
+</span><span class="c1"></span>    <span class="nx">dataqsiz</span> <span class="kt">uint</span>           <span class="c1">// 初始化的时候赋值，之后不再改变，指明数组 buffer 的大小；
+</span><span class="c1"></span>    <span class="nx">buf</span>      <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="c1">// 指明 buffer 数组的地址，初始化赋值，之后不会再改变；
+</span><span class="c1"></span>    <span class="nx">elemsize</span> <span class="kt">uint16</span>         <span class="c1">// 指明元素的大小，和 dataqsiz 配合使用就能知道 buffer 内存块的大小了；
+</span><span class="c1"></span>    <span class="nx">closed</span>   <span class="kt">uint32</span>
+    <span class="nx">elemtype</span> <span class="o">*</span><span class="nx">_type</span>         <span class="c1">// 元素类型，初始化赋值；
+</span><span class="c1"></span>    <span class="nx">sendx</span>    <span class="kt">uint</span>           <span class="c1">// send index
+</span><span class="c1"></span>    <span class="nx">recvx</span>    <span class="kt">uint</span>           <span class="c1">// receive index
+</span><span class="c1"></span>    <span class="nx">recvq</span>    <span class="nx">waitq</span>          <span class="c1">// 等待 recv 响应的对象列表，抽象成 waiters
+</span><span class="c1"></span>    <span class="nx">sendq</span>    <span class="nx">waitq</span>          <span class="c1">// 等待 sedn 响应的对象列表，抽象成 waiters
+</span><span class="c1"></span>    <span class="nx">lock</span>     <span class="nx">mutex</span>          <span class="c1">// 锁
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><blockquote>
 <p>这是我们初始化channel使用的make方法</p>
 </blockquote>
-<pre><code>type hchan struct {
-    qcount   uint           // queue 里面有效用户元素，这个字段是在元素出对，入队改变的；
-    dataqsiz uint           // 初始化的时候赋值，之后不再改变，指明数组 buffer 的大小；
-    buf      unsafe.Pointer // 指明 buffer 数组的地址，初始化赋值，之后不会再改变；
-    elemsize uint16         // 指明元素的大小，和 dataqsiz 配合使用就能知道 buffer 内存块的大小了；
-    closed   uint32
-    elemtype *_type         // 元素类型，初始化赋值；
-    sendx    uint           // send index
-    recvx    uint           // receive index
-    recvq    waitq          // 等待 recv 响应的对象列表，抽象成 waiters
-    sendq    waitq          // 等待 sedn 响应的对象列表，抽象成 waiters
-    lock     mutex          // 锁
-}
-</code></pre><div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
 <span class="c1">// makechan需要传入的参数也很明显, 就是make(chan int, 2) 中的两个参数
 </span><span class="c1">// chantype=int 和 size=2
 </span><span class="c1">// 这里返回的 *hchan 就是channel的结构体
