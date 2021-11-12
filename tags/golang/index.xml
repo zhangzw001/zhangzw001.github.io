@@ -7,7 +7,25 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 16 Jul 2021 14:07:27 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 12 Nov 2021 10:19:57 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go学习 Go汇编plan9</title>
+      <link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-go%E6%B1%87%E7%BC%96plan9/</link>
+      <pubDate>Fri, 12 Nov 2021 10:19:57 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-go%E6%B1%87%E7%BC%96plan9/</guid>
+      <description>在此之前,什么是函数栈? 先了解下几个汇编寄存器 通用寄存器包括: 1. 数据寄存器 AX:累加寄存器 BX:基地址寄存器 CX:计数器寄存器 DX:数据寄存器 2. 指针寄存器 SP:堆栈指针, 栈顶 BP:基址指针, 栈底 IP:指令指针, cpu下一条要执行指令的内存地址 3. 变址寄存器 SI:源变址 DI:目的变址 golang伪寄存器: FP: Frame pointer: arguments and locals.(指向当前frame的起始位置) FP+0 使用形如 symbol+offset(FP) 的方式，引用函数的输入参数。例如 arg0+0(FP)，arg1+8(FP)，使用 FP 不加 symbol 时，无法通过编译，在汇编层面来讲，symbol 并没有什么用，加 symbol 主要是为了提升代码可读性。另外，官方文档虽然将伪寄存器 FP 称之为 frame pointer，实际上它根本不是 frame pointer，按照传统的 x86 的习惯来讲，frame pointer 是指向整个 stack frame 底部的 BP 寄存器。假如当前的 callee 函数是 add，在 add 的代码中引用 FP，该 FP 指向的位置不在 callee 的 stack frame 之内，而是在 caller 的 stack frame 上。 PC: Program counter: jumps and branches.</description>
+    </item>
+    
+    <item>
+      <title>Go学习 Channel源码分析</title>
+      <link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
+      <pubDate>Wed, 10 Nov 2021 15:18:42 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
+      <description>根据以下代码我们逐个看下channel的实现 package main /* $ go tool compile -S channel源码分析.go|grep runtime|grep chan|grep -v &amp;#34;print&amp;#34; 0x003a 00058 (channel源码分析.go:32)	CALL	runtime.newobject(SB) 0x0060 00096 (channel源码分析.go:32)	CALL	runtime.makechan(SB) 0x006a 00106 (channel源码分析.go:32)	CMPL	runtime.writeBarrier(SB), $0 0x0097 00151 (channel源码分析.go:34)	CALL	runtime.newproc(SB) 0x00b1 00177 (channel源码分析.go:40)	CALL	runtime.chanrecv1(SB) 0x00cb 00203 (channel源码分析.go:42)	CALL	runtime.chanrecv2(SB) 0x0100 00256 (channel源码分析.go:44)	CALL	runtime.chanrecv2(SB) 0x0120 00288 (channel源码分析.go:47)	CALL	runtime.makechan(SB) 0x012a 00298 (channel源码分析.go:47)	CMPL	runtime.writeBarrier(SB), $0 0x01eb 00491 (channel源码分析.go:50)	CALL	runtime.selectgo(SB) 0x02c0 00704 (channel源码分析.go:47)	CALL	runtime.</description>
+    </item>
+    
     <item>
       <title>Go算法学习 链表 设计链表</title>
       <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E9%93%BE%E8%A1%A8-%E8%AE%BE%E8%AE%A1%E9%93%BE%E8%A1%A8/</link>
@@ -86,24 +104,6 @@
       <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</guid>
       <description>说明  纯暴力搜索, 通常可以抽象为N叉树, 树的深度就是递归的深度
   组合问题(不强调顺序) 1234 =&amp;gt; 12,13,14,23,24,34 切割问题(分割回文串) aab =&amp;gt; [a,a,b],[aa,b] 子集问题 排列问题(强调顺序) 1234 =&amp;gt; 12,13,14,21,23,24&amp;hellip; 棋盘问题(N皇后,数独)  回溯算法模板 func backtracking(参数) { if (终止条件) { 存放结果; return; } for (选择：本层集合中元素（树中节点孩子的数量就是集合的大小）) { 处理节点; backtracking(路径，选择列表); // 递归  回溯，撤销处理结果 } } 参考文献  力扣题目: 77.组合 力扣题目: 39.组合总和 力扣题目: 131.分割回文串 代码随想录视频 回溯算法-理论（对应力扣题目：77.组合） 代码随想录视频 回溯算法-组合（对应力扣题目：77.组合） 代码随想录视频 回溯算法-组合剪枝（对应力扣题目：77.组合） 代码随想录视频 回溯算法-分割回文串（对应力扣题目：131.分割回文串） 代码随想录图文 回溯算法：分割回文串  例一 77. 组合 //77. 组合 //给定两个整数 n 和 k，返回 1 .</description>
-    </item>
-    
-    <item>
-      <title>Go算法学习 辗转相除法</title>
-      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</link>
-      <pubDate>Fri, 16 Apr 2021 15:56:59 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E8%BE%97%E8%BD%AC%E7%9B%B8%E9%99%A4%E6%B3%95/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Go算法学习 最小栈的实现</title>
-      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</link>
-      <pubDate>Fri, 16 Apr 2021 10:09:37 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E6%9C%80%E5%B0%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</guid>
-      <description></description>
     </item>
     
   </channel>

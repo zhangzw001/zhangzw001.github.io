@@ -11,7 +11,7 @@
 <meta itemprop="description" content="go的一些简单记录">
 <meta itemprop="datePublished" content="2020-05-27T17:25:31+00:00" />
 <meta itemprop="dateModified" content="2020-05-27T17:25:31+00:00" />
-<meta itemprop="wordCount" content="1294">
+<meta itemprop="wordCount" content="1426">
 
 
 
@@ -74,7 +74,11 @@
 			</header>
 			<div class="content">
 				<p>go的一些简单记录</p>
-<h3 id="1-go中的用法">1. go中'&hellip;&lsquo;的用法<a href="#1-go中的用法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h3 id="0-mac升级go">0. mac升级go<a href="#0-mac升级go" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>go get golang.org/dl/go1.17
+go1.17 download
+go1.17 version
+</code></pre><h3 id="1-go中的用法">1. go中'&hellip;&lsquo;的用法<a href="#1-go中的用法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <ul>
 <li>第一个用法: 用于函数有多个不定参数的情况,可以接受多个不确定个数参数, 将多个参数作为slice传递了</li>
 <li>第二个用法: 用于slice打散进行传递</li>
@@ -270,11 +274,15 @@
 
 </code></pre></div><h3 id="11-printf用法">11. Printf用法<a href="#11-printf用法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">//第一, 通常Printf格式化字符串包含多个%参数时将会包含对应相同数量的额外操作数，但是%之后的[1]副词告诉Printf函数再次使用第一个操作数。
-</span><span class="c1">//第二, %后的#副词告诉Printf在用%o、%x或%X输出时生成0、0x或0X前缀。
-</span><span class="c1"></span><span class="nx">o</span> <span class="o">:=</span> <span class="mo">0666</span>
+</span><span class="c1">//第二, %后的#副词告诉Printf在用%o、%x或%X输出时生成0、0x或0X前缀,
+</span><span class="c1">//     %#v 如果是列表会输出类型,但[]byte{} 例外
+</span><span class="c1">//     通过源码 printArg -&gt; p.fmtBytes(f, verb, &#34;[]byte&#34;) 知道,结果不是[]uint8{},而是[]byte{}
+</span><span class="c1"></span>
+<span class="nx">o</span> <span class="o">:=</span> <span class="mo">0666</span>
 <span class="nx">x</span> <span class="o">:=</span> <span class="nb">int64</span><span class="p">(</span><span class="mh">0xdeadbeef</span><span class="p">)</span>
 <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%d %[1]o %#[1]o , %d %[2]x %#[2]x %#[2]X\n&#34;</span><span class="p">,</span> <span class="nx">o</span><span class="p">,</span><span class="nx">x</span><span class="p">)</span> <span class="c1">// &#34;438 666 0666 , 3735928559 deadbeef 0xdeadbeef 0XDEADBEEF&#34;
 </span><span class="c1"></span>
+
 </code></pre></div><h3 id="12-fmtprintf">12. fmt.Printf<a href="#12-fmtprintf" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="o">%</span><span class="nx">p</span>	<span class="o">-</span><span class="p">&gt;</span> <span class="nx">内存地址</span>
 <span class="o">%</span><span class="nx">q</span>	<span class="o">-</span><span class="p">&gt;</span> <span class="nx">该值对应的单引号括起来的go语法字符字面值</span><span class="err">，</span><span class="nx">必要时会采用安全的转义表示</span>
@@ -608,7 +616,74 @@ import	_ &quot;github.com/zhangzw001/learnGin/docs&quot;
 go tool compile -S go-main-slice.go
 # 第二种
 GOSSAFUNC=main go build go-main-slice.go
-</code></pre>
+</code></pre><h3 id="24-go比较问题">24. go比较问题<a href="#24-go比较问题" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>数组比较</li>
+</ul>
+<pre><code>1. 数组可以比较, 但是必须是相同的数组
+2. 数组的长度不同是属于不同的数组,不能比较
+</code></pre><ul>
+<li>结构体比较</li>
+</ul>
+<pre><code>1. 结构体只能比较相等,不能比较大小
+2. 结构体的属性顺序不同,也是属于不同的结构体, 同样无法比较
+3. 不可以比较的属性是: 切片,map,函数, 具体见: https://golang.org/ref/spec#Comparison_operators
+</code></pre><h3 id="25-type类型定义和类型别名">25 type类型定义和类型别名<a href="#25-type类型定义和类型别名" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>type的有两个用法, 一个是等号一个是没有等号
+type Test1 uint8    //类型定义, 是一个新的独立类型,赋值需要强制转换
+type Test2 = uint8  //类型别名, reflect.TypeOf 可以看到都是uint8
+</code></pre><h3 id="const">const<a href="#const" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">const</span> <span class="p">(</span>
+	<span class="nx">x</span> <span class="p">=</span> <span class="kc">iota</span>	<span class="c1">//0
+</span><span class="c1"></span>	<span class="nx">_</span>
+	<span class="nx">y</span>			<span class="c1">//2
+</span><span class="c1"></span>	<span class="nx">z</span> <span class="p">=</span> <span class="mi">4</span>		<span class="c1">//4
+</span><span class="c1"></span>	<span class="nx">k</span>			<span class="c1">//4
+</span><span class="c1"></span>	<span class="nx">p</span> <span class="p">=</span> <span class="kc">iota</span>	<span class="c1">//5
+</span><span class="c1"></span><span class="p">)</span>
+</code></pre></div><h3 id="25-go语言断行规则">25 go语言断行规则<a href="#25-go语言断行规则" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li><a href="https://gfw.go101.org/article/line-break-rules.html">Go代码断行规则</a></li>
+</ul>
+<ol>
+<li>在Go代码中，注释除外，如果一个代码行的最后一个语法词段（token）为下列所示之一，则一个分号将自动插入在此字段后（即行尾）：
+<ul>
+<li>一个标识符；</li>
+<li>一个整数、浮点数、虚部、码点或者字符串字面量；</li>
+<li>这几个跳转关键字之一：break、continue、fallthrough和return；</li>
+<li>自增运算符++或者自减运算符&ndash;；</li>
+<li>一个右括号：)、]或}。</li>
+</ul>
+</li>
+<li>为了允许一条复杂语句完全显示在一个代码行中，分号可能被插入在一个右小括号)或者右大括号}之前。</li>
+</ol>
+<ul>
+<li>例子1</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">如下是不行的</span><span class="p">,</span> <span class="nx">因为</span><span class="o">++</span><span class="nx">后面会被编译器添加分号</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">i</span><span class="o">++</span><span class="p">;)</span>
+</code></pre></div><ul>
+<li>例子2</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">如下是可行的</span>
+<span class="nx">deployClient</span> <span class="o">:=</span> <span class="nx">clientSet</span><span class="p">.</span>
+    <span class="nf">AppsV1</span><span class="p">().</span>
+    <span class="nf">Deployments</span><span class="p">(</span><span class="nx">apiv1</span><span class="p">.</span><span class="nx">NamespaceDefault</span><span class="p">)</span>
+<span class="nx">但如下是不行的</span>
+<span class="nx">deployClient</span> <span class="o">:=</span> <span class="nx">clientSet</span>       <span class="c1">// 会在标识符后添加分号
+</span><span class="c1"></span>    <span class="p">.</span><span class="nf">AppsV1</span><span class="p">()</span>                   <span class="c1">// 会在右括号)后添加分号
+</span><span class="c1"></span>    <span class="p">.</span><span class="nf">Deployments</span><span class="p">(</span><span class="nx">apiv1</span><span class="p">.</span><span class="nx">NamespaceDefault</span><span class="p">)</span>    
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">alwaysFalse</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span><span class="k">return</span> <span class="kc">false</span><span class="p">}</span>
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">switch</span> <span class="nf">alwaysFalse</span><span class="p">()</span>
+	<span class="p">{</span>
+	<span class="k">case</span> <span class="kc">true</span><span class="p">:</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;true&#34;</span><span class="p">)</span>
+	<span class="k">case</span> <span class="kc">false</span><span class="p">:</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;false&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">如上代码是可行的</span><span class="p">,</span> <span class="nx">但结果是</span> <span class="kc">true</span>
+</code></pre></div>
 			</div>
    
 
@@ -617,7 +692,7 @@ GOSSAFUNC=main go build go-main-slice.go
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/go">go</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1294 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1426 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-05-28 01:25 &#43;0800</p>
 			</footer>
 		</article>
@@ -627,6 +702,7 @@ GOSSAFUNC=main go build go-main-slice.go
   <ul>
     <li>
       <ul>
+        <li><a href="#0-mac升级go">0. mac升级go</a></li>
         <li><a href="#1-go中的用法">1. go中'&hellip;&lsquo;的用法</a></li>
         <li><a href="#2-golang中引用类型-slice切片map字典channel管道">2. golang中引用类型 slice(切片)、map(字典)、channel(管道)</a></li>
         <li><a href="#3-golang查看变量类型">3. golang查看变量类型</a></li>
@@ -650,6 +726,10 @@ GOSSAFUNC=main go build go-main-slice.go
         <li><a href="#21-swagger本地测试的一个问题">21. swagger本地测试的一个问题</a></li>
         <li><a href="#22-gorm">22. gorm.</a></li>
         <li><a href="#23-go转汇编">23. go转汇编</a></li>
+        <li><a href="#24-go比较问题">24. go比较问题</a></li>
+        <li><a href="#25-type类型定义和类型别名">25 type类型定义和类型别名</a></li>
+        <li><a href="#const">const</a></li>
+        <li><a href="#25-go语言断行规则">25 go语言断行规则</a></li>
       </ul>
     </li>
   </ul>

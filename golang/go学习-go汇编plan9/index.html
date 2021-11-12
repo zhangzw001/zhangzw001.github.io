@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="Go学习 Go汇编plan9">
+<meta itemprop="description" content="在此之前,什么是函数栈? 先了解下几个汇编寄存器 通用寄存器包括: 1. 数据寄存器 AX:累加寄存器 BX:基地址寄存器 CX:计数器寄存器 DX:数据寄存器 2. 指针寄存器 SP:堆栈指针, 栈顶 BP:基址指针, 栈底 IP:指令指针, cpu下一条要执行指令的内存地址 3. 变址寄存器 SI:源变址 DI:目的变址 golang伪寄存器: FP: Frame pointer: arguments and locals.(指向当前frame的起始位置) FP&#43;0 使用形如 symbol&#43;offset(FP) 的方式，引用函数的输入参数。例如 arg0&#43;0(FP)，arg1&#43;8(FP)，使用 FP 不加 symbol 时，无法通过编译，在汇编层面来讲，symbol 并没有什么用，加 symbol 主要是为了提升代码可读性。另外，官方文档虽然将伪寄存器 FP 称之为 frame pointer，实际上它根本不是 frame pointer，按照传统的 x86 的习惯来讲，frame pointer 是指向整个 stack frame 底部的 BP 寄存器。假如当前的 callee 函数是 add，在 add 的代码中引用 FP，该 FP 指向的位置不在 callee 的 stack frame 之内，而是在 caller 的 stack frame 上。 PC: Program counter: jumps and branches.">
+<meta itemprop="datePublished" content="2021-11-12T10:19:57+08:00" />
+<meta itemprop="dateModified" content="2021-11-12T10:19:57+08:00" />
+<meta itemprop="wordCount" content="713">
+
+
+
+<meta itemprop="keywords" content="golang,汇编," />
+<meta property="og:title" content="Go学习 Go汇编plan9" />
+<meta property="og:description" content="在此之前,什么是函数栈? 先了解下几个汇编寄存器 通用寄存器包括: 1. 数据寄存器 AX:累加寄存器 BX:基地址寄存器 CX:计数器寄存器 DX:数据寄存器 2. 指针寄存器 SP:堆栈指针, 栈顶 BP:基址指针, 栈底 IP:指令指针, cpu下一条要执行指令的内存地址 3. 变址寄存器 SI:源变址 DI:目的变址 golang伪寄存器: FP: Frame pointer: arguments and locals.(指向当前frame的起始位置) FP&#43;0 使用形如 symbol&#43;offset(FP) 的方式，引用函数的输入参数。例如 arg0&#43;0(FP)，arg1&#43;8(FP)，使用 FP 不加 symbol 时，无法通过编译，在汇编层面来讲，symbol 并没有什么用，加 symbol 主要是为了提升代码可读性。另外，官方文档虽然将伪寄存器 FP 称之为 frame pointer，实际上它根本不是 frame pointer，按照传统的 x86 的习惯来讲，frame pointer 是指向整个 stack frame 底部的 BP 寄存器。假如当前的 callee 函数是 add，在 add 的代码中引用 FP，该 FP 指向的位置不在 callee 的 stack frame 之内，而是在 caller 的 stack frame 上。 PC: Program counter: jumps and branches." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-go%E6%B1%87%E7%BC%96plan9/" />
+<meta property="article:published_time" content="2021-11-12T10:19:57+08:00" />
+<meta property="article:modified_time" content="2021-11-12T10:19:57+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Go学习 Go汇编plan9"/>
+<meta name="twitter:description" content="在此之前,什么是函数栈? 先了解下几个汇编寄存器 通用寄存器包括: 1. 数据寄存器 AX:累加寄存器 BX:基地址寄存器 CX:计数器寄存器 DX:数据寄存器 2. 指针寄存器 SP:堆栈指针, 栈顶 BP:基址指针, 栈底 IP:指令指针, cpu下一条要执行指令的内存地址 3. 变址寄存器 SI:源变址 DI:目的变址 golang伪寄存器: FP: Frame pointer: arguments and locals.(指向当前frame的起始位置) FP&#43;0 使用形如 symbol&#43;offset(FP) 的方式，引用函数的输入参数。例如 arg0&#43;0(FP)，arg1&#43;8(FP)，使用 FP 不加 symbol 时，无法通过编译，在汇编层面来讲，symbol 并没有什么用，加 symbol 主要是为了提升代码可读性。另外，官方文档虽然将伪寄存器 FP 称之为 frame pointer，实际上它根本不是 frame pointer，按照传统的 x86 的习惯来讲，frame pointer 是指向整个 stack frame 底部的 BP 寄存器。假如当前的 callee 函数是 add，在 add 的代码中引用 FP，该 FP 指向的位置不在 callee 的 stack frame 之内，而是在 caller 的 stack frame 上。 PC: Program counter: jumps and branches."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>Go学习 Go汇编plan9</title>
+	<link rel="stylesheet" href="https://www.ngirl.xyz/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://www.ngirl.xyz">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://www.ngirl.xyz/golang/">golang</a>
+					<a href="https://www.ngirl.xyz/posts/">文章</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://www.ngirl.xyz/posts/">文章</a></li>
+			<li><a href="https://www.ngirl.xyz/tags/">标签</a></li>
+			<li><a href="https://www.ngirl.xyz/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Nov 12, 2021</span></div>
+				<h1>Go学习 Go汇编plan9</h1>
+			</header>
+			<div class="content">
+				<h3 id="在此之前什么是函数栈">在此之前,什么是函数栈?<a href="#在此之前什么是函数栈" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h3 id="先了解下几个汇编寄存器">先了解下几个汇编寄存器<a href="#先了解下几个汇编寄存器" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>通用寄存器包括:
+1. 数据寄存器
+    AX:累加寄存器
+    BX:基地址寄存器
+    CX:计数器寄存器
+    DX:数据寄存器
+2. 指针寄存器
+    SP:堆栈指针, 栈顶
+    BP:基址指针, 栈底
+    IP:指令指针, cpu下一条要执行指令的内存地址
+3. 变址寄存器
+    SI:源变址
+    DI:目的变址
+
+golang伪寄存器:
+FP: Frame pointer: arguments and locals.(指向当前frame的起始位置) FP+0
+    使用形如 symbol+offset(FP) 的方式，引用函数的输入参数。例如 arg0+0(FP)，arg1+8(FP)，使用 FP 不加 symbol 时，无法通过编译，在汇编层面来讲，symbol 并没有什么用，加 symbol 主要是为了提升代码可读性。另外，官方文档虽然将伪寄存器 FP 称之为 frame pointer，实际上它根本不是 frame pointer，按照传统的 x86 的习惯来讲，frame pointer 是指向整个 stack frame 底部的 BP 寄存器。假如当前的 callee 函数是 add，在 add 的代码中引用 FP，该 FP 指向的位置不在 callee 的 stack frame 之内，而是在 caller 的 stack frame 上。
+PC: Program counter: jumps and branches.(指向下一条要执行的指令的位置)
+    实际上就是在体系结构的知识中常见的 pc 寄存器，在 x86 平台下对应 ip 寄存器，amd64 上则是 rip。除了个别跳转之外，手写 plan9 代码与 PC 寄存器打交道的情况较少。
+SB: Static base pointer: global symbols.(指向全局变量的位置,可以看着是程序的起始地址)
+    全局静态基指针，一般用来声明函数或全局变量，在之后的函数知识和示例部分会看到具体用法
+SP: Stack pointer: top of stack.(指向当前栈顶)
+    plan9 的这个 SP 寄存器指向当前栈帧的局部变量的开始位置，使用形如 symbol+offset(SP) 的方式，引用函数的局部变量。offset 的合法取值是 [-framesize, 0)，注意是个左闭右开的区间。假如局部变量都是 8 字节，那么第一个局部变量就可以用 localvar0-8(SP) 来表示。这也是一个词不表意的寄存器。与硬件寄存器 SP 是两个不同的东西，在栈帧 size 为 0 的情况下，伪寄存器 SP 和硬件寄存器 SP 指向同一位置。手写汇编代码时，如果是 symbol+offset(SP) 形式，则表示伪寄存器 SP。如果是 offset(SP) 则表示硬件寄存器 SP。务必注意。对于编译输出(go tool compile -S / go tool objdump)的代码来讲，目前所有的 SP 都是硬件寄存器 SP，无论是否带 symbol。
+
+汇编指令:
+PUSH: 入栈, 将内容保存栈中,并且SP下移(减小)
+POP: 出栈,读取栈中结果,并且SP上移(增加)
+CALL: 函数调用,这里记录A为调用者,B为被调用者, 代码段读到call指令时,call后面跟的是B的地址,
+    1. call: 入栈call下一条指令地址(因为call执行完,你还得接着call后面的指令继续执行),同时SP下移(入栈了肯定要下移)
+    2. call: IP指令指针跳转到B的地址处
+    3. 执行B函数: 分配B需要的栈大小,比如24字节,直接将SP下移SP-24,分配B函数栈帧大小
+    4. 执行B函数: 入栈BP寄存器中保存的A函数的栈底地址, A的栈底BP值保存在SP+16的位置,后续用于恢复
+    5. 执行B函数: BP改为SP+16,这里假定16个字节是B函数的剩下的指令
+RET: 函数返回
+    6. 执行B函数: 首先需要恢复调用者A的BP,我们第4步入栈了,此时出栈就能得到A函数之前入栈保存的BP值
+    7. 执行B函数: B函数执行完了,肯定要释放栈空间,所以SP+24
+    8. RET: 继续出栈,此时就是第1步入栈的内容,
+    9. RET: 跳转到出栈的地址,就是call调用后的位置
+</code></pre><ul>
+<li><a href="https://www.zhihu.com/zvideo/1308359170928799744">函数栈视频讲解</a></li>
+<li><a href="https://blog.csdn.net/u011555996/article/details/80153141">x86汇编指令说明</a></li>
+</ul>
+<h3 id="函数栈">函数栈<a href="#函数栈" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>栈,每个goroutine都有自己的栈, 一般顺序为 SP栈顶(低地址)-&gt;存储参数,返回值,局部变量-&gt;BP栈底(高地址)</li>
+<li>栈帧,一个栈由多个栈帧组成, 每个函数对应一段栈帧,栈帧表示着函数间的调用关系</li>
+</ul>
+<pre><code>
+                                       caller                                                                                 
+                                 +------------------+                                                                         
+                                 |                  |                                                                         
+       +----------------------&gt;  --------------------                                                                         
+       |                         |                  |                                                                         
+       |                         | caller parent BP |                                                                         
+       |           BP(pseudo SP) --------------------                                                                         
+       |                         |                  |                                                                         
+       |                         |   Local VarX     |                                                                         
+       |                         --------------------                                                                         
+       |                         |                  |                                                                         
+       |                         |   .......        |                                                                         
+       |                         --------------------                                                                         
+       |                         |                  |                                                                         
+       |                         |   Local VarN     |                                                                         
+                                 --------------------                                                                         
+ caller stack frame              |                  |                                                                         
+                                 |   callee arg2    |                                                                         
+       |                         |------------------|                                                                         
+       |                         |                  |                                                                         
+       |                         |   callee arg1    |                                                                         
+       |                         |------------------|                                                                         
+       |                         |                  |                                                                         
+       |                         |   callee arg0    |                                                                         
+       |                         ----------------------------------------------+   FP(virtual register)                       
+       |                         |                  |                          |                                              
+       |                         |   return addr    |  parent return address   |                                              
+       +----------------------&gt;  +------------------+---------------------------    &lt;-------------------------------+         
+                                                    |  caller BP               |                                    |         
+                                                    |  (caller frame pointer)  |                                    |         
+                                     BP(pseudo SP)  ----------------------------                                    |         
+                                                    |                          |                                    |         
+                                                    |     Local Var0           |                                    |         
+                                                    ----------------------------                                    |         
+                                                    |                          |                                              
+                                                    |     Local Var1           |                                              
+                                                    ----------------------------                            callee stack frame
+                                                    |                          |                                              
+                                                    |       .....              |                                              
+                                                    ----------------------------                                    |         
+                                                    |                          |                                    |         
+                                                    |     Local VarN           |                                    |         
+                                  SP(Real Register) ----------------------------                                    |         
+                                                    |                          |                                    |         
+                                                    |                          |                                    |         
+                                                    |                          |                                    |         
+                                                    |                          |                                    |         
+                                                    |                          |                                    |         
+                                                    +--------------------------+    &lt;-------------------------------+         
+
+                                                              callee
+</code></pre><ul>
+<li><a href="https://www.bilibili.com/video/BV1Xb411J7Yk">曹大讲解go plan9汇编 视频</a></li>
+<li><a href="https://github.com/cch123/asmshare/blob/master/layout.md">曹大讲解go plan9汇编 资料</a></li>
+</ul>
+<h3 id="例子1">例子1<a href="#例子1" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code># cat 函数栈.go
+package main
+
+// go代码直接实现累加
+func sumGo(rl  []int64) int64 {
+	var a int64
+	for i:=0 ;i &lt;len(rl);i++ {
+		a += rl[i]
+	}
+	return a
+}
+
+func main() {
+    l := []int64{1,2,3}
+	sumGo(l)
+}
+</code></pre><blockquote>
+<p>反编译或者编译的汇编结果看其一即可, 差别不大</p>
+</blockquote>
+<ul>
+<li>反编译看汇编</li>
+</ul>
+<pre><code># 先build生成二进制
+go build 函数栈.go
+# 在反编译
+go tool objdump 函数栈|grep &quot;函数栈.go&quot;
+</code></pre><ul>
+<li>编译看汇编</li>
+</ul>
+<pre><code>go tool compile -S 函数栈.go|egrep &quot;函数栈.go|funcid&quot;
+&quot;&quot;.sumGo STEXT nosplit size=43 args=0x20 locals=0x0 funcid=0x0
+	0x0000 00000 (函数栈.go:4)	TEXT	&quot;&quot;.sumGo(SB), NOSPLIT|ABIInternal, $0-32
+	0x0000 00000 (函数栈.go:6)	MOVQ	&quot;&quot;.rl+16(SP), AX  // 这里都是物理sp寄存器, AX=len(rl),我们知道slice结构体是struct{array,len,cap},每个字段都是8字节
+	0x0005 00005 (函数栈.go:6)	MOVQ	&quot;&quot;.rl+8(SP), CX   // CX=&amp;rl[0]
+	0x000a 00010 (函数栈.go:6)	XORL	DX, DX    // 相同的值异或肯定都是0,DX=0
+	0x000c 00012 (函数栈.go:6)	XORL	BX, BX    // BX=0
+	0x000e 00014 (函数栈.go:6)	JMP	32            // 跳到 32行 CMPQ	DX, AX
+	0x0010 00016 (函数栈.go:6)	LEAQ	1(DX), SI //装入有效地址, 1(DX)偏移地址存入SI, SI= DX+1 ~ i+1
+	0x0014 00020 (函数栈.go:7)	MOVQ	(CX)(DX*8), DI    // 指针*CX移动i*8字节? 所以 DI=rl[i]
+	0x0018 00024 (函数栈.go:7)	ADDQ	DI, BX    // BX += DI  ~ += rl[i]
+	0x001b 00027 (函数栈.go:6)	MOVQ	SI, DX    // DX = SI ~ i
+	0x001e 00030 (函数栈.go:6)	NOP               // 空操作?
+	0x0020 00032 (函数栈.go:6)	CMPQ	DX, AX    // 比较DX是否小于AX ?
+	0x0023 00035 (函数栈.go:6)	JLT	16            // 小于 就跳转到16行
+	0x0025 00037 (函数栈.go:9)	MOVQ	BX, &quot;&quot;.~r1+32(SP) // 否则 BX结果写到 32(SP)的栈中
+	0x002a 00042 (函数栈.go:9)	RET
+&quot;&quot;.main STEXT nosplit size=14 args=0x0 locals=0x0 funcid=0x0
+	0x0000 00000 (函数栈.go:14)	TEXT	&quot;&quot;.main(SB), NOSPLIT|ABIInternal, $0-0
+	0x0000 00000 (函数栈.go:16)	XORL	AX, AX
+	0x0002 00002 (函数栈.go:6)	JMP	7
+	0x0004 00004 (函数栈.go:6)	INCQ	AX
+	0x0007 00007 (函数栈.go:6)	CMPQ	AX, $3
+	0x000b 00011 (函数栈.go:6)	JLT	4
+	0x000d 00013 (函数栈.go:16)	RET
+</code></pre><h3 id="例子2">例子2<a href="#例子2" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>//sum_amd64.s
+#include &quot;textflag.h&quot;
+
+// func sumAsm(sl []int64) int64
+TEXT ·sumAsm(SB), NOSPLIT, $0-32
+    MOVQ $0, SI
+    MOVQ sl+0(FP), BX // &amp;sl[0], addr of the first elem
+    MOVQ sl+8(FP), CX // len(sl)
+    INCQ CX           // CX++, 因为要循环 len 次
+
+start:
+    DECQ CX       // CX--
+    JZ   done
+    ADDQ (BX), SI // SI += *BX
+    ADDQ $8, BX   // 指针移动
+    JMP  start
+
+done:
+    MOVQ SI, ret+24(FP)
+    RET
+
+// 函数栈.go
+// go plan9实现累加
+func sumAsm(rl []int64) int64
+
+func main() {
+	l := []int64{1,2,3}
+	// 当前目录执行 go build . , 然后执行二进制文件即可
+	sumAsm(l)
+}
+</code></pre><h3 id="plan9汇编的编写格式">plan9汇编的编写格式<a href="#plan9汇编的编写格式" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>                              参数及返回值大小
+                                  |
+ TEXT pkgname·add(SB),NOSPLIT,$32-32
+       |        |               |
+      包名     函数名         栈帧大小(局部变量+可能需要的额外调用函数的参数空间的总大小，但不包括调用其它函数时的 ret address 的大小)
+</code></pre>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/golang">golang</a></span><span class="tag"><a href="https://www.ngirl.xyz/tags/%E6%B1%87%E7%BC%96">汇编</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>713 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2021-11-12 10:19 &#43;0800</p>
+			</footer>
+		</article>
+		<aside id="toc" class="show-toc">
+			<div class="toc-title">Table of Contents</div>
+			<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#在此之前什么是函数栈">在此之前,什么是函数栈?</a></li>
+        <li><a href="#先了解下几个汇编寄存器">先了解下几个汇编寄存器</a></li>
+        <li><a href="#函数栈">函数栈</a></li>
+        <li><a href="#例子1">例子1</a></li>
+        <li><a href="#例子2">例子2</a></li>
+        <li><a href="#plan9汇编的编写格式">plan9汇编的编写格式</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+		</aside>
+		<div class="post-nav thin">
+			<a class="prev-post" href="https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Go学习 Channel源码分析</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2021 <a href="https://www.ngirl.xyz">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://www.ngirl.xyz/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://www.ngirl.xyz/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-180942795-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

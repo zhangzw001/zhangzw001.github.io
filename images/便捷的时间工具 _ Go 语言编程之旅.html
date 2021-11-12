@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<!-- saved from url=(0053)https://golang2.eddycjy.com/posts/ch1/03-time2format/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style>
+    .utterances {
+      position: relative;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .utterances-frame {
+      color-scheme: light;
+      position: absolute;
+      left: 0;
+      right: 0;
+      width: 1px;
+      min-width: 100%;
+      max-width: 100%;
+      height: 100%;
+      border: 0;
+    }
+  </style>
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="1.3 便捷的时间工具 平时在查看原始数据时，有时候要看格式化后的个性化时间，又或是直接看时间戳等等，这些都是我们时不时会接触到的。更甚的是，如果不同系统中的时间格式不一样，比较规则不一样，那你每用一次都要做一轮转换。又有可能是，你的业务接口的入参开始时间和结束时间是一个时间戳的值，在通常情况下，你是不是要靠外部的一些快捷站点，又或是内部的 Web 站点去获取、调整呢，这其实还是有些麻烦的，要连上网，要输入站点地址，还要鼠标操作….，这显然不符合我们的小极客思维，因此在本章节我们将做一个时间相关的工具，尽可能的优化我们日常获取时间的相关手工行为效率。
+1.3.1 获取时间 我们在项目的 internal 目录下新建 timer 目录，并新建 time.go 文件，目录结构如下：
+├── internal │ ├── timer │ │ └── time.go 在 time.go 文件中写入如下代码：
+func GetNowTime() time.Time { return time.Now() } 我们在 GetNowTime 方法中对标准库 time 的 Now 方法进行了封装，用于返回当前本地时间的 Time 对象，此处的封装主要是为了便于后续对 Time 对象做进一步的统一处理，因为可能会涉及时区的一些问题处理。
+1.3.2 时间推算 接下来针对时间推算，我们继续在 time.go 文件中新增方法，如下：
+func GetCalculateTime(currentTimer time.Time, d string) (time.Time, error) { duration, err := time.ParseDuration(d) if err != nil { return time.Time{}, err } return currentTimer."><meta property="og:title" content="便捷的时间工具">
+<meta property="og:description" content="1.3 便捷的时间工具 平时在查看原始数据时，有时候要看格式化后的个性化时间，又或是直接看时间戳等等，这些都是我们时不时会接触到的。更甚的是，如果不同系统中的时间格式不一样，比较规则不一样，那你每用一次都要做一轮转换。又有可能是，你的业务接口的入参开始时间和结束时间是一个时间戳的值，在通常情况下，你是不是要靠外部的一些快捷站点，又或是内部的 Web 站点去获取、调整呢，这其实还是有些麻烦的，要连上网，要输入站点地址，还要鼠标操作….，这显然不符合我们的小极客思维，因此在本章节我们将做一个时间相关的工具，尽可能的优化我们日常获取时间的相关手工行为效率。
+1.3.1 获取时间 我们在项目的 internal 目录下新建 timer 目录，并新建 time.go 文件，目录结构如下：
+├── internal │ ├── timer │ │ └── time.go 在 time.go 文件中写入如下代码：
+func GetNowTime() time.Time { return time.Now() } 我们在 GetNowTime 方法中对标准库 time 的 Now 方法进行了封装，用于返回当前本地时间的 Time 对象，此处的封装主要是为了便于后续对 Time 对象做进一步的统一处理，因为可能会涉及时区的一些问题处理。
+1.3.2 时间推算 接下来针对时间推算，我们继续在 time.go 文件中新增方法，如下：
+func GetCalculateTime(currentTimer time.Time, d string) (time.Time, error) { duration, err := time.ParseDuration(d) if err != nil { return time.Time{}, err } return currentTimer.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://example.org/posts/ch1/03-time2format/">
+
+<title>便捷的时间工具 | Go 语言编程之旅</title>
+<link rel="icon" href="https://golang2.eddycjy.com/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="./便捷的时间工具 _ Go 语言编程之旅_files/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y+uI2qVFNlQF7NuyEDMoajJcYKNs+m0i0h58O8koaUE=">
+
+
+<script defer="" src="./便捷的时间工具 _ Go 语言编程之旅_files/en.search.min.8665f3c459960d7441954213be859a95a52d95996e1fff5e230fb83fb708ef03.js" integrity="sha256-hmXzxFmWDXRBlUITvoWalaUtlZluH/9eIw+4P7cI7wM="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control">
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="https://golang2.eddycjy.com/"><span>Go 语言编程之旅</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/">
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+<ul>
+	<li><a href="https://eddycjy.com/">脑子进煎鱼了</a></li><a href="https://eddycjy.com/">
+	</a><li><a href="https://eddycjy.com/"></a><a href="https://github.com/eddycjy">GitHub</a></li>
+	<li><a href="https://image.eddycjy.com/f3ccdd27d2000e3f9255a7e3e2c48800.jpg">微信公众号</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+  <ul>
+<li>第一章 命令行应用
+<ul>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch1/01-simple-flag/">1.1 打开工具之旅</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch1/02-word2word/">1.2 单词格式转换</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/" class="active">1.3 便捷的时间工具</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch1/04-sql2struct/">1.4 SQL 语句到结构体的转换</a>
+</li>
+</ul>
+</li>
+<li>第二章 HTTP 应用
+<ul>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch2/01-simple-server/">2.1 开启博客之路</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch2/02-project-design/">2.2 进行项目设计</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch2/03-auxiliary-component/">2.3 编写公共组件</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch2/04-api-doc/">2.4 生成接口文档</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch2/05-validator/">2.5 为接口做参数校验</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch2/06-api-tag-module/">2.6 模块开发：标签管理</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch2/07-upload-file/">2.7 上传图片和文件服务</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch2/08-api-access-security/">2.8 对接口进行访问控制</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch2/09-app-middleware/">2.9 应用中间件</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch2/10-tracing/">2.10 进行链路追踪</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch2/11-config/">2.11 应用配置</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch2/12-build/">2.12 应用编译</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch2/13-graceful-restart-stop/">2.13 优雅重启和停止</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch2/14-thinker/">2.14 思考</a>
+</li>
+</ul>
+</li>
+<li>第三章 RPC 应用
+<ul>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch3/01-simple-grpc-protobuf/">3.1 遨游 gRPC 和 Protobuf</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch3/02-simple-protobuf/">3.2 Protobuf 的使用和了解</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch3/03-simple-grpc/">3.3 gRPC 的使用和了解</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch3/04-start-grpc/">3.4 运行一个 gRPC 服务</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch3/05-call-grpc/">3.5 进行服务间内调</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch3/06-grpc-http-support/">3.6 同时提供 HTTP 接口</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch3/07-api-doc/">3.7 生成接口文档</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch3/08-grpc-interceptor/">3.8 拦截器介绍和实际使用</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch3/09-grpc-metadata-creds/">3.9 Metadata 和 RPC 自定义认证</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch3/10-tracing/">3.10 进行链路追踪</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch3/11-grpc-naming-discovery/">3.11 服务注册和发现</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch3/12-protoc-plugin/">3.12 实现自定义的 protoc 插件</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch3/13-grpc-version/">3.13 对接口进行版本管理</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch3/14-thinker/">3.14 思考</a>
+</li>
+</ul>
+</li>
+<li>第四章 Websocket 应用
+<ul>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch4/01-tcp/">4.1 基于 TCP 的聊天室</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch4/02-protocol/">4.2 WebSocket 介绍、握手协议和细节</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch4/03-requirement-and-design/">4.3 聊天室需求分析和设计</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch4/04-code-framwork/">4.4 实现聊天室：项目组织和基础代码框架</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch4/05-core-process/">4.5 实现聊天室：核心流程</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch4/06-broadcaster/">4.6 实现聊天室：广播器</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch4/07-non-core-functions/">4.7 非核心功能</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch4/08-performance/">4.8 关键性能分析和优化</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch4/09-deploy/">4.9 Nginx 部署</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch4/10-summary/">4.10 总结</a>
+</li>
+</ul>
+</li>
+<li>第五章 进程内缓存
+<ul>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch5/01-intro/">5.1 缓存简介</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch5/02-evict/">5.2 缓存淘汰算法</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch5/03-genneral/">5.3 实现一个进程内缓存</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch5/04-performance/">5.4 缓存的性能和优化思路</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch5/05-bigcache/">5.5 高性能缓存库：BigCache</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch5/06-optimize/">5.6 进程内缓存的优化版</a>
+</li>
+</ul>
+</li>
+<li>第六章 Go 语言中的大杀器
+<ul>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch6/01-pprof-1/">6.1 Go 大杀器之性能剖析 PProf（上）</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch6/02-pprof-2/">6.2 Go 大杀器之性能剖析 PProf（下）</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch6/03-trace/">6.3 Go 大杀器之跟踪剖析 trace</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch6/04-godebug-sched/">6.4 用 GODEBUG 看调度跟踪</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch6/05-godebug-gc/">6.5 用 GODEBUG 看 GC</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch6/06-gops/">6.6 Go 进程诊断工具 gops</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch6/07-metrics/">6.7 公开和发布度量指标</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/ch6/08-stack-heap/">6.8 逃逸分析：变量在哪儿</a>
+</li>
+</ul>
+</li>
+<li>附录
+<ul>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/appendix/01-go-modules-use/">附录 A：Go Modules 终极入门</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/appendix/02-goroutine-panic/">附录 B：Goroutine 与 panic、recover 的小问题</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/appendix/03-gomaxprocs-docker/">附录 C：Go 在容器运行时要注意这个细节</a>
+</li>
+<li>
+  <a href="https://golang2.eddycjy.com/posts/appendix/04-go-panic/">附录 D：让 Go panic 的十种方法</a>
+</li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="./便捷的时间工具 _ Go 语言编程之旅_files/menu.svg" class="book-icon" alt="Menu">
+  </label>
+
+  <strong>便捷的时间工具</strong>
+
+  <label for="toc-control">
+    <img src="./便捷的时间工具 _ Go 语言编程之旅_files/toc.svg" class="book-icon" alt="Table of Contents">
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control">
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#131-%E8%8E%B7%E5%8F%96%E6%97%B6%E9%97%B4">1.3.1 获取时间</a></li>
+    <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#132-%E6%97%B6%E9%97%B4%E6%8E%A8%E7%AE%97">1.3.2 时间推算</a></li>
+    <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#133-%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AD%90%E5%91%BD%E4%BB%A4">1.3.3 初始化子命令</a>
+      <ul>
+        <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#1331-time-now-%E5%AD%90%E5%91%BD%E4%BB%A4">1.3.3.1 time now 子命令</a></li>
+        <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#1332-time-calc-%E5%AD%90%E5%91%BD%E4%BB%A4">1.3.3.2 time calc 子命令</a></li>
+      </ul>
+    </li>
+    <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#134-%E9%AA%8C%E8%AF%81">1.3.4 验证</a></li>
+    <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#135-%E6%9C%89%E6%B2%A1%E6%9C%89%E6%97%B6%E5%8C%BA%E9%97%AE%E9%A2%98">1.3.5 有没有时区问题</a>
+      <ul>
+        <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#1351-local-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A1%A8%E7%A4%BA%E6%9C%AC%E5%9C%B0%E6%97%B6%E5%8C%BA%E7%9A%84">1.3.5.1 Local 是如何表示本地时区的</a></li>
+        <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#1352-%E5%A6%82%E4%BD%95%E8%AE%BE%E7%BD%AE%E6%97%B6%E5%8C%BA">1.3.5.2 如何设置时区</a></li>
+        <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#1353-%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84-timeparseformat">1.3.5.3 要注意的 time.Parse/Format</a></li>
+        <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#1354-%E6%88%91%E7%9A%84%E7%B3%BB%E7%BB%9F%E6%97%B6%E5%8C%BA%E6%98%AF%E5%AF%B9%E7%9A%84">1.3.5.4 我的系统时区是对的</a></li>
+      </ul>
+    </li>
+    <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#136-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF-2006-01-02-150405">1.3.6 为什么是 2006-01-02 15:04:05</a></li>
+    <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#137-%E5%B0%8F%E7%BB%93">1.3.7 小结</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article id="articles" class="markdown"><h1 id="13-便捷的时间工具">1.3 便捷的时间工具</h1>
+<p>平时在查看原始数据时，有时候要看格式化后的个性化时间，又或是直接看时间戳等等，这些都是我们时不时会接触到的。更甚的是，如果不同系统中的时间格式不一样，比较规则不一样，那你每用一次都要做一轮转换。又有可能是，你的业务接口的入参开始时间和结束时间是一个时间戳的值，在通常情况下，你是不是要靠外部的一些快捷站点，又或是内部的 Web 站点去获取、调整呢，这其实还是有些麻烦的，要连上网，要输入站点地址，还要鼠标操作….，这显然不符合我们的小极客思维，因此在本章节我们将做一个时间相关的工具，尽可能的优化我们日常获取时间的相关手工行为效率。</p>
+<h2 id="131-获取时间">1.3.1 获取时间</h2>
+<p>我们在项目的 <code>internal</code> 目录下新建 timer 目录，并新建 time.go 文件，目录结构如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">├── internal
+│&nbsp;&nbsp; ├── timer
+│&nbsp;&nbsp; │&nbsp;&nbsp; └── time.go
+</code></pre></div><p>在 time.go 文件中写入如下代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">GetNowTime</span>() <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Time</span> {
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>()
+}
+</code></pre></div><p>我们在 GetNowTime 方法中对标准库 time 的 Now 方法进行了封装，用于返回当前本地时间的 Time 对象，此处的封装主要是为了便于后续对 Time 对象做进一步的统一处理，因为可能会涉及时区的一些问题处理。</p>
+<h2 id="132-时间推算">1.3.2 时间推算</h2>
+<p>接下来针对时间推算，我们继续在 time.go 文件中新增方法，如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">GetCalculateTime</span>(<span style="color:#a6e22e">currentTimer</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Time</span>, <span style="color:#a6e22e">d</span> <span style="color:#66d9ef">string</span>) (<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Time</span>, <span style="color:#66d9ef">error</span>) {
+	<span style="color:#a6e22e">duration</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">ParseDuration</span>(<span style="color:#a6e22e">d</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Time</span>{}, <span style="color:#a6e22e">err</span>
+	}
+
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">currentTimer</span>.<span style="color:#a6e22e">Add</span>(<span style="color:#a6e22e">duration</span>), <span style="color:#66d9ef">nil</span>
+}
+</code></pre></div><p>在上述代码中，我们比较核心的是调用了两个方法来处理，分别是 ParseDuration 和 Add 方法，ParseDuration 方法用于在字符串中解析出 duration（持续时间），其支持的有效单位有"ns”, “us” (or “µ s”), “ms”, “s”, “m”, “h”，例如：“300ms”, “-1.5h” or “2h45m”。而在 Add 方法中，我们可以将其返回的 duration 传入，就可以得到当前 timer 时间加上 duration 后所得到的最终时间。</p>
+<p>可能会有的人会有疑惑，为什么不直接用 Add 方法来做，还要转多一道 ParseDuration 方法，效率会不会没有那么好，实际上在我们的这个时间工具中，你预先并不知道他传入的值是什么，因此利用 ParseDuration 方法先处理是最好的办法之一。</p>
+<p>如果你预先知道准确的 duration，也不需要适配，那你就可以直接使用 Add 方法和 Duration 类型进行处理，例如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">const</span> (
+	<span style="color:#a6e22e">Nanosecond</span>  <span style="color:#a6e22e">Duration</span> = <span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">Microsecond</span>          = <span style="color:#ae81ff">1000</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">Nanosecond</span>
+	<span style="color:#a6e22e">Millisecond</span>          = <span style="color:#ae81ff">1000</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">Microsecond</span>
+	<span style="color:#a6e22e">Second</span>               = <span style="color:#ae81ff">1000</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">Millisecond</span>
+	<span style="color:#a6e22e">Minute</span>               = <span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">Second</span>
+	<span style="color:#a6e22e">Hour</span>                 = <span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">Minute</span>
+)
+
+<span style="color:#f92672">...</span>
+<span style="color:#a6e22e">timer</span>.<span style="color:#a6e22e">GetNowTime</span>().<span style="color:#a6e22e">Add</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">60</span>)
+</code></pre></div><h2 id="133-初始化子命令">1.3.3 初始化子命令</h2>
+<p>在完成了获取时间和推算时间的处理方法后，我们需要将其集成到我们的子命令中，也就是创建项目的 time 子命令，我们需要项目的 <code>cmd</code> 目录下新建 time.go 文件，新增如下代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">calculateTime</span> <span style="color:#66d9ef">string</span>
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">duration</span> <span style="color:#66d9ef">string</span>
+
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">timeCmd</span> = <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cobra</span>.<span style="color:#a6e22e">Command</span>{
+	<span style="color:#a6e22e">Use</span>:   <span style="color:#e6db74">"time"</span>,
+	<span style="color:#a6e22e">Short</span>: <span style="color:#e6db74">"时间格式处理"</span>,
+	<span style="color:#a6e22e">Long</span>:  <span style="color:#e6db74">"时间格式处理"</span>,
+	<span style="color:#a6e22e">Run</span>:   <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cobra</span>.<span style="color:#a6e22e">Command</span>, <span style="color:#a6e22e">args</span> []<span style="color:#66d9ef">string</span>) {},
+}
+</code></pre></div><p>完成 time 子命令编写后，再到项目的 <code>cmd/root.go</code> 文件中进行相应的注册即可：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">init</span>() {
+	<span style="color:#a6e22e">rootCmd</span>.<span style="color:#a6e22e">AddCommand</span>(<span style="color:#a6e22e">wordCmd</span>)
+	<span style="color:#a6e22e">rootCmd</span>.<span style="color:#a6e22e">AddCommand</span>(<span style="color:#a6e22e">timeCmd</span>)
+}
+</code></pre></div><p>每一个子命令，都是需要到 rootCmd 中进行注册的，否则将无法使用。</p>
+<h3 id="1331-time-now-子命令">1.3.3.1 time now 子命令</h3>
+<p>接下来针对获取当前时间，我们在 time 子命令下再新增一个 now 子命令，用于处理其具体的逻辑，在 time.go 文件中新增如下代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">nowTimeCmd</span> = <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cobra</span>.<span style="color:#a6e22e">Command</span>{
+	<span style="color:#a6e22e">Use</span>:   <span style="color:#e6db74">"now"</span>,
+	<span style="color:#a6e22e">Short</span>: <span style="color:#e6db74">"获取当前时间"</span>,
+	<span style="color:#a6e22e">Long</span>:  <span style="color:#e6db74">"获取当前时间"</span>,
+	<span style="color:#a6e22e">Run</span>: <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cobra</span>.<span style="color:#a6e22e">Command</span>, <span style="color:#a6e22e">args</span> []<span style="color:#66d9ef">string</span>) {
+		<span style="color:#a6e22e">nowTime</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">timer</span>.<span style="color:#a6e22e">GetNowTime</span>()
+		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">"输出结果: %s, %d"</span>, <span style="color:#a6e22e">nowTime</span>.<span style="color:#a6e22e">Format</span>(<span style="color:#e6db74">"2006-01-02 15:04:05"</span>), <span style="color:#a6e22e">nowTime</span>.<span style="color:#a6e22e">Unix</span>())
+	},
+}
+</code></pre></div><p>我们在获取当前时间的 Time 对象后，一共输出了两个不同格式的时间，分别如下：</p>
+<ol>
+<li>
+<p>第一个格式：通过调用 Format 方法设定约定的 2006-01-02 15:04:05 格式来进行时间的标准格式化。</p>
+</li>
+<li>
+<p>第二个格式：通过调用 Unix 方法返回 Unix 时间，就是我们通俗说的时间戳，其值为自 UTC 1970 年 1 月 1 日起经过的秒数。</p>
+</li>
+</ol>
+<p>如果你想要定义其它时间格式的话，标准库 time 中还支持（内部预定义）如下格式：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">const</span> (
+	<span style="color:#a6e22e">ANSIC</span>       = <span style="color:#e6db74">"Mon Jan _2 15:04:05 2006"</span>
+	<span style="color:#a6e22e">UnixDate</span>    = <span style="color:#e6db74">"Mon Jan _2 15:04:05 MST 2006"</span>
+	<span style="color:#a6e22e">RubyDate</span>    = <span style="color:#e6db74">"Mon Jan 02 15:04:05 -0700 2006"</span>
+	<span style="color:#a6e22e">RFC822</span>      = <span style="color:#e6db74">"02 Jan 06 15:04 MST"</span>
+	<span style="color:#a6e22e">RFC822Z</span>     = <span style="color:#e6db74">"02 Jan 06 15:04 -0700"</span> <span style="color:#75715e">// RFC822 with numeric zone
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">RFC850</span>      = <span style="color:#e6db74">"Monday, 02-Jan-06 15:04:05 MST"</span>
+	<span style="color:#a6e22e">RFC1123</span>     = <span style="color:#e6db74">"Mon, 02 Jan 2006 15:04:05 MST"</span>
+	<span style="color:#a6e22e">RFC1123Z</span>    = <span style="color:#e6db74">"Mon, 02 Jan 2006 15:04:05 -0700"</span> <span style="color:#75715e">// RFC1123 with numeric zone
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">RFC3339</span>     = <span style="color:#e6db74">"2006-01-02T15:04:05Z07:00"</span>
+	<span style="color:#f92672">...</span>
+)
+</code></pre></div><p>可以像这样子使用这些预定义格式，例如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">t</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>().<span style="color:#a6e22e">Format</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">RFC3339</span>)
+</code></pre></div><h3 id="1332-time-calc-子命令">1.3.3.2 time calc 子命令</h3>
+<p>接下来针对时间推算的处理，我们在 time 子命令下再新增一个 calc 子命令，在 time.go 文件中继续新增如下代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">calculateTimeCmd</span> = <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cobra</span>.<span style="color:#a6e22e">Command</span>{
+	<span style="color:#a6e22e">Use</span>:   <span style="color:#e6db74">"calc"</span>,
+	<span style="color:#a6e22e">Short</span>: <span style="color:#e6db74">"计算所需时间"</span>,
+	<span style="color:#a6e22e">Long</span>:  <span style="color:#e6db74">"计算所需时间"</span>,
+	<span style="color:#a6e22e">Run</span>: <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cobra</span>.<span style="color:#a6e22e">Command</span>, <span style="color:#a6e22e">args</span> []<span style="color:#66d9ef">string</span>) {
+		<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">currentTimer</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Time</span>
+		<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">layout</span> = <span style="color:#e6db74">"2006-01-02 15:04:05"</span>
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">calculateTime</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">""</span> {
+			<span style="color:#a6e22e">currentTimer</span> = <span style="color:#a6e22e">timer</span>.<span style="color:#a6e22e">GetNowTime</span>()
+		} <span style="color:#66d9ef">else</span> {
+			<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">err</span> <span style="color:#66d9ef">error</span>
+			<span style="color:#a6e22e">space</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">Count</span>(<span style="color:#a6e22e">calculateTime</span>, <span style="color:#e6db74">" "</span>)
+			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">space</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> {
+				<span style="color:#a6e22e">layout</span> = <span style="color:#e6db74">"2006-01-02"</span>
+			}
+			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">space</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> {
+				<span style="color:#a6e22e">layout</span> = <span style="color:#e6db74">"2006-01-02 15:04"</span>
+			}
+			<span style="color:#a6e22e">currentTimer</span>, <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Parse</span>(<span style="color:#a6e22e">layout</span>, <span style="color:#a6e22e">calculateTime</span>)
+			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+				<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">strconv</span>.<span style="color:#a6e22e">Atoi</span>(<span style="color:#a6e22e">calculateTime</span>)
+				<span style="color:#a6e22e">currentTimer</span> = <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Unix</span>(int64(<span style="color:#a6e22e">t</span>), <span style="color:#ae81ff">0</span>)
+			}
+		}
+		<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">timer</span>.<span style="color:#a6e22e">GetCalculateTime</span>(<span style="color:#a6e22e">currentTimer</span>, <span style="color:#a6e22e">duration</span>)
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+			<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">"timer.GetCalculateTime err: %v"</span>, <span style="color:#a6e22e">err</span>)
+		}
+
+		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">"输出结果: %s, %d"</span>, <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Format</span>(<span style="color:#a6e22e">layout</span>), <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Unix</span>())
+	},
+}
+</code></pre></div><p>在上述代码中，一共支持了三种常用时间格式的处理，分别是：时间戳、2006-01-02 以及 2006-01-02 15:04:05。</p>
+<p>在时间格式处理上，我们调用了 strings.Contains 方法，对空格进行了包含判断，若存在则按既定的 2006-01-02 15:04:05 格式进行格式化，否则以 2006-01-02 格式进行处理，若出现异常错误，则直接按时间戳的方式进行转换处理。</p>
+<p>在最后我们针对 time 子命令进行 now、calc 的子命令和所需的命令行参数进行注册即可，如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">init</span>() {
+	<span style="color:#a6e22e">timeCmd</span>.<span style="color:#a6e22e">AddCommand</span>(<span style="color:#a6e22e">nowTimeCmd</span>)
+	<span style="color:#a6e22e">timeCmd</span>.<span style="color:#a6e22e">AddCommand</span>(<span style="color:#a6e22e">calculateTimeCmd</span>)
+
+	<span style="color:#a6e22e">calculateTimeCmd</span>.<span style="color:#a6e22e">Flags</span>().<span style="color:#a6e22e">StringVarP</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">calculateTime</span>, <span style="color:#e6db74">"calculate"</span>, <span style="color:#e6db74">"c"</span>, <span style="color:#e6db74">""</span>, <span style="color:#e6db74">` 需要计算的时间，有效单位为时间戳或已格式化后的时间 `</span>)
+	<span style="color:#a6e22e">calculateTimeCmd</span>.<span style="color:#a6e22e">Flags</span>().<span style="color:#a6e22e">StringVarP</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">duration</span>, <span style="color:#e6db74">"duration"</span>, <span style="color:#e6db74">"d"</span>, <span style="color:#e6db74">""</span>, <span style="color:#e6db74">` 持续时间，有效时间单位为"ns", "us" (or "µ s"), "ms", "s", "m", "h"`</span>)
+}
+</code></pre></div><h2 id="134-验证">1.3.4 验证</h2>
+<p>在完成功能开发后，我们将进行功能验证，在下述命令分别获取了当前的时间，以及推算了所传入时间的后五分钟和前两小时，输出结果如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ go run main.go time now
+输出结果: 2029-09-04 12:02:33, <span style="color:#ae81ff">1883188953</span>
+
+$ go run main.go time calc -c<span style="color:#f92672">=</span><span style="color:#e6db74">"2029-09-04 12:02:33"</span> -d<span style="color:#f92672">=</span>5m
+输出结果: 2029-09-04 12:07:33, <span style="color:#ae81ff">1883218053</span>
+
+$ go run main.go time calc -c<span style="color:#f92672">=</span><span style="color:#e6db74">"2029-09-04 12:02:33"</span> -d<span style="color:#f92672">=</span>-2h 
+输出结果: 2029-09-04 10:02:33, <span style="color:#ae81ff">1883210553</span>
+</code></pre></div><p>需要注意的是，这里的时间我进行了虚构，因此你需要根据本地的实际输出时间进行结果确定和验证。</p>
+<h2 id="135-有没有时区问题">1.3.5 有没有时区问题</h2>
+<p>如果你在上一步的验证命令中，没有遇到少了八小时的之类的问题，那你是相对顺利的。但是这也有一个问题，可能以后你会忽略掉这一个”坑“，那就是时区的问题，实际上在使用标准库 time 时是存在遇到时区问题的风险的，因此我们需要对这个问题注意，接下来我们将针对这块内容进行介绍，并作出一定的调整和设置。</p>
+<p>不同的国家（有时甚至是同一个国家内的不同地区）使用着不同的时区。对于要输入和输出时间的程序来说，必须对系统所处的时区加以考虑。而在 Go 语言中使用 Location 来表示地区相关的时区，一个 Location 可能表示多个时区。</p>
+<p>在标准库 time 上，提供了 Location 的两个实例：Local 和 UTC。Local 代表当前系统本地时区；UTC 代表通用协调时间，也就是零时区，在默认值上，标准库 time 使用的是 UTC 时区。</p>
+<h3 id="1351-local-是如何表示本地时区的">1.3.5.1 Local 是如何表示本地时区的</h3>
+<p>时区信息既浩繁又多变，Unix 系统以标准格式存于文件中，这些文件位于 /usr/share/zoneinfo，而本地时区可以通过 /etc/localtime 获取，这是一个符号链接，指向 /usr/share/zoneinfo 中某一个时区。比如我本地电脑指向的是：/var/db/timezone/zoneinfo/Asia/Shanghai。</p>
+<p>因此在初始化 Local 时，标准库 time 通过读取/etc/localtime 就可以获取到系统的本地时区，如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">	<span style="color:#a6e22e">tz</span>, <span style="color:#a6e22e">ok</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">syscall</span>.<span style="color:#a6e22e">Getenv</span>(<span style="color:#e6db74">"TZ"</span>)
+	<span style="color:#66d9ef">switch</span> {
+	<span style="color:#66d9ef">case</span> !<span style="color:#a6e22e">ok</span>:
+		<span style="color:#a6e22e">z</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">loadLocation</span>(<span style="color:#e6db74">"localtime"</span>, []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">"/etc/"</span>})
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {
+			<span style="color:#a6e22e">localLoc</span> = <span style="color:#f92672">*</span><span style="color:#a6e22e">z</span>
+			<span style="color:#a6e22e">localLoc</span>.<span style="color:#a6e22e">name</span> = <span style="color:#e6db74">"Local"</span>
+			<span style="color:#66d9ef">return</span>
+		}
+	<span style="color:#66d9ef">case</span> <span style="color:#a6e22e">tz</span> <span style="color:#f92672">!=</span> <span style="color:#e6db74">""</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">tz</span> <span style="color:#f92672">!=</span> <span style="color:#e6db74">"UTC"</span>:
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">z</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">loadLocation</span>(<span style="color:#a6e22e">tz</span>, <span style="color:#a6e22e">zoneSources</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {
+			<span style="color:#a6e22e">localLoc</span> = <span style="color:#f92672">*</span><span style="color:#a6e22e">z</span>
+			<span style="color:#66d9ef">return</span>
+		}
+	}
+</code></pre></div><h3 id="1352-如何设置时区">1.3.5.2 如何设置时区</h3>
+<p>既然发现了这个问题，那么有什么办法处理呢，我们可以通过标准库 time 中的 LoadLocation 方法来根据名称获取特定时区的 Location 实例，原型如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">LoadLocation</span>(<span style="color:#a6e22e">name</span> <span style="color:#66d9ef">string</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">Location</span>, <span style="color:#66d9ef">error</span>)
+</code></pre></div><p>在该方法中，如果所传入的 name 是"UTC"或为空，返回 UTC；如果 name 是 “Local”，返回当前的本地时区 Local；否则 name 应该是 IANA 时区数据库（IANA Time Zone Database，简称 tzdata）里有记录的地点名（该数据库记录了地点和对应的时区），如 “America/New_York”。</p>
+<p>另外要注意的是 LoadLocation 方法所需要的时区数据库可能不是所有系统都有提供，特别是在非 Unix 系统，此时 <code>LoadLocation</code> 方法会查找环境变量 ZONEINFO 指定目录或解压该变量指定的 zip 文件（如果有该环境变量）；然后查找 Unix 系统约定的时区数据安装位置。最后如果都找不到，就会查找 <code>$GOROOT/lib/time/zoneinfo.zip</code> 里的时区数据库，简单来讲就是会在不同的约定路径中尽可能的查找到所需的时区数据库。</p>
+<p>那么为了保证我们所获取的时间，与我们所期望的时区一致，我们要对获取时间的代码进行修改，设置当前时区为 Asia/Shanghai，修改如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">GetNowTime</span>() <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Time</span> {
+	<span style="color:#a6e22e">location</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">LoadLocation</span>(<span style="color:#e6db74">"Asia/Shanghai"</span>)
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>().<span style="color:#a6e22e">In</span>(<span style="color:#a6e22e">location</span>)
+}
+</code></pre></div><h3 id="1353-要注意的-timeparseformat">1.3.5.3 要注意的 time.Parse/Format</h3>
+<p>在前面的实践代码中，我们用到了 time.Format 方法，与此还有一个相对应的方法并没有介绍到它，就是 time.Parse 方法，Parse 方法会解析格式化的字符串并返回它表示的时间值，它非常的常见，并且有一个非常需要注意的点。首先我们一起看看下面这个示例程序，如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">location</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">LoadLocation</span>(<span style="color:#e6db74">"Asia/Shanghai"</span>)
+	<span style="color:#a6e22e">inputTime</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">"2029-09-04 12:02:33"</span>
+	<span style="color:#a6e22e">layout</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">"2006-01-02 15:04:05"</span>
+	<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Parse</span>(<span style="color:#a6e22e">layout</span>, <span style="color:#a6e22e">inputTime</span>)
+	<span style="color:#a6e22e">dateTime</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Unix</span>(<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Unix</span>(), <span style="color:#ae81ff">0</span>).<span style="color:#a6e22e">In</span>(<span style="color:#a6e22e">location</span>).<span style="color:#a6e22e">Format</span>(<span style="color:#a6e22e">layout</span>)
+
+	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">"输入时间：%s，输出时间：%s"</span>, <span style="color:#a6e22e">inputTime</span>, <span style="color:#a6e22e">dateTime</span>)
+}
+</code></pre></div><p>那么你觉得这个示例程序的输出时间的结果是什么呢，还是 2029-09-04 12:02:33 吗，我们一起来看看最终的输出结果，如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">输入时间：2029-09-04 12:02:33，输出时间：2029-09-04 20:02:33
+</code></pre></div><p>从输出结果上来看，输入和输出时间竟然相差了八个小时，这显然是时区的设置问题，但是这里你可能又打起了嘀咕，明明在调用 Format 方法前我们已经设置了时区…这究竟是为什么呢？</p>
+<p>实际上这与 Parse 方法有直接关系，因为 Parse 方法会尝试在入参的参数中中分析并读取时区信息，但是如果入参的参数没有指定时区信息的话，那么就会默认使用 UTC 时间。因此在这种情况下我们要采用 ParseInLocation 方法，指定时区就可以解决这个问题，如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">	<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">ParseInLocation</span>(<span style="color:#a6e22e">layout</span>, <span style="color:#a6e22e">inputTime</span>, <span style="color:#a6e22e">location</span>)
+	<span style="color:#a6e22e">dateTime</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Unix</span>(<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Unix</span>(), <span style="color:#ae81ff">0</span>).<span style="color:#a6e22e">In</span>(<span style="color:#a6e22e">location</span>).<span style="color:#a6e22e">Format</span>(<span style="color:#a6e22e">layout</span>)
+</code></pre></div><p>也就是所有解析与格式化的操作都最好指定时区信息，否则当你遇到时区问题的时候，并且已经上线，那么后期再进行数据清洗就比较麻烦了。</p>
+<h3 id="1354-我的系统时区是对的">1.3.5.4 我的系统时区是对的</h3>
+<p>我们常常会说，程序运行在我的本地是正常的…这个经典答复，在时区上好像又是说的过去。实际上，我们常常在开发时，用的可能是本地或预装好的开发环境，时区往往都是设置正确（符合我们东八区的需求）的，你可以在本地查看 localtime 文件，如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ cat /etc/localtime
+...
+CST-8
+</code></pre></div><p>你会发现实际上输出的就是 CST-8，也就是中国标准时间，UTC+8，因此你在本地不需要设置时区，你也不会发现异样。但是，到了其它部署环境就不一定了，举一个例子，在 Kubernetes、Docker 盛行的现在，你被编译后的 Go 程序很有可能就运行在 Docker 中，假设该镜像并没有经过时区调整，你在编译和启动时也没有指定时区，那么你就会遇到很多问题，像是日志的写入时间不对，标准库 time 的转换存在问题，又或是数据库写入的时候有问题…如果是遇到事故时，才察觉到这个问题，那就非常麻烦了。</p>
+<p>因此确保你的所有部署环境的系统时区是正确的，这个能够给你基本的保障。</p>
+<p>但你以为这就万无一失了吗，并不，例如当你所部署的环境并不存在所设置时区的时区数据库时，也会导致 fallback 到 UTC 时区，因此与对接的运维人员确保部署时区的各方面设置是非常重要的。</p>
+<h2 id="136-为什么是-2006-01-02-150405">1.3.6 为什么是 2006-01-02 15:04:05</h2>
+<p>另外可能你已经注意到 2006-01-02 15:04:05 这个格式字符串了，这是很多刚学 Go 语言的小伙伴会感到疑惑的点之一，它是什么，怎么和其它语言的表示方式不一样，为什么是 2006-01-02 15:04:05，这是随便写的时间点吗，甚至还曾经有传言说这是 Go 语言的诞生时间…</p>
+<p>实际上，2006-01-02 15:04:05 是一个参考时间的格式，也就是其它语言中 <code>Y-m-d H:i:s</code> 格式，在功能上用于时间的格式化处理，这个我们在前面章节中已经进行过验证。</p>
+<p>那么为什么要用 2006-01-02 15:04:05 呢，其实这些”数字“是有意义的，在 Go 语言中强调必须显示参考时间的格式，因此每个布局字符串都是一个时间戳的表示，并非随便写的时间点，如果你觉得记忆困难，可参见官方例子中的如下方式：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">Jan <span style="color:#ae81ff">2</span> 15:04:05 <span style="color:#ae81ff">2006</span> MST
+<span style="color:#ae81ff">1</span>   <span style="color:#ae81ff">2</span>  <span style="color:#ae81ff">3</span>  <span style="color:#ae81ff">4</span>  <span style="color:#ae81ff">5</span>    <span style="color:#ae81ff">6</span>  -7
+</code></pre></div><p>而转换到 2006-01-02 15:04:05 的时间格式，我们也可以将其记忆为 2006 年 1 月 2 日 3 点 4 分 5 秒。</p>
+<h2 id="137-小结">1.3.7 小结</h2>
+<p>在 Go 语言中，标准库 time 的各类问题或疑问，是很多刚入门的小伙伴会疑惑的，尤其是在时区设置、格式化时间、2006-01-02 15:04:05 的问题更是来一个，踩一个坑，也有很多的讲解不清的。</p>
+<p>因此在本章节，我们在基于标准库 time 完成的时间工具的需求上，还进行了进一步的说明，争取让你能够对常见问题心里有底，知道为什么，是怎么出现的。</p>
+</article>
+ 
+      <div class="book-footer justify-between"></div>
+
+<hr style="height: 1px;
+    background: var(--gray-200);">
+<br>
+<p>本图书由<a href="https://github.com/eddycjy"> 煎鱼 </a>©2020 版权所有，<a href="https://golang2.eddycjy.com/">所有文章</a>采用<a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh">知识署名-非商业性使用-禁止演绎 4.0 国际</a>进行许可。</p>
+
+
+<p>	<img width="70%" style="width:70%;height:70%;!important" src="./便捷的时间工具 _ Go 语言编程之旅_files/b4b8377688c599ff4c396febde01de61.png"></p>
+
+
+<script src="./便捷的时间工具 _ Go 语言编程之旅_files/readmore.js" type="text/javascript"></script>
+<script>
+    const btw = new BTWPlugin();
+    btw.init({
+        id: 'articles',
+        blogId: '15881-1622211408490-859',
+        name: '脑子进煎鱼了',
+        qrcode: 'https://image.eddycjy.com/7074be90379a121746146bc4229819f8.jpg',
+        keyword: '601',
+    });
+
+	$(document).on('click','#read-more-btn',function(){
+		if(navigator.userAgent.indexOf("Chrome") > -1){
+	    	setTimeout(function(){
+				$('#btw-modal').css('top','88%')
+			}, 200)
+		}
+	});
+</script>
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+</div>
+
+<div class="utterances" style="height: 896px;">
+    <iframe class="utterances-frame" title="Comments" scrolling="no" src="./便捷的时间工具 _ Go 语言编程之旅_files/utterances.html" loading="lazy"></iframe>
+  </div>
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#131-%E8%8E%B7%E5%8F%96%E6%97%B6%E9%97%B4">1.3.1 获取时间</a></li>
+    <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#132-%E6%97%B6%E9%97%B4%E6%8E%A8%E7%AE%97">1.3.2 时间推算</a></li>
+    <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#133-%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AD%90%E5%91%BD%E4%BB%A4">1.3.3 初始化子命令</a>
+      <ul>
+        <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#1331-time-now-%E5%AD%90%E5%91%BD%E4%BB%A4">1.3.3.1 time now 子命令</a></li>
+        <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#1332-time-calc-%E5%AD%90%E5%91%BD%E4%BB%A4">1.3.3.2 time calc 子命令</a></li>
+      </ul>
+    </li>
+    <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#134-%E9%AA%8C%E8%AF%81">1.3.4 验证</a></li>
+    <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#135-%E6%9C%89%E6%B2%A1%E6%9C%89%E6%97%B6%E5%8C%BA%E9%97%AE%E9%A2%98">1.3.5 有没有时区问题</a>
+      <ul>
+        <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#1351-local-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A1%A8%E7%A4%BA%E6%9C%AC%E5%9C%B0%E6%97%B6%E5%8C%BA%E7%9A%84">1.3.5.1 Local 是如何表示本地时区的</a></li>
+        <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#1352-%E5%A6%82%E4%BD%95%E8%AE%BE%E7%BD%AE%E6%97%B6%E5%8C%BA">1.3.5.2 如何设置时区</a></li>
+        <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#1353-%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84-timeparseformat">1.3.5.3 要注意的 time.Parse/Format</a></li>
+        <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#1354-%E6%88%91%E7%9A%84%E7%B3%BB%E7%BB%9F%E6%97%B6%E5%8C%BA%E6%98%AF%E5%AF%B9%E7%9A%84">1.3.5.4 我的系统时区是对的</a></li>
+      </ul>
+    </li>
+    <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#136-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF-2006-01-02-150405">1.3.6 为什么是 2006-01-02 15:04:05</a></li>
+    <li><a href="https://golang2.eddycjy.com/posts/ch1/03-time2format/#137-%E5%B0%8F%E7%BB%93">1.3.7 小结</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

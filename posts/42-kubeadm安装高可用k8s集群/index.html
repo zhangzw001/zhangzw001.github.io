@@ -8,29 +8,32 @@
 	<meta name="theme-color" content="#494f5c">
 	<meta name="msapplication-TileColor" content="#494f5c">
 <meta itemprop="name" content="kubeadm安装高可用k8s集群">
-<meta itemprop="description" content="简单记录kubeadm方式安装k8s1.16.4高可用集群,haproxy通过keepalived绑定的vip来负载均衡到三台master, 其中keepalived则反之单机故障,haproxy则让三台master可以同时提供服务.
+<meta itemprop="description" content="简单记录kubeadm方式安装k8s1.16.4高可用集群 haproxy 用于代理三台master负载均衡, VIP:16443 -&gt; master0x:6443 keepalived 用于配置VIP提供对外服务, 外部访问 VIP:16443 如果master01宕机,VIP漂移到master02, 这样对外集群正常访问,haproxy会代理到master02,03工作
+haproxy负载均衡主要是让集群更健壮,三台master同时提供服务,keepalived 则防止单机故障,热备
  Centos7.6部署k8s v1.16.4高可用集群(主备模式) 使用kubeadm搭建高可用k8s v1.16.3集群(keepalived&#43;haproxy)
-   一、 安装准备  1.1 主机名  192.168.53.106 master01.k8s.io 192.168.53.107 master02.k8s.io 192.168.53.108 master03.k8s.io 192.168.53.137 master.k8s.io  1.2 同步时间, 设置时区  * * * * * /usr/sbin/ntpdate time.nist.gov timedatectl set-timezone Asia/Shanghai 或者 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime  1.3 关闭SElinux  setenforce 0 sed -i &quot;s/^SELINUX=enforcing/SELINUX=disabled/g&quot; /etc/sysconfig/selinux sed -i &quot;s/^SELINUX=enforcing/SELINUX=disabled/g&quot; /etc/selinux/config sed -i &quot;s/^SELINUX=permissive/SELINUX=disabled/g&quot; /etc/sysconfig/selinux sed -i &quot;s/^SELINUX=permissive/SELINUX=disabled/g&quot; /etc/selinux/config  1.4 关闭swap(否则kubeadm init或join会报错)  &gt; swapoff -a &amp;&amp; sysctl -w vm.">
+   一、 安装准备  1.1 主机名  192.168.53.106 master01.k8s.io 192.168.53.107 master02.k8s.io 192.168.53.108 master03.k8s.io 192.168.53.137 master.k8s.io  1.2 同步时间, 设置时区  * * * * * /usr/sbin/ntpdate time.nist.gov timedatectl set-timezone Asia/Shanghai 或者 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime  1.3 关闭SElinux  setenforce 0 sed -i &quot;s/^SELINUX=enforcing/SELINUX=disabled/g&quot; /etc/sysconfig/selinux sed -i &quot;s/^SELINUX=enforcing/SELINUX=disabled/g&quot; /etc/selinux/config sed -i &quot;s/^SELINUX=permissive/SELINUX=disabled/g&quot; /etc/sysconfig/selinux sed -i &quot;s/^SELINUX=permissive/SELINUX=disabled/g&quot; /etc/selinux/config  1.">
 <meta itemprop="datePublished" content="2020-03-24T11:10:41+00:00" />
 <meta itemprop="dateModified" content="2020-03-24T11:10:41+00:00" />
-<meta itemprop="wordCount" content="1415">
+<meta itemprop="wordCount" content="1427">
 
 
 
 <meta itemprop="keywords" content="k8s," />
 <meta property="og:title" content="kubeadm安装高可用k8s集群" />
-<meta property="og:description" content="简单记录kubeadm方式安装k8s1.16.4高可用集群,haproxy通过keepalived绑定的vip来负载均衡到三台master, 其中keepalived则反之单机故障,haproxy则让三台master可以同时提供服务.
+<meta property="og:description" content="简单记录kubeadm方式安装k8s1.16.4高可用集群 haproxy 用于代理三台master负载均衡, VIP:16443 -&gt; master0x:6443 keepalived 用于配置VIP提供对外服务, 外部访问 VIP:16443 如果master01宕机,VIP漂移到master02, 这样对外集群正常访问,haproxy会代理到master02,03工作
+haproxy负载均衡主要是让集群更健壮,三台master同时提供服务,keepalived 则防止单机故障,热备
  Centos7.6部署k8s v1.16.4高可用集群(主备模式) 使用kubeadm搭建高可用k8s v1.16.3集群(keepalived&#43;haproxy)
-   一、 安装准备  1.1 主机名  192.168.53.106 master01.k8s.io 192.168.53.107 master02.k8s.io 192.168.53.108 master03.k8s.io 192.168.53.137 master.k8s.io  1.2 同步时间, 设置时区  * * * * * /usr/sbin/ntpdate time.nist.gov timedatectl set-timezone Asia/Shanghai 或者 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime  1.3 关闭SElinux  setenforce 0 sed -i &quot;s/^SELINUX=enforcing/SELINUX=disabled/g&quot; /etc/sysconfig/selinux sed -i &quot;s/^SELINUX=enforcing/SELINUX=disabled/g&quot; /etc/selinux/config sed -i &quot;s/^SELINUX=permissive/SELINUX=disabled/g&quot; /etc/sysconfig/selinux sed -i &quot;s/^SELINUX=permissive/SELINUX=disabled/g&quot; /etc/selinux/config  1.4 关闭swap(否则kubeadm init或join会报错)  &gt; swapoff -a &amp;&amp; sysctl -w vm." />
+   一、 安装准备  1.1 主机名  192.168.53.106 master01.k8s.io 192.168.53.107 master02.k8s.io 192.168.53.108 master03.k8s.io 192.168.53.137 master.k8s.io  1.2 同步时间, 设置时区  * * * * * /usr/sbin/ntpdate time.nist.gov timedatectl set-timezone Asia/Shanghai 或者 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime  1.3 关闭SElinux  setenforce 0 sed -i &quot;s/^SELINUX=enforcing/SELINUX=disabled/g&quot; /etc/sysconfig/selinux sed -i &quot;s/^SELINUX=enforcing/SELINUX=disabled/g&quot; /etc/selinux/config sed -i &quot;s/^SELINUX=permissive/SELINUX=disabled/g&quot; /etc/sysconfig/selinux sed -i &quot;s/^SELINUX=permissive/SELINUX=disabled/g&quot; /etc/selinux/config  1." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://www.ngirl.xyz/posts/42-kubeadm%E5%AE%89%E8%A3%85%E9%AB%98%E5%8F%AF%E7%94%A8k8s%E9%9B%86%E7%BE%A4/" />
 <meta property="article:published_time" content="2020-03-24T11:10:41+00:00" />
 <meta property="article:modified_time" content="2020-03-24T11:10:41+00:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="kubeadm安装高可用k8s集群"/>
-<meta name="twitter:description" content="简单记录kubeadm方式安装k8s1.16.4高可用集群,haproxy通过keepalived绑定的vip来负载均衡到三台master, 其中keepalived则反之单机故障,haproxy则让三台master可以同时提供服务.
+<meta name="twitter:description" content="简单记录kubeadm方式安装k8s1.16.4高可用集群 haproxy 用于代理三台master负载均衡, VIP:16443 -&gt; master0x:6443 keepalived 用于配置VIP提供对外服务, 外部访问 VIP:16443 如果master01宕机,VIP漂移到master02, 这样对外集群正常访问,haproxy会代理到master02,03工作
+haproxy负载均衡主要是让集群更健壮,三台master同时提供服务,keepalived 则防止单机故障,热备
  Centos7.6部署k8s v1.16.4高可用集群(主备模式) 使用kubeadm搭建高可用k8s v1.16.3集群(keepalived&#43;haproxy)
-   一、 安装准备  1.1 主机名  192.168.53.106 master01.k8s.io 192.168.53.107 master02.k8s.io 192.168.53.108 master03.k8s.io 192.168.53.137 master.k8s.io  1.2 同步时间, 设置时区  * * * * * /usr/sbin/ntpdate time.nist.gov timedatectl set-timezone Asia/Shanghai 或者 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime  1.3 关闭SElinux  setenforce 0 sed -i &quot;s/^SELINUX=enforcing/SELINUX=disabled/g&quot; /etc/sysconfig/selinux sed -i &quot;s/^SELINUX=enforcing/SELINUX=disabled/g&quot; /etc/selinux/config sed -i &quot;s/^SELINUX=permissive/SELINUX=disabled/g&quot; /etc/sysconfig/selinux sed -i &quot;s/^SELINUX=permissive/SELINUX=disabled/g&quot; /etc/selinux/config  1.4 关闭swap(否则kubeadm init或join会报错)  &gt; swapoff -a &amp;&amp; sysctl -w vm."/>
+   一、 安装准备  1.1 主机名  192.168.53.106 master01.k8s.io 192.168.53.107 master02.k8s.io 192.168.53.108 master03.k8s.io 192.168.53.137 master.k8s.io  1.2 同步时间, 设置时区  * * * * * /usr/sbin/ntpdate time.nist.gov timedatectl set-timezone Asia/Shanghai 或者 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime  1.3 关闭SElinux  setenforce 0 sed -i &quot;s/^SELINUX=enforcing/SELINUX=disabled/g&quot; /etc/sysconfig/selinux sed -i &quot;s/^SELINUX=enforcing/SELINUX=disabled/g&quot; /etc/selinux/config sed -i &quot;s/^SELINUX=permissive/SELINUX=disabled/g&quot; /etc/sysconfig/selinux sed -i &quot;s/^SELINUX=permissive/SELINUX=disabled/g&quot; /etc/selinux/config  1."/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -79,7 +82,11 @@
 				<h1>kubeadm安装高可用k8s集群</h1>
 			</header>
 			<div class="content">
-				<p>简单记录kubeadm方式安装k8s1.16.4高可用集群,haproxy通过keepalived绑定的vip来负载均衡到三台master, 其中keepalived则反之单机故障,haproxy则让三台master可以同时提供服务.</p>
+				<p>简单记录kubeadm方式安装k8s1.16.4高可用集群
+haproxy 用于代理三台master负载均衡, VIP:16443 -&gt; master0x:6443
+keepalived 用于配置VIP提供对外服务, 外部访问 VIP:16443
+如果master01宕机,VIP漂移到master02, 这样对外集群正常访问,haproxy会代理到master02,03工作</p>
+<p>haproxy负载均衡主要是让集群更健壮,三台master同时提供服务,keepalived 则防止单机故障,热备</p>
 <p><img src="//zhangzw001.github.io/images/42/01.png" alt=""></p>
 <!--more -->
 <blockquote>
@@ -718,7 +725,7 @@ curl --insecure -sfL https://rancher-dev.xxx.com/v3/import/68nzw8nlch92gshktcx2v
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/k8s">k8s</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1415 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1427 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-03-24 19:10 &#43;0800</p>
 			</footer>
 		</article>

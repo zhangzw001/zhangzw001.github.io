@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>源码 on zhangzw</title>
+    <link>https://www.ngirl.xyz/tags/%E6%BA%90%E7%A0%81/</link>
+    <description>Recent content in 源码 on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Wed, 10 Nov 2021 15:18:42 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/%E6%BA%90%E7%A0%81/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go学习 Channel源码分析</title>
+      <link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
+      <pubDate>Wed, 10 Nov 2021 15:18:42 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
+      <description>根据以下代码我们逐个看下channel的实现 package main /* $ go tool compile -S channel源码分析.go|grep runtime|grep chan|grep -v &amp;#34;print&amp;#34; 0x003a 00058 (channel源码分析.go:32)	CALL	runtime.newobject(SB) 0x0060 00096 (channel源码分析.go:32)	CALL	runtime.makechan(SB) 0x006a 00106 (channel源码分析.go:32)	CMPL	runtime.writeBarrier(SB), $0 0x0097 00151 (channel源码分析.go:34)	CALL	runtime.newproc(SB) 0x00b1 00177 (channel源码分析.go:40)	CALL	runtime.chanrecv1(SB) 0x00cb 00203 (channel源码分析.go:42)	CALL	runtime.chanrecv2(SB) 0x0100 00256 (channel源码分析.go:44)	CALL	runtime.chanrecv2(SB) 0x0120 00288 (channel源码分析.go:47)	CALL	runtime.makechan(SB) 0x012a 00298 (channel源码分析.go:47)	CMPL	runtime.writeBarrier(SB), $0 0x01eb 00491 (channel源码分析.go:50)	CALL	runtime.selectgo(SB) 0x02c0 00704 (channel源码分析.go:47)	CALL	runtime.</description>
+    </item>
+    
+  </channel>
+</rss>

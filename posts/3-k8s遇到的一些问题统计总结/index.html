@@ -14,7 +14,7 @@
  # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从`hub.">
 <meta itemprop="datePublished" content="2020-11-10T14:06:41+00:00" />
 <meta itemprop="dateModified" content="2020-11-10T14:06:41+00:00" />
-<meta itemprop="wordCount" content="584">
+<meta itemprop="wordCount" content="691">
 
 
 
@@ -308,6 +308,44 @@ mount: wrong fs type, bad option, bad superblock on 172.16.x.x:/data-nfs/nfs/k3s
        dmesg | tail or so.
 </code></pre><p>所以安装了nfs即可</p>
 <pre><code>yum install nfs
+</code></pre><h3 id="11-go-get-获取kubernetes作为依赖包提示错误">11 go get 获取kubernetes作为依赖包提示错误<a href="#11-go-get-获取kubernetes作为依赖包提示错误" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>go get -u k8s.io/kubernetes/pkg/apis/node@v1.16.0
+k8s.io/api@v0.0.0: reading k8s.io/api/go.mod at revision v0.0.0: unknown revision v0.0.0
+
+由于kubernetes主仓中也使用了很多的公共库,而且go.mod中指定的是v0.0.0, 最后通过go mod的replace机制将版本替换为子目录
+
+所以我们直接get会有问题, 通过issue找到一下解决办法:
+</code></pre><p>#!/bin/sh
+set -euo pipefail</p>
+<p>VERSION=${1#&ldquo;v&rdquo;}
+if [ -z &ldquo;$VERSION&rdquo; ]; then
+echo &ldquo;Must specify version!&rdquo;
+exit 1
+fi</p>
+<p>MODS=($(curl -sS <a href="https://raw.githubusercontent.com/kubernetes/kubernetes/v$%7BVERSION%7D/go.mod">https://raw.githubusercontent.com/kubernetes/kubernetes/v${VERSION}/go.mod</a> |
+sed -n &rsquo;s|.<em>k8s.io/(.</em>) =&gt; ./staging/src/k8s.io/.<em>|k8s.io/\1|p'
+))
+for MOD in &ldquo;${MODS[@]}&quot;; do
+echo ${MOD}
+V=$(go mod download -json &ldquo;${MOD}@kubernetes-${VERSION}&rdquo; |sed -n &rsquo;s|.</em>&ldquo;Version&rdquo;: &ldquo;(.<em>)&rdquo;.</em>|\1|p')
+go mod edit &ldquo;-replace=${MOD}=${MOD}@${V}&rdquo;
+done</p>
+<pre><code>go get &quot;k8s.io/kubernetes@v${VERSION}&quot;
+</code></pre>
+<pre><code>
+1. 首先我们下载对应版本的kubernetes的go.mod
+2. 我们通过sed把所有的k8s.io的replace的内容 =&gt; 后面的内容都删了   
+        MOD = k8s.io/api
+3. 我们获取到MOD的version
+    go mod download -json &quot;${MOD}@kubernetes-${VERSION}&quot;
+        {
+        &quot;Path&quot;: &quot;k8s.io/api&quot;,
+        &quot;Version&quot;: &quot;v0.0.0-20190918155943-95b840bb6a1f&quot;,
+        ...
+        }
+4. 在通过go mod edit去修改当前项目的go.mod的replace 配置
+    replace k8s.io/api =&gt; k8s.io/api v0.0.0-20190918155943-95b840bb6a1f
+
 </code></pre>
 			</div>
    
@@ -317,7 +355,7 @@ mount: wrong fs type, bad option, bad superblock on 172.16.x.x:/data-nfs/nfs/k3s
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/k8s">k8s</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>584 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>691 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-11-10 22:06 &#43;0800</p>
 			</footer>
 		</article>
@@ -337,6 +375,7 @@ mount: wrong fs type, bad option, bad superblock on 172.16.x.x:/data-nfs/nfs/k3s
         <li><a href="#8-k8s机器进程数达到500多的时候-ssh连接到服务报错-shell-request-failed-on-channel-0">8 k8s机器进程数达到500多的时候, ssh连接到服务报错 shell request failed on channel 0</a></li>
         <li><a href="#9-centos8安装k8s118flannel-pod间不通">9 centos8安装k8s1.18+flannel pod间不通</a></li>
         <li><a href="#10-部署服务器查看describe信息如下">10 部署服务器查看describe信息如下:</a></li>
+        <li><a href="#11-go-get-获取kubernetes作为依赖包提示错误">11 go get 获取kubernetes作为依赖包提示错误</a></li>
       </ul>
     </li>
   </ul>
