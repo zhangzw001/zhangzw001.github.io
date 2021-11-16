@@ -452,42 +452,42 @@ TEXT runtime·gogo(SB), NOSPLIT, $16-8
 </code></pre><ul>
 <li>mcall</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="err">//</span> <span class="err">在</span><span class="na">.go文件中</span><span class="p">,</span><span class="err">如下没有函数体</span><span class="p">,</span> <span class="err">所以</span><span class="no">asm定义的$0表示没有内部变量</span><span class="p">,</span><span class="err">只有一个参数没有返回值</span><span class="p">,</span><span class="err">所以是</span><span class="no">$8</span>
-<span class="err">//</span> <span class="nf">runtime</span><span class="err">/</span><span class="no">asm_amd64.s</span>
-<span class="err">//</span> <span class="nf">func</span> <span class="no">mcall</span><span class="p">(</span><span class="no">fn</span> <span class="no">func</span><span class="p">(*</span><span class="no">g</span><span class="p">))</span>
-<span class="err">//</span> <span class="err">切换到</span><span class="nf">m-</span><span class="err">&gt;</span><span class="no">g0的栈上</span><span class="p">,</span><span class="err">调用</span><span class="no">fn</span><span class="p">(</span><span class="no">g</span><span class="p">)</span><span class="err">函数</span>
-<span class="err">//</span> <span class="nf">fn函数不能返回</span><span class="p">,</span><span class="err">它应该调用</span><span class="no">gogo</span><span class="p">(</span><span class="err">&amp;</span><span class="no">g-</span><span class="err">&gt;</span><span class="no">sched</span><span class="p">)</span><span class="err">来运行</span><span class="no">g</span>
-<span class="err">//</span> <span class="err">注意这个·是</span><span class="nf">UTF8值</span><span class="err">=</span><span class="no">U</span><span class="err">+</span><span class="mi">00</span><span class="no">B7</span><span class="p">,</span><span class="err">并不是英文的</span><span class="p">.</span>
-<span class="nf">TEXT</span> <span class="no">runtime</span><span class="err">·</span><span class="no">mcall</span><span class="p">(</span><span class="no">SB</span><span class="p">),</span> <span class="no">NOSPLIT</span><span class="p">,</span> <span class="no">$0-8</span>
-	<span class="nf">MOVQ</span>	<span class="no">fn</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">FP</span><span class="p">),</span> <span class="no">DI</span>  <span class="err">//</span><span class="no">FP是当前栈帧起始地址</span><span class="p">,</span> <span class="no">fn函数指针存到DI寄存器</span>
-	<span class="nf">get_tls</span><span class="p">(</span><span class="no">CX</span><span class="p">)</span>    <span class="err">//</span><span class="no">tls</span> <span class="err">是线程局部存储，将这个存储的开始位置存到</span> <span class="no">CX</span>
-	<span class="nf">MOVQ</span>	<span class="no">g</span><span class="p">(</span><span class="no">CX</span><span class="p">),</span> <span class="no">AX</span>	<span class="err">//</span> <span class="no">g</span><span class="p">(</span><span class="no">CX</span><span class="p">)</span><span class="err">还是宏，在</span><span class="no">tls上可以拿到g</span><span class="err">，也就是当前正在跑的</span><span class="no">g</span><span class="err">，把这个</span><span class="no">g的地址存到AX寄存器</span>
-	<span class="nf">MOVQ</span>	<span class="mi">0</span><span class="p">(</span><span class="no">SP</span><span class="p">),</span> <span class="no">BX</span>	<span class="err">//</span> <span class="no">caller</span><span class="err">&#39;</span><span class="no">s</span> <span class="no">PC</span>
-	<span class="nf">MOVQ</span>	<span class="no">BX</span><span class="p">,</span> <span class="p">(</span><span class="no">g_sched</span><span class="err">+</span><span class="no">gobuf_pc</span><span class="p">)(</span><span class="no">AX</span><span class="p">)</span>    <span class="err">//把</span><span class="no">BX</span><span class="p">(</span><span class="no">caller</span><span class="err">&#39;</span><span class="no">s</span> <span class="no">PC</span><span class="p">)</span><span class="err">存入到</span><span class="no">AX的g-</span><span class="err">&gt;</span><span class="no">sched的gobuf-</span><span class="err">&gt;</span><span class="no">pc字段</span>
-	<span class="nf">LEAQ</span>	<span class="no">fn</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">FP</span><span class="p">),</span> <span class="no">BX</span>	<span class="err">//</span> <span class="no">caller</span><span class="err">&#39;</span><span class="no">s</span> <span class="no">SP</span><span class="p">,</span> <span class="no">fn函数</span>
-	<span class="nf">MOVQ</span>	<span class="no">BX</span><span class="p">,</span> <span class="p">(</span><span class="no">g_sched</span><span class="err">+</span><span class="no">gobuf_sp</span><span class="p">)(</span><span class="no">AX</span><span class="p">)</span>    <span class="err">//把</span><span class="no">BX</span><span class="p">(</span><span class="no">caller</span><span class="err">&#39;</span><span class="no">s</span> <span class="no">SP</span><span class="p">)</span><span class="err">存入到</span><span class="no">AX的g-</span><span class="err">&gt;</span><span class="no">sched的gobuf-</span><span class="err">&gt;</span><span class="no">sp字段</span>
-	<span class="nf">MOVQ</span>	<span class="no">AX</span><span class="p">,</span> <span class="p">(</span><span class="no">g_sched</span><span class="err">+</span><span class="no">gobuf_g</span><span class="p">)(</span><span class="no">AX</span><span class="p">)</span>     <span class="err">//把</span><span class="no">g本身也存起来</span>
-	<span class="nf">MOVQ</span>	<span class="no">BP</span><span class="p">,</span> <span class="p">(</span><span class="no">g_sched</span><span class="err">+</span><span class="no">gobuf_bp</span><span class="p">)(</span><span class="no">AX</span><span class="p">)</span>    <span class="err">//把</span><span class="no">BP</span><span class="p">(</span><span class="err">当前栈底</span><span class="p">)</span><span class="err">存入到</span><span class="no">AX的g-</span><span class="err">&gt;</span><span class="no">sched的gobuf-</span><span class="err">&gt;</span><span class="no">bp字段</span>
-
-	<span class="err">//</span> <span class="nf">switch</span> <span class="no">to</span> <span class="no">m-</span><span class="err">&gt;</span><span class="no">g0</span> <span class="err">&amp;</span> <span class="no">its</span> <span class="no">stack</span><span class="p">,</span> <span class="no">call</span> <span class="no">fn</span>
-	<span class="nf">MOVQ</span>	<span class="no">g</span><span class="p">(</span><span class="no">CX</span><span class="p">),</span> <span class="no">BX</span>     <span class="err">//把</span><span class="no">g存入BX</span>
-	<span class="nf">MOVQ</span>	<span class="no">g_m</span><span class="p">(</span><span class="no">BX</span><span class="p">),</span> <span class="no">BX</span>   <span class="err">//根据</span><span class="no">g得到m存入BX</span>
-	<span class="nf">MOVQ</span>	<span class="no">m_g0</span><span class="p">(</span><span class="no">BX</span><span class="p">),</span> <span class="no">SI</span>  <span class="err">//根据</span><span class="no">m得到g0存入SI</span>
-	<span class="nf">CMPQ</span>	<span class="no">SI</span><span class="p">,</span> <span class="no">AX</span>	<span class="err">//</span> <span class="no">if</span> <span class="no">g</span> <span class="err">==</span> <span class="no">m-</span><span class="err">&gt;</span><span class="no">g0</span> <span class="no">call</span> <span class="no">badmcall</span>
-	<span class="nf">JNE</span>	<span class="mi">3</span><span class="p">(</span><span class="no">PC</span><span class="p">)</span>      <span class="err">//</span><span class="no">JNE表示不等于的时候转移</span><span class="p">,</span> <span class="no">if</span> <span class="no">g</span> <span class="p">!</span><span class="err">=</span> <span class="no">m-</span><span class="err">&gt;</span><span class="no">g0</span> <span class="p">,</span> <span class="err">那就跳</span><span class="mi">3</span><span class="err">行</span>
-	<span class="nf">MOVQ</span>	<span class="no">$runtime</span><span class="err">·</span><span class="no">badmcall</span><span class="p">(</span><span class="no">SB</span><span class="p">),</span> <span class="no">AX</span>         
-	<span class="no">JMP</span>	<span class="no">AX</span>
-	<span class="nf">MOVQ</span>	<span class="no">SI</span><span class="p">,</span> <span class="no">g</span><span class="p">(</span><span class="no">CX</span><span class="p">)</span>	<span class="err">//</span> <span class="no">g</span> <span class="err">=</span> <span class="no">m-</span><span class="err">&gt;</span><span class="no">g0</span><span class="p">,</span> <span class="err">直接把</span><span class="no">SI的m-</span><span class="err">&gt;</span><span class="no">g0</span> <span class="err">复制给</span><span class="no">g</span><span class="p">,</span> <span class="err">那现在的</span><span class="no">g就是m-</span><span class="err">&gt;</span><span class="no">g0</span><span class="p">,</span> <span class="err">成功切换到</span><span class="no">g0</span>
-	<span class="nf">MOVQ</span>	<span class="p">(</span><span class="no">g_sched</span><span class="err">+</span><span class="no">gobuf_sp</span><span class="p">)(</span><span class="no">SI</span><span class="p">),</span> <span class="no">SP</span>	<span class="err">//</span> <span class="no">sp</span> <span class="err">=</span> <span class="no">m-</span><span class="err">&gt;</span><span class="no">g0-</span><span class="err">&gt;</span><span class="no">sched.sp</span><span class="p">,</span> <span class="err">直接拿</span><span class="no">g0中的sp值给SP寄存器了</span>
-	<span class="nf">PUSHQ</span>	<span class="no">AX</span>        <span class="err">//</span><span class="no">AX就是g</span><span class="p">,</span><span class="err">将</span><span class="no">g入栈保存</span>
-	<span class="nf">MOVQ</span>	<span class="no">DI</span><span class="p">,</span> <span class="no">DX</span>    <span class="err">//</span><span class="no">DI里面保存的是fn函数</span><span class="p">,</span> <span class="err">现在存入到</span><span class="no">DX</span>
-	<span class="nf">MOVQ</span>	<span class="mi">0</span><span class="p">(</span><span class="no">DI</span><span class="p">),</span> <span class="no">DI</span>
-	<span class="nf">CALL</span>	<span class="no">DI</span>        <span class="err">//调用</span><span class="no">fn</span>
-	<span class="nf">POPQ</span>	<span class="no">AX</span>        <span class="err">//将</span><span class="no">g出栈</span>
-	<span class="nf">MOVQ</span>	<span class="no">$runtime</span><span class="err">·</span><span class="no">badmcall2</span><span class="p">(</span><span class="no">SB</span><span class="p">),</span> <span class="no">AX</span>
-	<span class="nf">JMP</span>	<span class="no">AX</span>
-	<span class="nf">RET</span>    <span class="err">//</span><span class="no">return</span>
-</code></pre></div><h3 id="3-channel的发送方法-chansend">3. channel的发送方法-chansend<a href="#3-channel的发送方法-chansend" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 在.go文件中,如下没有函数体, 所以asm定义的$0表示没有内部变量,只有一个参数没有返回值,所以是$8
+</span><span class="c1">// runtime/asm_amd64.s
+</span><span class="c1">// func mcall(fn func(*g))
+</span><span class="c1">// 切换到m-&gt;g0的栈上,调用fn(g)函数
+</span><span class="c1">// fn函数不能返回,它应该调用gogo(&amp;g-&gt;sched)来运行g
+</span><span class="c1">// 注意这个·是UTF8值=U+00B7,并不是英文的.
+</span><span class="c1"></span><span class="nx">TEXT</span> <span class="nx">runtime</span><span class="err">·</span><span class="nf">mcall</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">NOSPLIT</span><span class="p">,</span> <span class="err">$</span><span class="mi">0</span><span class="o">-</span><span class="mi">8</span>
+	<span class="nx">MOVQ</span>	<span class="nx">fn</span><span class="o">+</span><span class="mi">0</span><span class="p">(</span><span class="nx">FP</span><span class="p">),</span> <span class="nx">DI</span>  <span class="c1">//FP是当前栈帧起始地址, fn函数指针存到DI寄存器
+</span><span class="c1"></span>	<span class="nf">get_tls</span><span class="p">(</span><span class="nx">CX</span><span class="p">)</span>    <span class="c1">//tls 是线程局部存储，将这个存储的开始位置存到 CX
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nf">g</span><span class="p">(</span><span class="nx">CX</span><span class="p">),</span> <span class="nx">AX</span>	<span class="c1">// g(CX)还是宏，在tls上可以拿到g，也就是当前正在跑的g，把这个g的地址存到AX寄存器
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="mi">0</span><span class="p">(</span><span class="nx">SP</span><span class="p">),</span> <span class="nx">BX</span>	<span class="c1">// caller&#39;s PC
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nx">BX</span><span class="p">,</span> <span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_pc</span><span class="p">)(</span><span class="nx">AX</span><span class="p">)</span>    <span class="c1">//把BX(caller&#39;s PC)存入到AX的g-&gt;sched的gobuf-&gt;pc字段
+</span><span class="c1"></span>	<span class="nx">LEAQ</span>	<span class="nx">fn</span><span class="o">+</span><span class="mi">0</span><span class="p">(</span><span class="nx">FP</span><span class="p">),</span> <span class="nx">BX</span>	<span class="c1">// caller&#39;s SP, fn函数
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nx">BX</span><span class="p">,</span> <span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_sp</span><span class="p">)(</span><span class="nx">AX</span><span class="p">)</span>    <span class="c1">//把BX(caller&#39;s SP)存入到AX的g-&gt;sched的gobuf-&gt;sp字段
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nx">AX</span><span class="p">,</span> <span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_g</span><span class="p">)(</span><span class="nx">AX</span><span class="p">)</span>     <span class="c1">//把g本身也存起来
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nx">BP</span><span class="p">,</span> <span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_bp</span><span class="p">)(</span><span class="nx">AX</span><span class="p">)</span>    <span class="c1">//把BP(当前栈底)存入到AX的g-&gt;sched的gobuf-&gt;bp字段
+</span><span class="c1"></span>
+	<span class="c1">// switch to m-&gt;g0 &amp; its stack, call fn
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nf">g</span><span class="p">(</span><span class="nx">CX</span><span class="p">),</span> <span class="nx">BX</span>     <span class="c1">//把g存入BX
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nf">g_m</span><span class="p">(</span><span class="nx">BX</span><span class="p">),</span> <span class="nx">BX</span>   <span class="c1">//根据g得到m存入BX
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nf">m_g0</span><span class="p">(</span><span class="nx">BX</span><span class="p">),</span> <span class="nx">SI</span>  <span class="c1">//根据m得到g0存入SI
+</span><span class="c1"></span>	<span class="nx">CMPQ</span>	<span class="nx">SI</span><span class="p">,</span> <span class="nx">AX</span>	<span class="c1">// if g == m-&gt;g0 call badmcall
+</span><span class="c1"></span>	<span class="nx">JNE</span>	<span class="mi">3</span><span class="p">(</span><span class="nx">PC</span><span class="p">)</span>      <span class="c1">//JNE表示不等于的时候转移, if g != m-&gt;g0 , 那就跳3行
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="err">$</span><span class="nx">runtime</span><span class="err">·</span><span class="nf">badmcall</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">AX</span>         
+	<span class="nx">JMP</span>	<span class="nx">AX</span>
+	<span class="nx">MOVQ</span>	<span class="nx">SI</span><span class="p">,</span> <span class="nf">g</span><span class="p">(</span><span class="nx">CX</span><span class="p">)</span>	<span class="c1">// g = m-&gt;g0, 直接把SI的m-&gt;g0 复制给g, 那现在的g就是m-&gt;g0, 成功切换到g0
+</span><span class="c1"></span>	<span class="nf">MOVQ</span>	<span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_sp</span><span class="p">)(</span><span class="nx">SI</span><span class="p">),</span> <span class="nx">SP</span>	<span class="c1">// sp = m-&gt;g0-&gt;sched.sp, 直接拿g0中的sp值给SP寄存器了
+</span><span class="c1"></span>	<span class="nx">PUSHQ</span>	<span class="nx">AX</span>        <span class="c1">//AX就是g,将g入栈保存
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nx">DI</span><span class="p">,</span> <span class="nx">DX</span>    <span class="c1">//DI里面保存的是fn函数, 现在存入到DX
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="mi">0</span><span class="p">(</span><span class="nx">DI</span><span class="p">),</span> <span class="nx">DI</span>
+	<span class="nx">CALL</span>	<span class="nx">DI</span>        <span class="c1">//调用fn
+</span><span class="c1"></span>	<span class="nx">POPQ</span>	<span class="nx">AX</span>        <span class="c1">//将g出栈
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="err">$</span><span class="nx">runtime</span><span class="err">·</span><span class="nf">badmcall2</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">AX</span>
+	<span class="nx">JMP</span>	<span class="nx">AX</span>
+	<span class="nx">RET</span>    <span class="c1">//return
+</span></code></pre></div><h3 id="3-channel的发送方法-chansend">3. channel的发送方法-chansend<a href="#3-channel的发送方法-chansend" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <ul>
 <li>runtime.chansend1 是对runtime.chansend的封装</li>
 </ul>
@@ -1031,8 +1031,8 @@ TEXT runtime·gogo(SB), NOSPLIT, $16-8
 </blockquote>
 <h3 id="简单总结">简单总结<a href="#简单总结" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <ul>
-<li>channel</li>
-</ul>
+<li>
+<p>channel</p>
 <ul>
 <li>
 <ol>
@@ -1055,9 +1055,9 @@ TEXT runtime·gogo(SB), NOSPLIT, $16-8
 </ol>
 </li>
 </ul>
-<ul>
-<li>select</li>
-</ul>
+</li>
+<li>
+<p>select</p>
 <ul>
 <li>
 <ol>
@@ -1068,6 +1068,8 @@ TEXT runtime·gogo(SB), NOSPLIT, $16-8
 <ol start="2">
 <li>selectgo 会将每个case的channel索引组成的数组pollorder 进行随机排序 并同时剔除nil channel, 如果存在可发送或者可读取的case 就直接跳转, 如果都没有就判断是否block(即走default),最后会阻塞等待</li>
 </ol>
+</li>
+</ul>
 </li>
 </ul>
 <hr>
