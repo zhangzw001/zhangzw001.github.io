@@ -321,7 +321,7 @@
 	<span class="k">return</span> <span class="nx">noverflow</span> <span class="o">&gt;=</span> <span class="nb">uint16</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="nx">B</span><span class="o">&amp;</span><span class="mi">15</span><span class="p">)</span>
 <span class="p">}</span>
 </code></pre></div><h4 id="hashgrow-扩容">hashGrow 扩容</h4>
-<p><img src="images/golang/map-1.png" alt=""></p>
+<p><img src="/images/golang/map-1.png" alt=""></p>
 <ul>
 <li>首先做一个简单的说明</li>
 </ul>
