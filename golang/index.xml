@@ -34,28 +34,28 @@
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">hmap</span> <span class="kd">struct</span> <span class="p">{</span>
 	<span class="c1">// Note: the format of the hmap is also encoded in cmd/compile/internal/gc/reflect.go.
 </span><span class="c1"></span>	<span class="c1">// Make sure this stays in sync with the compiler&#39;s definition.
-</span><span class="c1"></span>	<span class="nx">count</span>	  <span class="kt">int</span>			<span class="c1">// # 已经在使用的键值对总数, len(map)的值
-</span><span class="c1"></span>	<span class="nx">flags</span>	  <span class="kt">uint8</span>		  <span class="c1">// 标志位
-</span><span class="c1"></span>	<span class="nx">B</span>		  <span class="kt">uint8</span>		  <span class="c1">// 装载因子, 2^B = 桶的大小
-</span><span class="c1"></span>	<span class="nx">noverflow</span>  <span class="kt">uint16</span>		 <span class="c1">// overflow 的 bucket 近似数
-</span><span class="c1"></span>	<span class="nx">hash0</span>	  <span class="kt">uint32</span>		 <span class="c1">// 哈希因子
-</span><span class="c1"></span>	<span class="nx">buckets</span>	<span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="c1">// 桶的大小 , may be nil if count==0.
+</span><span class="c1"></span>	<span class="nx">count</span>      <span class="kt">int</span>            <span class="c1">// # 已经在使用的键值对总数, len(map)的值
+</span><span class="c1"></span>	<span class="nx">flags</span>      <span class="kt">uint8</span>          <span class="c1">// 标志位
+</span><span class="c1"></span>	<span class="nx">B</span>          <span class="kt">uint8</span>          <span class="c1">// 装载因子, 2^B = 桶的大小
+</span><span class="c1"></span>	<span class="nx">noverflow</span>  <span class="kt">uint16</span>         <span class="c1">// overflow 的 bucket 近似数
+</span><span class="c1"></span>	<span class="nx">hash0</span>      <span class="kt">uint32</span>         <span class="c1">// 哈希因子
+</span><span class="c1"></span>	<span class="nx">buckets</span>    <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="c1">// 桶的大小 , may be nil if count==0.
 </span><span class="c1"></span>	<span class="nx">oldbuckets</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="c1">// 通常是nil, 如果在扩容,就是旧的桶
-</span><span class="c1"></span>	<span class="nx">nevacuate</span>  <span class="kt">uintptr</span>		<span class="c1">// 指示扩容进度，小于此地址的 buckets 迁移完成
-</span><span class="c1"></span>	<span class="nx">extra</span>	  <span class="o">*</span><span class="nx">mapextra</span>	  <span class="c1">// 存储溢出桶
+</span><span class="c1"></span>	<span class="nx">nevacuate</span>  <span class="kt">uintptr</span>        <span class="c1">// 指示扩容进度，小于此地址的 buckets 迁移完成
+</span><span class="c1"></span>	<span class="nx">extra</span>      <span class="o">*</span><span class="nx">mapextra</span>      <span class="c1">// 存储溢出桶
 </span><span class="c1"></span><span class="p">}</span>
 
 <span class="kd">type</span> <span class="nx">mapextra</span> <span class="kd">struct</span> <span class="p">{</span>
-	<span class="nx">overflow</span>	<span class="o">*</span><span class="p">[]</span><span class="o">*</span><span class="nx">bmap</span>
-	<span class="nx">oldoverflow</span> <span class="o">*</span><span class="p">[]</span><span class="o">*</span><span class="nx">bmap</span>
+	<span class="nx">overflow</span>     <span class="o">*</span><span class="p">[]</span><span class="o">*</span><span class="nx">bmap</span>
+	<span class="nx">oldoverflow</span>  <span class="o">*</span><span class="p">[]</span><span class="o">*</span><span class="nx">bmap</span>
 	<span class="nx">nextOverflow</span> <span class="o">*</span><span class="nx">bmap</span>
 <span class="p">}</span>
 <span class="kd">type</span> <span class="nx">bmap</span> <span class="kd">struct</span> <span class="p">{</span>
-	<span class="nx">tophash</span> <span class="p">[</span><span class="nx">bucketCnt</span><span class="p">]</span><span class="kt">uint8</span>	  <span class="c1">//生成的hash值的高8位
-</span><span class="c1"></span>	<span class="c1">// 在src/cmd/compile/internal/gc/reflect.go里面bmap函数会添加该字段,以及后续几个字段
-</span><span class="c1"></span>	<span class="c1">//	keys Type				// key类型
-</span><span class="c1"></span>	<span class="c1">//	elems Type			   // value类型
-</span><span class="c1"></span>	<span class="c1">//	overflow unsafe.Pointer  // 解决冲突的链表指针
+	<span class="nx">tophash</span> <span class="p">[</span><span class="nx">bucketCnt</span><span class="p">]</span><span class="kt">uint8</span> <span class="c1">//生成的hash值的高8位
+</span><span class="c1"></span>	<span class="c1">//在src/cmd/compile/internal/gc/reflect.go里面bmap函数会添加该字段,以及后续几个字段
+</span><span class="c1"></span>	<span class="c1">//keys Type		  // key类型
+</span><span class="c1"></span>	<span class="c1">//elems Type	          // value类型
+</span><span class="c1"></span>	<span class="c1">//overflow unsafe.Pointer // 解决冲突的链表指针
 </span><span class="c1"></span><span class="p">}</span>
 </code></pre></div><h3 id="runtimemakemap-代码">runtime.makemap 代码</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/map.go
