@@ -14,7 +14,7 @@
       <pubDate>Mon, 22 Nov 2021 13:59:53 +0800</pubDate>
       
       <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-map%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
-      <description>在看map之前,我们从一个简单的代码开始 1 package main 2 func main() { 3	a := make(map[int]int,209) 4	a[1] = 1 5	print(a[1]) 6 }  以上代码我们看下编译的map相关调用  go tool compile -S map源码分析.go|egrep &amp;quot;map源码分析.*CALL.*map&amp;quot; 0x0051 00081 (map源码分析.go:3)	CALL	runtime.makemap(SB) // 显然第3行是初始化 0x0079 00121 (map源码分析.go:4)	CALL	runtime.mapassign_fast64(SB) //第4行是写入 0x00a8 00168 (map源码分析.go:5)	CALL	runtime.mapaccess1_fast64(SB) //第5行是读取 首先看下相关结构体hmap type hmap struct { // Note: the format of the hmap is also encoded in cmd/compile/internal/gc/reflect.go. 	// Make sure this stays in sync with the compiler&amp;#39;s definition.</description>
+      <description>在看map之前,我们从一个简单的代码开始 1 package main 2 func main() { 3	a := make(map[int]int,209) 4	a[1] = 1 5	print(a[1]) 6 }  以上代码我们看下编译的map相关调用  go tool compile -S map源码分析.go|egrep &amp;quot;map源码分析.*CALL.*map&amp;quot; 0x0051 00081 (map源码分析.go:3)	CALL	runtime.makemap(SB)	// 显然第3行是初始化 0x0079 00121 (map源码分析.go:4)	CALL	runtime.mapassign_fast64(SB) //第4行是写入 0x00a8 00168 (map源码分析.go:5)	CALL	runtime.mapaccess1_fast64(SB) //第5行是读取 首先看下相关结构体hmap type hmap struct { // Note: the format of the hmap is also encoded in cmd/compile/internal/gc/reflect.go. 	// Make sure this stays in sync with the compiler&amp;#39;s definition.</description>
     </item>
     
     <item>
