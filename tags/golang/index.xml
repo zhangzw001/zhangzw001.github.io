@@ -7,7 +7,25 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 12 Nov 2021 10:19:57 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 22 Nov 2021 13:59:53 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go学习 Map源码分析</title>
+      <link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-map%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
+      <pubDate>Mon, 22 Nov 2021 13:59:53 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-map%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
+      <description>在看map之前,我们从一个简单的代码开始 1 package main 2 func main() { 3	a := make(map[int]int,209) 4	a[1] = 1 5	print(a[1]) 6 }  以上代码我们看下编译的map相关调用  go tool compile -S map源码分析.go|egrep &amp;quot;map源码分析.*CALL.*map&amp;quot; 0x0051 00081 (map源码分析.go:3)	CALL	runtime.makemap(SB) // 显然第3行是初始化 0x0079 00121 (map源码分析.go:4)	CALL	runtime.mapassign_fast64(SB) //第4行是写入 0x00a8 00168 (map源码分析.go:5)	CALL	runtime.mapaccess1_fast64(SB) //第5行是读取 首先看下相关结构体hmap type hmap struct { // Note: the format of the hmap is also encoded in cmd/compile/internal/gc/reflect.go. 	// Make sure this stays in sync with the compiler&amp;#39;s definition.</description>
+    </item>
+    
+    <item>
+      <title>Go学习 Gmp模型</title>
+      <link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-gmp%E6%A8%A1%E5%9E%8B/</link>
+      <pubDate>Wed, 17 Nov 2021 09:31:09 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-gmp%E6%A8%A1%E5%9E%8B/</guid>
+      <description>在此之前我们先看一下go启动的入口 通过gdb调试, 找到入口文件 # GOFLAGS=&amp;#34;-ldflags=-compressdwarf=false&amp;#34; go build gdb-main.go # gdb gdb-main (gdb) info files Symbols from &amp;#34;/Users/zhangzw/work/go/github.com/zhangzw001/learngo/basic/gdb/gdb-main&amp;#34;. Local exec file: `/Users/zhangzw/work/go/github.com/zhangzw001/learngo/basic/gdb/gdb-main&amp;#39;, file type mach-o-x86-64. Entry point: 0x1065600 0x0000000001001000 - 0x00000000010a2e8a is .text 0x00000000010a2ea0 - 0x00000000010a2fa2 is __TEXT.__symbol_stub1 ... (gdb) b *0x1065600 // 上面的Entry point后面的地址 Breakpoint 1 at 0x1065600: file /usr/local/go/src/runtime/rt0_darwin_amd64.s, line 8. // 这里是mac 继续查看 // src/runtime/rt0_darwin_amd64.s TEXT _rt0_amd64_darwin(SB),NOSPLIT,$-8 JMP	_rt0_amd64(SB) //跳转到 _rt0_amd64 TEXT _rt0_amd64(SB),NOSPLIT,$-8 MOVQ	0(SP), DI	// argc LEAQ	8(SP), SI	// argv JMP	runtime·rt0_go(SB) // 又跳转到runtime·rt0_go 来到核心代码 TEXT runtime·rt0_go(SB),NOSPLIT|NOFRAME,$0 // Copy arguments forward on an even stack.</description>
+    </item>
+    
     <item>
       <title>Go学习 Go汇编plan9</title>
       <link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-go%E6%B1%87%E7%BC%96plan9/</link>
@@ -82,28 +100,6 @@
       
       <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84/</guid>
       <description>show me the code package main import &amp;#34;fmt&amp;#34; //https://github.com/youngyangyang04/leetcode-master/blob/master/problems/0062.%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84.md //62.不同路径 //题目链接：https://leetcode-cn.com/problems/unique-paths/ // //一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为 “Start” ）。 // //机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。 // //问总共有多少条不同的路径？ //输入：m = 3, n = 7 输出：28 // //示例 2： 输入：m = 2, n = 3 输出：3 解释： 从左上角开始，总共有 3 条路径可以到达右下角。 // //向右 -&amp;gt; 向右 -&amp;gt; 向下 //向右 -&amp;gt; 向下 -&amp;gt; 向右 //向下 -&amp;gt; 向右 -&amp;gt; 向右 //示例 3： 输入：m = 7, n = 3 输出：28 // //示例 4： 输入：m = 3, n = 3 输出：6 提示： // //1 &amp;lt;= m, n &amp;lt;= 100 //题目数据保证答案小于等于 2 * 10^9  // 动态规划五部曲 // 1.</description>
-    </item>
-    
-    <item>
-      <title>Go算法学习 二叉树 迭代统一遍历写法</title>
-      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E4%BA%8C%E5%8F%89%E6%A0%91-%E8%BF%AD%E4%BB%A3%E7%BB%9F%E4%B8%80%E9%81%8D%E5%8E%86%E5%86%99%E6%B3%95/</link>
-      <pubDate>Tue, 27 Apr 2021 11:21:41 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E4%BA%8C%E5%8F%89%E6%A0%91-%E8%BF%AD%E4%BB%A3%E7%BB%9F%E4%B8%80%E9%81%8D%E5%8E%86%E5%86%99%E6%B3%95/</guid>
-      <description>说明 首先二叉树有三种遍历,针对根节点遍历顺序分别是 前序,中序, 后续
- 前序: 中 左 右 中序: 左 中 右 后续: 左 右 中  遍历的写法分为两种:
- 递归 迭代  二叉树结构体 type TreeNode struct { Val int Left *TreeNode Right *TreeNode } 1. 递归  递归比较简单, 代码如下:
-  1.1 前序遍历 (中 左 右)  func preorderTraversal(root *TreeNode) []int { var result []int var Traversal func( *TreeNode) Traversal = func(node *TreeNode) { if node == nil { return } result = append(result, node.</description>
-    </item>
-    
-    <item>
-      <title>Go算法学习 回溯 分割回文串</title>
-      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</link>
-      <pubDate>Fri, 23 Apr 2021 09:27:50 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%9B%9E%E6%BA%AF-%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2/</guid>
-      <description>说明  纯暴力搜索, 通常可以抽象为N叉树, 树的深度就是递归的深度
-  组合问题(不强调顺序) 1234 =&amp;gt; 12,13,14,23,24,34 切割问题(分割回文串) aab =&amp;gt; [a,a,b],[aa,b] 子集问题 排列问题(强调顺序) 1234 =&amp;gt; 12,13,14,21,23,24&amp;hellip; 棋盘问题(N皇后,数独)  回溯算法模板 func backtracking(参数) { if (终止条件) { 存放结果; return; } for (选择：本层集合中元素（树中节点孩子的数量就是集合的大小）) { 处理节点; backtracking(路径，选择列表); // 递归  回溯，撤销处理结果 } } 参考文献  力扣题目: 77.组合 力扣题目: 39.组合总和 力扣题目: 131.分割回文串 代码随想录视频 回溯算法-理论（对应力扣题目：77.组合） 代码随想录视频 回溯算法-组合（对应力扣题目：77.组合） 代码随想录视频 回溯算法-组合剪枝（对应力扣题目：77.组合） 代码随想录视频 回溯算法-分割回文串（对应力扣题目：131.分割回文串） 代码随想录图文 回溯算法：分割回文串  例一 77. 组合 //77. 组合 //给定两个整数 n 和 k，返回 1 .</description>
     </item>
     
   </channel>

@@ -10,10 +10,10 @@
 <meta itemprop="name" content="docker简介和使用">
 <meta itemprop="description" content="简单介绍docker
 docker k8s支持的docker 版本查看 这里我们使用年份命名版本的docker-ce，假设我们要安装v1.16.3的k8s，我们去 https://github.com/kubernetes/kubernetes 里进对应版本的CHANGELOG-1.16.md里搜The list of validated docker versions remain查找支持的docker版本，docker版本不一定得在支持列表里，实际上19.03也能使用，这里我们使用docker官方的安装脚本安装docker(该脚本支持centos和ubuntu)
-export VERSION=19.03 curl -fsSL &quot;https://get.docker.com/&quot; | bash -s -- --mirror Aliyun ">
+export VERSION=19.03 curl -fsSL &quot;https://get.docker.com/&quot; | bash -s -- --mirror Aliyun harbor harbor中开启内容信任后签名的问题: https://github.com/zj1244/Blog/blob/master/2019/harbor%E7%9A%84Notary%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95.md harbor2.3安装问题 docker: 18.06.1-ce,19.03.13 由于维护过程需要停止或重启harbor服务,再次启动时postgresql会报错: ls: cannot access &#39;/var/lib/postgresql/data&#39;: Operation not permitted initdb: error: directory &quot;/var/lib/postgresql/data/pg13&quot; exists but is not empty 这里解决办法是修改一下 docker-compose.yml, 添加 privileged: true postgresql: image: goharbor/harbor-db:v2.3.4 container_name: harbor-db privileged: true #需要加入超级权限 从官方issue并没有看到更好的解决方法, 目前是添加超级权限解决 https://github.com/goharbor/harbor/issues/15456 ">
 <meta itemprop="datePublished" content="2019-10-16T15:31:08+00:00" />
 <meta itemprop="dateModified" content="2019-10-16T15:31:08+00:00" />
-<meta itemprop="wordCount" content="24">
+<meta itemprop="wordCount" content="63">
 
 
 
@@ -21,7 +21,7 @@ export VERSION=19.03 curl -fsSL &quot;https://get.docker.com/&quot; | bash -s --
 <meta property="og:title" content="docker简介和使用" />
 <meta property="og:description" content="简单介绍docker
 docker k8s支持的docker 版本查看 这里我们使用年份命名版本的docker-ce，假设我们要安装v1.16.3的k8s，我们去 https://github.com/kubernetes/kubernetes 里进对应版本的CHANGELOG-1.16.md里搜The list of validated docker versions remain查找支持的docker版本，docker版本不一定得在支持列表里，实际上19.03也能使用，这里我们使用docker官方的安装脚本安装docker(该脚本支持centos和ubuntu)
-export VERSION=19.03 curl -fsSL &quot;https://get.docker.com/&quot; | bash -s -- --mirror Aliyun " />
+export VERSION=19.03 curl -fsSL &quot;https://get.docker.com/&quot; | bash -s -- --mirror Aliyun harbor harbor中开启内容信任后签名的问题: https://github.com/zj1244/Blog/blob/master/2019/harbor%E7%9A%84Notary%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95.md harbor2.3安装问题 docker: 18.06.1-ce,19.03.13 由于维护过程需要停止或重启harbor服务,再次启动时postgresql会报错: ls: cannot access &#39;/var/lib/postgresql/data&#39;: Operation not permitted initdb: error: directory &quot;/var/lib/postgresql/data/pg13&quot; exists but is not empty 这里解决办法是修改一下 docker-compose.yml, 添加 privileged: true postgresql: image: goharbor/harbor-db:v2.3.4 container_name: harbor-db privileged: true #需要加入超级权限 从官方issue并没有看到更好的解决方法, 目前是添加超级权限解决 https://github.com/goharbor/harbor/issues/15456 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://www.ngirl.xyz/posts/15-docker%E7%AE%80%E4%BB%8B%E5%92%8C%E4%BD%BF%E7%94%A8/" />
 <meta property="article:published_time" content="2019-10-16T15:31:08+00:00" />
@@ -30,7 +30,7 @@ export VERSION=19.03 curl -fsSL &quot;https://get.docker.com/&quot; | bash -s --
 <meta name="twitter:title" content="docker简介和使用"/>
 <meta name="twitter:description" content="简单介绍docker
 docker k8s支持的docker 版本查看 这里我们使用年份命名版本的docker-ce，假设我们要安装v1.16.3的k8s，我们去 https://github.com/kubernetes/kubernetes 里进对应版本的CHANGELOG-1.16.md里搜The list of validated docker versions remain查找支持的docker版本，docker版本不一定得在支持列表里，实际上19.03也能使用，这里我们使用docker官方的安装脚本安装docker(该脚本支持centos和ubuntu)
-export VERSION=19.03 curl -fsSL &quot;https://get.docker.com/&quot; | bash -s -- --mirror Aliyun "/>
+export VERSION=19.03 curl -fsSL &quot;https://get.docker.com/&quot; | bash -s -- --mirror Aliyun harbor harbor中开启内容信任后签名的问题: https://github.com/zj1244/Blog/blob/master/2019/harbor%E7%9A%84Notary%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95.md harbor2.3安装问题 docker: 18.06.1-ce,19.03.13 由于维护过程需要停止或重启harbor服务,再次启动时postgresql会报错: ls: cannot access &#39;/var/lib/postgresql/data&#39;: Operation not permitted initdb: error: directory &quot;/var/lib/postgresql/data/pg13&quot; exists but is not empty 这里解决办法是修改一下 docker-compose.yml, 添加 privileged: true postgresql: image: goharbor/harbor-db:v2.3.4 container_name: harbor-db privileged: true #需要加入超级权限 从官方issue并没有看到更好的解决方法, 目前是添加超级权限解决 https://github.com/goharbor/harbor/issues/15456 "/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -87,6 +87,23 @@ export VERSION=19.03 curl -fsSL &quot;https://get.docker.com/&quot; | bash -s --
 <pre><code>export VERSION=19.03
 curl -fsSL &quot;https://get.docker.com/&quot; | bash -s -- --mirror Aliyun
 
+</code></pre><h3 id="harbor">harbor<a href="#harbor" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>harbor中开启内容信任后签名的问题: https://github.com/zj1244/Blog/blob/master/2019/harbor%E7%9A%84Notary%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95.md
+</code></pre><h3 id="harbor23安装问题">harbor2.3安装问题<a href="#harbor23安装问题" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code>docker: 18.06.1-ce,19.03.13
+
+由于维护过程需要停止或重启harbor服务,再次启动时postgresql会报错:
+ls: cannot access '/var/lib/postgresql/data': Operation not permitted
+initdb: error: directory &quot;/var/lib/postgresql/data/pg13&quot; exists but is not empty
+
+这里解决办法是修改一下 docker-compose.yml, 添加 privileged: true
+  postgresql:
+    image: goharbor/harbor-db:v2.3.4
+    container_name: harbor-db
+    privileged: true    #需要加入超级权限
+
+从官方issue并没有看到更好的解决方法, 目前是添加超级权限解决
+https://github.com/goharbor/harbor/issues/15456
 </code></pre>
 			</div>
    
@@ -96,7 +113,7 @@ curl -fsSL &quot;https://get.docker.com/&quot; | bash -s -- --mirror Aliyun
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/docker">docker</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>24 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>63 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-10-16 23:31 &#43;0800</p>
 			</footer>
 		</article>
@@ -108,6 +125,8 @@ curl -fsSL &quot;https://get.docker.com/&quot; | bash -s -- --mirror Aliyun
       <ul>
         <li><a href="#docker">docker</a></li>
         <li><a href="#k8s支持的docker-版本查看">k8s支持的docker 版本查看</a></li>
+        <li><a href="#harbor">harbor</a></li>
+        <li><a href="#harbor23安装问题">harbor2.3安装问题</a></li>
       </ul>
     </li>
   </ul>

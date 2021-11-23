@@ -37,7 +37,7 @@ Dockerfile 文件有自己的书写格式和支持的命令，常用的Dockerfil
       <guid>https://www.ngirl.xyz/posts/15-docker%E7%AE%80%E4%BB%8B%E5%92%8C%E4%BD%BF%E7%94%A8/</guid>
       <description>简单介绍docker
 docker k8s支持的docker 版本查看 这里我们使用年份命名版本的docker-ce，假设我们要安装v1.16.3的k8s，我们去 https://github.com/kubernetes/kubernetes 里进对应版本的CHANGELOG-1.16.md里搜The list of validated docker versions remain查找支持的docker版本，docker版本不一定得在支持列表里，实际上19.03也能使用，这里我们使用docker官方的安装脚本安装docker(该脚本支持centos和ubuntu)
-export VERSION=19.03 curl -fsSL &amp;quot;https://get.docker.com/&amp;quot; | bash -s -- --mirror Aliyun </description>
+export VERSION=19.03 curl -fsSL &amp;quot;https://get.docker.com/&amp;quot; | bash -s -- --mirror Aliyun harbor harbor中开启内容信任后签名的问题: https://github.com/zj1244/Blog/blob/master/2019/harbor%E7%9A%84Notary%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95.md harbor2.3安装问题 docker: 18.06.1-ce,19.03.13 由于维护过程需要停止或重启harbor服务,再次启动时postgresql会报错: ls: cannot access &#39;/var/lib/postgresql/data&#39;: Operation not permitted initdb: error: directory &amp;quot;/var/lib/postgresql/data/pg13&amp;quot; exists but is not empty 这里解决办法是修改一下 docker-compose.yml, 添加 privileged: true postgresql: image: goharbor/harbor-db:v2.3.4 container_name: harbor-db privileged: true #需要加入超级权限 从官方issue并没有看到更好的解决方法, 目前是添加超级权限解决 https://github.com/goharbor/harbor/issues/15456 </description>
     </item>
     
   </channel>

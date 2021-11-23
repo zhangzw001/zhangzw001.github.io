@@ -12765,7 +12765,7 @@ ENV LANG zh_CN.utf8
 			<guid>https://www.ngirl.xyz/posts/15-docker%E7%AE%80%E4%BB%8B%E5%92%8C%E4%BD%BF%E7%94%A8/</guid>
 			<description>简单介绍docker
 docker k8s支持的docker 版本查看 这里我们使用年份命名版本的docker-ce，假设我们要安装v1.16.3的k8s，我们去 https://github.com/kubernetes/kubernetes 里进对应版本的CHANGELOG-1.16.md里搜The list of validated docker versions remain查找支持的docker版本，docker版本不一定得在支持列表里，实际上19.03也能使用，这里我们使用docker官方的安装脚本安装docker(该脚本支持centos和ubuntu)
-export VERSION=19.03 curl -fsSL &amp;quot;https://get.docker.com/&amp;quot; | bash -s -- --mirror Aliyun </description>
+export VERSION=19.03 curl -fsSL &amp;quot;https://get.docker.com/&amp;quot; | bash -s -- --mirror Aliyun harbor harbor中开启内容信任后签名的问题: https://github.com/zj1244/Blog/blob/master/2019/harbor%E7%9A%84Notary%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95.md harbor2.3安装问题 docker: 18.06.1-ce,19.03.13 由于维护过程需要停止或重启harbor服务,再次启动时postgresql会报错: ls: cannot access &#39;/var/lib/postgresql/data&#39;: Operation not permitted initdb: error: directory &amp;quot;/var/lib/postgresql/data/pg13&amp;quot; exists but is not empty 这里解决办法是修改一下 docker-compose.yml, 添加 privileged: true postgresql: image: goharbor/harbor-db:v2.3.4 container_name: harbor-db privileged: true #需要加入超级权限 从官方issue并没有看到更好的解决方法, 目前是添加超级权限解决 https://github.com/goharbor/harbor/issues/15456 </description>
 			<content type="html"><![CDATA[<p>简单介绍docker</p>
 <!-- more -->
 <h3 id="docker">docker</h3>
@@ -12774,6 +12774,23 @@ export VERSION=19.03 curl -fsSL &amp;quot;https://get.docker.com/&amp;quot; | ba
 <pre><code>export VERSION=19.03
 curl -fsSL &quot;https://get.docker.com/&quot; | bash -s -- --mirror Aliyun
 
+</code></pre><h3 id="harbor">harbor</h3>
+<pre><code>harbor中开启内容信任后签名的问题: https://github.com/zj1244/Blog/blob/master/2019/harbor%E7%9A%84Notary%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95.md
+</code></pre><h3 id="harbor23安装问题">harbor2.3安装问题</h3>
+<pre><code>docker: 18.06.1-ce,19.03.13
+
+由于维护过程需要停止或重启harbor服务,再次启动时postgresql会报错:
+ls: cannot access '/var/lib/postgresql/data': Operation not permitted
+initdb: error: directory &quot;/var/lib/postgresql/data/pg13&quot; exists but is not empty
+
+这里解决办法是修改一下 docker-compose.yml, 添加 privileged: true
+  postgresql:
+    image: goharbor/harbor-db:v2.3.4
+    container_name: harbor-db
+    privileged: true    #需要加入超级权限
+
+从官方issue并没有看到更好的解决方法, 目前是添加超级权限解决
+https://github.com/goharbor/harbor/issues/15456
 </code></pre>]]></content>
 		</item>
 		
@@ -13142,6 +13159,29 @@ WHERE
   }
   ...
 }   
+</code></pre><h3 id="using-where-using-index的原因">Using where; Using index的原因</h3>
+<pre><code>首先有一个表:
+CREATE TABLE `test` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `aid` varchar(20) NOT NULL DEFAULT '' COMMENT 'aid',
+  `bid` varchar(20) NOT NULL DEFAULT '' COMMENT 'bid',
+  `cid` varchar(20) NOT NULL DEFAULT '' COMMENT 'cid',
+  PRIMARY KEY (`id`),
+  KEY `abc` (`aid`,`bid`,`cid`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+explain select id,aid,bid,cid from test where cid='1' and bid='1';
++----+-------------+-------+------------+-------+---------------+------+---------+------+------+----------+--------------------------+
+| id | select_type | table | partitions | type  | possible_keys | key  | key_len | ref  | rows | filtered | Extra                    |
++----+-------------+-------+------------+-------+---------------+------+---------+------+------+----------+--------------------------+
+|  1 | SIMPLE      | test  | NULL       | index | NULL          | abc  | 186     | NULL |    1 |   100.00 | Using where; Using index |
++----+-------------+-------+------------+-------+---------------+------+---------+------+------+----------+--------------------------+
+
+由上可以看到type是index, ref=null, 所以并不是通过索引的等值
+extra既有where也有index的情况:
+1，查询的列被索引覆盖，并且where筛选条件是索引列之一但是不是索引的前导列，Extra中为Using where; Using index，
+
+该查询不需要回表, 通过索引得到了所有的查询内容 , 然后在通过where条件判断即可
 </code></pre>]]></content>
 		</item>
 		
