@@ -59,7 +59,7 @@
 </span><span class="c1"></span><span class="p">}</span>
 </code></pre></div><h3 id="runtimemakemap-代码">runtime.makemap 代码</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/map.go
-</span><span class="c1">// 以上示例 hint=9
+</span><span class="c1">// 以上示例 hint=209
 </span><span class="c1"></span><span class="kd">func</span> <span class="nf">makemap</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">maptype</span><span class="p">,</span> <span class="nx">hint</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">h</span> <span class="o">*</span><span class="nx">hmap</span><span class="p">)</span> <span class="o">*</span><span class="nx">hmap</span> <span class="p">{</span>
 	<span class="c1">// 判断 hint * size 是否溢出
 </span><span class="c1"></span>	<span class="nx">mem</span><span class="p">,</span> <span class="nx">overflow</span> <span class="o">:=</span> <span class="nx">math</span><span class="p">.</span><span class="nf">MulUintptr</span><span class="p">(</span><span class="nb">uintptr</span><span class="p">(</span><span class="nx">hint</span><span class="p">),</span> <span class="nx">t</span><span class="p">.</span><span class="nx">bucket</span><span class="p">.</span><span class="nx">size</span><span class="p">)</span>
