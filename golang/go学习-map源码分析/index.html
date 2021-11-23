@@ -11,7 +11,7 @@
 <meta itemprop="description" content="在看map之前,我们从一个简单的代码开始 1 package main 2 func main() { 3	a := make(map[int]int,209) 4	a[1] = 1 5	print(a[1]) 6 }  以上代码我们看下编译的map相关调用  go tool compile -S map源码分析.go|egrep &quot;map源码分析.*CALL.*map&quot; 0x0051 00081 (map源码分析.go:3)	CALL	runtime.makemap(SB) // 显然第3行是初始化 0x0079 00121 (map源码分析.go:4)	CALL	runtime.mapassign_fast64(SB) //第4行是写入 0x00a8 00168 (map源码分析.go:5)	CALL	runtime.mapaccess1_fast64(SB) //第5行是读取 首先看下相关结构体hmap type hmap struct { // Note: the format of the hmap is also encoded in cmd/compile/internal/gc/reflect.go. 	// Make sure this stays in sync with the compiler&#39;s definition.">
 <meta itemprop="datePublished" content="2021-11-22T13:59:53+08:00" />
 <meta itemprop="dateModified" content="2021-11-22T13:59:53+08:00" />
-<meta itemprop="wordCount" content="2088">
+<meta itemprop="wordCount" content="2090">
 
 
 
@@ -91,18 +91,17 @@
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">hmap</span> <span class="kd">struct</span> <span class="p">{</span>
 	<span class="c1">// Note: the format of the hmap is also encoded in cmd/compile/internal/gc/reflect.go.
 </span><span class="c1"></span>	<span class="c1">// Make sure this stays in sync with the compiler&#39;s definition.
-</span><span class="c1"></span>	<span class="nx">count</span>     <span class="kt">int</span> <span class="c1">// # 已经在使用的键值对总数, len(map)的值
-</span><span class="c1"></span>	<span class="nx">flags</span>     <span class="kt">uint8</span>
-	<span class="nx">B</span>         <span class="kt">uint8</span>  <span class="c1">// 桶的大小的log2, 2^B = 桶的大小
-</span><span class="c1"></span>	<span class="nx">noverflow</span> <span class="kt">uint16</span> <span class="c1">// overflow 的 bucket 近似数
-</span><span class="c1"></span>	<span class="nx">hash0</span>     <span class="kt">uint32</span> <span class="c1">// 哈希因子
-</span><span class="c1"></span>
-	<span class="nx">buckets</span>    <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="c1">// 桶的大小 , may be nil if count==0.
+</span><span class="c1"></span>	<span class="nx">count</span>      <span class="kt">int</span>            <span class="c1">// # 已经在使用的键值对总数, len(map)的值
+</span><span class="c1"></span>	<span class="nx">flags</span>      <span class="kt">uint8</span>          <span class="c1">// 标志位
+</span><span class="c1"></span>	<span class="nx">B</span>          <span class="kt">uint8</span>          <span class="c1">// 装载因子, 2^B = 桶的大小
+</span><span class="c1"></span>	<span class="nx">noverflow</span>  <span class="kt">uint16</span>         <span class="c1">// overflow 的 bucket 近似数
+</span><span class="c1"></span>	<span class="nx">hash0</span>      <span class="kt">uint32</span>         <span class="c1">// 哈希因子
+</span><span class="c1"></span>	<span class="nx">buckets</span>    <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="c1">// 桶的大小 , may be nil if count==0.
 </span><span class="c1"></span>	<span class="nx">oldbuckets</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="c1">// 通常是nil, 如果在扩容,就是旧的桶
 </span><span class="c1"></span>	<span class="nx">nevacuate</span>  <span class="kt">uintptr</span>        <span class="c1">// 指示扩容进度，小于此地址的 buckets 迁移完成
-</span><span class="c1"></span>
-	<span class="nx">extra</span> <span class="o">*</span><span class="nx">mapextra</span> <span class="c1">// hint&gt;8才会使用?
+</span><span class="c1"></span>	<span class="nx">extra</span>      <span class="o">*</span><span class="nx">mapextra</span>      <span class="c1">// 存储溢出桶
 </span><span class="c1"></span><span class="p">}</span>
+
 <span class="kd">type</span> <span class="nx">mapextra</span> <span class="kd">struct</span> <span class="p">{</span>
 	<span class="nx">overflow</span>    <span class="o">*</span><span class="p">[]</span><span class="o">*</span><span class="nx">bmap</span>
 	<span class="nx">oldoverflow</span> <span class="o">*</span><span class="p">[]</span><span class="o">*</span><span class="nx">bmap</span>
@@ -379,6 +378,7 @@
 	<span class="k">return</span> <span class="nx">noverflow</span> <span class="o">&gt;=</span> <span class="nb">uint16</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="nx">B</span><span class="o">&amp;</span><span class="mi">15</span><span class="p">)</span>
 <span class="p">}</span>
 </code></pre></div><h4 id="hashgrow-扩容">hashGrow 扩容<a href="#hashgrow-扩容" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<p><img src="images/golang/map-1.png" alt=""></p>
 <ul>
 <li>首先做一个简单的说明</li>
 </ul>
@@ -725,7 +725,7 @@
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/golang">golang</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>2088 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>2090 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2021-11-22 13:59 &#43;0800</p>
 			</footer>
 		</article>
