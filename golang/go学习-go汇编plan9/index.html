@@ -8,7 +8,7 @@
 	<meta name="theme-color" content="#494f5c">
 	<meta name="msapplication-TileColor" content="#494f5c">
 <meta itemprop="name" content="Go学习 Go汇编plan9">
-<meta itemprop="description" content="在此之前,什么是函数栈? 先了解下几个汇编寄存器 通用寄存器包括: 1. 数据寄存器 AX:累加寄存器 BX:基地址寄存器 CX:计数器寄存器 DX:数据寄存器 2. 指针寄存器 SP:堆栈指针, 栈顶 BP:基址指针, 栈底 IP:指令指针, cpu下一条要执行指令的内存地址 3. 变址寄存器 SI:源变址 DI:目的变址 golang伪寄存器: FP: Frame pointer: arguments and locals.(指向当前frame的起始位置) FP&#43;0 使用形如 symbol&#43;offset(FP) 的方式，引用函数的输入参数。例如 arg0&#43;0(FP)，arg1&#43;8(FP)，使用 FP 不加 symbol 时，无法通过编译，在汇编层面来讲，symbol 并没有什么用，加 symbol 主要是为了提升代码可读性。另外，官方文档虽然将伪寄存器 FP 称之为 frame pointer，实际上它根本不是 frame pointer，按照传统的 x86 的习惯来讲，frame pointer 是指向整个 stack frame 底部的 BP 寄存器。假如当前的 callee 函数是 add，在 add 的代码中引用 FP，该 FP 指向的位置不在 callee 的 stack frame 之内，而是在 caller 的 stack frame 上。 PC: Program counter: jumps and branches.">
+<meta itemprop="description" content="在此之前,什么是函数栈? 先了解下几个汇编寄存器 通用寄存器包括: 1. 数据寄存器 AX:累加寄存器 BX:基地址寄存器 CX:计数器寄存器 DX:数据寄存器 2. 指针寄存器 SP:堆栈指针, 栈顶 BP:基址指针, 栈底 IP:指令指针,(或者PC) cpu下一条要执行指令的内存地址 3. 变址寄存器 SI:源变址 DI:目的变址 golang伪寄存器: FP: Frame pointer: arguments and locals.(指向当前frame的起始位置) FP&#43;0 使用形如 symbol&#43;offset(FP) 的方式，引用函数的输入参数。例如 arg0&#43;0(FP)，arg1&#43;8(FP)，使用 FP 不加 symbol 时，无法通过编译，在汇编层面来讲，symbol 并没有什么用，加 symbol 主要是为了提升代码可读性。另外，官方文档虽然将伪寄存器 FP 称之为 frame pointer，实际上它根本不是 frame pointer，按照传统的 x86 的习惯来讲，frame pointer 是指向整个 stack frame 底部的 BP 寄存器。假如当前的 callee 函数是 add，在 add 的代码中引用 FP，该 FP 指向的位置不在 callee 的 stack frame 之内，而是在 caller 的 stack frame 上。 PC: Program counter: jumps and branches.">
 <meta itemprop="datePublished" content="2021-11-12T10:19:57+08:00" />
 <meta itemprop="dateModified" content="2021-11-12T10:19:57+08:00" />
 <meta itemprop="wordCount" content="729">
@@ -17,14 +17,14 @@
 
 <meta itemprop="keywords" content="golang,汇编," />
 <meta property="og:title" content="Go学习 Go汇编plan9" />
-<meta property="og:description" content="在此之前,什么是函数栈? 先了解下几个汇编寄存器 通用寄存器包括: 1. 数据寄存器 AX:累加寄存器 BX:基地址寄存器 CX:计数器寄存器 DX:数据寄存器 2. 指针寄存器 SP:堆栈指针, 栈顶 BP:基址指针, 栈底 IP:指令指针, cpu下一条要执行指令的内存地址 3. 变址寄存器 SI:源变址 DI:目的变址 golang伪寄存器: FP: Frame pointer: arguments and locals.(指向当前frame的起始位置) FP&#43;0 使用形如 symbol&#43;offset(FP) 的方式，引用函数的输入参数。例如 arg0&#43;0(FP)，arg1&#43;8(FP)，使用 FP 不加 symbol 时，无法通过编译，在汇编层面来讲，symbol 并没有什么用，加 symbol 主要是为了提升代码可读性。另外，官方文档虽然将伪寄存器 FP 称之为 frame pointer，实际上它根本不是 frame pointer，按照传统的 x86 的习惯来讲，frame pointer 是指向整个 stack frame 底部的 BP 寄存器。假如当前的 callee 函数是 add，在 add 的代码中引用 FP，该 FP 指向的位置不在 callee 的 stack frame 之内，而是在 caller 的 stack frame 上。 PC: Program counter: jumps and branches." />
+<meta property="og:description" content="在此之前,什么是函数栈? 先了解下几个汇编寄存器 通用寄存器包括: 1. 数据寄存器 AX:累加寄存器 BX:基地址寄存器 CX:计数器寄存器 DX:数据寄存器 2. 指针寄存器 SP:堆栈指针, 栈顶 BP:基址指针, 栈底 IP:指令指针,(或者PC) cpu下一条要执行指令的内存地址 3. 变址寄存器 SI:源变址 DI:目的变址 golang伪寄存器: FP: Frame pointer: arguments and locals.(指向当前frame的起始位置) FP&#43;0 使用形如 symbol&#43;offset(FP) 的方式，引用函数的输入参数。例如 arg0&#43;0(FP)，arg1&#43;8(FP)，使用 FP 不加 symbol 时，无法通过编译，在汇编层面来讲，symbol 并没有什么用，加 symbol 主要是为了提升代码可读性。另外，官方文档虽然将伪寄存器 FP 称之为 frame pointer，实际上它根本不是 frame pointer，按照传统的 x86 的习惯来讲，frame pointer 是指向整个 stack frame 底部的 BP 寄存器。假如当前的 callee 函数是 add，在 add 的代码中引用 FP，该 FP 指向的位置不在 callee 的 stack frame 之内，而是在 caller 的 stack frame 上。 PC: Program counter: jumps and branches." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-go%E6%B1%87%E7%BC%96plan9/" />
 <meta property="article:published_time" content="2021-11-12T10:19:57+08:00" />
 <meta property="article:modified_time" content="2021-11-12T10:19:57+08:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Go学习 Go汇编plan9"/>
-<meta name="twitter:description" content="在此之前,什么是函数栈? 先了解下几个汇编寄存器 通用寄存器包括: 1. 数据寄存器 AX:累加寄存器 BX:基地址寄存器 CX:计数器寄存器 DX:数据寄存器 2. 指针寄存器 SP:堆栈指针, 栈顶 BP:基址指针, 栈底 IP:指令指针, cpu下一条要执行指令的内存地址 3. 变址寄存器 SI:源变址 DI:目的变址 golang伪寄存器: FP: Frame pointer: arguments and locals.(指向当前frame的起始位置) FP&#43;0 使用形如 symbol&#43;offset(FP) 的方式，引用函数的输入参数。例如 arg0&#43;0(FP)，arg1&#43;8(FP)，使用 FP 不加 symbol 时，无法通过编译，在汇编层面来讲，symbol 并没有什么用，加 symbol 主要是为了提升代码可读性。另外，官方文档虽然将伪寄存器 FP 称之为 frame pointer，实际上它根本不是 frame pointer，按照传统的 x86 的习惯来讲，frame pointer 是指向整个 stack frame 底部的 BP 寄存器。假如当前的 callee 函数是 add，在 add 的代码中引用 FP，该 FP 指向的位置不在 callee 的 stack frame 之内，而是在 caller 的 stack frame 上。 PC: Program counter: jumps and branches."/>
+<meta name="twitter:description" content="在此之前,什么是函数栈? 先了解下几个汇编寄存器 通用寄存器包括: 1. 数据寄存器 AX:累加寄存器 BX:基地址寄存器 CX:计数器寄存器 DX:数据寄存器 2. 指针寄存器 SP:堆栈指针, 栈顶 BP:基址指针, 栈底 IP:指令指针,(或者PC) cpu下一条要执行指令的内存地址 3. 变址寄存器 SI:源变址 DI:目的变址 golang伪寄存器: FP: Frame pointer: arguments and locals.(指向当前frame的起始位置) FP&#43;0 使用形如 symbol&#43;offset(FP) 的方式，引用函数的输入参数。例如 arg0&#43;0(FP)，arg1&#43;8(FP)，使用 FP 不加 symbol 时，无法通过编译，在汇编层面来讲，symbol 并没有什么用，加 symbol 主要是为了提升代码可读性。另外，官方文档虽然将伪寄存器 FP 称之为 frame pointer，实际上它根本不是 frame pointer，按照传统的 x86 的习惯来讲，frame pointer 是指向整个 stack frame 底部的 BP 寄存器。假如当前的 callee 函数是 add，在 add 的代码中引用 FP，该 FP 指向的位置不在 callee 的 stack frame 之内，而是在 caller 的 stack frame 上。 PC: Program counter: jumps and branches."/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -84,7 +84,7 @@
 2. 指针寄存器
     SP:堆栈指针, 栈顶
     BP:基址指针, 栈底
-    IP:指令指针, cpu下一条要执行指令的内存地址
+    IP:指令指针,<span class="o">(</span>或者PC<span class="o">)</span> cpu下一条要执行指令的内存地址
 3. 变址寄存器
     SI:源变址
     DI:目的变址
@@ -122,58 +122,58 @@ RET: 函数返回
 <li>栈,每个goroutine都有自己的栈, 一般顺序为 SP栈顶(低地址)-&gt;存储参数,返回值,局部变量-&gt;BP栈底(高地址)</li>
 <li>栈帧,一个栈由多个栈帧组成, 每个函数对应一段栈帧,栈帧表示着函数间的调用关系</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
-                                       <span class="nx">caller</span>                                                                                 
-                                 <span class="o">+------------------+</span>                                                                         
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">
+                                       <span class="nb">caller</span>                                                                                 
+                                 +------------------+                                                                         
                                  <span class="p">|</span>                  <span class="p">|</span>                                                                         
-       <span class="o">+----------------------</span><span class="p">&gt;</span>  <span class="o">--------------------</span>                                                                         
+       +----------------------&gt;  --------------------                                                                         
        <span class="p">|</span>                         <span class="p">|</span>                  <span class="p">|</span>                                                                         
-       <span class="p">|</span>                         <span class="p">|</span> <span class="nx">caller</span> <span class="nx">parent</span> <span class="nx">BP</span> <span class="p">|</span>                                                                         
-       <span class="p">|</span>           <span class="nf">BP</span><span class="p">(</span><span class="nx">pseudo</span> <span class="nx">SP</span><span class="p">)</span> <span class="o">--------------------</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span> <span class="nb">caller</span> parent BP <span class="p">|</span>                                                                         
+       <span class="p">|</span>           BP<span class="o">(</span>pseudo SP<span class="o">)</span> --------------------                                                                         
        <span class="p">|</span>                         <span class="p">|</span>                  <span class="p">|</span>                                                                         
-       <span class="p">|</span>                         <span class="p">|</span>   <span class="nx">Local</span> <span class="nx">VarX</span>     <span class="p">|</span>                                                                         
-       <span class="p">|</span>                         <span class="o">--------------------</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>   Local VarX     <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         --------------------                                                                         
        <span class="p">|</span>                         <span class="p">|</span>                  <span class="p">|</span>                                                                         
-       <span class="p">|</span>                         <span class="p">|</span>   <span class="o">......</span><span class="p">.</span>        <span class="p">|</span>                                                                         
-       <span class="p">|</span>                         <span class="o">--------------------</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>   .......        <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         --------------------                                                                         
        <span class="p">|</span>                         <span class="p">|</span>                  <span class="p">|</span>                                                                         
-       <span class="p">|</span>                         <span class="p">|</span>   <span class="nx">Local</span> <span class="nx">VarN</span>     <span class="p">|</span>                                                                         
-                                 <span class="o">--------------------</span>                                                                         
- <span class="nx">caller</span> <span class="nx">stack</span> <span class="nx">frame</span>              <span class="p">|</span>                  <span class="p">|</span>                                                                         
-                                 <span class="p">|</span>   <span class="nx">callee</span> <span class="nx">arg2</span>    <span class="p">|</span>                                                                         
-       <span class="p">|</span>                         <span class="p">|</span><span class="o">------------------</span><span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>   Local VarN     <span class="p">|</span>                                                                         
+                                 --------------------                                                                         
+ <span class="nb">caller</span> stack frame              <span class="p">|</span>                  <span class="p">|</span>                                                                         
+                                 <span class="p">|</span>   callee arg2    <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>------------------<span class="p">|</span>                                                                         
        <span class="p">|</span>                         <span class="p">|</span>                  <span class="p">|</span>                                                                         
-       <span class="p">|</span>                         <span class="p">|</span>   <span class="nx">callee</span> <span class="nx">arg1</span>    <span class="p">|</span>                                                                         
-       <span class="p">|</span>                         <span class="p">|</span><span class="o">------------------</span><span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>   callee arg1    <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         <span class="p">|</span>------------------<span class="p">|</span>                                                                         
        <span class="p">|</span>                         <span class="p">|</span>                  <span class="p">|</span>                                                                         
-       <span class="p">|</span>                         <span class="p">|</span>   <span class="nx">callee</span> <span class="nx">arg0</span>    <span class="p">|</span>                                                                         
-       <span class="p">|</span>                         <span class="o">----------------------------------------------+</span>   <span class="nf">FP</span><span class="p">(</span><span class="nx">virtual</span> <span class="nx">register</span><span class="p">)</span>                       
+       <span class="p">|</span>                         <span class="p">|</span>   callee arg0    <span class="p">|</span>                                                                         
+       <span class="p">|</span>                         ----------------------------------------------+   FP<span class="o">(</span>virtual register<span class="o">)</span>                       
        <span class="p">|</span>                         <span class="p">|</span>                  <span class="p">|</span>                          <span class="p">|</span>                                              
-       <span class="p">|</span>                         <span class="p">|</span>   <span class="k">return</span> <span class="nx">addr</span>    <span class="p">|</span>  <span class="nx">parent</span> <span class="k">return</span> <span class="nx">address</span>   <span class="p">|</span>                                              
-       <span class="o">+----------------------</span><span class="p">&gt;</span>  <span class="o">+------------------+---------------------------</span>    <span class="o">&lt;-------------------------------+</span>         
-                                                    <span class="p">|</span>  <span class="nx">caller</span> <span class="nx">BP</span>               <span class="p">|</span>                                    <span class="p">|</span>         
-                                                    <span class="p">|</span>  <span class="p">(</span><span class="nx">caller</span> <span class="nx">frame</span> <span class="nx">pointer</span><span class="p">)</span>  <span class="p">|</span>                                    <span class="p">|</span>         
-                                     <span class="nf">BP</span><span class="p">(</span><span class="nx">pseudo</span> <span class="nx">SP</span><span class="p">)</span>  <span class="o">----------------------------</span>                                    <span class="p">|</span>         
+       <span class="p">|</span>                         <span class="p">|</span>   <span class="k">return</span> addr    <span class="p">|</span>  parent <span class="k">return</span> address   <span class="p">|</span>                                              
+       +----------------------&gt;  +------------------+---------------------------    &lt;-------------------------------+         
+                                                    <span class="p">|</span>  <span class="nb">caller</span> BP               <span class="p">|</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>  <span class="o">(</span><span class="nb">caller</span> frame pointer<span class="o">)</span>  <span class="p">|</span>                                    <span class="p">|</span>         
+                                     BP<span class="o">(</span>pseudo SP<span class="o">)</span>  ----------------------------                                    <span class="p">|</span>         
                                                     <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
-                                                    <span class="p">|</span>     <span class="nx">Local</span> <span class="nx">Var0</span>           <span class="p">|</span>                                    <span class="p">|</span>         
-                                                    <span class="o">----------------------------</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>     Local Var0           <span class="p">|</span>                                    <span class="p">|</span>         
+                                                    ----------------------------                                    <span class="p">|</span>         
                                                     <span class="p">|</span>                          <span class="p">|</span>                                              
-                                                    <span class="p">|</span>     <span class="nx">Local</span> <span class="nx">Var1</span>           <span class="p">|</span>                                              
-                                                    <span class="o">----------------------------</span>                            <span class="nx">callee</span> <span class="nx">stack</span> <span class="nx">frame</span>
+                                                    <span class="p">|</span>     Local Var1           <span class="p">|</span>                                              
+                                                    ----------------------------                            callee stack frame
                                                     <span class="p">|</span>                          <span class="p">|</span>                                              
-                                                    <span class="p">|</span>       <span class="o">...</span><span class="p">..</span>              <span class="p">|</span>                                              
-                                                    <span class="o">----------------------------</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>       .....              <span class="p">|</span>                                              
+                                                    ----------------------------                                    <span class="p">|</span>         
                                                     <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
-                                                    <span class="p">|</span>     <span class="nx">Local</span> <span class="nx">VarN</span>           <span class="p">|</span>                                    <span class="p">|</span>         
-                                  <span class="nf">SP</span><span class="p">(</span><span class="nx">Real</span> <span class="nx">Register</span><span class="p">)</span> <span class="o">----------------------------</span>                                    <span class="p">|</span>         
-                                                    <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
-                                                    <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>     Local VarN           <span class="p">|</span>                                    <span class="p">|</span>         
+                                  SP<span class="o">(</span>Real Register<span class="o">)</span> ----------------------------                                    <span class="p">|</span>         
                                                     <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
                                                     <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
                                                     <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
-                                                    <span class="o">+--------------------------+</span>    <span class="o">&lt;-------------------------------+</span>         
+                                                    <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
+                                                    <span class="p">|</span>                          <span class="p">|</span>                                    <span class="p">|</span>         
+                                                    +--------------------------+    &lt;-------------------------------+         
 
-                                                              <span class="nx">callee</span>
+                                                              callee
 </code></pre></div><ul>
 <li><a href="https://www.bilibili.com/video/BV1Xb411J7Yk">曹大讲解go plan9汇编 视频</a></li>
 <li><a href="https://github.com/cch123/asmshare/blob/master/layout.md">曹大讲解go plan9汇编 资料</a></li>
@@ -208,65 +208,65 @@ RET: 函数返回
 </code></pre></div><ul>
 <li>编译看汇编</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">//MOV 指令有有好几种后缀 MOVB MOVW MOVL MOVQ 分别对应的是 1 字节 、2 字节 、4 字节、8 字节
-</span><span class="c1"></span>
-<span class="k">go</span> <span class="nx">tool</span> <span class="nx">compile</span> <span class="o">-</span><span class="nx">S</span> <span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">|</span><span class="nx">egrep</span> <span class="s">&#34;函数栈.go|funcid&#34;</span>
-<span class="s">&#34;&#34;</span><span class="p">.</span><span class="nx">sumGo</span> <span class="nx">STEXT</span> <span class="nx">nosplit</span> <span class="nx">size</span><span class="p">=</span><span class="mi">43</span> <span class="nx">args</span><span class="p">=</span><span class="mh">0x20</span> <span class="nx">locals</span><span class="p">=</span><span class="mh">0x0</span> <span class="nx">funcid</span><span class="p">=</span><span class="mh">0x0</span>
-	<span class="mh">0x0000</span> <span class="mo">00000</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">4</span><span class="p">)</span>	<span class="nx">TEXT</span>	<span class="s">&#34;&#34;</span><span class="p">.</span><span class="nf">sumGo</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">NOSPLIT</span><span class="p">|</span><span class="nx">ABIInternal</span><span class="p">,</span> <span class="err">$</span><span class="mi">0</span><span class="o">-</span><span class="mi">32</span>
-	<span class="mh">0x0000</span> <span class="mo">00000</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">MOVQ</span>	<span class="s">&#34;&#34;</span><span class="p">.</span><span class="nx">rl</span><span class="o">+</span><span class="mi">16</span><span class="p">(</span><span class="nx">SP</span><span class="p">),</span> <span class="nx">AX</span>  <span class="c1">// 这里都是物理sp寄存器, AX=len(rl),我们知道slice结构体是struct{array,len,cap},每个字段都是8字节
-</span><span class="c1"></span>	<span class="mh">0x0005</span> <span class="mo">00005</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">MOVQ</span>	<span class="s">&#34;&#34;</span><span class="p">.</span><span class="nx">rl</span><span class="o">+</span><span class="mi">8</span><span class="p">(</span><span class="nx">SP</span><span class="p">),</span> <span class="nx">CX</span>   <span class="c1">// CX=&amp;rl[0]
-</span><span class="c1"></span>	<span class="mh">0x000a</span> <span class="mo">00010</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">XORL</span>	<span class="nx">DX</span><span class="p">,</span> <span class="nx">DX</span>            <span class="c1">// 相同的值异或肯定都是0,DX=0
-</span><span class="c1"></span>	<span class="mh">0x000c</span> <span class="mo">00012</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">XORL</span>	<span class="nx">BX</span><span class="p">,</span> <span class="nx">BX</span>            <span class="c1">// BX=0
-</span><span class="c1"></span>	<span class="mh">0x000e</span> <span class="mo">00014</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">JMP</span>	<span class="mi">32</span>                    <span class="c1">// 跳到 32行 CMPQ	DX, AX
-</span><span class="c1"></span>	<span class="mh">0x0010</span> <span class="mo">00016</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">LEAQ</span>	<span class="mi">1</span><span class="p">(</span><span class="nx">DX</span><span class="p">),</span> <span class="nx">SI</span>         <span class="c1">//装入有效地址, 1(DX)偏移地址存入SI, SI= DX+1 ~ i+1
-</span><span class="c1"></span>	<span class="mh">0x0014</span> <span class="mo">00020</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">7</span><span class="p">)</span>	<span class="nf">MOVQ</span>	<span class="p">(</span><span class="nx">CX</span><span class="p">)(</span><span class="nx">DX</span><span class="o">*</span><span class="mi">8</span><span class="p">),</span> <span class="nx">DI</span>    <span class="c1">// 指针*CX移动i*8字节? 所以 DI=rl[i]
-</span><span class="c1"></span>	<span class="mh">0x0018</span> <span class="mo">00024</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">7</span><span class="p">)</span>	<span class="nx">ADDQ</span>	<span class="nx">DI</span><span class="p">,</span> <span class="nx">BX</span>            <span class="c1">// BX += DI  ~ += rl[i]
-</span><span class="c1"></span>	<span class="mh">0x001b</span> <span class="mo">00027</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">MOVQ</span>	<span class="nx">SI</span><span class="p">,</span> <span class="nx">DX</span>            <span class="c1">// DX = SI ~ i
-</span><span class="c1"></span>	<span class="mh">0x001e</span> <span class="mo">00030</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">NOP</span>                       <span class="c1">// 空操作?
-</span><span class="c1"></span>	<span class="mh">0x0020</span> <span class="mo">00032</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">CMPQ</span>	<span class="nx">DX</span><span class="p">,</span> <span class="nx">AX</span>            <span class="c1">// 比较DX是否小于AX ?
-</span><span class="c1"></span>	<span class="mh">0x0023</span> <span class="mo">00035</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">JLT</span>	<span class="mi">16</span>                    <span class="c1">// 小于 就跳转到16行
-</span><span class="c1"></span>	<span class="mh">0x0025</span> <span class="mo">00037</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">9</span><span class="p">)</span>	<span class="nx">MOVQ</span>	<span class="nx">BX</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">.</span><span class="err">~</span><span class="nx">r1</span><span class="o">+</span><span class="mi">32</span><span class="p">(</span><span class="nx">SP</span><span class="p">)</span> <span class="c1">// 否则 BX结果写到 32(SP)的栈中
-</span><span class="c1"></span>	<span class="mh">0x002a</span> <span class="mo">00042</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">9</span><span class="p">)</span>	<span class="nx">RET</span>
-<span class="s">&#34;&#34;</span><span class="p">.</span><span class="nx">main</span> <span class="nx">STEXT</span> <span class="nx">nosplit</span> <span class="nx">size</span><span class="p">=</span><span class="mi">14</span> <span class="nx">args</span><span class="p">=</span><span class="mh">0x0</span> <span class="nx">locals</span><span class="p">=</span><span class="mh">0x0</span> <span class="nx">funcid</span><span class="p">=</span><span class="mh">0x0</span>
-	<span class="mh">0x0000</span> <span class="mo">00000</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">14</span><span class="p">)</span>	<span class="nx">TEXT</span>	<span class="s">&#34;&#34;</span><span class="p">.</span><span class="nf">main</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">NOSPLIT</span><span class="p">|</span><span class="nx">ABIInternal</span><span class="p">,</span> <span class="err">$</span><span class="mi">0</span><span class="o">-</span><span class="mi">0</span>
-	<span class="mh">0x0000</span> <span class="mo">00000</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">16</span><span class="p">)</span>	<span class="nx">XORL</span>	<span class="nx">AX</span><span class="p">,</span> <span class="nx">AX</span>
-	<span class="mh">0x0002</span> <span class="mo">00002</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">JMP</span>	<span class="mi">7</span>
-	<span class="mh">0x0004</span> <span class="mo">00004</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">INCQ</span>	<span class="nx">AX</span>
-	<span class="mh">0x0007</span> <span class="mo">00007</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">CMPQ</span>	<span class="nx">AX</span><span class="p">,</span> <span class="err">$</span><span class="mi">3</span>
-	<span class="mh">0x000b</span> <span class="mo">00011</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>	<span class="nx">JLT</span>	<span class="mi">4</span>
-	<span class="mh">0x000d</span> <span class="mo">00013</span> <span class="p">(</span><span class="nx">函数栈</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">16</span><span class="p">)</span>	<span class="nx">RET</span>
-</code></pre></div><h3 id="例子2">例子2<a href="#例子2" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">//sum_amd64.s
-</span><span class="c1"></span><span class="err">#</span><span class="nx">include</span> <span class="s">&#34;textflag.h&#34;</span>
+<pre><code class="language-assembly" data-lang="assembly">//MOV 指令有有好几种后缀 MOVB MOVW MOVL MOVQ 分别对应的是 1 字节 、2 字节 、4 字节、8 字节
 
-<span class="c1">// func sumAsm(sl []int64) int64
-</span><span class="c1"></span><span class="nx">TEXT</span> <span class="err">·</span><span class="nf">sumAsm</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">NOSPLIT</span><span class="p">,</span> <span class="err">$</span><span class="mi">0</span><span class="o">-</span><span class="mi">32</span>
-    <span class="nx">MOVQ</span> <span class="err">$</span><span class="mi">0</span><span class="p">,</span> <span class="nx">SI</span>
-    <span class="nx">MOVQ</span> <span class="nx">sl</span><span class="o">+</span><span class="mi">0</span><span class="p">(</span><span class="nx">FP</span><span class="p">),</span> <span class="nx">BX</span> <span class="c1">// &amp;sl[0], addr of the first elem
-</span><span class="c1"></span>    <span class="nx">MOVQ</span> <span class="nx">sl</span><span class="o">+</span><span class="mi">8</span><span class="p">(</span><span class="nx">FP</span><span class="p">),</span> <span class="nx">CX</span> <span class="c1">// len(sl)
-</span><span class="c1"></span>    <span class="nx">INCQ</span> <span class="nx">CX</span>           <span class="c1">// CX++, 因为要循环 len 次
-</span><span class="c1"></span>
-<span class="nx">start</span><span class="p">:</span>
-    <span class="nx">DECQ</span> <span class="nx">CX</span>       <span class="c1">// CX--
-</span><span class="c1"></span>    <span class="nx">JZ</span>   <span class="nx">done</span>
-    <span class="nf">ADDQ</span> <span class="p">(</span><span class="nx">BX</span><span class="p">),</span> <span class="nx">SI</span> <span class="c1">// SI += *BX
-</span><span class="c1"></span>    <span class="nx">ADDQ</span> <span class="err">$</span><span class="mi">8</span><span class="p">,</span> <span class="nx">BX</span>   <span class="c1">// 指针移动
-</span><span class="c1"></span>    <span class="nx">JMP</span>  <span class="nx">start</span>
+go tool compile -S 函数栈.go|egrep &quot;函数栈.go|funcid&quot;
+&quot;&quot;.sumGo STEXT nosplit size=43 args=0x20 locals=0x0 funcid=0x0
+	0x0000 00000 (函数栈.go:4)	TEXT	&quot;&quot;.sumGo(SB), NOSPLIT|ABIInternal, $0-32
+	0x0000 00000 (函数栈.go:6)	MOVQ	&quot;&quot;.rl+16(SP), AX  // 这里都是物理sp寄存器, AX=len(rl),我们知道slice结构体是struct{array,len,cap},每个字段都是8字节
+	0x0005 00005 (函数栈.go:6)	MOVQ	&quot;&quot;.rl+8(SP), CX   // CX=&amp;rl[0]
+	0x000a 00010 (函数栈.go:6)	XORL	DX, DX            // 相同的值异或肯定都是0,DX=0
+	0x000c 00012 (函数栈.go:6)	XORL	BX, BX            // BX=0
+	0x000e 00014 (函数栈.go:6)	JMP	32                    // 跳到 32行 CMPQ	DX, AX
+	0x0010 00016 (函数栈.go:6)	LEAQ	1(DX), SI         //装入有效地址, 1(DX)偏移地址存入SI, SI= DX+1 ~ i+1
+	0x0014 00020 (函数栈.go:7)	MOVQ	(CX)(DX*8), DI    // 指针*CX移动i*8字节? 所以 DI=rl[i]
+	0x0018 00024 (函数栈.go:7)	ADDQ	DI, BX            // BX += DI  ~ += rl[i]
+	0x001b 00027 (函数栈.go:6)	MOVQ	SI, DX            // DX = SI ~ i
+	0x001e 00030 (函数栈.go:6)	NOP                       // 空操作?
+	0x0020 00032 (函数栈.go:6)	CMPQ	DX, AX            // 比较DX是否小于AX ?
+	0x0023 00035 (函数栈.go:6)	JLT	16                    // 小于 就跳转到16行
+	0x0025 00037 (函数栈.go:9)	MOVQ	BX, &quot;&quot;.~r1+32(SP) // 否则 BX结果写到 32(SP)的栈中
+	0x002a 00042 (函数栈.go:9)	RET
+&quot;&quot;.main STEXT nosplit size=14 args=0x0 locals=0x0 funcid=0x0
+	0x0000 00000 (函数栈.go:14)	TEXT	&quot;&quot;.main(SB), NOSPLIT|ABIInternal, $0-0
+	0x0000 00000 (函数栈.go:16)	XORL	AX, AX
+	0x0002 00002 (函数栈.go:6)	JMP	7
+	0x0004 00004 (函数栈.go:6)	INCQ	AX
+	0x0007 00007 (函数栈.go:6)	CMPQ	AX, $3
+	0x000b 00011 (函数栈.go:6)	JLT	4
+	0x000d 00013 (函数栈.go:16)	RET
+</code></pre><h3 id="例子2">例子2<a href="#例子2" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<pre><code class="language-assembly" data-lang="assembly">//sum_amd64.s
+#include &quot;textflag.h&quot;
 
-<span class="nx">done</span><span class="p">:</span>
-    <span class="nx">MOVQ</span> <span class="nx">SI</span><span class="p">,</span> <span class="nx">ret</span><span class="o">+</span><span class="mi">24</span><span class="p">(</span><span class="nx">FP</span><span class="p">)</span>
-    <span class="nx">RET</span>
+// func sumAsm(sl []int64) int64
+TEXT ·sumAsm(SB), NOSPLIT, $0-32
+    MOVQ $0, SI
+    MOVQ sl+0(FP), BX // &amp;sl[0], addr of the first elem
+    MOVQ sl+8(FP), CX // len(sl)
+    INCQ CX           // CX++, 因为要循环 len 次
 
-<span class="c1">// 函数栈.go
-</span><span class="c1">// go plan9实现累加
-</span><span class="c1"></span><span class="kd">func</span> <span class="nf">sumAsm</span><span class="p">(</span><span class="nx">rl</span> <span class="p">[]</span><span class="kt">int64</span><span class="p">)</span> <span class="kt">int64</span>
+start:
+    DECQ CX       // CX--
+    JZ   done
+    ADDQ (BX), SI // SI += *BX
+    ADDQ $8, BX   // 指针移动
+    JMP  start
 
-<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-	<span class="nx">l</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int64</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}</span>
-	<span class="c1">// 当前目录执行 go build . , 然后执行二进制文件即可
-</span><span class="c1"></span>	<span class="nf">sumAsm</span><span class="p">(</span><span class="nx">l</span><span class="p">)</span>
-<span class="p">}</span>
-</code></pre></div><h3 id="plan9汇编的编写格式">plan9汇编的编写格式<a href="#plan9汇编的编写格式" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+done:
+    MOVQ SI, ret+24(FP)
+    RET
+
+// 函数栈.go
+// go plan9实现累加
+func sumAsm(rl []int64) int64
+
+func main() {
+	l := []int64{1,2,3}
+	// 当前目录执行 go build . , 然后执行二进制文件即可
+	sumAsm(l)
+}
+</code></pre><h3 id="plan9汇编的编写格式">plan9汇编的编写格式<a href="#plan9汇编的编写格式" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <pre><code>                              参数及返回值大小
                                   |
  TEXT pkgname·add(SB),NOSPLIT,$32-32

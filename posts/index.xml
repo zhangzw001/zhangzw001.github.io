@@ -803,7 +803,16 @@ done</p>
 4. 在通过go mod edit去修改当前项目的go.mod的replace 配置
     replace k8s.io/api =&gt; k8s.io/api v0.0.0-20190918155943-95b840bb6a1f
 
-</code></pre>]]></content>
+</code></pre><h3 id="12-terminating的无法删除的情况">12 Terminating的无法删除的情况</h3>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">1. 首先使用强制命令
+        kubectl delete ns cattle-system --force --grace-period <span class="m">0</span>
+2. 如果不行,那就通过api删除
+        2.1 kubectl get ns cattle-system -o json <span class="p">|</span>jq <span class="s1">&#39;.spec = {&#34;finalizers&#34;:[]}&#39;</span> &gt; cattle-system.yaml
+        2.2 kubectl proxy <span class="o">(</span>启动代理<span class="o">)</span>
+        2.3 curl -k -H <span class="s2">&#34;Content-Type: application/json&#34;</span> -X PUT --data-binary @cattle-system.yaml http://127.0.0.1:8001/api/v1/namespaces/prom/finalize
+3. 如果不行, 那就直接etcd删除吧!!!
+        <span class="nv">ETCDCTL_API</span><span class="o">=</span><span class="m">3</span>  etcdctl del /registry/namespaces/rancher-system
+</code></pre></div>]]></content>
 		</item>
 		
 		<item>
@@ -10356,10 +10365,7 @@ Lucene 能很好利用文件系统的缓存，它是通过系统内核管理的�
 			
 			<guid>https://www.ngirl.xyz/posts/37-mac%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</guid>
 			<description>记录一些常用的mac工具和方法
- 1. Item2     1.1 同时按住 option(alt) 键，可以以列选中，类似于 sublime3中 按住 alt的列选中 。 Command + option(alt) 
-  1.2 剪贴板历史记录 Command + Shift + h
-  1.3 将文本内容复制到剪切板 pbcopy &amp;lt; a.txt
-   N. 其他    n.1 前进的快捷键  1. sublime3 command + shift + z (比后退 command + z 多一个shift) 或者 command + y  n.2 从linux生成的.csv文件到mac上乱码  iconv -f UTF8 -t GB18030 2020-12-02.</description>
+ 1. Item2    1.1 常用命令  # 同时按住 option(alt) 键，可以以列选中，类似于 sublime3中 按住 alt的列选中 。 Command + option(alt) #剪贴板历史记录 Command + Shift + h #将文本内容复制到剪切板 pbcopy &amp;lt; a.txt  1.2 插件  # Shell Integration  N. 其他    n.1 前进的快捷键  1. sublime3 command + shift + z (比后退 command + z 多一个shift) 或者 command + y  n.2 从linux生成的.csv文件到mac上乱码  iconv -f UTF8 -t GB18030 2020-12-02.</description>
 			<content type="html"><![CDATA[<p>记录一些常用的mac工具和方法</p>
 <!-- more-->
 <center>
@@ -10367,20 +10373,19 @@ Lucene 能很好利用文件系统的缓存，它是通过系统内核管理的�
 <font color="blue" face="黑体" size=5> 1. Item2 </font>
 </center>
 <ul>
-<li>
-<p>1.1 同时按住 option(alt) 键，可以以列选中，类似于 sublime3中 按住 alt的列选中 。
-<code>Command + option(alt) </code></p>
-</li>
-<li>
-<p>1.2 剪贴板历史记录
-<code>Command + Shift + h</code></p>
-</li>
-<li>
-<p>1.3 将文本内容复制到剪切板
-<code>pbcopy &lt; a.txt</code></p>
-</li>
+<li>1.1 常用命令</li>
 </ul>
-<center>
+<pre><code># 同时按住 option(alt) 键，可以以列选中，类似于 sublime3中 按住 alt的列选中 。
+Command + option(alt)
+#剪贴板历史记录
+Command + Shift + h
+#将文本内容复制到剪切板
+pbcopy &lt; a.txt
+</code></pre><ul>
+<li>1.2 插件</li>
+</ul>
+<pre><code># Shell Integration 
+</code></pre><center>
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 <font color="blue" face="黑体" size=5> N. 其他 </font>
 </center>

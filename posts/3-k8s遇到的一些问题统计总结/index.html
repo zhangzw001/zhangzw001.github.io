@@ -14,7 +14,7 @@
  # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从`hub.">
 <meta itemprop="datePublished" content="2020-11-10T14:06:41+00:00" />
 <meta itemprop="dateModified" content="2020-11-10T14:06:41+00:00" />
-<meta itemprop="wordCount" content="691">
+<meta itemprop="wordCount" content="739">
 
 
 
@@ -346,7 +346,16 @@ done</p>
 4. 在通过go mod edit去修改当前项目的go.mod的replace 配置
     replace k8s.io/api =&gt; k8s.io/api v0.0.0-20190918155943-95b840bb6a1f
 
-</code></pre>
+</code></pre><h3 id="12-terminating的无法删除的情况">12 Terminating的无法删除的情况<a href="#12-terminating的无法删除的情况" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">1. 首先使用强制命令
+        kubectl delete ns cattle-system --force --grace-period <span class="m">0</span>
+2. 如果不行,那就通过api删除
+        2.1 kubectl get ns cattle-system -o json <span class="p">|</span>jq <span class="s1">&#39;.spec = {&#34;finalizers&#34;:[]}&#39;</span> &gt; cattle-system.yaml
+        2.2 kubectl proxy <span class="o">(</span>启动代理<span class="o">)</span>
+        2.3 curl -k -H <span class="s2">&#34;Content-Type: application/json&#34;</span> -X PUT --data-binary @cattle-system.yaml http://127.0.0.1:8001/api/v1/namespaces/prom/finalize
+3. 如果不行, 那就直接etcd删除吧!!!
+        <span class="nv">ETCDCTL_API</span><span class="o">=</span><span class="m">3</span>  etcdctl del /registry/namespaces/rancher-system
+</code></pre></div>
 			</div>
    
 
@@ -355,7 +364,7 @@ done</p>
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/k8s">k8s</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>691 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>739 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-11-10 22:06 &#43;0800</p>
 			</footer>
 		</article>
@@ -376,6 +385,7 @@ done</p>
         <li><a href="#9-centos8安装k8s118flannel-pod间不通">9 centos8安装k8s1.18+flannel pod间不通</a></li>
         <li><a href="#10-部署服务器查看describe信息如下">10 部署服务器查看describe信息如下:</a></li>
         <li><a href="#11-go-get-获取kubernetes作为依赖包提示错误">11 go get 获取kubernetes作为依赖包提示错误</a></li>
+        <li><a href="#12-terminating的无法删除的情况">12 Terminating的无法删除的情况</a></li>
       </ul>
     </li>
   </ul>

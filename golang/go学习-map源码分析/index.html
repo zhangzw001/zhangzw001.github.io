@@ -11,7 +11,7 @@
 <meta itemprop="description" content="在看map之前,我们从一个简单的代码开始 1 package main 2 func main() { 3	a := make(map[int]int,209) 4	a[1] = 1 5	print(a[1]) 6 }  以上代码我们看下编译的map相关调用  go tool compile -S map源码分析.go|egrep &quot;map源码分析.*CALL.*map&quot; 0x0051 00081 (map源码分析.go:3)	CALL	runtime.makemap(SB)	// 显然第3行是初始化 0x0079 00121 (map源码分析.go:4)	CALL	runtime.mapassign_fast64(SB) //第4行是写入 0x00a8 00168 (map源码分析.go:5)	CALL	runtime.mapaccess1_fast64(SB) //第5行是读取 首先看下相关结构体hmap type hmap struct { // Note: the format of the hmap is also encoded in cmd/compile/internal/gc/reflect.go. 	// Make sure this stays in sync with the compiler&#39;s definition.">
 <meta itemprop="datePublished" content="2021-11-22T13:59:53+08:00" />
 <meta itemprop="dateModified" content="2021-11-22T13:59:53+08:00" />
-<meta itemprop="wordCount" content="2086">
+<meta itemprop="wordCount" content="2110">
 
 
 
@@ -84,7 +84,7 @@
 <li>以上代码我们看下编译的map相关调用</li>
 </ul>
 <pre><code>go tool compile -S map源码分析.go|egrep &quot;map源码分析.*CALL.*map&quot;
-	0x0051 00081 (map源码分析.go:3)	CALL	runtime.makemap(SB)	   // 显然第3行是初始化
+	0x0051 00081 (map源码分析.go:3)	CALL	runtime.makemap(SB)	      // 显然第3行是初始化
 	0x0079 00121 (map源码分析.go:4)	CALL	runtime.mapassign_fast64(SB)  //第4行是写入
 	0x00a8 00168 (map源码分析.go:5)	CALL	runtime.mapaccess1_fast64(SB) //第5行是读取
 </code></pre><h3 id="首先看下相关结构体hmap">首先看下相关结构体hmap<a href="#首先看下相关结构体hmap" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
@@ -99,7 +99,7 @@
 </span><span class="c1"></span>	<span class="nx">buckets</span>    <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="c1">// 桶的大小 , may be nil if count==0.
 </span><span class="c1"></span>	<span class="nx">oldbuckets</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="c1">// 通常是nil, 如果在扩容,就是旧的桶
 </span><span class="c1"></span>	<span class="nx">nevacuate</span>  <span class="kt">uintptr</span>        <span class="c1">// 指示扩容进度，小于此地址的 buckets 迁移完成
-</span><span class="c1"></span>	<span class="nx">extra</span>      <span class="o">*</span><span class="nx">mapextra</span>      <span class="c1">// 存储溢出桶
+</span><span class="c1"></span>	<span class="nx">extra</span>      <span class="o">*</span><span class="nx">mapextra</span>      <span class="c1">// 溢出桶
 </span><span class="c1"></span><span class="p">}</span>
 
 <span class="kd">type</span> <span class="nx">mapextra</span> <span class="kd">struct</span> <span class="p">{</span>
@@ -108,7 +108,7 @@
 	<span class="nx">nextOverflow</span> <span class="o">*</span><span class="nx">bmap</span>
 <span class="p">}</span>
 <span class="kd">type</span> <span class="nx">bmap</span> <span class="kd">struct</span> <span class="p">{</span>
-	<span class="nx">tophash</span> <span class="p">[</span><span class="nx">bucketCnt</span><span class="p">]</span><span class="kt">uint8</span> <span class="c1">//生成的hash值的高8位
+	<span class="nx">tophash</span> <span class="p">[</span><span class="nx">bucketCnt</span><span class="p">]</span><span class="kt">uint8</span>  <span class="c1">// hash值的高8位
 </span><span class="c1"></span>	<span class="c1">//在src/cmd/compile/internal/gc/reflect.go里面bmap函数会添加该字段,以及后续几个字段
 </span><span class="c1"></span>	<span class="c1">//keys Type		  // key类型
 </span><span class="c1"></span>	<span class="c1">//elems Type	          // value类型
@@ -133,12 +133,13 @@
 
 	<span class="nx">B</span> <span class="o">:=</span> <span class="nb">uint8</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 	<span class="c1">// 找到一个 B，使得 map 的装载因子在正常范围内
-</span><span class="c1"></span>	<span class="c1">// 这里hint=209,因此B=5
+</span><span class="c1"></span>	<span class="c1">// 这里hint=209,因此B=5, overLoadFactor 详细内容后面有分析
 </span><span class="c1"></span>	<span class="k">for</span> <span class="nf">overLoadFactor</span><span class="p">(</span><span class="nx">hint</span><span class="p">,</span> <span class="nx">B</span><span class="p">)</span> <span class="p">{</span>
 		<span class="nx">B</span><span class="o">++</span>
 	<span class="p">}</span>
 	<span class="nx">h</span><span class="p">.</span><span class="nx">B</span> <span class="p">=</span> <span class="nx">B</span>
 	<span class="c1">// 如果hint&gt;8,那么h.B就一定不等于0了
+</span><span class="c1"></span>        <span class="c1">// 所以如果hint&lt;=8, 就不会初始化桶吗? - 是的, 会在写入的时候初始化
 </span><span class="c1"></span>	<span class="k">if</span> <span class="nx">h</span><span class="p">.</span><span class="nx">B</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
 		<span class="kd">var</span> <span class="nx">nextOverflow</span> <span class="o">*</span><span class="nx">bmap</span>
 		<span class="c1">// 这里显然就是生成桶了
@@ -183,7 +184,7 @@
 </span><span class="c1"></span>	<span class="nx">base</span> <span class="o">:=</span> <span class="nf">bucketShift</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span>
 	<span class="nx">nbuckets</span> <span class="o">:=</span> <span class="nx">base</span>
 	<span class="k">if</span> <span class="nx">b</span> <span class="o">&gt;=</span> <span class="mi">4</span> <span class="p">{</span>
-		<span class="c1">// nbuckets = 32+2
+		<span class="c1">// nbuckets = 32+2,
 </span><span class="c1"></span>		<span class="nx">nbuckets</span> <span class="o">+=</span> <span class="nf">bucketShift</span><span class="p">(</span><span class="nx">b</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
 		<span class="nx">sz</span> <span class="o">:=</span> <span class="nx">t</span><span class="p">.</span><span class="nx">bucket</span><span class="p">.</span><span class="nx">size</span> <span class="o">*</span> <span class="nx">nbuckets</span>
 		<span class="nx">up</span> <span class="o">:=</span> <span class="nf">roundupsize</span><span class="p">(</span><span class="nx">sz</span><span class="p">)</span>
@@ -191,9 +192,10 @@
 			<span class="nx">nbuckets</span> <span class="p">=</span> <span class="nx">up</span> <span class="o">/</span> <span class="nx">t</span><span class="p">.</span><span class="nx">bucket</span><span class="p">.</span><span class="nx">size</span>
 		<span class="p">}</span>
 	<span class="p">}</span>
-
-	<span class="k">if</span> <span class="nx">dirtyalloc</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-		<span class="nx">buckets</span> <span class="p">=</span> <span class="nf">newarray</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">bucket</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nx">nbuckets</span><span class="p">))</span>
+        <span class="c1">// 这里会生成nbucket大小的桶
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">dirtyalloc</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+                <span class="c1">// 调用mallocgc分配一个连续的内存空间
+</span><span class="c1"></span>		<span class="nx">buckets</span> <span class="p">=</span> <span class="nf">newarray</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">bucket</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nx">nbuckets</span><span class="p">))</span>
 	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
 		<span class="nx">buckets</span> <span class="p">=</span> <span class="nx">dirtyalloc</span>
 		<span class="nx">size</span> <span class="o">:=</span> <span class="nx">t</span><span class="p">.</span><span class="nx">bucket</span><span class="p">.</span><span class="nx">size</span> <span class="o">*</span> <span class="nx">nbuckets</span>
@@ -229,9 +231,11 @@
 </span><span class="c1"></span>	<span class="nx">hash</span> <span class="o">:=</span> <span class="nx">t</span><span class="p">.</span><span class="nf">hasher</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nb">uintptr</span><span class="p">(</span><span class="nx">h</span><span class="p">.</span><span class="nx">hash0</span><span class="p">))</span>
 	<span class="c1">// 异或之后下次两个肯定不同了, 就会 throw(&#34;concurrent map writes&#34;)
 </span><span class="c1"></span>	<span class="nx">h</span><span class="p">.</span><span class="nx">flags</span> <span class="p">^=</span> <span class="nx">hashWriting</span>
-
-	<span class="k">if</span> <span class="nx">h</span><span class="p">.</span><span class="nx">buckets</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-		<span class="nx">h</span><span class="p">.</span><span class="nx">buckets</span> <span class="p">=</span> <span class="nf">newobject</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">bucket</span><span class="p">)</span> <span class="c1">// newarray(t.bucket, 1)
+        <span class="c1">// 如果是nil, 写入的时候会初始化
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">h</span><span class="p">.</span><span class="nx">buckets</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+                <span class="c1">// 调用mallocgc分配一个大小为h.bucket.size的内存空间
+</span><span class="c1"></span>                <span class="c1">// 所以如果make初始化的时候, hint&lt;=8的话, 是在这里初始化
+</span><span class="c1"></span>		<span class="nx">h</span><span class="p">.</span><span class="nx">buckets</span> <span class="p">=</span> <span class="nf">newobject</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">bucket</span><span class="p">)</span> <span class="c1">// newarray(t.bucket, 1)
 </span><span class="c1"></span>	<span class="p">}</span>
 <span class="c1">// 核心代码
 </span><span class="c1"></span><span class="nx">again</span><span class="p">:</span>
@@ -377,7 +381,7 @@
 	<span class="p">}</span>
 	<span class="k">return</span> <span class="nx">noverflow</span> <span class="o">&gt;=</span> <span class="nb">uint16</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="nx">B</span><span class="o">&amp;</span><span class="mi">15</span><span class="p">)</span>
 <span class="p">}</span>
-</code></pre></div><h4 id="hashgrow-扩容">hashGrow 扩容<a href="#hashgrow-扩容" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+</code></pre></div><h3 id="runtimehashgrow-扩容">runtime.hashGrow 扩容<a href="#runtimehashgrow-扩容" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <p><img src="/images/golang/map-1.png" alt=""></p>
 <ul>
 <li>首先做一个简单的说明</li>
@@ -410,7 +414,8 @@
 <ul>
 <li>hashGrow 仅分配好新的buckets</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">hashGrow</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">maptype</span><span class="p">,</span> <span class="nx">h</span> <span class="o">*</span><span class="nx">hmap</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/map.go
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">hashGrow</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">maptype</span><span class="p">,</span> <span class="nx">h</span> <span class="o">*</span><span class="nx">hmap</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">bigger</span> <span class="o">:=</span> <span class="nb">uint8</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 	<span class="c1">// 如果不是因为 大于哈希因子 6.5*2^h.B的原因
 </span><span class="c1"></span>	<span class="c1">// 那就是 太多的溢出桶
@@ -493,8 +498,8 @@
 	<span class="c1">// 第一次肯定是没有迁移, true的条件: 1 &lt; b.tophash[0] &lt; 5
 </span><span class="c1"></span>	<span class="k">if</span> <span class="p">!</span><span class="nf">evacuated</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
 		<span class="c1">// type evacDst struct {
-</span><span class="c1"></span>		<span class="c1">//	b *bmap		  // current destination bucket
-</span><span class="c1"></span>		<span class="c1">//	i int			// key/elem index into b
+</span><span class="c1"></span>		<span class="c1">//	b *bmap		 // current destination bucket
+</span><span class="c1"></span>		<span class="c1">//	i int		 // key/elem index into b
 </span><span class="c1"></span>		<span class="c1">//	k unsafe.Pointer // pointer to current key storage
 </span><span class="c1"></span>		<span class="c1">//	e unsafe.Pointer // pointer to current elem storage
 </span><span class="c1"></span>		<span class="c1">// }
@@ -637,7 +642,7 @@
 	<span class="p">}</span>
 <span class="p">}</span>
 
-</code></pre></div><h3 id="mapaccess1-map读取">mapaccess1 map读取<a href="#mapaccess1-map读取" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+</code></pre></div><h3 id="runtimemapaccess1-map读取">runtime.mapaccess1 map读取<a href="#runtimemapaccess1-map读取" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">mapaccess1</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">maptype</span><span class="p">,</span> <span class="nx">h</span> <span class="o">*</span><span class="nx">hmap</span><span class="p">,</span> <span class="nx">key</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span><span class="p">)</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="p">{</span>
 	<span class="k">if</span> <span class="nx">raceenabled</span> <span class="o">&amp;&amp;</span> <span class="nx">h</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
 		<span class="nx">callerpc</span> <span class="o">:=</span> <span class="nf">getcallerpc</span><span class="p">()</span>
@@ -725,7 +730,7 @@
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/golang">golang</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>2086 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>2110 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2021-11-22 13:59 &#43;0800</p>
 			</footer>
 		</article>
@@ -739,7 +744,8 @@
         <li><a href="#首先看下相关结构体hmap">首先看下相关结构体hmap</a></li>
         <li><a href="#runtimemakemap-代码">runtime.makemap 代码</a></li>
         <li><a href="#runtimemapassign-map写入">runtime.mapassign map写入</a></li>
-        <li><a href="#mapaccess1-map读取">mapaccess1 map读取</a></li>
+        <li><a href="#runtimehashgrow-扩容">runtime.hashGrow 扩容</a></li>
+        <li><a href="#runtimemapaccess1-map读取">runtime.mapaccess1 map读取</a></li>
       </ul>
     </li>
   </ul>

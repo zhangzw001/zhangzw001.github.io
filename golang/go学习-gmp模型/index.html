@@ -8,23 +8,23 @@
 	<meta name="theme-color" content="#494f5c">
 	<meta name="msapplication-TileColor" content="#494f5c">
 <meta itemprop="name" content="Go学习 Gmp模型">
-<meta itemprop="description" content="在此之前我们先看一下go启动的入口 通过gdb调试, 找到入口文件 # GOFLAGS=&#34;-ldflags=-compressdwarf=false&#34; go build gdb-main.go # gdb gdb-main (gdb) info files Symbols from &#34;/Users/zhangzw/work/go/github.com/zhangzw001/learngo/basic/gdb/gdb-main&#34;. Local exec file: `/Users/zhangzw/work/go/github.com/zhangzw001/learngo/basic/gdb/gdb-main&#39;, file type mach-o-x86-64. Entry point: 0x1065600 0x0000000001001000 - 0x00000000010a2e8a is .text 0x00000000010a2ea0 - 0x00000000010a2fa2 is __TEXT.__symbol_stub1 ... (gdb) b *0x1065600 // 上面的Entry point后面的地址 Breakpoint 1 at 0x1065600: file /usr/local/go/src/runtime/rt0_darwin_amd64.s, line 8. // 这里是mac 继续查看 // src/runtime/rt0_darwin_amd64.s TEXT _rt0_amd64_darwin(SB),NOSPLIT,$-8 JMP	_rt0_amd64(SB) //跳转到 _rt0_amd64 TEXT _rt0_amd64(SB),NOSPLIT,$-8 MOVQ	0(SP), DI	// argc LEAQ	8(SP), SI	// argv JMP	runtime·rt0_go(SB) // 又跳转到runtime·rt0_go 来到核心代码 TEXT runtime·rt0_go(SB),NOSPLIT|NOFRAME,$0 // Copy arguments forward on an even stack.">
+<meta itemprop="description" content="为什么需要P  如果没有P, 所有的G都必须在一个全局的队列中, 然后M一个个从全局队列中获取, 这种共享内存的方式并发必须需要加锁 如果没有P, 当前g1中包含了创建新协程g2(go func)时, 当前的M1还得继续执行g1, 因此M1必须主动转义g2给另外一个线程M2去执行,这就造成了不必要的转移,浪费cpu资源, 因为g1 g2是相关的, 如果都在本地M1上执行更好, 而不是调度出去执行  GMP模型 简介  全局队列（Global Queue）：存放等待运行的G。 P的本地队列：同全局队列类似，存放的也是等待运行的G，存的数量有限，不超过256个。新建G&rsquo;时，G&rsquo;优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列。 P列表：所有的P都在程序启动时创建，并保存在数组中，最多有GOMAXPROCS(可配置)个。 M：线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去。 g0: 一个比一比g大的多栈, 可以用于 创建goroutine, deferproc函数里新建_defer,垃圾回收相关工资  何时会创建 P : 由启动时环境变量$GOMAXPROCS或者是由runtime的方法GOMAXPROCS()决定, 运行时系统就会创建 M : 如果P找不到空闲的M去绑定,就会创建M 调度器策略 work stealing : 当本地G队列为空时, 尝试从全局队列或者其他的线程绑定的P偷取G,而不是销毁线程 hand off : 当g阻塞时,实际是当前M线程会阻塞,那么 gmp结构体  m  // src/runtime/runtime2.go type m struct { g0 *g // 用于执行调度指令的 Goroutine 	gsignal *g // 处理 signal 的 g 	tls [6]uintptr // 线程本地存储 	curg *g // 当前运行的用户 Goroutine 	p puintptr // 执行 go 代码时持有的 p (如果没有执行则为 nil) 	preemptoff string // if !">
 <meta itemprop="datePublished" content="2021-11-17T09:31:09+08:00" />
 <meta itemprop="dateModified" content="2021-11-17T09:31:09+08:00" />
-<meta itemprop="wordCount" content="746">
+<meta itemprop="wordCount" content="3841">
 
 
 
 <meta itemprop="keywords" content="golang," />
 <meta property="og:title" content="Go学习 Gmp模型" />
-<meta property="og:description" content="在此之前我们先看一下go启动的入口 通过gdb调试, 找到入口文件 # GOFLAGS=&#34;-ldflags=-compressdwarf=false&#34; go build gdb-main.go # gdb gdb-main (gdb) info files Symbols from &#34;/Users/zhangzw/work/go/github.com/zhangzw001/learngo/basic/gdb/gdb-main&#34;. Local exec file: `/Users/zhangzw/work/go/github.com/zhangzw001/learngo/basic/gdb/gdb-main&#39;, file type mach-o-x86-64. Entry point: 0x1065600 0x0000000001001000 - 0x00000000010a2e8a is .text 0x00000000010a2ea0 - 0x00000000010a2fa2 is __TEXT.__symbol_stub1 ... (gdb) b *0x1065600 // 上面的Entry point后面的地址 Breakpoint 1 at 0x1065600: file /usr/local/go/src/runtime/rt0_darwin_amd64.s, line 8. // 这里是mac 继续查看 // src/runtime/rt0_darwin_amd64.s TEXT _rt0_amd64_darwin(SB),NOSPLIT,$-8 JMP	_rt0_amd64(SB) //跳转到 _rt0_amd64 TEXT _rt0_amd64(SB),NOSPLIT,$-8 MOVQ	0(SP), DI	// argc LEAQ	8(SP), SI	// argv JMP	runtime·rt0_go(SB) // 又跳转到runtime·rt0_go 来到核心代码 TEXT runtime·rt0_go(SB),NOSPLIT|NOFRAME,$0 // Copy arguments forward on an even stack." />
+<meta property="og:description" content="为什么需要P  如果没有P, 所有的G都必须在一个全局的队列中, 然后M一个个从全局队列中获取, 这种共享内存的方式并发必须需要加锁 如果没有P, 当前g1中包含了创建新协程g2(go func)时, 当前的M1还得继续执行g1, 因此M1必须主动转义g2给另外一个线程M2去执行,这就造成了不必要的转移,浪费cpu资源, 因为g1 g2是相关的, 如果都在本地M1上执行更好, 而不是调度出去执行  GMP模型 简介  全局队列（Global Queue）：存放等待运行的G。 P的本地队列：同全局队列类似，存放的也是等待运行的G，存的数量有限，不超过256个。新建G&rsquo;时，G&rsquo;优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列。 P列表：所有的P都在程序启动时创建，并保存在数组中，最多有GOMAXPROCS(可配置)个。 M：线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去。 g0: 一个比一比g大的多栈, 可以用于 创建goroutine, deferproc函数里新建_defer,垃圾回收相关工资  何时会创建 P : 由启动时环境变量$GOMAXPROCS或者是由runtime的方法GOMAXPROCS()决定, 运行时系统就会创建 M : 如果P找不到空闲的M去绑定,就会创建M 调度器策略 work stealing : 当本地G队列为空时, 尝试从全局队列或者其他的线程绑定的P偷取G,而不是销毁线程 hand off : 当g阻塞时,实际是当前M线程会阻塞,那么 gmp结构体  m  // src/runtime/runtime2.go type m struct { g0 *g // 用于执行调度指令的 Goroutine 	gsignal *g // 处理 signal 的 g 	tls [6]uintptr // 线程本地存储 	curg *g // 当前运行的用户 Goroutine 	p puintptr // 执行 go 代码时持有的 p (如果没有执行则为 nil) 	preemptoff string // if !" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-gmp%E6%A8%A1%E5%9E%8B/" />
 <meta property="article:published_time" content="2021-11-17T09:31:09+08:00" />
 <meta property="article:modified_time" content="2021-11-17T09:31:09+08:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Go学习 Gmp模型"/>
-<meta name="twitter:description" content="在此之前我们先看一下go启动的入口 通过gdb调试, 找到入口文件 # GOFLAGS=&#34;-ldflags=-compressdwarf=false&#34; go build gdb-main.go # gdb gdb-main (gdb) info files Symbols from &#34;/Users/zhangzw/work/go/github.com/zhangzw001/learngo/basic/gdb/gdb-main&#34;. Local exec file: `/Users/zhangzw/work/go/github.com/zhangzw001/learngo/basic/gdb/gdb-main&#39;, file type mach-o-x86-64. Entry point: 0x1065600 0x0000000001001000 - 0x00000000010a2e8a is .text 0x00000000010a2ea0 - 0x00000000010a2fa2 is __TEXT.__symbol_stub1 ... (gdb) b *0x1065600 // 上面的Entry point后面的地址 Breakpoint 1 at 0x1065600: file /usr/local/go/src/runtime/rt0_darwin_amd64.s, line 8. // 这里是mac 继续查看 // src/runtime/rt0_darwin_amd64.s TEXT _rt0_amd64_darwin(SB),NOSPLIT,$-8 JMP	_rt0_amd64(SB) //跳转到 _rt0_amd64 TEXT _rt0_amd64(SB),NOSPLIT,$-8 MOVQ	0(SP), DI	// argc LEAQ	8(SP), SI	// argv JMP	runtime·rt0_go(SB) // 又跳转到runtime·rt0_go 来到核心代码 TEXT runtime·rt0_go(SB),NOSPLIT|NOFRAME,$0 // Copy arguments forward on an even stack."/>
+<meta name="twitter:description" content="为什么需要P  如果没有P, 所有的G都必须在一个全局的队列中, 然后M一个个从全局队列中获取, 这种共享内存的方式并发必须需要加锁 如果没有P, 当前g1中包含了创建新协程g2(go func)时, 当前的M1还得继续执行g1, 因此M1必须主动转义g2给另外一个线程M2去执行,这就造成了不必要的转移,浪费cpu资源, 因为g1 g2是相关的, 如果都在本地M1上执行更好, 而不是调度出去执行  GMP模型 简介  全局队列（Global Queue）：存放等待运行的G。 P的本地队列：同全局队列类似，存放的也是等待运行的G，存的数量有限，不超过256个。新建G&rsquo;时，G&rsquo;优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列。 P列表：所有的P都在程序启动时创建，并保存在数组中，最多有GOMAXPROCS(可配置)个。 M：线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去。 g0: 一个比一比g大的多栈, 可以用于 创建goroutine, deferproc函数里新建_defer,垃圾回收相关工资  何时会创建 P : 由启动时环境变量$GOMAXPROCS或者是由runtime的方法GOMAXPROCS()决定, 运行时系统就会创建 M : 如果P找不到空闲的M去绑定,就会创建M 调度器策略 work stealing : 当本地G队列为空时, 尝试从全局队列或者其他的线程绑定的P偷取G,而不是销毁线程 hand off : 当g阻塞时,实际是当前M线程会阻塞,那么 gmp结构体  m  // src/runtime/runtime2.go type m struct { g0 *g // 用于执行调度指令的 Goroutine 	gsignal *g // 处理 signal 的 g 	tls [6]uintptr // 线程本地存储 	curg *g // 当前运行的用户 Goroutine 	p puintptr // 执行 go 代码时持有的 p (如果没有执行则为 nil) 	preemptoff string // if !"/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -73,122 +73,7 @@
 				<h1>Go学习 Gmp模型</h1>
 			</header>
 			<div class="content">
-				<h3 id="在此之前我们先看一下go启动的入口">在此之前我们先看一下go启动的入口<a href="#在此之前我们先看一下go启动的入口" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-<h4 id="通过gdb调试-找到入口文件">通过gdb调试, 找到入口文件<a href="#通过gdb调试-找到入口文件" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="err">#</span> <span class="nx">GOFLAGS</span><span class="p">=</span><span class="s">&#34;-ldflags=-compressdwarf=false&#34;</span> <span class="k">go</span> <span class="nx">build</span> <span class="nx">gdb</span><span class="o">-</span><span class="nx">main</span><span class="p">.</span><span class="k">go</span>
-
-<span class="err">#</span> <span class="nx">gdb</span> <span class="nx">gdb</span><span class="o">-</span><span class="nf">main</span>
-<span class="p">(</span><span class="nx">gdb</span><span class="p">)</span> <span class="nx">info</span> <span class="nx">files</span>
-<span class="nx">Symbols</span> <span class="nx">from</span> <span class="s">&#34;/Users/zhangzw/work/go/github.com/zhangzw001/learngo/basic/gdb/gdb-main&#34;</span><span class="p">.</span>
-<span class="nx">Local</span> <span class="nx">exec</span> <span class="nx">file</span><span class="p">:</span>
-	<span class="err">`</span><span class="o">/</span><span class="nx">Users</span><span class="o">/</span><span class="nx">zhangzw</span><span class="o">/</span><span class="nx">work</span><span class="o">/</span><span class="k">go</span><span class="o">/</span><span class="nx">github</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">zhangzw001</span><span class="o">/</span><span class="nx">learngo</span><span class="o">/</span><span class="nx">basic</span><span class="o">/</span><span class="nx">gdb</span><span class="o">/</span><span class="nx">gdb</span><span class="o">-</span><span class="nx">main</span><span class="err">&#39;</span><span class="p">,</span> <span class="nx">file</span> <span class="kd">type</span> <span class="nx">mach</span><span class="o">-</span><span class="nx">o</span><span class="o">-</span><span class="nx">x86</span><span class="o">-</span><span class="mf">64.</span>
-	<span class="nx">Entry</span> <span class="nx">point</span><span class="p">:</span> <span class="mh">0x1065600</span>
-	<span class="mh">0x0000000001001000</span> <span class="o">-</span> <span class="mh">0x00000000010a2e8a</span> <span class="nx">is</span> <span class="p">.</span><span class="nx">text</span>
-	<span class="mh">0x00000000010a2ea0</span> <span class="o">-</span> <span class="mh">0x00000000010a2fa2</span> <span class="nx">is</span> <span class="nx">__TEXT</span><span class="p">.</span><span class="nx">__symbol_stub1</span>
-    <span class="o">...</span>
-<span class="p">(</span><span class="nx">gdb</span><span class="p">)</span> <span class="nx">b</span> <span class="o">*</span><span class="mh">0x1065600</span>  <span class="c1">// 上面的Entry point后面的地址
-</span><span class="c1"></span><span class="nx">Breakpoint</span> <span class="mi">1</span> <span class="nx">at</span> <span class="mh">0x1065600</span><span class="p">:</span> <span class="nx">file</span> <span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="k">go</span><span class="o">/</span><span class="nx">src</span><span class="o">/</span><span class="nx">runtime</span><span class="o">/</span><span class="nx">rt0_darwin_amd64</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="nx">line</span> <span class="mf">8.</span>   <span class="c1">// 这里是mac
-</span></code></pre></div><h4 id="继续查看">继续查看<a href="#继续查看" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
-<pre><code>// src/runtime/rt0_darwin_amd64.s
-TEXT _rt0_amd64_darwin(SB),NOSPLIT,$-8
-	JMP	_rt0_amd64(SB) //跳转到 _rt0_amd64
-
-TEXT _rt0_amd64(SB),NOSPLIT,$-8
-	MOVQ	0(SP), DI	// argc
-	LEAQ	8(SP), SI	// argv
-	JMP	runtime·rt0_go(SB) // 又跳转到runtime·rt0_go
-</code></pre><h4 id="来到核心代码">来到核心代码<a href="#来到核心代码" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
-<pre><code>TEXT runtime·rt0_go(SB),NOSPLIT|NOFRAME,$0
-	// Copy arguments forward on an even stack.
-	// Users of this function jump to it, they don't call it.
-	MOVL	0(SP), AX
-	MOVL	4(SP), BX
-	SUBL	$128, SP		// plenty of scratch
-	ANDL	$~15, SP
-	MOVL	AX, 120(SP)		// save argc, argv away
-	MOVL	BX, 124(SP)
-    ...
-ok:
-	// set up m and g &quot;registers&quot;
-    // 程序刚刚启动, 此时位于主线程
-    // 当前栈与资源保存在g0
-    // 线程保存在m0
-	get_tls(BX)
-	LEAL	runtime·g0(SB), DX
-	MOVL	DX, g(BX)
-	LEAL	runtime·m0(SB), AX
-
-	// save m-&gt;g0 = g0
-	MOVL	DX, m_g0(AX)
-	// save g0-&gt;m = m0
-	MOVL	AX, g_m(DX)
-
-	CALL	runtime·check(SB) //运行时类型检查，主要是校验编译器的翻译工作是否正确
-	MOVL	120(SP), AX       // copy argc
-	MOVL	AX, 0(SP)
-	MOVL	124(SP), AX       // copy argv
-	MOVL	AX, 4(SP)
-	CALL	runtime·args(SB)      //系统参数传递，主要是将系统参数转换传递给程序使用
-	CALL	runtime·osinit(SB)    //系统基本参数设置，主要是获取 CPU 核心数和内存物理页大小
-	CALL	runtime·schedinit(SB) //进行各种运行时组件的初始化，包含调度器、内存分配器、堆、栈、GC 等一大堆初始化工作。会进行 p 的初始化，并将 m0 和某一个 p 进行绑定。
-
-	// 创建一个新的goroutine来运行程序
-	PUSHL	$runtime·mainPC(SB)	  // entry ,主要工作是运行 main goroutine，虽然在runtime·rt0_go 中指向的是$runtime·mainPC，但实质指向的是 runtime.main。
-	PUSHL	$0	// arg size
-	CALL	runtime·newproc(SB)   //创建一个新的 goroutine，且绑定 runtime.main 方法（也就是应用程序中的入口 main 方法）。并将其放入 m0 绑定的p的本地队列中去，以便后续调度。
-	POPL	AX
-	POPL	AX
-
-	// start this M
-	CALL	runtime·mstart(SB)
-
-	CALL	runtime·abort(SB)
-	RET
-</code></pre><h4 id="mstart">mstart()<a href="#mstart" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/proc.go
-</span><span class="c1"></span><span class="kd">func</span> <span class="nf">mstart</span><span class="p">()</span> <span class="p">{</span>
-    <span class="c1">// g0
-</span><span class="c1"></span>	<span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
-    <span class="p">..</span>
-	<span class="nf">mstart1</span><span class="p">()</span>
-
-	<span class="c1">// 退出线程
-</span><span class="c1"></span>	<span class="k">if</span> <span class="nf">mStackIsSystemAllocated</span><span class="p">()</span> <span class="p">{</span>
-		<span class="nx">osStack</span> <span class="p">=</span> <span class="kc">true</span>
-	<span class="p">}</span>
-	<span class="nf">mexit</span><span class="p">(</span><span class="nx">osStack</span><span class="p">)</span>
-<span class="p">}</span>
-</code></pre></div><h4 id="实质逻辑mstart1">实质逻辑mstart1()<a href="#实质逻辑mstart1" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/proc.go
-</span><span class="c1"></span><span class="kd">func</span> <span class="nf">mstart1</span><span class="p">()</span> <span class="p">{</span>
-    <span class="c1">// 必须是g0
-</span><span class="c1"></span>	<span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
-	<span class="k">if</span> <span class="nx">_g_</span> <span class="o">!=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">g0</span> <span class="p">{</span>
-		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;bad runtime·mstart&#34;</span><span class="p">)</span>
-	<span class="p">}</span>
-    <span class="c1">// 初始化m, 并记录pc,sp
-</span><span class="c1"></span>	<span class="nf">save</span><span class="p">(</span><span class="nf">getcallerpc</span><span class="p">(),</span> <span class="nf">getcallersp</span><span class="p">())</span>
-	<span class="nf">asminit</span><span class="p">()</span>  
-	<span class="nf">minit</span><span class="p">()</span>
-	<span class="c1">// 若当前 g 所绑定的 m 是 m0，
-</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span> <span class="o">==</span> <span class="o">&amp;</span><span class="nx">m0</span> <span class="p">{</span>
-		<span class="nf">mstartm0</span><span class="p">()</span>
-	<span class="p">}</span>
-    <span class="c1">// 运行启动函数
-</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">fn</span> <span class="o">:=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">mstartfn</span><span class="p">;</span> <span class="nx">fn</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-		<span class="nf">fn</span><span class="p">()</span>
-	<span class="p">}</span>
-    <span class="c1">//若当前 g 所绑定的 m 不是 m0，
-</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span> <span class="o">!=</span> <span class="o">&amp;</span><span class="nx">m0</span> <span class="p">{</span>
-        <span class="c1">//则需要调用 acquirep 方法获取并绑定 p，也就是 m 与 p 绑定。
-</span><span class="c1"></span>		<span class="nf">acquirep</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">nextp</span><span class="p">.</span><span class="nf">ptr</span><span class="p">())</span>
-		<span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">nextp</span> <span class="p">=</span> <span class="mi">0</span>
-	<span class="p">}</span>
-	<span class="nf">schedule</span><span class="p">()</span> <span class="c1">// 调度
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></div><h4 id="真正的调度-schedule">真正的调度 schedule()<a href="#真正的调度-schedule" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
-</code></pre></div><h3 id="为什么需要p">为什么需要P<a href="#为什么需要p" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+				<h3 id="为什么需要p">为什么需要P<a href="#为什么需要p" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <ul>
 <li>如果没有P, 所有的G都必须在一个全局的队列中, 然后M一个个从全局队列中获取, 这种共享内存的方式并发必须需要加锁</li>
 <li>如果没有P, 当前g1中包含了创建新协程g2(go func)时, 当前的M1还得继续执行g1, 因此M1必须主动转义g2给另外一个线程M2去执行,这就造成了不必要的转移,浪费cpu资源, 因为g1 g2是相关的, 如果都在本地M1上执行更好, 而不是调度出去执行</li>
@@ -228,7 +113,7 @@ hand off : 当g阻塞时,实际是当前M线程会阻塞,那么
 </span><span class="c1"></span>	<span class="nx">cgoCallers</span> <span class="o">*</span><span class="nx">cgoCallers</span> <span class="c1">// cgo 调用崩溃的 cgo 回溯
 </span><span class="c1"></span>	<span class="nx">alllink</span>    <span class="o">*</span><span class="nx">m</span>          <span class="c1">// 在 allm 上
 </span><span class="c1"></span>	<span class="nx">mcache</span>     <span class="o">*</span><span class="nx">mcache</span>     <span class="c1">// 当前线程上进行内存分配的本地缓存 mcache
-</span><span class="c1"></span>    <span class="nx">freelink</span>   <span class="o">*</span><span class="nx">m</span>          <span class="c1">// on sched.freem
+</span><span class="c1"></span>	<span class="nx">freelink</span>   <span class="o">*</span><span class="nx">m</span>          <span class="c1">// on sched.freem
 </span><span class="c1"></span>
 	<span class="o">...</span>
 <span class="p">}</span>
@@ -236,20 +121,21 @@ hand off : 当g阻塞时,实际是当前M线程会阻塞,那么
 <li>p</li>
 </ul>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/runtime2.go
-</span><span class="c1"></span><span class="kd">type</span> <span class="nx">p</span> <span class="kd">struct</span> <span class="p">{</span>
+</span><span class="c1"></span>
+<span class="kd">type</span> <span class="nx">p</span> <span class="kd">struct</span> <span class="p">{</span>
 	<span class="nx">id</span>           <span class="kt">int32</span>
-	<span class="nx">status</span>       <span class="kt">uint32</span>        <span class="c1">// p 的状态 pidle/prunning/...
-</span><span class="c1"></span>	<span class="nx">link</span>         <span class="nx">puintptr</span>
-	<span class="nx">m</span>            <span class="nx">muintptr</span>      <span class="c1">// 反向链接到关联的 m （nil 则表示 idle）
-</span><span class="c1"></span>	<span class="nx">mcache</span>       <span class="o">*</span><span class="nx">mcache</span>
-	<span class="nx">pcache</span>       <span class="nx">pageCache</span>
-	<span class="nx">deferpool</span>    <span class="p">[</span><span class="mi">5</span><span class="p">][]</span><span class="o">*</span><span class="nx">_defer</span>  <span class="c1">// 不同大小的可用的 defer 结构池
-</span><span class="c1"></span>	<span class="nx">deferpoolbuf</span> <span class="p">[</span><span class="mi">5</span><span class="p">][</span><span class="mi">32</span><span class="p">]</span><span class="o">*</span><span class="nx">_defer</span>
-	<span class="nx">runqhead</span>     <span class="kt">uint32</span>	       <span class="c1">// 可运行的 Goroutine 队列，可无锁访问
-</span><span class="c1"></span>	<span class="nx">runqtail</span>     <span class="kt">uint32</span>
-	<span class="nx">runq</span>         <span class="p">[</span><span class="mi">256</span><span class="p">]</span><span class="nx">guintptr</span>
-	<span class="nx">runnext</span>      <span class="nx">guintptr</span>
-	<span class="nx">timersLock</span>   <span class="nx">mutex</span>
+	<span class="nx">status</span>       <span class="kt">uint32</span>         <span class="c1">// p 的状态 pidle/prunning/...
+</span><span class="c1"></span>	<span class="nx">link</span>         <span class="nx">puintptr</span>       <span class="c1">// 链表
+</span><span class="c1"></span>	<span class="nx">m</span>            <span class="nx">muintptr</span>       <span class="c1">// 反向链接到关联的 m （nil 则表示 idle）
+</span><span class="c1"></span>	<span class="nx">mcache</span>       <span class="o">*</span><span class="nx">mcache</span>        <span class="c1">// mcache
+</span><span class="c1"></span>	<span class="nx">pcache</span>       <span class="nx">pageCache</span>      <span class="c1">// pageCache
+</span><span class="c1"></span>	<span class="nx">deferpool</span>    <span class="p">[</span><span class="mi">5</span><span class="p">][]</span><span class="o">*</span><span class="nx">_defer</span>   <span class="c1">// 不同大小的可用的 defer 结构池
+</span><span class="c1"></span>	<span class="nx">deferpoolbuf</span> <span class="p">[</span><span class="mi">5</span><span class="p">][</span><span class="mi">32</span><span class="p">]</span><span class="o">*</span><span class="nx">_defer</span> <span class="c1">// buf
+</span><span class="c1"></span>	<span class="nx">runqhead</span>     <span class="kt">uint32</span>         <span class="c1">// 可运行的 Goroutine 队列，可无锁访问
+</span><span class="c1"></span>	<span class="nx">runqtail</span>     <span class="kt">uint32</span>         <span class="c1">// 尾
+</span><span class="c1"></span>	<span class="nx">runq</span>         <span class="p">[</span><span class="mi">256</span><span class="p">]</span><span class="nx">guintptr</span>  <span class="c1">// 本地队列
+</span><span class="c1"></span>	<span class="nx">runnext</span>      <span class="nx">guintptr</span>       <span class="c1">// 下一个要执行的g
+</span><span class="c1"></span>	<span class="nx">timersLock</span>   <span class="nx">mutex</span>
 	<span class="nx">timers</span>       <span class="p">[]</span><span class="o">*</span><span class="nx">timer</span>
 	<span class="nx">preempt</span>      <span class="kt">bool</span>
 	<span class="o">...</span>
@@ -262,22 +148,20 @@ hand off : 当g阻塞时,实际是当前M线程会阻塞,那么
 	<span class="nx">stack</span> <span class="kd">struct</span> <span class="p">{</span>
 		<span class="nx">lo</span> <span class="kt">uintptr</span>
 		<span class="nx">hi</span> <span class="kt">uintptr</span>
-	<span class="p">}</span> 							<span class="c1">// 栈内存：[stack.lo, stack.hi)
-</span><span class="c1"></span>	<span class="nx">stackguard0</span>	<span class="kt">uintptr</span>
+	<span class="p">}</span> <span class="c1">// 栈内存：[stack.lo, stack.hi)
+</span><span class="c1"></span>	<span class="nx">stackguard0</span> <span class="kt">uintptr</span>
 	<span class="nx">stackguard1</span> <span class="kt">uintptr</span>
 
-	<span class="nx">_panic</span>       <span class="o">*</span><span class="nx">_panic</span>
-	<span class="nx">_defer</span>       <span class="o">*</span><span class="nx">_defer</span>
-	<span class="nx">m</span>            <span class="o">*</span><span class="nx">m</span>				<span class="c1">// 当前的 m
-</span><span class="c1"></span>	<span class="nx">sched</span>        <span class="nx">gobuf</span>
-	<span class="nx">stktopsp</span>     <span class="kt">uintptr</span>		<span class="c1">// 期望 sp 位于栈顶，用于回溯检查
-</span><span class="c1"></span>	<span class="nx">param</span>        <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="c1">// wakeup 唤醒时候传递的参数
-</span><span class="c1"></span>	<span class="nx">atomicstatus</span> <span class="kt">uint32</span>
-	<span class="nx">goid</span>         <span class="kt">int64</span>
-	<span class="nx">preempt</span>      <span class="kt">bool</span>       	<span class="c1">// 抢占信号，stackguard0 = stackpreempt 的副本
-</span><span class="c1"></span>	<span class="nx">timer</span>        <span class="o">*</span><span class="nx">timer</span>         <span class="c1">// 为 time.Sleep 缓存的计时器
-</span><span class="c1"></span>
-	<span class="o">...</span>
+	<span class="nx">_panic</span>   <span class="o">*</span><span class="nx">_panic</span>
+	<span class="nx">_defer</span>   <span class="o">*</span><span class="nx">_defer</span>
+	<span class="nx">m</span>        <span class="o">*</span><span class="nx">m</span>             <span class="c1">// 当前的 m
+</span><span class="c1"></span>	<span class="nx">sched</span>    <span class="nx">gobuf</span>          <span class="c1">// 保存g
+</span><span class="c1"></span>	<span class="nx">stktopsp</span> <span class="kt">uintptr</span>        <span class="c1">// 期望 sp 位于栈顶，用于回溯检查
+</span><span class="c1"></span>	<span class="nx">param</span>    <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="c1">// wakeup 唤醒时候传递的参数
+</span><span class="c1"></span>	<span class="nx">goid</span>     <span class="kt">int64</span>          <span class="c1">// goid
+</span><span class="c1"></span>	<span class="nx">preempt</span>  <span class="kt">bool</span>           <span class="c1">// 抢占信号，stackguard0 = stackpreempt 的副本
+</span><span class="c1"></span>	<span class="nx">timer</span>    <span class="o">*</span><span class="nx">timer</span>         <span class="c1">// 为 time.Sleep 缓存的计时器
+</span><span class="c1"></span>	<span class="o">...</span>
 <span class="p">}</span>
 </code></pre></div><ul>
 <li>调度器
@@ -292,8 +176,8 @@ hand off : 当g阻塞时,实际是当前M线程会阻塞,那么
 </ul>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/runtime2.go
 </span><span class="c1"></span><span class="kd">type</span> <span class="nx">schedt</span> <span class="kd">struct</span> <span class="p">{</span>
-	<span class="nx">lock</span> <span class="nx">mutex</span>
-    <span class="nx">ngsys</span> <span class="kt">uint32</span>        <span class="c1">// 系统 goroutine的数量; 自增
+	<span class="nx">lock</span>       <span class="nx">mutex</span>
+	<span class="nx">ngsys</span>      <span class="kt">uint32</span>   <span class="c1">// 系统 goroutine的数量; 自增
 </span><span class="c1"></span>	<span class="nx">pidle</span>      <span class="nx">puintptr</span> <span class="c1">// 空闲 p 链表
 </span><span class="c1"></span>	<span class="nx">npidle</span>     <span class="kt">uint32</span>   <span class="c1">// 空闲 p 数量
 </span><span class="c1"></span>	<span class="nx">nmspinning</span> <span class="kt">uint32</span>   <span class="c1">// 自旋状态的 M 的数量
@@ -312,10 +196,1155 @@ hand off : 当g阻塞时,实际是当前M线程会阻塞,那么
 
 	<span class="o">...</span>
 <span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">gQueue</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">head</span> <span class="nx">guintptr</span>
+	<span class="nx">tail</span> <span class="nx">guintptr</span>
+<span class="p">}</span>
+</code></pre></div><h3 id="在此之前我们先看一下go启动的入口">在此之前我们先看一下go启动的入口<a href="#在此之前我们先看一下go启动的入口" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="通过gdb调试-找到入口文件">通过gdb调试, 找到入口文件<a href="#通过gdb调试-找到入口文件" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="err">#</span> <span class="nx">GOFLAGS</span><span class="p">=</span><span class="s">&#34;-ldflags=-compressdwarf=false&#34;</span> <span class="k">go</span> <span class="nx">build</span> <span class="nx">gdb</span><span class="o">-</span><span class="nx">main</span><span class="p">.</span><span class="k">go</span>
+
+<span class="err">#</span> <span class="nx">gdb</span> <span class="nx">gdb</span><span class="o">-</span><span class="nf">main</span>
+<span class="p">(</span><span class="nx">gdb</span><span class="p">)</span> <span class="nx">info</span> <span class="nx">files</span>
+<span class="nx">Symbols</span> <span class="nx">from</span> <span class="s">&#34;/Users/zhangzw/work/go/github.com/zhangzw001/learngo/basic/gdb/gdb-main&#34;</span><span class="p">.</span>
+<span class="nx">Local</span> <span class="nx">exec</span> <span class="nx">file</span><span class="p">:</span>
+	<span class="err">`</span><span class="o">/</span><span class="nx">Users</span><span class="o">/</span><span class="nx">zhangzw</span><span class="o">/</span><span class="nx">work</span><span class="o">/</span><span class="k">go</span><span class="o">/</span><span class="nx">github</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">zhangzw001</span><span class="o">/</span><span class="nx">learngo</span><span class="o">/</span><span class="nx">basic</span><span class="o">/</span><span class="nx">gdb</span><span class="o">/</span><span class="nx">gdb</span><span class="o">-</span><span class="nx">main</span><span class="err">&#39;</span><span class="p">,</span> <span class="nx">file</span> <span class="kd">type</span> <span class="nx">mach</span><span class="o">-</span><span class="nx">o</span><span class="o">-</span><span class="nx">x86</span><span class="o">-</span><span class="mf">64.</span>
+	<span class="nx">Entry</span> <span class="nx">point</span><span class="p">:</span> <span class="mh">0x1065600</span>
+	<span class="mh">0x0000000001001000</span> <span class="o">-</span> <span class="mh">0x00000000010a2e8a</span> <span class="nx">is</span> <span class="p">.</span><span class="nx">text</span>
+	<span class="mh">0x00000000010a2ea0</span> <span class="o">-</span> <span class="mh">0x00000000010a2fa2</span> <span class="nx">is</span> <span class="nx">__TEXT</span><span class="p">.</span><span class="nx">__symbol_stub1</span>
+	<span class="o">...</span>
+<span class="p">(</span><span class="nx">gdb</span><span class="p">)</span> <span class="nx">b</span> <span class="o">*</span><span class="mh">0x1065600</span>  <span class="c1">// 上面的Entry point后面的地址
+</span><span class="c1"></span><span class="nx">Breakpoint</span> <span class="mi">1</span> <span class="nx">at</span> <span class="mh">0x1065600</span><span class="p">:</span> <span class="nx">file</span> <span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="k">go</span><span class="o">/</span><span class="nx">src</span><span class="o">/</span><span class="nx">runtime</span><span class="o">/</span><span class="nx">rt0_darwin_amd64</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="nx">line</span> <span class="mf">8.</span>   <span class="c1">// 这里是mac
+</span></code></pre></div><h4 id="继续查看">继续查看<a href="#继续查看" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code class="language-assembly" data-lang="assembly">// src/runtime/rt0_darwin_amd64.s
+TEXT _rt0_amd64_darwin(SB),NOSPLIT,$-8
+	JMP	_rt0_amd64(SB) //跳转到 _rt0_amd64
+
+TEXT _rt0_amd64(SB),NOSPLIT,$-8
+	MOVQ	0(SP), DI	// argc
+	LEAQ	8(SP), SI	// argv
+	JMP	runtime·rt0_go(SB) // 又跳转到runtime·rt0_go
+</code></pre><h4 id="来到核心代码">来到核心代码<a href="#来到核心代码" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code class="language-assembly" data-lang="assembly">TEXT runtime·rt0_go&lt;ABIInternal&gt;(SB),NOSPLIT,$0
+        ...
+        // DI 现在是g0的地址
+        MOVQ	$runtime·g0(SB), DI
+        // BX = SP-64*1024+104 准备64k的内存空间
+        LEAQ	(-64*1024+104)(SP), BX
+        // 设置 g.stackguard0
+        MOVQ	BX, g_stackguard0(DI)   
+        // 设置 g.stackguard1   
+        MOVQ	BX, g_stackguard1(DI)
+        // g0 栈的low低地址
+        MOVQ	BX, (g_stack+stack_lo)(DI)
+        // g0 栈的high高地址
+        MOVQ	SP, (g_stack+stack_hi)(DI)
+	...
+        // m0的tls成员
+        LEAQ	runtime·m0+m_tls(SB), DI
+        // 通过fs段寄存器找到m.tls
+        CALL	runtime·settls(SB)
+        // 获得fs段地址放入BX = m0.tls[1]
+        get_tls(BX)
+        MOVQ	$0x123, g(BX)
+        MOVQ	runtime·m0+m_tls(SB), AX
+        // AX肯定还是$0x123
+        CMPQ	AX, $0x123
+        // EQ的话就跳2行执行
+        JEQ 2(PC)
+        CALL	runtime·abort(SB)
+ok:
+	get_tls(BX)
+        // DX 现在是g0的地址
+	LEAL	runtime·g0(SB), DX
+        // m0.tls[0] = DX
+	MOVL	DX, g(BX)
+        // AX 现在是m0的地址
+	LEAL	runtime·m0(SB), AX
+        // m0 和g0绑定
+	// m0.g0 = &amp;g0
+	MOVL	DX, m_g0(AX)
+	// g0.m0 = &amp;m0
+	MOVL	AX, g_m(DX)
+
+        CLD				// convention is D is always left cleared
+	CALL	runtime·check(SB)  // 运行时类型检查，主要是校验编译器的翻译工作是否正确
+	MOVL	16(SP), AX	   // copy argc
+	MOVL	AX, 0(SP)
+	MOVQ	24(SP), AX	   // copy argv
+	MOVQ	AX, 8(SP)
+	CALL	runtime·args(SB)	  //系统参数传递，主要是将系统参数转换传递给程序使用
+	CALL	runtime·osinit(SB)	  //系统基本参数设置，主要是获取 CPU 核心数和内存物理页大小
+	CALL	runtime·schedinit(SB)     //进行各种运行时组件的初始化，包含调度器、内存分配器、堆、栈、GC 等一大堆初始化工作。会进行 p 的初始化，并将 m0 和某一个 p 进行绑定。
+
+	// 创建一个新的goroutine来运行程序
+        // 主要工作是运行 main goroutine，虽然在runtime·rt0_go 中指向的是$runtime·mainPC，但实质指向的是 runtime.main。
+	MOVQ	$runtime·mainPC(SB), AX
+        // 入栈新的goroutine的地址
+        PUSHQ	AX	  
+        // main函数参数个数是0
+        PUSHL	$0	                  // arg size
+        // 创建一个新的 goroutine，且绑定 runtime.main 方法（也就是应用程序中的入口 main 方法）。并将其放入 m0 绑定的p的本地队列中去，以便后续调度。
+	CALL	runtime·newproc(SB)       
+        // 出站
+	POPL	AX
+	POPL	AX
+
+	// start this M
+	CALL	runtime·mstart(SB)
+        // 以下不会执行, 万一mstart返回了,这里直接abort crash掉
+	CALL	runtime·abort(SB)
+	RET
+</code></pre><h4 id="schedinit">schedinit<a href="#schedinit" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/proc.go
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">schedinit</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nf">lockInit</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">,</span> <span class="nx">lockRankSched</span><span class="p">)</span>
+        <span class="o">...</span>
+	<span class="nf">lockInit</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">memstats</span><span class="p">.</span><span class="nx">heapStats</span><span class="p">.</span><span class="nx">noPLock</span><span class="p">,</span> <span class="nx">lockRankLeafRank</span><span class="p">)</span>
+        <span class="c1">// g0
+</span><span class="c1"></span>	<span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nx">raceenabled</span> <span class="p">{</span>
+		<span class="nx">_g_</span><span class="p">.</span><span class="nx">racectx</span><span class="p">,</span> <span class="nx">raceprocctx0</span> <span class="p">=</span> <span class="nf">raceinit</span><span class="p">()</span>
+	<span class="p">}</span>
+        <span class="c1">// 设置全局变量 最大的m线程数量
+</span><span class="c1"></span>	<span class="nx">sched</span><span class="p">.</span><span class="nx">maxmcount</span> <span class="p">=</span> <span class="mi">10000</span>
+
+	<span class="c1">// The world starts stopped.
+</span><span class="c1"></span>	<span class="nf">worldStopped</span><span class="p">()</span>
+
+	<span class="nf">moduledataverify</span><span class="p">()</span>
+	<span class="nf">stackinit</span><span class="p">()</span>
+	<span class="nf">mallocinit</span><span class="p">()</span>
+	<span class="nf">fastrandinit</span><span class="p">()</span>  <span class="c1">// must run before mcommoninit
+</span><span class="c1"></span>        <span class="c1">// 初始化 m0, 详细见后面
+</span><span class="c1"></span>	<span class="nf">mcommoninit</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+	<span class="nf">cpuinit</span><span class="p">()</span>       <span class="c1">// must run before alginit
+</span><span class="c1"></span>	<span class="nf">alginit</span><span class="p">()</span>       <span class="c1">// maps must not be used before this call
+</span><span class="c1"></span>	<span class="nf">modulesinit</span><span class="p">()</span>   <span class="c1">// provides activeModules
+</span><span class="c1"></span>	<span class="nf">typelinksinit</span><span class="p">()</span> <span class="c1">// uses maps, activeModules
+</span><span class="c1"></span>	<span class="nf">itabsinit</span><span class="p">()</span>     <span class="c1">// uses activeModules
+</span><span class="c1"></span>
+	<span class="nf">sigsave</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">sigmask</span><span class="p">)</span>
+	<span class="nx">initSigmask</span> <span class="p">=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">sigmask</span>
+
+	<span class="nf">goargs</span><span class="p">()</span>
+	<span class="nf">goenvs</span><span class="p">()</span>
+	<span class="nf">parsedebugvars</span><span class="p">()</span>
+	<span class="nf">gcinit</span><span class="p">()</span>
+        <span class="c1">// 锁
+</span><span class="c1"></span>	<span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+	<span class="nx">sched</span><span class="p">.</span><span class="nx">lastpoll</span> <span class="p">=</span> <span class="nb">uint64</span><span class="p">(</span><span class="nf">nanotime</span><span class="p">())</span>
+	<span class="nx">procs</span> <span class="o">:=</span> <span class="nx">ncpu</span>
+        <span class="c1">// 读一下是否设置了env
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nf">atoi32</span><span class="p">(</span><span class="nf">gogetenv</span><span class="p">(</span><span class="s">&#34;GOMAXPROCS&#34;</span><span class="p">));</span> <span class="nx">ok</span> <span class="o">&amp;&amp;</span> <span class="nx">n</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">procs</span> <span class="p">=</span> <span class="nx">n</span>
+	<span class="p">}</span>
+        <span class="c1">// 初始化p,详细见后面
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nf">procresize</span><span class="p">(</span><span class="nx">procs</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;unknown runnable goroutine during bootstrap&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+
+	<span class="c1">// World is effectively started now, as P&#39;s can run.
+</span><span class="c1"></span>	<span class="nf">worldStarted</span><span class="p">()</span>
+        <span class="o">...</span>
+<span class="p">}</span>
+
+</code></pre></div><ul>
+<li>mcommoninit</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">mcommoninit</span><span class="p">(</span><span class="nx">mp</span> <span class="o">*</span><span class="nx">m</span><span class="p">,</span> <span class="nx">id</span> <span class="kt">int64</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// g0
+</span><span class="c1"></span>	<span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+
+	<span class="c1">// g0 stack won&#39;t make sense for user (and is not necessary unwindable).
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">_g_</span> <span class="o">!=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">g0</span> <span class="p">{</span>
+		<span class="nf">callers</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">mp</span><span class="p">.</span><span class="nx">createstack</span><span class="p">[:])</span>
+	<span class="p">}</span>
+
+	<span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+        <span class="c1">// 设置mp id, 初始化传入的id=-1
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">id</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">mp</span><span class="p">.</span><span class="nx">id</span> <span class="p">=</span> <span class="nx">id</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="c1">// 取一个id,m0=0,之后的递增 , 详细见后面
+</span><span class="c1"></span>		<span class="nx">mp</span><span class="p">.</span><span class="nx">id</span> <span class="p">=</span> <span class="nf">mReserveID</span><span class="p">()</span>
+	<span class="p">}</span>
+        <span class="c1">// rand初始化
+</span><span class="c1"></span>	<span class="nx">mp</span><span class="p">.</span><span class="nx">fastrand</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">=</span> <span class="nb">uint32</span><span class="p">(</span><span class="nf">int64Hash</span><span class="p">(</span><span class="nb">uint64</span><span class="p">(</span><span class="nx">mp</span><span class="p">.</span><span class="nx">id</span><span class="p">),</span> <span class="nx">fastrandseed</span><span class="p">))</span>
+	<span class="nx">mp</span><span class="p">.</span><span class="nx">fastrand</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">=</span> <span class="nb">uint32</span><span class="p">(</span><span class="nf">int64Hash</span><span class="p">(</span><span class="nb">uint64</span><span class="p">(</span><span class="nf">cputicks</span><span class="p">()),</span> <span class="p">^</span><span class="nx">fastrandseed</span><span class="p">))</span>
+	<span class="k">if</span> <span class="nx">mp</span><span class="p">.</span><span class="nx">fastrand</span><span class="p">[</span><span class="mi">0</span><span class="p">]|</span><span class="nx">mp</span><span class="p">.</span><span class="nx">fastrand</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">mp</span><span class="p">.</span><span class="nx">fastrand</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">=</span> <span class="mi">1</span>
+	<span class="p">}</span>
+        <span class="c1">// 设置信号
+</span><span class="c1"></span>	<span class="nf">mpreinit</span><span class="p">(</span><span class="nx">mp</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">mp</span><span class="p">.</span><span class="nx">gsignal</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">mp</span><span class="p">.</span><span class="nx">gsignal</span><span class="p">.</span><span class="nx">stackguard1</span> <span class="p">=</span> <span class="nx">mp</span><span class="p">.</span><span class="nx">gsignal</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">lo</span> <span class="o">+</span> <span class="nx">_StackGuard</span>
+	<span class="p">}</span>
+
+	<span class="c1">// Add to allm so garbage collector doesn&#39;t free g-&gt;m
+</span><span class="c1"></span>	<span class="c1">// when it is just in a register or thread-local storage.
+</span><span class="c1"></span>	<span class="nx">mp</span><span class="p">.</span><span class="nx">alllink</span> <span class="p">=</span> <span class="nx">allm</span>
+
+	<span class="c1">// NumCgoCall() iterates over allm w/o schedlock,
+</span><span class="c1"></span>	<span class="c1">// so we need to publish it safely.
+</span><span class="c1"></span>	<span class="nf">atomicstorep</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">allm</span><span class="p">),</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">mp</span><span class="p">))</span>
+	<span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+
+	<span class="c1">// Allocate memory to hold a cgo traceback if the cgo call crashes.
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">iscgo</span> <span class="o">||</span> <span class="nx">GOOS</span> <span class="o">==</span> <span class="s">&#34;solaris&#34;</span> <span class="o">||</span> <span class="nx">GOOS</span> <span class="o">==</span> <span class="s">&#34;illumos&#34;</span> <span class="o">||</span> <span class="nx">GOOS</span> <span class="o">==</span> <span class="s">&#34;windows&#34;</span> <span class="p">{</span>
+		<span class="nx">mp</span><span class="p">.</span><span class="nx">cgoCallers</span> <span class="p">=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">cgoCallers</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div><ul>
+<li>mReserveID</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">mReserveID</span><span class="p">()</span> <span class="kt">int64</span> <span class="p">{</span>
+        <span class="c1">// 加锁, 操作全局变量sched
+</span><span class="c1"></span>	<span class="nf">assertLockHeld</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+        <span class="c1">// 满了
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">mnext</span><span class="o">+</span><span class="mi">1</span> <span class="p">&lt;</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">mnext</span> <span class="p">{</span>
+		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;runtime: thread ID overflow&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+        <span class="c1">// 得到id
+</span><span class="c1"></span>	<span class="nx">id</span> <span class="o">:=</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">mnext</span>
+	<span class="nx">sched</span><span class="p">.</span><span class="nx">mnext</span><span class="o">++</span>
+        <span class="c1">// 检查是否超过 maxcount
+</span><span class="c1"></span>	<span class="nf">checkmcount</span><span class="p">()</span>
+	<span class="k">return</span> <span class="nx">id</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>mpreinit</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">mpreinit</span><span class="p">(</span><span class="nx">mp</span> <span class="o">*</span><span class="nx">m</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// new 一个 g 结构体对象，然后从堆上为其分配栈，并设置 g 的 stack 成员和两个 stackgard 成员
+</span><span class="c1"></span>	<span class="nx">mp</span><span class="p">.</span><span class="nx">gsignal</span> <span class="p">=</span> <span class="nf">malg</span><span class="p">(</span><span class="mi">32</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span> <span class="c1">// OS X wants &gt;= 8K
+</span><span class="c1"></span>	<span class="nx">mp</span><span class="p">.</span><span class="nx">gsignal</span><span class="p">.</span><span class="nx">m</span> <span class="p">=</span> <span class="nx">mp</span>
+	<span class="o">...</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>malg</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">malg</span><span class="p">(</span><span class="nx">stacksize</span> <span class="kt">int32</span><span class="p">)</span> <span class="o">*</span><span class="nx">g</span> <span class="p">{</span>
+        <span class="c1">// new 结构体
+</span><span class="c1"></span>	<span class="nx">newg</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">g</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">stacksize</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">stacksize</span> <span class="p">=</span> <span class="nf">round2</span><span class="p">(</span><span class="nx">_StackSystem</span> <span class="o">+</span> <span class="nx">stacksize</span><span class="p">)</span>
+                <span class="c1">// g0来分配堆栈
+</span><span class="c1"></span>		<span class="nf">systemstack</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+			<span class="nx">newg</span><span class="p">.</span><span class="nx">stack</span> <span class="p">=</span> <span class="nf">stackalloc</span><span class="p">(</span><span class="nb">uint32</span><span class="p">(</span><span class="nx">stacksize</span><span class="p">))</span>
+		<span class="p">})</span>
+		<span class="nx">newg</span><span class="p">.</span><span class="nx">stackguard0</span> <span class="p">=</span> <span class="nx">newg</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">lo</span> <span class="o">+</span> <span class="nx">_StackGuard</span>
+		<span class="nx">newg</span><span class="p">.</span><span class="nx">stackguard1</span> <span class="p">=</span> <span class="p">^</span><span class="nb">uintptr</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+		<span class="c1">// Clear the bottom word of the stack. We record g
+</span><span class="c1"></span>		<span class="c1">// there on gsignal stack during VDSO on ARM and ARM64.
+</span><span class="c1"></span>		<span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="kt">uintptr</span><span class="p">)(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">newg</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">lo</span><span class="p">))</span> <span class="p">=</span> <span class="mi">0</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">newg</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li></li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="o">-</span> <span class="nx">systemstack</span>
+<span class="s">``</span><span class="err">`</span><span class="nx">assembly</span>
+<span class="c1">// 切换到g0 执行
+</span><span class="c1">// func systemstack(fn func())
+</span><span class="c1"></span><span class="nx">TEXT</span> <span class="nx">runtime</span><span class="err">·</span><span class="nf">systemstack</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">NOSPLIT</span><span class="p">,</span> <span class="err">$</span><span class="mi">0</span><span class="o">-</span><span class="mi">8</span>
+	<span class="nx">MOVQ</span>	<span class="nx">fn</span><span class="o">+</span><span class="mi">0</span><span class="p">(</span><span class="nx">FP</span><span class="p">),</span> <span class="nx">DI</span>	<span class="c1">// DI = fn
+</span><span class="c1"></span>	<span class="nf">get_tls</span><span class="p">(</span><span class="nx">CX</span><span class="p">)</span>
+	<span class="nx">MOVQ</span>	<span class="nf">g</span><span class="p">(</span><span class="nx">CX</span><span class="p">),</span> <span class="nx">AX</span>	<span class="c1">// AX = g
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nf">g_m</span><span class="p">(</span><span class="nx">AX</span><span class="p">),</span> <span class="nx">BX</span>	<span class="c1">// BX = m
+</span><span class="c1"></span>
+	<span class="nx">CMPQ</span>	<span class="nx">AX</span><span class="p">,</span> <span class="nf">m_gsignal</span><span class="p">(</span><span class="nx">BX</span><span class="p">)</span>
+	<span class="nx">JEQ</span>	<span class="nx">noswitch</span>
+
+	<span class="nx">MOVQ</span>	<span class="nf">m_g0</span><span class="p">(</span><span class="nx">BX</span><span class="p">),</span> <span class="nx">DX</span>	<span class="c1">// DX = g0
+</span><span class="c1"></span>	<span class="nx">CMPQ</span>	<span class="nx">AX</span><span class="p">,</span> <span class="nx">DX</span>
+	<span class="nx">JEQ</span>	<span class="nx">noswitch</span>
+
+	<span class="nx">CMPQ</span>	<span class="nx">AX</span><span class="p">,</span> <span class="nf">m_curg</span><span class="p">(</span><span class="nx">BX</span><span class="p">)</span>
+	<span class="nx">JNE</span>	<span class="nx">bad</span>
+
+	<span class="c1">// switch stacks
+</span><span class="c1"></span>	<span class="c1">// save our state in g-&gt;sched. Pretend to
+</span><span class="c1"></span>	<span class="c1">// be systemstack_switch if the G stack is scanned.
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="err">$</span><span class="nx">runtime</span><span class="err">·</span><span class="nf">systemstack_switch</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">SI</span>
+	<span class="nx">MOVQ</span>	<span class="nx">SI</span><span class="p">,</span> <span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_pc</span><span class="p">)(</span><span class="nx">AX</span><span class="p">)</span>
+	<span class="nx">MOVQ</span>	<span class="nx">SP</span><span class="p">,</span> <span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_sp</span><span class="p">)(</span><span class="nx">AX</span><span class="p">)</span>
+	<span class="nx">MOVQ</span>	<span class="nx">AX</span><span class="p">,</span> <span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_g</span><span class="p">)(</span><span class="nx">AX</span><span class="p">)</span>
+	<span class="nx">MOVQ</span>	<span class="nx">BP</span><span class="p">,</span> <span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_bp</span><span class="p">)(</span><span class="nx">AX</span><span class="p">)</span>
+
+	<span class="c1">// DX是g0
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nx">DX</span><span class="p">,</span> <span class="nf">g</span><span class="p">(</span><span class="nx">CX</span><span class="p">)</span>
+        <span class="c1">// 保存sp
+</span><span class="c1"></span>	<span class="nf">MOVQ</span>	<span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_sp</span><span class="p">)(</span><span class="nx">DX</span><span class="p">),</span> <span class="nx">BX</span>
+	<span class="c1">// make it look like mstart called systemstack on g0, to stop traceback
+</span><span class="c1"></span>	<span class="nx">SUBQ</span>	<span class="err">$</span><span class="mi">8</span><span class="p">,</span> <span class="nx">BX</span>
+	<span class="nx">MOVQ</span>	<span class="err">$</span><span class="nx">runtime</span><span class="err">·</span><span class="nf">mstart</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">DX</span>
+	<span class="nx">MOVQ</span>	<span class="nx">DX</span><span class="p">,</span> <span class="mi">0</span><span class="p">(</span><span class="nx">BX</span><span class="p">)</span>
+	<span class="nx">MOVQ</span>	<span class="nx">BX</span><span class="p">,</span> <span class="nx">SP</span>
+
+	<span class="c1">// 这里调用了fn函数
+</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nx">DI</span><span class="p">,</span> <span class="nx">DX</span>
+	<span class="nx">MOVQ</span>	<span class="mi">0</span><span class="p">(</span><span class="nx">DI</span><span class="p">),</span> <span class="nx">DI</span>
+	<span class="nx">CALL</span>	<span class="nx">DI</span>
+
+	<span class="c1">// switch back to g
+</span><span class="c1"></span>	<span class="nf">get_tls</span><span class="p">(</span><span class="nx">CX</span><span class="p">)</span>
+	<span class="nx">MOVQ</span>	<span class="nf">g</span><span class="p">(</span><span class="nx">CX</span><span class="p">),</span> <span class="nx">AX</span>
+	<span class="nx">MOVQ</span>	<span class="nf">g_m</span><span class="p">(</span><span class="nx">AX</span><span class="p">),</span> <span class="nx">BX</span>
+	<span class="nx">MOVQ</span>	<span class="nf">m_curg</span><span class="p">(</span><span class="nx">BX</span><span class="p">),</span> <span class="nx">AX</span>
+	<span class="nx">MOVQ</span>	<span class="nx">AX</span><span class="p">,</span> <span class="nf">g</span><span class="p">(</span><span class="nx">CX</span><span class="p">)</span>
+	<span class="nf">MOVQ</span>	<span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_sp</span><span class="p">)(</span><span class="nx">AX</span><span class="p">),</span> <span class="nx">SP</span>
+	<span class="nx">MOVQ</span>	<span class="err">$</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_sp</span><span class="p">)(</span><span class="nx">AX</span><span class="p">)</span>
+	<span class="nx">RET</span>
+
+        <span class="o">...</span>
+
+</code></pre></div><ul>
+<li>procresize 如何分配p</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">procresize</span><span class="p">(</span><span class="nx">nprocs</span> <span class="kt">int32</span><span class="p">)</span> <span class="o">*</span><span class="nx">p</span> <span class="p">{</span>
+	<span class="nf">assertLockHeld</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+	<span class="nf">assertWorldStopped</span><span class="p">()</span>
+
+	<span class="nx">old</span> <span class="o">:=</span> <span class="nx">gomaxprocs</span>
+	<span class="k">if</span> <span class="nx">old</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">nprocs</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;procresize: invalid arg&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">trace</span><span class="p">.</span><span class="nx">enabled</span> <span class="p">{</span>
+		<span class="nf">traceGomaxprocs</span><span class="p">(</span><span class="nx">nprocs</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="c1">// update statistics
+</span><span class="c1"></span>	<span class="nx">now</span> <span class="o">:=</span> <span class="nf">nanotime</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">procresizetime</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">sched</span><span class="p">.</span><span class="nx">totaltime</span> <span class="o">+=</span> <span class="nb">int64</span><span class="p">(</span><span class="nx">old</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nx">now</span> <span class="o">-</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">procresizetime</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="nx">sched</span><span class="p">.</span><span class="nx">procresizetime</span> <span class="p">=</span> <span class="nx">now</span>
+
+	<span class="nx">maskWords</span> <span class="o">:=</span> <span class="p">(</span><span class="nx">nprocs</span> <span class="o">+</span> <span class="mi">31</span><span class="p">)</span> <span class="o">/</span> <span class="mi">32</span>
+
+	<span class="c1">// 第一次allp肯定是0
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">nprocs</span> <span class="p">&gt;</span> <span class="nb">int32</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">allp</span><span class="p">))</span> <span class="p">{</span>
+		<span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">allpLock</span><span class="p">)</span>
+                <span class="c1">// cap(allp) 第一次肯定是0
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">nprocs</span> <span class="o">&lt;=</span> <span class="nb">int32</span><span class="p">(</span><span class="nb">cap</span><span class="p">(</span><span class="nx">allp</span><span class="p">))</span> <span class="p">{</span>
+			<span class="nx">allp</span> <span class="p">=</span> <span class="nx">allp</span><span class="p">[:</span><span class="nx">nprocs</span><span class="p">]</span>
+                <span class="c1">// 第一次是走else
+</span><span class="c1"></span>                <span class="c1">// 如果运行过程中存在手工调整p的情况, 减小了也可能走这里
+</span><span class="c1"></span>		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                        <span class="c1">// 生成p的数组
+</span><span class="c1"></span>			<span class="nx">nallp</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="o">*</span><span class="nx">p</span><span class="p">,</span> <span class="nx">nprocs</span><span class="p">)</span>
+                        <span class="c1">// 会需要需要减小的情况, 需要把原来的p copy过来
+</span><span class="c1"></span>                        <span class="c1">// 初始化的话,allp肯定是空的
+</span><span class="c1"></span>			<span class="nb">copy</span><span class="p">(</span><span class="nx">nallp</span><span class="p">,</span> <span class="nx">allp</span><span class="p">[:</span><span class="nb">cap</span><span class="p">(</span><span class="nx">allp</span><span class="p">)])</span>
+                        <span class="c1">// 设置一下全局变量
+</span><span class="c1"></span>			<span class="nx">allp</span> <span class="p">=</span> <span class="nx">nallp</span>
+		<span class="p">}</span>
+                <span class="o">...</span>
+		<span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">allpLock</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="c1">// initialize new P&#39;s
+</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nx">old</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">nprocs</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">pp</span> <span class="o">:=</span> <span class="nx">allp</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+		<span class="k">if</span> <span class="nx">pp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nx">pp</span> <span class="p">=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span>
+		<span class="p">}</span>
+                <span class="c1">// 详细内容见后面
+</span><span class="c1"></span>		<span class="nx">pp</span><span class="p">.</span><span class="nf">init</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span>
+                <span class="c1">// p存入到allp中
+</span><span class="c1"></span>		<span class="nf">atomicstorep</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">allp</span><span class="p">[</span><span class="nx">i</span><span class="p">]),</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">pp</span><span class="p">))</span>
+	<span class="p">}</span>
+        <span class="c1">// 初始化是g0
+</span><span class="c1"></span>	<span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">().</span><span class="nx">id</span> <span class="p">&lt;</span> <span class="nx">nprocs</span> <span class="p">{</span>
+		<span class="c1">// continue to use the current P
+</span><span class="c1"></span>		<span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">().</span><span class="nx">status</span> <span class="p">=</span> <span class="nx">_Prunning</span>
+		<span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">().</span><span class="nx">mcache</span><span class="p">.</span><span class="nf">prepareForSweep</span><span class="p">()</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+		<span class="o">...</span>
+		<span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span> <span class="p">=</span> <span class="mi">0</span>
+                <span class="c1">// 取队列的第0个p
+</span><span class="c1"></span>		<span class="nx">p</span> <span class="o">:=</span> <span class="nx">allp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1">//
+</span><span class="c1"></span>		<span class="nx">p</span><span class="p">.</span><span class="nx">m</span> <span class="p">=</span> <span class="mi">0</span>
+                <span class="c1">// 把p设置为idle
+</span><span class="c1"></span>		<span class="nx">p</span><span class="p">.</span><span class="nx">status</span> <span class="p">=</span> <span class="nx">_Pidle</span>
+                <span class="c1">// p0 和 m0 关联起来, 详细内容见后面
+</span><span class="c1"></span>		<span class="nf">acquirep</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nx">trace</span><span class="p">.</span><span class="nx">enabled</span> <span class="p">{</span>
+			<span class="nf">traceGoStart</span><span class="p">()</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+
+	<span class="c1">// g.m.p is now set, so we no longer need mcache0 for bootstrapping.
+</span><span class="c1"></span>	<span class="nx">mcache0</span> <span class="p">=</span> <span class="kc">nil</span>
+
+	<span class="c1">// 如果是手工缩小p就 释放
+</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nx">nprocs</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">old</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">p</span> <span class="o">:=</span> <span class="nx">allp</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+                <span class="c1">// 这里释放主要是把一些本地的g都加到全局队列中去
+</span><span class="c1"></span>                <span class="c1">// 然后p都设置为dead, 这里并没有去删除,方便下次需要直接调用
+</span><span class="c1"></span>		<span class="nx">p</span><span class="p">.</span><span class="nf">destroy</span><span class="p">()</span>
+		<span class="c1">// can&#39;t free P itself because it can be referenced by an M in syscall
+</span><span class="c1"></span>	<span class="p">}</span>
+
+	<span class="c1">// 对p队列做一次伸缩
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nb">int32</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">allp</span><span class="p">))</span> <span class="o">!=</span> <span class="nx">nprocs</span> <span class="p">{</span>
+		<span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">allpLock</span><span class="p">)</span>
+		<span class="nx">allp</span> <span class="p">=</span> <span class="nx">allp</span><span class="p">[:</span><span class="nx">nprocs</span><span class="p">]</span>
+		<span class="nx">idlepMask</span> <span class="p">=</span> <span class="nx">idlepMask</span><span class="p">[:</span><span class="nx">maskWords</span><span class="p">]</span>
+		<span class="nx">timerpMask</span> <span class="p">=</span> <span class="nx">timerpMask</span><span class="p">[:</span><span class="nx">maskWords</span><span class="p">]</span>
+		<span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">allpLock</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="kd">var</span> <span class="nx">runnablePs</span> <span class="o">*</span><span class="nx">p</span>
+	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nx">nprocs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">--</span> <span class="p">{</span>
+		<span class="nx">p</span> <span class="o">:=</span> <span class="nx">allp</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+                <span class="c1">// g0.m.p是p0, 不用加入到空闲队列
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">()</span> <span class="o">==</span> <span class="nx">p</span> <span class="p">{</span>
+			<span class="k">continue</span>
+		<span class="p">}</span>
+                <span class="c1">// 设置idle
+</span><span class="c1"></span>		<span class="nx">p</span><span class="p">.</span><span class="nx">status</span> <span class="p">=</span> <span class="nx">_Pidle</span>
+                <span class="c1">// 可运行的空闲队列,详细见后面
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nf">runqempty</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="c1">// 放入全局空闲链表
+</span><span class="c1"></span>			<span class="nf">pidleput</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                        <span class="c1">// mget() 获取一个m 绑定到这个p上去执行
+</span><span class="c1"></span>			<span class="nx">p</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nf">mget</span><span class="p">())</span>
+                        <span class="c1">// 设置链表
+</span><span class="c1"></span>			<span class="nx">p</span><span class="p">.</span><span class="nx">link</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nx">runnablePs</span><span class="p">)</span>
+			<span class="nx">runnablePs</span> <span class="p">=</span> <span class="nx">p</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+        <span class="c1">// 对randomOrder的队列做一个随机处理, 为了后续有偷取的时候更随机,调度更公平
+</span><span class="c1"></span>	<span class="nx">stealOrder</span><span class="p">.</span><span class="nf">reset</span><span class="p">(</span><span class="nb">uint32</span><span class="p">(</span><span class="nx">nprocs</span><span class="p">))</span>
+	<span class="kd">var</span> <span class="nx">int32p</span> <span class="o">*</span><span class="kt">int32</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">gomaxprocs</span> <span class="c1">// make compiler check that gomaxprocs is an int32
+</span><span class="c1"></span>	<span class="nx">atomic</span><span class="p">.</span><span class="nf">Store</span><span class="p">((</span><span class="o">*</span><span class="kt">uint32</span><span class="p">)(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">int32p</span><span class="p">)),</span> <span class="nb">uint32</span><span class="p">(</span><span class="nx">nprocs</span><span class="p">))</span>
+        <span class="c1">// 返回本地任务链表p头, allp队列里的第一个可执行的p
+</span><span class="c1"></span>	<span class="k">return</span> <span class="nx">runnablePs</span>
+<span class="p">}</span>
+
+</code></pre></div><ul>
+<li>init p初始化函数</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">pp</span> <span class="o">*</span><span class="nx">p</span><span class="p">)</span> <span class="nf">init</span><span class="p">(</span><span class="nx">id</span> <span class="kt">int32</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// id就是索引了
+</span><span class="c1"></span>	<span class="nx">pp</span><span class="p">.</span><span class="nx">id</span> <span class="p">=</span> <span class="nx">id</span>
+        <span class="c1">// 新建的p开始是stop状态
+</span><span class="c1"></span>	<span class="nx">pp</span><span class="p">.</span><span class="nx">status</span> <span class="p">=</span> <span class="nx">_Pgcstop</span>
+	<span class="o">...</span>
+<span class="p">}</span>
+
+</code></pre></div><ul>
+<li>acquirep</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">acquirep</span><span class="p">(</span><span class="nx">_p_</span> <span class="o">*</span><span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// 继续追
+</span><span class="c1"></span>	<span class="nf">wirep</span><span class="p">(</span><span class="nx">_p_</span><span class="p">)</span>
+	<span class="nx">_p_</span><span class="p">.</span><span class="nx">mcache</span><span class="p">.</span><span class="nf">prepareForSweep</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nx">trace</span><span class="p">.</span><span class="nx">enabled</span> <span class="p">{</span>
+		<span class="nf">traceProcStart</span><span class="p">()</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>wirep</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">wirep</span><span class="p">(</span><span class="nx">_p_</span> <span class="o">*</span><span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// g0
+</span><span class="c1"></span>	<span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+        <span class="c1">// 第一次是g0.m.p == 0  
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;wirep: already in go&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">m</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">status</span> <span class="o">!=</span> <span class="nx">_Pidle</span> <span class="p">{</span>
+		<span class="nx">id</span> <span class="o">:=</span> <span class="nb">int64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">m</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+			<span class="nx">id</span> <span class="p">=</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nf">ptr</span><span class="p">().</span><span class="nx">id</span>
+		<span class="p">}</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s">&#34;wirep: p-&gt;m=&#34;</span><span class="p">,</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">m</span><span class="p">,</span> <span class="s">&#34;(&#34;</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="s">&#34;) p-&gt;status=&#34;</span><span class="p">,</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span> <span class="s">&#34;\n&#34;</span><span class="p">)</span>
+		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;wirep: invalid p state&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+        <span class="c1">// g0.m.p = p0
+</span><span class="c1"></span>	<span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nx">_p_</span><span class="p">)</span>
+        <span class="c1">// p0.m0 = m0
+</span><span class="c1"></span>	<span class="nx">_p_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">)</span>
+        <span class="c1">// 现在就可以设置为running了
+</span><span class="c1"></span>	<span class="nx">_p_</span><span class="p">.</span><span class="nx">status</span> <span class="p">=</span> <span class="nx">_Prunning</span>
+<span class="p">}</span>
+
+</code></pre></div><ul>
+<li>runqempty</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">runqempty</span><span class="p">(</span><span class="nx">_p_</span> <span class="o">*</span><span class="nx">p</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+        <span class="c1">// 这里是无锁的方式判断
+</span><span class="c1"></span>	<span class="k">for</span> <span class="p">{</span>
+		<span class="nx">head</span> <span class="o">:=</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">runqhead</span><span class="p">)</span>
+		<span class="nx">tail</span> <span class="o">:=</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">runqtail</span><span class="p">)</span>
+		<span class="nx">runnext</span> <span class="o">:=</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Loaduintptr</span><span class="p">((</span><span class="o">*</span><span class="kt">uintptr</span><span class="p">)(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">runnext</span><span class="p">)))</span>
+		<span class="k">if</span> <span class="nx">tail</span> <span class="o">==</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">runqtail</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="nx">head</span> <span class="o">==</span> <span class="nx">tail</span> <span class="o">&amp;&amp;</span> <span class="nx">runnext</span> <span class="o">==</span> <span class="mi">0</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div><p>到 runtime·schedinit时的状态图, 来自<code>https://qcrao.com/</code>的图:</p>
+<p><img src="/images/golang/gmp-1.png" alt=""></p>
+<pre><code class="language-assembly" data-lang="assembly">        MOVQ	$runtime·mainPC(SB), AX
+        // 入栈新的goroutine的地址
+        PUSHQ	AX	  
+        // main函数参数个数是0
+        PUSHL	$0
+        // 创建goroutine
+        CALL	runtime·newproc(SB)       
+        POPL	AX
+        POPL	AX
+</code></pre><blockquote>
+<p>gmp已经初始化的差不多了, 现在可以创建main goroutine了</p>
+</blockquote>
+<h3 id="runtimenewproc-创建goroutine">runtime·newproc 创建goroutine<a href="#runtimenewproc-创建goroutine" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/proc.go
+</span><span class="c1">// 两个参数, 一个是函数siz,一个是函数地址
+</span><span class="c1">// type funcval struct {
+</span><span class="c1">// 	fn uintptr
+</span><span class="c1">// 	// variable-size, fn-specific data here
+</span><span class="c1">// }
+</span><span class="c1">// 函数栈从高到底依次是:
+</span><span class="c1">// fn的参数        这里是高地址, &amp;fn+sys.PtrSize
+</span><span class="c1">// fn的地址        这里是&amp;fn
+</span><span class="c1">// fn的size
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">newproc</span><span class="p">(</span><span class="nx">siz</span> <span class="kt">int32</span><span class="p">,</span> <span class="nx">fn</span> <span class="o">*</span><span class="nx">funcval</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// fn的第一个参数
+</span><span class="c1"></span>	<span class="nx">argp</span> <span class="o">:=</span> <span class="nf">add</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">fn</span><span class="p">),</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">PtrSize</span><span class="p">)</span>
+        <span class="c1">// g0
+</span><span class="c1"></span>	<span class="nx">gp</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+        <span class="c1">// 调用者的pc,call pc就是调用者的下一个指令, 我们看到runtime·rt0_go中, call runtime-newproc后 POPL AX了
+</span><span class="c1"></span>        <span class="c1">// 所以这里的调用者pc 就是 AX地址, AX 是 main的地址
+</span><span class="c1"></span>	<span class="nx">pc</span> <span class="o">:=</span> <span class="nf">getcallerpc</span><span class="p">()</span>
+        <span class="c1">// systemstack 的作用是切换到 g0 栈执行作为参数的函数
+</span><span class="c1"></span>        <span class="c1">// 用 g0 系统栈创建 goroutine 对象
+</span><span class="c1"></span>        <span class="c1">// 传递的参数包括 fn 函数入口地址，argp 参数起始地址，siz 参数长度，调用方 pc（goroutine）
+</span><span class="c1"></span>	<span class="nf">systemstack</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                <span class="c1">// 真正的创建go
+</span><span class="c1"></span>		<span class="nx">newg</span> <span class="o">:=</span> <span class="nf">newproc1</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">argp</span><span class="p">,</span> <span class="nx">siz</span><span class="p">,</span> <span class="nx">gp</span><span class="p">,</span> <span class="nx">pc</span><span class="p">)</span>
+                <span class="c1">// 获取到本地绑定的p
+</span><span class="c1"></span>		<span class="nx">_p_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">().</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">()</span>
+                <span class="c1">// 将这里新创建的 g 放入 p 的本地队列或直接放入全局队列
+</span><span class="c1"></span>                <span class="c1">// true 表示放入执行队列的下一个，false 表示放入队尾
+</span><span class="c1"></span>		<span class="nf">runqput</span><span class="p">(</span><span class="nx">_p_</span><span class="p">,</span> <span class="nx">newg</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="nx">mainStarted</span> <span class="p">{</span>
+			<span class="nf">wakep</span><span class="p">()</span>
+		<span class="p">}</span>
+	<span class="p">})</span>
+<span class="p">}</span>
+
+</code></pre></div><ul>
+<li>newproc1</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/proc.go
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">newproc1</span><span class="p">(</span><span class="nx">fn</span> <span class="o">*</span><span class="nx">funcval</span><span class="p">,</span> <span class="nx">argp</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span><span class="p">,</span> <span class="nx">narg</span> <span class="kt">int32</span><span class="p">,</span> <span class="nx">callergp</span> <span class="o">*</span><span class="nx">g</span><span class="p">,</span> <span class="nx">callerpc</span> <span class="kt">uintptr</span><span class="p">)</span> <span class="o">*</span><span class="nx">g</span> <span class="p">{</span>
+        <span class="c1">// g0, systemstack 切换的
+</span><span class="c1"></span>	<span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+        <span class="c1">// go 命令后面的函数肯定不能是nil
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">fn</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">throwing</span> <span class="p">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1">// do not dump full stacks
+</span><span class="c1"></span>		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;go of nil func value&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+        <span class="c1">// 绑定m
+</span><span class="c1"></span>	<span class="nf">acquirem</span><span class="p">()</span> <span class="c1">// disable preemption because it can be holding p in a local var
+</span><span class="c1"></span>	<span class="nx">siz</span> <span class="o">:=</span> <span class="nx">narg</span>
+        <span class="c1">// 内存对齐, &amp;^ 7 会把低三位全部置为0
+</span><span class="c1"></span>	<span class="nx">siz</span> <span class="p">=</span> <span class="p">(</span><span class="nx">siz</span> <span class="o">+</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&amp;^</span> <span class="mi">7</span>
+
+        <span class="o">...</span>
+        <span class="c1">// 当前g0所绑定的p
+</span><span class="c1"></span>	<span class="nx">_p_</span> <span class="o">:=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">()</span>
+        <span class="c1">// 从p的本地队列获取一个g,空的话会从全局拿一个,初始化肯定是nil 详细见后面
+</span><span class="c1"></span>	<span class="nx">newg</span> <span class="o">:=</span> <span class="nf">gfget</span><span class="p">(</span><span class="nx">_p_</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">newg</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+                <span class="c1">// 分配一个2k空间的g
+</span><span class="c1"></span>		<span class="nx">newg</span> <span class="p">=</span> <span class="nf">malg</span><span class="p">(</span><span class="nx">_StackMin</span><span class="p">)</span>
+                <span class="c1">// 设置为dead状态
+</span><span class="c1"></span>		<span class="nf">casgstatus</span><span class="p">(</span><span class="nx">newg</span><span class="p">,</span> <span class="nx">_Gidle</span><span class="p">,</span> <span class="nx">_Gdead</span><span class="p">)</span>
+                <span class="c1">// 加入到 allgs 全局队列中
+</span><span class="c1"></span>		<span class="nf">allgadd</span><span class="p">(</span><span class="nx">newg</span><span class="p">)</span> <span class="c1">// publishes with a g-&gt;status of Gdead so GC scanner doesn&#39;t look at uninitialized stack.
+</span><span class="c1"></span>	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">newg</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">hi</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;newproc1: newg missing stack&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span> <span class="nf">readgstatus</span><span class="p">(</span><span class="nx">newg</span><span class="p">)</span> <span class="o">!=</span> <span class="nx">_Gdead</span> <span class="p">{</span>
+		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;newproc1: new g is not Gdead&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+        <span class="c1">// 计算内存空间
+</span><span class="c1"></span>	<span class="nx">totalSize</span> <span class="o">:=</span> <span class="mi">4</span><span class="o">*</span><span class="nx">sys</span><span class="p">.</span><span class="nx">RegSize</span> <span class="o">+</span> <span class="nb">uintptr</span><span class="p">(</span><span class="nx">siz</span><span class="p">)</span> <span class="o">+</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">MinFrameSize</span> <span class="c1">// extra space in case of reads slightly beyond frame
+</span><span class="c1"></span>        <span class="c1">// 对于arm环境的sys.SpAlign=16,其他的是1
+</span><span class="c1"></span>	<span class="nx">totalSize</span> <span class="o">+=</span> <span class="o">-</span><span class="nx">totalSize</span> <span class="o">&amp;</span> <span class="p">(</span><span class="nx">sys</span><span class="p">.</span><span class="nx">SpAlign</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>                  <span class="c1">// align to spAlign
+</span><span class="c1"></span>        <span class="c1">// 预留空间, 确定sp栈顶的位置
+</span><span class="c1"></span>	<span class="nx">sp</span> <span class="o">:=</span> <span class="nx">newg</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">hi</span> <span class="o">-</span> <span class="nx">totalSize</span>
+        <span class="c1">// 确定参数入栈位置
+</span><span class="c1"></span>	<span class="nx">spArg</span> <span class="o">:=</span> <span class="nx">sp</span>
+        <span class="o">...</span>
+	<span class="k">if</span> <span class="nx">narg</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+                <span class="c1">// argp 是fn的第一个参数地址
+</span><span class="c1"></span>                <span class="c1">// 这是copy 参数到新的g栈的spArg参数位置
+</span><span class="c1"></span>		<span class="nf">memmove</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">spArg</span><span class="p">),</span> <span class="nx">argp</span><span class="p">,</span> <span class="nb">uintptr</span><span class="p">(</span><span class="nx">narg</span><span class="p">))</span>
+                <span class="o">...</span>
+	<span class="p">}</span>
+        <span class="c1">// 把 newg.sched 结构体成员的所有成员设置为 0
+</span><span class="c1"></span>	<span class="nf">memclrNoHeapPointers</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">newg</span><span class="p">.</span><span class="nx">sched</span><span class="p">),</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Sizeof</span><span class="p">(</span><span class="nx">newg</span><span class="p">.</span><span class="nx">sched</span><span class="p">))</span>
+        <span class="c1">// 设置 newg 的 sched 成员，调度器需要依靠这些字段才能把 goroutine 调度到 CPU 上运行
+</span><span class="c1"></span>	<span class="nx">newg</span><span class="p">.</span><span class="nx">sched</span><span class="p">.</span><span class="nx">sp</span> <span class="p">=</span> <span class="nx">sp</span>
+	<span class="nx">newg</span><span class="p">.</span><span class="nx">stktopsp</span> <span class="p">=</span> <span class="nx">sp</span>
+        <span class="c1">// 设置newg被调度时的第一个指令,从这个地址开始执行
+</span><span class="c1"></span>	<span class="nx">newg</span><span class="p">.</span><span class="nx">sched</span><span class="p">.</span><span class="nx">pc</span> <span class="p">=</span> <span class="nf">funcPC</span><span class="p">(</span><span class="nx">goexit</span><span class="p">)</span> <span class="o">+</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">PCQuantum</span> <span class="c1">// +PCQuantum 这样前一条指令就在同一个函数中了
+</span><span class="c1"></span>	<span class="nx">newg</span><span class="p">.</span><span class="nx">sched</span><span class="p">.</span><span class="nx">g</span> <span class="p">=</span> <span class="nf">guintptr</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">newg</span><span class="p">))</span>
+        <span class="c1">// 设置newg.sched的 sp和pc等信息,pc设为fn的地址了 详细见后面
+</span><span class="c1"></span>	<span class="nf">gostartcallfn</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">newg</span><span class="p">.</span><span class="nx">sched</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span>
+        <span class="c1">// 设置为调用者pc
+</span><span class="c1"></span>	<span class="nx">newg</span><span class="p">.</span><span class="nx">gopc</span> <span class="p">=</span> <span class="nx">callerpc</span>
+	<span class="nx">newg</span><span class="p">.</span><span class="nx">ancestors</span> <span class="p">=</span> <span class="nf">saveAncestors</span><span class="p">(</span><span class="nx">callergp</span><span class="p">)</span>
+	<span class="nx">newg</span><span class="p">.</span><span class="nx">startpc</span> <span class="p">=</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">fn</span>
+	<span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">curg</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">newg</span><span class="p">.</span><span class="nx">labels</span> <span class="p">=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">curg</span><span class="p">.</span><span class="nx">labels</span>
+	<span class="p">}</span>
+        <span class="c1">// runtime. 前缀的属于系统goroutine
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nf">isSystemGoroutine</span><span class="p">(</span><span class="nx">newg</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">atomic</span><span class="p">.</span><span class="nf">Xadd</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">ngsys</span><span class="p">,</span> <span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+	<span class="p">}</span>
+        <span class="c1">// g的状态设置为可运行
+</span><span class="c1"></span>	<span class="nf">casgstatus</span><span class="p">(</span><span class="nx">newg</span><span class="p">,</span> <span class="nx">_Gdead</span><span class="p">,</span> <span class="nx">_Grunnable</span><span class="p">)</span>
+
+	<span class="k">if</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcache</span> <span class="o">==</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcacheend</span> <span class="p">{</span>
+                <span class="c1">// Sched.goidgen 为最后一个分配的 id，相当于一个全局计数器
+</span><span class="c1"></span>		<span class="c1">// 这一批必须为 [sched.goidgen+1, sched.goidgen+GoidCacheBatch].
+</span><span class="c1"></span>		<span class="c1">// 启动时 sched.goidgen=0, 因此主 Goroutine 的 goid 为 1
+</span><span class="c1"></span>		<span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcache</span> <span class="p">=</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Xadd64</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">goidgen</span><span class="p">,</span> <span class="nx">_GoidCacheBatch</span><span class="p">)</span>
+		<span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcache</span> <span class="o">-=</span> <span class="nx">_GoidCacheBatch</span> <span class="o">-</span> <span class="mi">1</span>
+		<span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcacheend</span> <span class="p">=</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcache</span> <span class="o">+</span> <span class="nx">_GoidCacheBatch</span>
+	<span class="p">}</span>
+        <span class="c1">// 生成goid
+</span><span class="c1"></span>	<span class="nx">newg</span><span class="p">.</span><span class="nx">goid</span> <span class="p">=</span> <span class="nb">int64</span><span class="p">(</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcache</span><span class="p">)</span>
+	<span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcache</span><span class="o">++</span>
+	<span class="k">if</span> <span class="nx">raceenabled</span> <span class="p">{</span>
+		<span class="nx">newg</span><span class="p">.</span><span class="nx">racectx</span> <span class="p">=</span> <span class="nf">racegostart</span><span class="p">(</span><span class="nx">callerpc</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">trace</span><span class="p">.</span><span class="nx">enabled</span> <span class="p">{</span>
+		<span class="nf">traceGoCreate</span><span class="p">(</span><span class="nx">newg</span><span class="p">,</span> <span class="nx">newg</span><span class="p">.</span><span class="nx">startpc</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="nf">releasem</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">)</span>
+
+	<span class="k">return</span> <span class="nx">newg</span>
+<span class="p">}</span>
+
+</code></pre></div><ul>
+<li>gfget</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/proc.go
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">gfget</span><span class="p">(</span><span class="nx">_p_</span> <span class="o">*</span><span class="nx">p</span><span class="p">)</span> <span class="o">*</span><span class="nx">g</span> <span class="p">{</span>
+<span class="nx">retry</span><span class="p">:</span>
+        <span class="c1">// 如果p本地空闲队列为空 并且全局空闲队列不空
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">gFree</span><span class="p">.</span><span class="nf">empty</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="p">(!</span><span class="nx">sched</span><span class="p">.</span><span class="nx">gFree</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nf">empty</span><span class="p">()</span> <span class="o">||</span> <span class="p">!</span><span class="nx">sched</span><span class="p">.</span><span class="nx">gFree</span><span class="p">.</span><span class="nx">noStack</span><span class="p">.</span><span class="nf">empty</span><span class="p">())</span> <span class="p">{</span>
+                <span class="c1">// 操作全局,上锁
+</span><span class="c1"></span>		<span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">gFree</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+		<span class="c1">// Move a batch of free Gs to the P.
+</span><span class="c1"></span>		<span class="k">for</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">gFree</span><span class="p">.</span><span class="nx">n</span> <span class="p">&lt;</span> <span class="mi">32</span> <span class="p">{</span>
+			<span class="c1">// 从全局拿一个g
+</span><span class="c1"></span>			<span class="nx">gp</span> <span class="o">:=</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">gFree</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">()</span>
+			<span class="k">if</span> <span class="nx">gp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+				<span class="nx">gp</span> <span class="p">=</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">gFree</span><span class="p">.</span><span class="nx">noStack</span><span class="p">.</span><span class="nf">pop</span><span class="p">()</span>
+				<span class="k">if</span> <span class="nx">gp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+					<span class="k">break</span>
+				<span class="p">}</span>
+			<span class="p">}</span>
+                        <span class="c1">// 全局的n--
+</span><span class="c1"></span>			<span class="nx">sched</span><span class="p">.</span><span class="nx">gFree</span><span class="p">.</span><span class="nx">n</span><span class="o">--</span>
+                        <span class="c1">// 全局的放入到p本地队列中
+</span><span class="c1"></span>			<span class="nx">_p_</span><span class="p">.</span><span class="nx">gFree</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nx">gp</span><span class="p">)</span>
+			<span class="nx">_p_</span><span class="p">.</span><span class="nx">gFree</span><span class="p">.</span><span class="nx">n</span><span class="o">++</span>
+		<span class="p">}</span>
+		<span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">gFree</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+                <span class="c1">// 本地队列加一个了, 然后再去retry一下
+</span><span class="c1"></span>		<span class="k">goto</span> <span class="nx">retry</span>
+	<span class="p">}</span>
+        <span class="c1">// 如果本地不为空直接取
+</span><span class="c1"></span>        <span class="c1">// 如果本地为空 并且全局也是空, 初始化的情况,也得取一个nil
+</span><span class="c1"></span>        <span class="c1">// 直接从本地的p空闲队列取出
+</span><span class="c1"></span>	<span class="nx">gp</span> <span class="o">:=</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">gFree</span><span class="p">.</span><span class="nf">pop</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nx">gp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+                <span class="c1">// 初始化的情况
+</span><span class="c1"></span>		<span class="k">return</span> <span class="kc">nil</span>
+	<span class="p">}</span>
+	<span class="nx">_p_</span><span class="p">.</span><span class="nx">gFree</span><span class="p">.</span><span class="nx">n</span><span class="o">--</span>
+	<span class="k">if</span> <span class="nx">gp</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">lo</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="c1">// Stack was deallocated in gfput. Allocate a new one.
+</span><span class="c1"></span>		<span class="nf">systemstack</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+			<span class="nx">gp</span><span class="p">.</span><span class="nx">stack</span> <span class="p">=</span> <span class="nf">stackalloc</span><span class="p">(</span><span class="nx">_FixedStack</span><span class="p">)</span>
+		<span class="p">})</span>
+		<span class="nx">gp</span><span class="p">.</span><span class="nx">stackguard0</span> <span class="p">=</span> <span class="nx">gp</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">lo</span> <span class="o">+</span> <span class="nx">_StackGuard</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">raceenabled</span> <span class="p">{</span>
+			<span class="nf">racemalloc</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">gp</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">lo</span><span class="p">),</span> <span class="nx">gp</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">hi</span><span class="o">-</span><span class="nx">gp</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">lo</span><span class="p">)</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="nx">msanenabled</span> <span class="p">{</span>
+			<span class="nf">msanmalloc</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">gp</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">lo</span><span class="p">),</span> <span class="nx">gp</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">hi</span><span class="o">-</span><span class="nx">gp</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">lo</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">gp</span>
+<span class="p">}</span>
+
+</code></pre></div><ul>
+<li>gostartcallfn</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">gostartcallfn</span><span class="p">(</span><span class="nx">gobuf</span> <span class="o">*</span><span class="nx">gobuf</span><span class="p">,</span> <span class="nx">fv</span> <span class="o">*</span><span class="nx">funcval</span><span class="p">)</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">fn</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span>
+	<span class="k">if</span> <span class="nx">fv</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">fn</span> <span class="p">=</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">fv</span><span class="p">.</span><span class="nx">fn</span><span class="p">)</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+		<span class="nx">fn</span> <span class="p">=</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nf">funcPC</span><span class="p">(</span><span class="nx">nilfunc</span><span class="p">))</span>
+	<span class="p">}</span>
+	<span class="nf">gostartcall</span><span class="p">(</span><span class="nx">gobuf</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">fv</span><span class="p">))</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">gostartcall</span><span class="p">(</span><span class="nx">buf</span> <span class="o">*</span><span class="nx">gobuf</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">ctxt</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// newg.sched.sp
+</span><span class="c1"></span>	<span class="nx">sp</span> <span class="o">:=</span> <span class="nx">buf</span><span class="p">.</span><span class="nx">sp</span>
+	<span class="k">if</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">RegSize</span> <span class="p">&gt;</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">PtrSize</span> <span class="p">{</span>
+		<span class="nx">sp</span> <span class="o">-=</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">PtrSize</span>
+		<span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="kt">uintptr</span><span class="p">)(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">sp</span><span class="p">))</span> <span class="p">=</span> <span class="mi">0</span>
+	<span class="p">}</span>
+        <span class="c1">// newg.sched.sp下移8
+</span><span class="c1"></span>	<span class="nx">sp</span> <span class="o">-=</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">PtrSize</span>
+        <span class="c1">// newg.sched.pc之前是记录我们newg函数的第一条指令,给他保存到sp位置
+</span><span class="c1"></span>	<span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="kt">uintptr</span><span class="p">)(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">sp</span><span class="p">))</span> <span class="p">=</span> <span class="nx">buf</span><span class="p">.</span><span class="nx">pc</span>
+        <span class="c1">// 更新为最新的sp
+</span><span class="c1"></span>	<span class="nx">buf</span><span class="p">.</span><span class="nx">sp</span> <span class="p">=</span> <span class="nx">sp</span>
+        <span class="c1">// 把newg.sched.pc 设置为fn的地址
+</span><span class="c1"></span>	<span class="nx">buf</span><span class="p">.</span><span class="nx">pc</span> <span class="p">=</span> <span class="nb">uintptr</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span>
+	<span class="nx">buf</span><span class="p">.</span><span class="nx">ctxt</span> <span class="p">=</span> <span class="nx">ctxt</span>
+<span class="p">}</span>
+
+</code></pre></div><ul>
+<li>runqput</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// runqput 尝试将 g 放到本地可执行队列里。
+</span><span class="c1">// 如果 next 为假，runqput 将 g 添加到可运行队列的尾部
+</span><span class="c1">// 如果 next 为真，runqput 将 g 添加到 p.runnext 字段
+</span><span class="c1">// 如果 run queue 满了，runnext 将 g 放到全局队列里
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">runqput</span><span class="p">(</span><span class="nx">_p_</span> <span class="o">*</span><span class="nx">p</span><span class="p">,</span> <span class="nx">gp</span> <span class="o">*</span><span class="nx">g</span><span class="p">,</span> <span class="nx">next</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// 如果是设置了随机模式?
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">randomizeScheduler</span> <span class="o">&amp;&amp;</span> <span class="nx">next</span> <span class="o">&amp;&amp;</span> <span class="nf">fastrand</span><span class="p">()</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">next</span> <span class="p">=</span> <span class="kc">false</span>
+	<span class="p">}</span>
+        <span class="c1">// 如果需要放入队尾
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">next</span> <span class="p">{</span>
+	<span class="nx">retryNext</span><span class="p">:</span>
+                <span class="c1">// 原本的p队列的next保存
+</span><span class="c1"></span>		<span class="nx">oldnext</span> <span class="o">:=</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">runnext</span>
+                <span class="c1">// 将新的gp放到runnext位置执行
+</span><span class="c1"></span>		<span class="k">if</span> <span class="p">!</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">runnext</span><span class="p">.</span><span class="nf">cas</span><span class="p">(</span><span class="nx">oldnext</span><span class="p">,</span> <span class="nf">guintptr</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">gp</span><span class="p">)))</span> <span class="p">{</span>
+                        <span class="c1">// 有其它线程在操作 oldnext 成员，需要重试
+</span><span class="c1"></span>			<span class="k">goto</span> <span class="nx">retryNext</span>
+		<span class="p">}</span>
+                <span class="c1">// 不用管
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">oldnext</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+			<span class="k">return</span>
+		<span class="p">}</span>
+                <span class="c1">// 把oldnext设置为了gp, 后续会对他入队尾的
+</span><span class="c1"></span>		<span class="nx">gp</span> <span class="p">=</span> <span class="nx">oldnext</span><span class="p">.</span><span class="nf">ptr</span><span class="p">()</span>
+	<span class="p">}</span>
+
+<span class="nx">retry</span><span class="p">:</span>
+	<span class="nx">h</span> <span class="o">:=</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">LoadAcq</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">runqhead</span><span class="p">)</span> <span class="c1">// load-acquire, synchronize with consumers
+</span><span class="c1"></span>	<span class="nx">t</span> <span class="o">:=</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">runqtail</span>
+        <span class="c1">// 没满
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">t</span><span class="o">-</span><span class="nx">h</span> <span class="p">&lt;</span> <span class="nb">uint32</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">runq</span><span class="p">))</span> <span class="p">{</span>
+                <span class="c1">// gp 入到队尾的, 可能是newg,也可能是oldnext
+</span><span class="c1"></span>		<span class="nx">_p_</span><span class="p">.</span><span class="nx">runq</span><span class="p">[</span><span class="nx">t</span><span class="o">%</span><span class="nb">uint32</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">runq</span><span class="p">))].</span><span class="nf">set</span><span class="p">(</span><span class="nx">gp</span><span class="p">)</span>
+                <span class="c1">// 原子操作
+</span><span class="c1"></span>		<span class="nx">atomic</span><span class="p">.</span><span class="nf">StoreRel</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">runqtail</span><span class="p">,</span> <span class="nx">t</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="c1">// store-release, makes the item available for consumption
+</span><span class="c1"></span>		<span class="k">return</span>
+	<span class="p">}</span>
+        <span class="c1">// 如果本地满了, 把本地的一半 和gp 放到全局队列中去,详细见后面
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nf">runqputslow</span><span class="p">(</span><span class="nx">_p_</span><span class="p">,</span> <span class="nx">gp</span><span class="p">,</span> <span class="nx">h</span><span class="p">,</span> <span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="c1">// 现在本地队列没满, 再试一次
+</span><span class="c1"></span>	<span class="k">goto</span> <span class="nx">retry</span>
+<span class="p">}</span>
+
+</code></pre></div><ul>
+<li>runqputslow</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">runqputslow</span><span class="p">(</span><span class="nx">_p_</span> <span class="o">*</span><span class="nx">p</span><span class="p">,</span> <span class="nx">gp</span> <span class="o">*</span><span class="nx">g</span><span class="p">,</span> <span class="nx">h</span><span class="p">,</span> <span class="nx">t</span> <span class="kt">uint32</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+        <span class="c1">// 新建一个本地队列一半(128)+1大小的队列
+</span><span class="c1"></span>	<span class="kd">var</span> <span class="nx">batch</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">runq</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="nx">g</span>
+
+	<span class="c1">// First, grab a batch from local queue.
+</span><span class="c1"></span>        <span class="c1">// 如果满了, t-h=256
+</span><span class="c1"></span>	<span class="nx">n</span> <span class="o">:=</span> <span class="nx">t</span> <span class="o">-</span> <span class="nx">h</span>
+        <span class="c1">// n = 128
+</span><span class="c1"></span>	<span class="nx">n</span> <span class="p">=</span> <span class="nx">n</span> <span class="o">/</span> <span class="mi">2</span>
+	<span class="k">if</span> <span class="nx">n</span> <span class="o">!=</span> <span class="nb">uint32</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">runq</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;runqputslow: queue is not full&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nb">uint32</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">n</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">batch</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">runq</span><span class="p">[(</span><span class="nx">h</span><span class="o">+</span><span class="nx">i</span><span class="p">)</span><span class="o">%</span><span class="nb">uint32</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">runq</span><span class="p">))].</span><span class="nf">ptr</span><span class="p">()</span>
+	<span class="p">}</span>
+        <span class="c1">// CasRel 如果未false, 那就说明本地队列没满, 直接返回
+</span><span class="c1"></span>	<span class="k">if</span> <span class="p">!</span><span class="nx">atomic</span><span class="p">.</span><span class="nf">CasRel</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">runqhead</span><span class="p">,</span> <span class="nx">h</span><span class="p">,</span> <span class="nx">h</span><span class="o">+</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// cas-release, commits consume
+</span><span class="c1"></span>		<span class="k">return</span> <span class="kc">false</span>
+	<span class="p">}</span>
+        <span class="c1">// 索引为128的是队尾, gp放到队尾
+</span><span class="c1"></span>	<span class="nx">batch</span><span class="p">[</span><span class="nx">n</span><span class="p">]</span> <span class="p">=</span> <span class="nx">gp</span>
+        <span class="c1">// 如果是随机调度
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">randomizeScheduler</span> <span class="p">{</span>
+                <span class="c1">// 把这个batch队列打乱
+</span><span class="c1"></span>		<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nb">uint32</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nx">n</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+			<span class="nx">j</span> <span class="o">:=</span> <span class="nf">fastrandn</span><span class="p">(</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+			<span class="nx">batch</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">batch</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="p">=</span> <span class="nx">batch</span><span class="p">[</span><span class="nx">j</span><span class="p">],</span> <span class="nx">batch</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+
+	<span class="c1">// 设置为链表
+</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nb">uint32</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">n</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">batch</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">schedlink</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nx">batch</span><span class="p">[</span><span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+	<span class="p">}</span>
+        <span class="c1">// 定义个g队列元素
+</span><span class="c1"></span>	<span class="kd">var</span> <span class="nx">q</span> <span class="nx">gQueue</span>
+	<span class="nx">q</span><span class="p">.</span><span class="nx">head</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nx">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+	<span class="nx">q</span><span class="p">.</span><span class="nx">tail</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nx">batch</span><span class="p">[</span><span class="nx">n</span><span class="p">])</span>
+
+	<span class="c1">// 上锁,
+</span><span class="c1"></span>	<span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+        <span class="c1">// 放到全局队列中
+</span><span class="c1"></span>	<span class="nf">globrunqputbatch</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">q</span><span class="p">,</span> <span class="nb">int32</span><span class="p">(</span><span class="nx">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+	<span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+	<span class="k">return</span> <span class="kc">true</span>
+<span class="p">}</span>
+
+</code></pre></div><ul>
+<li>globrunqputbatch</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">globrunqputbatch</span><span class="p">(</span><span class="nx">batch</span> <span class="o">*</span><span class="nx">gQueue</span><span class="p">,</span> <span class="nx">n</span> <span class="kt">int32</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nf">assertLockHeld</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+        <span class="c1">// 操作链表的函数
+</span><span class="c1"></span>	<span class="nx">sched</span><span class="p">.</span><span class="nx">runq</span><span class="p">.</span><span class="nf">pushBackAll</span><span class="p">(</span><span class="o">*</span><span class="nx">batch</span><span class="p">)</span>
+	<span class="nx">sched</span><span class="p">.</span><span class="nx">runqsize</span> <span class="o">+=</span> <span class="nx">n</span>
+	<span class="o">*</span><span class="nx">batch</span> <span class="p">=</span> <span class="nx">gQueue</span><span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">q</span> <span class="o">*</span><span class="nx">gQueue</span><span class="p">)</span> <span class="nf">pushBackAll</span><span class="p">(</span><span class="nx">q2</span> <span class="nx">gQueue</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">q2</span><span class="p">.</span><span class="nx">tail</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="nx">q2</span><span class="p">.</span><span class="nx">tail</span><span class="p">.</span><span class="nf">ptr</span><span class="p">().</span><span class="nx">schedlink</span> <span class="p">=</span> <span class="mi">0</span>
+	<span class="k">if</span> <span class="nx">q</span><span class="p">.</span><span class="nx">tail</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+                <span class="c1">// 如果当前的q(sched.runq)的tail不是0,那么先把指向 batch.head
+</span><span class="c1"></span>		<span class="nx">q</span><span class="p">.</span><span class="nx">tail</span><span class="p">.</span><span class="nf">ptr</span><span class="p">().</span><span class="nx">schedlink</span> <span class="p">=</span> <span class="nx">q2</span><span class="p">.</span><span class="nx">head</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="c1">// 如果sched.runq.tail 是空的, 那么就batch.head就是全局队列的head
+</span><span class="c1"></span>		<span class="nx">q</span><span class="p">.</span><span class="nx">head</span> <span class="p">=</span> <span class="nx">q2</span><span class="p">.</span><span class="nx">head</span>
+	<span class="p">}</span>
+        <span class="c1">// 设置新的队尾
+</span><span class="c1"></span>	<span class="nx">q</span><span class="p">.</span><span class="nx">tail</span> <span class="p">=</span> <span class="nx">q2</span><span class="p">.</span><span class="nx">tail</span>
+<span class="p">}</span>
+
+</code></pre></div><h4 id="runtimemain">runtime.main()<a href="#runtimemain" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">g</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+
+	<span class="c1">// Racectx of m0-&gt;g0 is used only as the parent of the main goroutine.
+</span><span class="c1"></span>	<span class="c1">// It must not be used for anything else.
+</span><span class="c1"></span>	<span class="nx">g</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">g0</span><span class="p">.</span><span class="nx">racectx</span> <span class="p">=</span> <span class="mi">0</span>
+
+	<span class="k">if</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">PtrSize</span> <span class="o">==</span> <span class="mi">8</span> <span class="p">{</span>
+		<span class="nx">maxstacksize</span> <span class="p">=</span> <span class="mi">1000000000</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+		<span class="nx">maxstacksize</span> <span class="p">=</span> <span class="mi">250000000</span>
+	<span class="p">}</span>
+
+	<span class="nx">maxstackceiling</span> <span class="p">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">maxstacksize</span>
+
+	<span class="c1">// Allow newproc to start new Ms.
+</span><span class="c1"></span>	<span class="nx">mainStarted</span> <span class="p">=</span> <span class="kc">true</span>
+
+	<span class="k">if</span> <span class="nx">GOARCH</span> <span class="o">!=</span> <span class="s">&#34;wasm&#34;</span> <span class="p">{</span> <span class="c1">// no threads on wasm yet, so no sysmon
+</span><span class="c1"></span>		<span class="c1">// For runtime_syscall_doAllThreadsSyscall, we
+</span><span class="c1"></span>		<span class="c1">// register sysmon is not ready for the world to be
+</span><span class="c1"></span>		<span class="c1">// stopped.
+</span><span class="c1"></span>		<span class="nx">atomic</span><span class="p">.</span><span class="nf">Store</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">sysmonStarting</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+		<span class="nf">systemstack</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+			<span class="nf">newm</span><span class="p">(</span><span class="nx">sysmon</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+		<span class="p">})</span>
+	<span class="p">}</span>
+
+
+	<span class="nf">lockOSThread</span><span class="p">()</span>
+
+	<span class="k">if</span> <span class="nx">g</span><span class="p">.</span><span class="nx">m</span> <span class="o">!=</span> <span class="o">&amp;</span><span class="nx">m0</span> <span class="p">{</span>
+		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;runtime.main not on m0&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="nx">m0</span><span class="p">.</span><span class="nx">doesPark</span> <span class="p">=</span> <span class="kc">true</span>
+
+	<span class="nx">runtimeInitTime</span> <span class="p">=</span> <span class="nf">nanotime</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nx">runtimeInitTime</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;nanotime returning zero&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span> <span class="nx">debug</span><span class="p">.</span><span class="nx">inittrace</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">inittrace</span><span class="p">.</span><span class="nx">id</span> <span class="p">=</span> <span class="nf">getg</span><span class="p">().</span><span class="nx">goid</span>
+		<span class="nx">inittrace</span><span class="p">.</span><span class="nx">active</span> <span class="p">=</span> <span class="kc">true</span>
+	<span class="p">}</span>
+
+	<span class="nf">doInit</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">runtime_inittask</span><span class="p">)</span> <span class="c1">// Must be before defer.
+</span><span class="c1"></span>
+	<span class="c1">// Defer unlock so that runtime.Goexit during init does the unlock too.
+</span><span class="c1"></span>	<span class="nx">needUnlock</span> <span class="o">:=</span> <span class="kc">true</span>
+	<span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">needUnlock</span> <span class="p">{</span>
+			<span class="nf">unlockOSThread</span><span class="p">()</span>
+		<span class="p">}</span>
+	<span class="p">}()</span>
+
+	<span class="nf">gcenable</span><span class="p">()</span>
+
+	<span class="nx">main_init_done</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">bool</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">iscgo</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">_cgo_thread_start</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_thread_start missing&#34;</span><span class="p">)</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="nx">GOOS</span> <span class="o">!=</span> <span class="s">&#34;windows&#34;</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="nx">_cgo_setenv</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+				<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_setenv missing&#34;</span><span class="p">)</span>
+			<span class="p">}</span>
+			<span class="k">if</span> <span class="nx">_cgo_unsetenv</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+				<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_unsetenv missing&#34;</span><span class="p">)</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="nx">_cgo_notify_runtime_init_done</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_notify_runtime_init_done missing&#34;</span><span class="p">)</span>
+		<span class="p">}</span>
+		<span class="c1">// Start the template thread in case we enter Go from
+</span><span class="c1"></span>		<span class="c1">// a C-created thread and need to create a new thread.
+</span><span class="c1"></span>		<span class="nf">startTemplateThread</span><span class="p">()</span>
+		<span class="nf">cgocall</span><span class="p">(</span><span class="nx">_cgo_notify_runtime_init_done</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="nf">doInit</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">main_inittask</span><span class="p">)</span>
+
+	<span class="c1">// Disable init tracing after main init done to avoid overhead
+</span><span class="c1"></span>	<span class="c1">// of collecting statistics in malloc and newproc
+</span><span class="c1"></span>	<span class="nx">inittrace</span><span class="p">.</span><span class="nx">active</span> <span class="p">=</span> <span class="kc">false</span>
+
+	<span class="nb">close</span><span class="p">(</span><span class="nx">main_init_done</span><span class="p">)</span>
+
+	<span class="nx">needUnlock</span> <span class="p">=</span> <span class="kc">false</span>
+	<span class="nf">unlockOSThread</span><span class="p">()</span>
+
+	<span class="k">if</span> <span class="nx">isarchive</span> <span class="o">||</span> <span class="nx">islibrary</span> <span class="p">{</span>
+		<span class="c1">// A program compiled with -buildmode=c-archive or c-shared
+</span><span class="c1"></span>		<span class="c1">// has a main, but it is not executed.
+</span><span class="c1"></span>		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="nx">fn</span> <span class="o">:=</span> <span class="nx">main_main</span> <span class="c1">// make an indirect call, as the linker doesn&#39;t know the address of the main package when laying down the runtime
+</span><span class="c1"></span>	<span class="nf">fn</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nx">raceenabled</span> <span class="p">{</span>
+		<span class="nf">racefini</span><span class="p">()</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">runningPanicDefers</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="c1">// Running deferred functions should not take long.
+</span><span class="c1"></span>		<span class="k">for</span> <span class="nx">c</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">c</span> <span class="p">&lt;</span> <span class="mi">1000</span><span class="p">;</span> <span class="nx">c</span><span class="o">++</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">runningPanicDefers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+				<span class="k">break</span>
+			<span class="p">}</span>
+			<span class="nf">Gosched</span><span class="p">()</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">panicking</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nf">gopark</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">waitReasonPanicWait</span><span class="p">,</span> <span class="nx">traceEvGoStop</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+	<span class="k">for</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">x</span> <span class="o">*</span><span class="kt">int32</span>
+		<span class="o">*</span><span class="nx">x</span> <span class="p">=</span> <span class="mi">0</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div><h4 id="mstart">mstart()<a href="#mstart" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/proc.go
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">mstart</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c1">// g0
+</span><span class="c1"></span>	<span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+	<span class="p">..</span>
+	<span class="nf">mstart1</span><span class="p">()</span>
+
+	<span class="c1">// 退出线程
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nf">mStackIsSystemAllocated</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">osStack</span> <span class="p">=</span> <span class="kc">true</span>
+	<span class="p">}</span>
+	<span class="nf">mexit</span><span class="p">(</span><span class="nx">osStack</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div><h4 id="实质逻辑-mstart1">实质逻辑 mstart1()<a href="#实质逻辑-mstart1" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/proc.go
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">mstart1</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c1">// 必须是g0
+</span><span class="c1"></span>	<span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nx">_g_</span> <span class="o">!=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">g0</span> <span class="p">{</span>
+		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;bad runtime·mstart&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="c1">// 初始化m, 并记录pc,sp
+</span><span class="c1"></span>	<span class="nf">save</span><span class="p">(</span><span class="nf">getcallerpc</span><span class="p">(),</span> <span class="nf">getcallersp</span><span class="p">())</span>
+	<span class="nf">asminit</span><span class="p">()</span>  
+	<span class="nf">minit</span><span class="p">()</span>
+	<span class="c1">// 若当前 g 所绑定的 m 是 m0，
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span> <span class="o">==</span> <span class="o">&amp;</span><span class="nx">m0</span> <span class="p">{</span>
+		<span class="nf">mstartm0</span><span class="p">()</span>
+	<span class="p">}</span>
+	<span class="c1">// 运行启动函数
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">fn</span> <span class="o">:=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">mstartfn</span><span class="p">;</span> <span class="nx">fn</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nf">fn</span><span class="p">()</span>
+	<span class="p">}</span>
+	<span class="c1">//若当前 g 所绑定的 m 不是 m0，
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span> <span class="o">!=</span> <span class="o">&amp;</span><span class="nx">m0</span> <span class="p">{</span>
+		<span class="c1">//则需要调用 acquirep 方法获取并绑定 p，也就是 m 与 p 绑定。
+</span><span class="c1"></span>		<span class="nf">acquirep</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">nextp</span><span class="p">.</span><span class="nf">ptr</span><span class="p">())</span>
+		<span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">nextp</span> <span class="p">=</span> <span class="mi">0</span>
+	<span class="p">}</span>
+	<span class="nf">schedule</span><span class="p">()</span> <span class="c1">// 调度
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><h4 id="真正的调度-schedule">真正的调度 schedule()<a href="#真正的调度-schedule" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">schedule</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+
+	<span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">locks</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;schedule: holding locks&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">lockedg</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nf">stoplockedm</span><span class="p">()</span>
+		<span class="nf">execute</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">lockedg</span><span class="p">.</span><span class="nf">ptr</span><span class="p">(),</span> <span class="kc">false</span><span class="p">)</span> <span class="c1">// Never returns.
+</span><span class="c1"></span>	<span class="p">}</span>
+
+	<span class="c1">// We should not schedule away from a g that is executing a cgo call,
+</span><span class="c1"></span>	<span class="c1">// since the cgo call is using the m&#39;s g0 stack.
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">incgo</span> <span class="p">{</span>
+		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;schedule: in cgo&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+
+<span class="nx">top</span><span class="p">:</span>
+	<span class="nx">pp</span> <span class="o">:=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">()</span>
+	<span class="nx">pp</span><span class="p">.</span><span class="nx">preempt</span> <span class="p">=</span> <span class="kc">false</span>
+
+	<span class="k">if</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">gcwaiting</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nf">gcstopm</span><span class="p">()</span>
+		<span class="k">goto</span> <span class="nx">top</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">pp</span><span class="p">.</span><span class="nx">runSafePointFn</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nf">runSafePointFn</span><span class="p">()</span>
+	<span class="p">}</span>
+
+	<span class="c1">// Sanity check: if we are spinning, the run queue should be empty.
+</span><span class="c1"></span>	<span class="c1">// Check this before calling checkTimers, as that might call
+</span><span class="c1"></span>	<span class="c1">// goready to put a ready goroutine on the local run queue.
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">spinning</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">pp</span><span class="p">.</span><span class="nx">runnext</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">pp</span><span class="p">.</span><span class="nx">runqhead</span> <span class="o">!=</span> <span class="nx">pp</span><span class="p">.</span><span class="nx">runqtail</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;schedule: spinning with local work&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="nf">checkTimers</span><span class="p">(</span><span class="nx">pp</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+	<span class="kd">var</span> <span class="nx">gp</span> <span class="o">*</span><span class="nx">g</span>
+	<span class="kd">var</span> <span class="nx">inheritTime</span> <span class="kt">bool</span>
+
+	<span class="c1">// Normal goroutines will check for need to wakeP in ready,
+</span><span class="c1"></span>	<span class="c1">// but GCworkers and tracereaders will not, so the check must
+</span><span class="c1"></span>	<span class="c1">// be done here instead.
+</span><span class="c1"></span>	<span class="nx">tryWakeP</span> <span class="o">:=</span> <span class="kc">false</span>
+	<span class="k">if</span> <span class="nx">trace</span><span class="p">.</span><span class="nx">enabled</span> <span class="o">||</span> <span class="nx">trace</span><span class="p">.</span><span class="nx">shutdown</span> <span class="p">{</span>
+		<span class="nx">gp</span> <span class="p">=</span> <span class="nf">traceReader</span><span class="p">()</span>
+		<span class="k">if</span> <span class="nx">gp</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nf">casgstatus</span><span class="p">(</span><span class="nx">gp</span><span class="p">,</span> <span class="nx">_Gwaiting</span><span class="p">,</span> <span class="nx">_Grunnable</span><span class="p">)</span>
+			<span class="nf">traceGoUnpark</span><span class="p">(</span><span class="nx">gp</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+			<span class="nx">tryWakeP</span> <span class="p">=</span> <span class="kc">true</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">gp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="o">&amp;&amp;</span> <span class="nx">gcBlackenEnabled</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">gp</span> <span class="p">=</span> <span class="nx">gcController</span><span class="p">.</span><span class="nf">findRunnableGCWorker</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">())</span>
+		<span class="nx">tryWakeP</span> <span class="p">=</span> <span class="nx">tryWakeP</span> <span class="o">||</span> <span class="nx">gp</span> <span class="o">!=</span> <span class="kc">nil</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">gp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="c1">// Check the global runnable queue once in a while to ensure fairness.
+</span><span class="c1"></span>		<span class="c1">// Otherwise two goroutines can completely occupy the local runqueue
+</span><span class="c1"></span>		<span class="c1">// by constantly respawning each other.
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">().</span><span class="nx">schedtick</span><span class="o">%</span><span class="mi">61</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">runqsize</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+			<span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+			<span class="nx">gp</span> <span class="p">=</span> <span class="nf">globrunqget</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+			<span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">gp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">gp</span><span class="p">,</span> <span class="nx">inheritTime</span> <span class="p">=</span> <span class="nf">runqget</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">())</span>
+		<span class="c1">// We can see gp != nil here even if the M is spinning,
+</span><span class="c1"></span>		<span class="c1">// if checkTimers added a local goroutine via goready.
+</span><span class="c1"></span>	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">gp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">gp</span><span class="p">,</span> <span class="nx">inheritTime</span> <span class="p">=</span> <span class="nf">findrunnable</span><span class="p">()</span> <span class="c1">// blocks until work is available
+</span><span class="c1"></span>	<span class="p">}</span>
+
+	<span class="c1">// This thread is going to run a goroutine and is not spinning anymore,
+</span><span class="c1"></span>	<span class="c1">// so if it was marked as spinning we need to reset it now and potentially
+</span><span class="c1"></span>	<span class="c1">// start a new spinning M.
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">spinning</span> <span class="p">{</span>
+		<span class="nf">resetspinning</span><span class="p">()</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">disable</span><span class="p">.</span><span class="nx">user</span> <span class="o">&amp;&amp;</span> <span class="p">!</span><span class="nf">schedEnabled</span><span class="p">(</span><span class="nx">gp</span><span class="p">)</span> <span class="p">{</span>
+		<span class="c1">// Scheduling of this goroutine is disabled. Put it on
+</span><span class="c1"></span>		<span class="c1">// the list of pending runnable goroutines for when we
+</span><span class="c1"></span>		<span class="c1">// re-enable user scheduling and look again.
+</span><span class="c1"></span>		<span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nf">schedEnabled</span><span class="p">(</span><span class="nx">gp</span><span class="p">)</span> <span class="p">{</span>
+			<span class="c1">// Something re-enabled scheduling while we
+</span><span class="c1"></span>			<span class="c1">// were acquiring the lock.
+</span><span class="c1"></span>			<span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+			<span class="nx">sched</span><span class="p">.</span><span class="nx">disable</span><span class="p">.</span><span class="nx">runnable</span><span class="p">.</span><span class="nf">pushBack</span><span class="p">(</span><span class="nx">gp</span><span class="p">)</span>
+			<span class="nx">sched</span><span class="p">.</span><span class="nx">disable</span><span class="p">.</span><span class="nx">n</span><span class="o">++</span>
+			<span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+			<span class="k">goto</span> <span class="nx">top</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+
+	<span class="c1">// If about to schedule a not-normal goroutine (a GCworker or tracereader),
+</span><span class="c1"></span>	<span class="c1">// wake a P if there is one.
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">tryWakeP</span> <span class="p">{</span>
+		<span class="nf">wakep</span><span class="p">()</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">gp</span><span class="p">.</span><span class="nx">lockedm</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="c1">// Hands off own p to the locked m,
+</span><span class="c1"></span>		<span class="c1">// then blocks waiting for a new p.
+</span><span class="c1"></span>		<span class="nf">startlockedm</span><span class="p">(</span><span class="nx">gp</span><span class="p">)</span>
+		<span class="k">goto</span> <span class="nx">top</span>
+	<span class="p">}</span>
+
+	<span class="nf">execute</span><span class="p">(</span><span class="nx">gp</span><span class="p">,</span> <span class="nx">inheritTime</span><span class="p">)</span>
+<span class="p">}</span>
+
 </code></pre></div><h3 id="附录">附录<a href="#附录" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <ul>
 <li><a href="https://eddycjy.com/posts/go/go-bootstrap0/">详解 Go 程序的启动流程，你知道 g0，m0 是什么吗？</a></li>
 <li><a href="https://golang.design/under-the-hood/zh-cn/part2runtime/ch06sched/schedule/">go语言原本 调度</a></li>
+<li><a href="https://qcrao.com/ishare/go-scheduler/#true%E8%B0%83%E5%BA%A6%E5%BE%AA%E7%8E%AF%E7%9A%84%E5%BB%BA%E7%AB%8B">qcrao分享 go调度详细源码分析</a></li>
 <li><a href="https://zhuanlan.zhihu.com/p/344842279">g0</a></li>
 <li><a href="https://talkgo.org/t/topic/31">golang 中 goroutine 的调度</a></li>
 </ul>
@@ -328,7 +1357,7 @@ hand off : 当g阻塞时,实际是当前M线程会阻塞,那么
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/golang">golang</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>746 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>3841 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2021-11-17 09:31 &#43;0800</p>
 			</footer>
 		</article>
@@ -338,10 +1367,11 @@ hand off : 当g阻塞时,实际是当前M线程会阻塞,那么
   <ul>
     <li>
       <ul>
-        <li><a href="#在此之前我们先看一下go启动的入口">在此之前我们先看一下go启动的入口</a></li>
         <li><a href="#为什么需要p">为什么需要P</a></li>
         <li><a href="#gmp模型">GMP模型</a></li>
         <li><a href="#gmp结构体">gmp结构体</a></li>
+        <li><a href="#在此之前我们先看一下go启动的入口">在此之前我们先看一下go启动的入口</a></li>
+        <li><a href="#runtimenewproc-创建goroutine">runtime·newproc 创建goroutine</a></li>
         <li><a href="#附录">附录</a></li>
       </ul>
     </li>
