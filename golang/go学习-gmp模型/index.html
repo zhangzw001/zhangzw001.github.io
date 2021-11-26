@@ -8,23 +8,23 @@
 	<meta name="theme-color" content="#494f5c">
 	<meta name="msapplication-TileColor" content="#494f5c">
 <meta itemprop="name" content="Go学习 Gmp模型">
-<meta itemprop="description" content="为什么需要P  如果没有P, 所有的G都必须在一个全局的队列中, 然后M一个个从全局队列中获取, 这种共享内存的方式并发必须需要加锁 如果没有P, 当前g1中包含了创建新协程g2(go func)时, 当前的M1还得继续执行g1, 因此M1必须主动转义g2给另外一个线程M2去执行,这就造成了不必要的转移,浪费cpu资源, 因为g1 g2是相关的, 如果都在本地M1上执行更好, 而不是调度出去执行  GMP模型 简介  全局队列（Global Queue）：存放等待运行的G。 P的本地队列：同全局队列类似，存放的也是等待运行的G，存的数量有限，不超过256个。新建G&rsquo;时，G&rsquo;优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列。 P列表：所有的P都在程序启动时创建，并保存在数组中，最多有GOMAXPROCS(可配置)个。 M：线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去。 g0: 一个比一比g大的多栈, 可以用于 创建goroutine, deferproc函数里新建_defer,垃圾回收相关工资  何时会创建 P : 由启动时环境变量$GOMAXPROCS或者是由runtime的方法GOMAXPROCS()决定, 运行时系统就会创建 M : 如果P找不到空闲的M去绑定,就会创建M 调度器策略 work stealing : 当本地G队列为空时, 尝试从全局队列或者其他的线程绑定的P偷取G,而不是销毁线程 hand off : 当g阻塞时,实际是当前M线程会阻塞,那么 gmp结构体  m  // src/runtime/runtime2.go type m struct { g0 *g // 用于执行调度指令的 Goroutine 	gsignal *g // 处理 signal 的 g 	tls [6]uintptr // 线程本地存储 	curg *g // 当前运行的用户 Goroutine 	p puintptr // 执行 go 代码时持有的 p (如果没有执行则为 nil) 	preemptoff string // if !">
+<meta itemprop="description" content="为什么需要P  如果没有P, 所有的G都必须在一个全局的队列中, 然后M一个个从全局队列中获取, 这种共享内存的方式并发必须需要加锁 如果没有P, 当前g1中包含了创建新协程g2(go func)时, 当前的M1还得继续执行g1, 因此M1必须主动转义g2给另外一个线程M2去执行,这就造成了不必要的转移,浪费cpu资源, 因为g1 g2是相关的, 如果都在本地M1上执行更好, 而不是调度出去执行  GMP模型 简介  全局队列（Global Queue）：存放等待运行的G。 P的本地队列：同全局队列类似，存放的也是等待运行的G，存的数量有限，不超过256个。新建G&rsquo;时，G&rsquo;优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列。 P列表：所有的P都在程序启动时创建，并保存在数组中，最多有GOMAXPROCS(可配置)个。 M：线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去。 g0: 一个比一比g大的多栈(64k), 可以用于 创建goroutine, deferproc函数里新建_defer,垃圾回收相关工资  何时会创建 P : 由启动时环境变量$GOMAXPROCS或者是由runtime的方法GOMAXPROCS()决定, 运行时系统就会创建 M : 如果P找不到空闲的M去绑定,就会创建M 调度器策略 work stealing : 当本地G队列为空时, 尝试从全局队列或者其他的线程绑定的P偷取G,而不是销毁线程 hand off : 当g阻塞时,实际是当前M线程会阻塞,那么 gmp结构体  m  // src/runtime/runtime2.go type m struct { g0 *g // 用于执行调度指令的 Goroutine 	gsignal *g // 处理 signal 的 g 	tls [6]uintptr // 线程本地存储 	curg *g // 当前运行的用户 Goroutine 	p puintptr // 执行 go 代码时持有的 p (如果没有执行则为 nil) 	preemptoff string // if !">
 <meta itemprop="datePublished" content="2021-11-17T09:31:09+08:00" />
 <meta itemprop="dateModified" content="2021-11-17T09:31:09+08:00" />
-<meta itemprop="wordCount" content="3841">
+<meta itemprop="wordCount" content="3845">
 
 
 
 <meta itemprop="keywords" content="golang," />
 <meta property="og:title" content="Go学习 Gmp模型" />
-<meta property="og:description" content="为什么需要P  如果没有P, 所有的G都必须在一个全局的队列中, 然后M一个个从全局队列中获取, 这种共享内存的方式并发必须需要加锁 如果没有P, 当前g1中包含了创建新协程g2(go func)时, 当前的M1还得继续执行g1, 因此M1必须主动转义g2给另外一个线程M2去执行,这就造成了不必要的转移,浪费cpu资源, 因为g1 g2是相关的, 如果都在本地M1上执行更好, 而不是调度出去执行  GMP模型 简介  全局队列（Global Queue）：存放等待运行的G。 P的本地队列：同全局队列类似，存放的也是等待运行的G，存的数量有限，不超过256个。新建G&rsquo;时，G&rsquo;优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列。 P列表：所有的P都在程序启动时创建，并保存在数组中，最多有GOMAXPROCS(可配置)个。 M：线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去。 g0: 一个比一比g大的多栈, 可以用于 创建goroutine, deferproc函数里新建_defer,垃圾回收相关工资  何时会创建 P : 由启动时环境变量$GOMAXPROCS或者是由runtime的方法GOMAXPROCS()决定, 运行时系统就会创建 M : 如果P找不到空闲的M去绑定,就会创建M 调度器策略 work stealing : 当本地G队列为空时, 尝试从全局队列或者其他的线程绑定的P偷取G,而不是销毁线程 hand off : 当g阻塞时,实际是当前M线程会阻塞,那么 gmp结构体  m  // src/runtime/runtime2.go type m struct { g0 *g // 用于执行调度指令的 Goroutine 	gsignal *g // 处理 signal 的 g 	tls [6]uintptr // 线程本地存储 	curg *g // 当前运行的用户 Goroutine 	p puintptr // 执行 go 代码时持有的 p (如果没有执行则为 nil) 	preemptoff string // if !" />
+<meta property="og:description" content="为什么需要P  如果没有P, 所有的G都必须在一个全局的队列中, 然后M一个个从全局队列中获取, 这种共享内存的方式并发必须需要加锁 如果没有P, 当前g1中包含了创建新协程g2(go func)时, 当前的M1还得继续执行g1, 因此M1必须主动转义g2给另外一个线程M2去执行,这就造成了不必要的转移,浪费cpu资源, 因为g1 g2是相关的, 如果都在本地M1上执行更好, 而不是调度出去执行  GMP模型 简介  全局队列（Global Queue）：存放等待运行的G。 P的本地队列：同全局队列类似，存放的也是等待运行的G，存的数量有限，不超过256个。新建G&rsquo;时，G&rsquo;优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列。 P列表：所有的P都在程序启动时创建，并保存在数组中，最多有GOMAXPROCS(可配置)个。 M：线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去。 g0: 一个比一比g大的多栈(64k), 可以用于 创建goroutine, deferproc函数里新建_defer,垃圾回收相关工资  何时会创建 P : 由启动时环境变量$GOMAXPROCS或者是由runtime的方法GOMAXPROCS()决定, 运行时系统就会创建 M : 如果P找不到空闲的M去绑定,就会创建M 调度器策略 work stealing : 当本地G队列为空时, 尝试从全局队列或者其他的线程绑定的P偷取G,而不是销毁线程 hand off : 当g阻塞时,实际是当前M线程会阻塞,那么 gmp结构体  m  // src/runtime/runtime2.go type m struct { g0 *g // 用于执行调度指令的 Goroutine 	gsignal *g // 处理 signal 的 g 	tls [6]uintptr // 线程本地存储 	curg *g // 当前运行的用户 Goroutine 	p puintptr // 执行 go 代码时持有的 p (如果没有执行则为 nil) 	preemptoff string // if !" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-gmp%E6%A8%A1%E5%9E%8B/" />
 <meta property="article:published_time" content="2021-11-17T09:31:09+08:00" />
 <meta property="article:modified_time" content="2021-11-17T09:31:09+08:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Go学习 Gmp模型"/>
-<meta name="twitter:description" content="为什么需要P  如果没有P, 所有的G都必须在一个全局的队列中, 然后M一个个从全局队列中获取, 这种共享内存的方式并发必须需要加锁 如果没有P, 当前g1中包含了创建新协程g2(go func)时, 当前的M1还得继续执行g1, 因此M1必须主动转义g2给另外一个线程M2去执行,这就造成了不必要的转移,浪费cpu资源, 因为g1 g2是相关的, 如果都在本地M1上执行更好, 而不是调度出去执行  GMP模型 简介  全局队列（Global Queue）：存放等待运行的G。 P的本地队列：同全局队列类似，存放的也是等待运行的G，存的数量有限，不超过256个。新建G&rsquo;时，G&rsquo;优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列。 P列表：所有的P都在程序启动时创建，并保存在数组中，最多有GOMAXPROCS(可配置)个。 M：线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去。 g0: 一个比一比g大的多栈, 可以用于 创建goroutine, deferproc函数里新建_defer,垃圾回收相关工资  何时会创建 P : 由启动时环境变量$GOMAXPROCS或者是由runtime的方法GOMAXPROCS()决定, 运行时系统就会创建 M : 如果P找不到空闲的M去绑定,就会创建M 调度器策略 work stealing : 当本地G队列为空时, 尝试从全局队列或者其他的线程绑定的P偷取G,而不是销毁线程 hand off : 当g阻塞时,实际是当前M线程会阻塞,那么 gmp结构体  m  // src/runtime/runtime2.go type m struct { g0 *g // 用于执行调度指令的 Goroutine 	gsignal *g // 处理 signal 的 g 	tls [6]uintptr // 线程本地存储 	curg *g // 当前运行的用户 Goroutine 	p puintptr // 执行 go 代码时持有的 p (如果没有执行则为 nil) 	preemptoff string // if !"/>
+<meta name="twitter:description" content="为什么需要P  如果没有P, 所有的G都必须在一个全局的队列中, 然后M一个个从全局队列中获取, 这种共享内存的方式并发必须需要加锁 如果没有P, 当前g1中包含了创建新协程g2(go func)时, 当前的M1还得继续执行g1, 因此M1必须主动转义g2给另外一个线程M2去执行,这就造成了不必要的转移,浪费cpu资源, 因为g1 g2是相关的, 如果都在本地M1上执行更好, 而不是调度出去执行  GMP模型 简介  全局队列（Global Queue）：存放等待运行的G。 P的本地队列：同全局队列类似，存放的也是等待运行的G，存的数量有限，不超过256个。新建G&rsquo;时，G&rsquo;优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列。 P列表：所有的P都在程序启动时创建，并保存在数组中，最多有GOMAXPROCS(可配置)个。 M：线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去。 g0: 一个比一比g大的多栈(64k), 可以用于 创建goroutine, deferproc函数里新建_defer,垃圾回收相关工资  何时会创建 P : 由启动时环境变量$GOMAXPROCS或者是由runtime的方法GOMAXPROCS()决定, 运行时系统就会创建 M : 如果P找不到空闲的M去绑定,就会创建M 调度器策略 work stealing : 当本地G队列为空时, 尝试从全局队列或者其他的线程绑定的P偷取G,而不是销毁线程 hand off : 当g阻塞时,实际是当前M线程会阻塞,那么 gmp结构体  m  // src/runtime/runtime2.go type m struct { g0 *g // 用于执行调度指令的 Goroutine 	gsignal *g // 处理 signal 的 g 	tls [6]uintptr // 线程本地存储 	curg *g // 当前运行的用户 Goroutine 	p puintptr // 执行 go 代码时持有的 p (如果没有执行则为 nil) 	preemptoff string // if !"/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -86,7 +86,7 @@
 <li>P的本地队列：同全局队列类似，存放的也是等待运行的G，存的数量有限，不超过256个。新建G&rsquo;时，G&rsquo;优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列。</li>
 <li>P列表：所有的P都在程序启动时创建，并保存在数组中，最多有GOMAXPROCS(可配置)个。</li>
 <li>M：线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去。</li>
-<li>g0: 一个比一比g大的多栈, 可以用于 创建goroutine, deferproc函数里新建_defer,垃圾回收相关工资</li>
+<li>g0: 一个比一比g大的多栈(64k), 可以用于 创建goroutine, deferproc函数里新建_defer,垃圾回收相关工资</li>
 </ul>
 <h4 id="何时会创建">何时会创建<a href="#何时会创建" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
 <pre><code>P : 由启动时环境变量$GOMAXPROCS或者是由runtime的方法GOMAXPROCS()决定, 运行时系统就会创建
@@ -164,7 +164,7 @@ hand off : 当g阻塞时,实际是当前M线程会阻塞,那么
 </span><span class="c1"></span>	<span class="o">...</span>
 <span class="p">}</span>
 </code></pre></div><ul>
-<li>调度器
+<li>调度器 schedt
 <ul>
 <li>管理了能够将 G 和 M 进行绑定的 M 队列</li>
 <li>管理了空闲的 P 链表（队列）</li>
@@ -201,22 +201,22 @@ hand off : 当g阻塞时,实际是当前M线程会阻塞,那么
 	<span class="nx">head</span> <span class="nx">guintptr</span>
 	<span class="nx">tail</span> <span class="nx">guintptr</span>
 <span class="p">}</span>
-</code></pre></div><h3 id="在此之前我们先看一下go启动的入口">在此之前我们先看一下go启动的入口<a href="#在此之前我们先看一下go启动的入口" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+</code></pre></div><h3 id="1-找到go函数真正的入口">1. 找到go函数真正的入口<a href="#1-找到go函数真正的入口" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <h4 id="通过gdb调试-找到入口文件">通过gdb调试, 找到入口文件<a href="#通过gdb调试-找到入口文件" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="err">#</span> <span class="nx">GOFLAGS</span><span class="p">=</span><span class="s">&#34;-ldflags=-compressdwarf=false&#34;</span> <span class="k">go</span> <span class="nx">build</span> <span class="nx">gdb</span><span class="o">-</span><span class="nx">main</span><span class="p">.</span><span class="k">go</span>
+<pre><code># GOFLAGS=&quot;-ldflags=-compressdwarf=false&quot; go build gdb-main.go
 
-<span class="err">#</span> <span class="nx">gdb</span> <span class="nx">gdb</span><span class="o">-</span><span class="nf">main</span>
-<span class="p">(</span><span class="nx">gdb</span><span class="p">)</span> <span class="nx">info</span> <span class="nx">files</span>
-<span class="nx">Symbols</span> <span class="nx">from</span> <span class="s">&#34;/Users/zhangzw/work/go/github.com/zhangzw001/learngo/basic/gdb/gdb-main&#34;</span><span class="p">.</span>
-<span class="nx">Local</span> <span class="nx">exec</span> <span class="nx">file</span><span class="p">:</span>
-	<span class="err">`</span><span class="o">/</span><span class="nx">Users</span><span class="o">/</span><span class="nx">zhangzw</span><span class="o">/</span><span class="nx">work</span><span class="o">/</span><span class="k">go</span><span class="o">/</span><span class="nx">github</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">zhangzw001</span><span class="o">/</span><span class="nx">learngo</span><span class="o">/</span><span class="nx">basic</span><span class="o">/</span><span class="nx">gdb</span><span class="o">/</span><span class="nx">gdb</span><span class="o">-</span><span class="nx">main</span><span class="err">&#39;</span><span class="p">,</span> <span class="nx">file</span> <span class="kd">type</span> <span class="nx">mach</span><span class="o">-</span><span class="nx">o</span><span class="o">-</span><span class="nx">x86</span><span class="o">-</span><span class="mf">64.</span>
-	<span class="nx">Entry</span> <span class="nx">point</span><span class="p">:</span> <span class="mh">0x1065600</span>
-	<span class="mh">0x0000000001001000</span> <span class="o">-</span> <span class="mh">0x00000000010a2e8a</span> <span class="nx">is</span> <span class="p">.</span><span class="nx">text</span>
-	<span class="mh">0x00000000010a2ea0</span> <span class="o">-</span> <span class="mh">0x00000000010a2fa2</span> <span class="nx">is</span> <span class="nx">__TEXT</span><span class="p">.</span><span class="nx">__symbol_stub1</span>
-	<span class="o">...</span>
-<span class="p">(</span><span class="nx">gdb</span><span class="p">)</span> <span class="nx">b</span> <span class="o">*</span><span class="mh">0x1065600</span>  <span class="c1">// 上面的Entry point后面的地址
-</span><span class="c1"></span><span class="nx">Breakpoint</span> <span class="mi">1</span> <span class="nx">at</span> <span class="mh">0x1065600</span><span class="p">:</span> <span class="nx">file</span> <span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="k">go</span><span class="o">/</span><span class="nx">src</span><span class="o">/</span><span class="nx">runtime</span><span class="o">/</span><span class="nx">rt0_darwin_amd64</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="nx">line</span> <span class="mf">8.</span>   <span class="c1">// 这里是mac
-</span></code></pre></div><h4 id="继续查看">继续查看<a href="#继续查看" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+# gdb gdb-main
+(gdb) info files
+Symbols from &quot;/Users/zhangzw/work/go/github.com/zhangzw001/learngo/basic/gdb/gdb-main&quot;.
+Local exec file:
+	`/Users/zhangzw/work/go/github.com/zhangzw001/learngo/basic/gdb/gdb-main', file type mach-o-x86-64.
+	Entry point: 0x1065600
+	0x0000000001001000 - 0x00000000010a2e8a is .text
+	0x00000000010a2ea0 - 0x00000000010a2fa2 is __TEXT.__symbol_stub1
+	...
+(gdb) b *0x1065600  // 上面的Entry point后面的地址
+Breakpoint 1 at 0x1065600: file /usr/local/go/src/runtime/rt0_darwin_amd64.s, line 8.   // 这里是mac
+</code></pre><h4 id="继续查看">继续查看<a href="#继续查看" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
 <pre><code class="language-assembly" data-lang="assembly">// src/runtime/rt0_darwin_amd64.s
 TEXT _rt0_amd64_darwin(SB),NOSPLIT,$-8
 	JMP	_rt0_amd64(SB) //跳转到 _rt0_amd64
@@ -225,7 +225,7 @@ TEXT _rt0_amd64(SB),NOSPLIT,$-8
 	MOVQ	0(SP), DI	// argc
 	LEAQ	8(SP), SI	// argv
 	JMP	runtime·rt0_go(SB) // 又跳转到runtime·rt0_go
-</code></pre><h4 id="来到核心代码">来到核心代码<a href="#来到核心代码" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+</code></pre><h4 id="来到核心入口代码">来到核心入口代码<a href="#来到核心入口代码" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
 <pre><code class="language-assembly" data-lang="assembly">TEXT runtime·rt0_go&lt;ABIInternal&gt;(SB),NOSPLIT,$0
         ...
         // DI 现在是g0的地址
@@ -296,7 +296,7 @@ ok:
         // 以下不会执行, 万一mstart返回了,这里直接abort crash掉
 	CALL	runtime·abort(SB)
 	RET
-</code></pre><h4 id="schedinit">schedinit<a href="#schedinit" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+</code></pre><h3 id="2-schedinit-运行时初始化">2 schedinit 运行时初始化<a href="#2-schedinit-运行时初始化" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/proc.go
 </span><span class="c1"></span><span class="kd">func</span> <span class="nf">schedinit</span><span class="p">()</span> <span class="p">{</span>
 	<span class="nf">lockInit</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">,</span> <span class="nx">lockRankSched</span><span class="p">)</span>
@@ -352,7 +352,7 @@ ok:
 <span class="p">}</span>
 
 </code></pre></div><ul>
-<li>mcommoninit</li>
+<li>mcommoninit m初始化</li>
 </ul>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">mcommoninit</span><span class="p">(</span><span class="nx">mp</span> <span class="o">*</span><span class="nx">m</span><span class="p">,</span> <span class="nx">id</span> <span class="kt">int64</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">// g0
@@ -399,7 +399,7 @@ ok:
 <span class="p">}</span>
 
 </code></pre></div><ul>
-<li>mReserveID</li>
+<li>mReserveID m自增id</li>
 </ul>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">mReserveID</span><span class="p">()</span> <span class="kt">int64</span> <span class="p">{</span>
         <span class="c1">// 加锁, 操作全局变量sched
@@ -445,66 +445,63 @@ ok:
 	<span class="k">return</span> <span class="nx">newg</span>
 <span class="p">}</span>
 </code></pre></div><ul>
-<li></li>
+<li>systemstack</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
-<span class="o">-</span> <span class="nx">systemstack</span>
-<span class="s">``</span><span class="err">`</span><span class="nx">assembly</span>
-<span class="c1">// 切换到g0 执行
-</span><span class="c1">// func systemstack(fn func())
-</span><span class="c1"></span><span class="nx">TEXT</span> <span class="nx">runtime</span><span class="err">·</span><span class="nf">systemstack</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">NOSPLIT</span><span class="p">,</span> <span class="err">$</span><span class="mi">0</span><span class="o">-</span><span class="mi">8</span>
-	<span class="nx">MOVQ</span>	<span class="nx">fn</span><span class="o">+</span><span class="mi">0</span><span class="p">(</span><span class="nx">FP</span><span class="p">),</span> <span class="nx">DI</span>	<span class="c1">// DI = fn
-</span><span class="c1"></span>	<span class="nf">get_tls</span><span class="p">(</span><span class="nx">CX</span><span class="p">)</span>
-	<span class="nx">MOVQ</span>	<span class="nf">g</span><span class="p">(</span><span class="nx">CX</span><span class="p">),</span> <span class="nx">AX</span>	<span class="c1">// AX = g
-</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nf">g_m</span><span class="p">(</span><span class="nx">AX</span><span class="p">),</span> <span class="nx">BX</span>	<span class="c1">// BX = m
-</span><span class="c1"></span>
-	<span class="nx">CMPQ</span>	<span class="nx">AX</span><span class="p">,</span> <span class="nf">m_gsignal</span><span class="p">(</span><span class="nx">BX</span><span class="p">)</span>
-	<span class="nx">JEQ</span>	<span class="nx">noswitch</span>
+<pre><code class="language-assembly" data-lang="assembly">// 切换到g0 执行
+// func systemstack(fn func())
+TEXT runtime·systemstack(SB), NOSPLIT, $0-8
+	MOVQ	fn+0(FP), DI	// DI = fn
+	get_tls(CX)
+	MOVQ	g(CX), AX	// AX = g
+	MOVQ	g_m(AX), BX	// BX = m
 
-	<span class="nx">MOVQ</span>	<span class="nf">m_g0</span><span class="p">(</span><span class="nx">BX</span><span class="p">),</span> <span class="nx">DX</span>	<span class="c1">// DX = g0
-</span><span class="c1"></span>	<span class="nx">CMPQ</span>	<span class="nx">AX</span><span class="p">,</span> <span class="nx">DX</span>
-	<span class="nx">JEQ</span>	<span class="nx">noswitch</span>
+	CMPQ	AX, m_gsignal(BX)
+	JEQ	noswitch
 
-	<span class="nx">CMPQ</span>	<span class="nx">AX</span><span class="p">,</span> <span class="nf">m_curg</span><span class="p">(</span><span class="nx">BX</span><span class="p">)</span>
-	<span class="nx">JNE</span>	<span class="nx">bad</span>
+	MOVQ	m_g0(BX), DX	// DX = g0
+	CMPQ	AX, DX
+	JEQ	noswitch
 
-	<span class="c1">// switch stacks
-</span><span class="c1"></span>	<span class="c1">// save our state in g-&gt;sched. Pretend to
-</span><span class="c1"></span>	<span class="c1">// be systemstack_switch if the G stack is scanned.
-</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="err">$</span><span class="nx">runtime</span><span class="err">·</span><span class="nf">systemstack_switch</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">SI</span>
-	<span class="nx">MOVQ</span>	<span class="nx">SI</span><span class="p">,</span> <span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_pc</span><span class="p">)(</span><span class="nx">AX</span><span class="p">)</span>
-	<span class="nx">MOVQ</span>	<span class="nx">SP</span><span class="p">,</span> <span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_sp</span><span class="p">)(</span><span class="nx">AX</span><span class="p">)</span>
-	<span class="nx">MOVQ</span>	<span class="nx">AX</span><span class="p">,</span> <span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_g</span><span class="p">)(</span><span class="nx">AX</span><span class="p">)</span>
-	<span class="nx">MOVQ</span>	<span class="nx">BP</span><span class="p">,</span> <span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_bp</span><span class="p">)(</span><span class="nx">AX</span><span class="p">)</span>
+	CMPQ	AX, m_curg(BX)
+	JNE	bad
 
-	<span class="c1">// DX是g0
-</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nx">DX</span><span class="p">,</span> <span class="nf">g</span><span class="p">(</span><span class="nx">CX</span><span class="p">)</span>
-        <span class="c1">// 保存sp
-</span><span class="c1"></span>	<span class="nf">MOVQ</span>	<span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_sp</span><span class="p">)(</span><span class="nx">DX</span><span class="p">),</span> <span class="nx">BX</span>
-	<span class="c1">// make it look like mstart called systemstack on g0, to stop traceback
-</span><span class="c1"></span>	<span class="nx">SUBQ</span>	<span class="err">$</span><span class="mi">8</span><span class="p">,</span> <span class="nx">BX</span>
-	<span class="nx">MOVQ</span>	<span class="err">$</span><span class="nx">runtime</span><span class="err">·</span><span class="nf">mstart</span><span class="p">(</span><span class="nx">SB</span><span class="p">),</span> <span class="nx">DX</span>
-	<span class="nx">MOVQ</span>	<span class="nx">DX</span><span class="p">,</span> <span class="mi">0</span><span class="p">(</span><span class="nx">BX</span><span class="p">)</span>
-	<span class="nx">MOVQ</span>	<span class="nx">BX</span><span class="p">,</span> <span class="nx">SP</span>
+	// switch stacks
+	// save our state in g-&gt;sched. Pretend to
+	// be systemstack_switch if the G stack is scanned.
+	MOVQ	$runtime·systemstack_switch(SB), SI
+	MOVQ	SI, (g_sched+gobuf_pc)(AX)
+	MOVQ	SP, (g_sched+gobuf_sp)(AX)
+	MOVQ	AX, (g_sched+gobuf_g)(AX)
+	MOVQ	BP, (g_sched+gobuf_bp)(AX)
 
-	<span class="c1">// 这里调用了fn函数
-</span><span class="c1"></span>	<span class="nx">MOVQ</span>	<span class="nx">DI</span><span class="p">,</span> <span class="nx">DX</span>
-	<span class="nx">MOVQ</span>	<span class="mi">0</span><span class="p">(</span><span class="nx">DI</span><span class="p">),</span> <span class="nx">DI</span>
-	<span class="nx">CALL</span>	<span class="nx">DI</span>
+	// DX是g0
+	MOVQ	DX, g(CX)
+        // 保存sp
+	MOVQ	(g_sched+gobuf_sp)(DX), BX
+	// make it look like mstart called systemstack on g0, to stop traceback
+	SUBQ	$8, BX
+	MOVQ	$runtime·mstart(SB), DX
+	MOVQ	DX, 0(BX)
+	MOVQ	BX, SP
 
-	<span class="c1">// switch back to g
-</span><span class="c1"></span>	<span class="nf">get_tls</span><span class="p">(</span><span class="nx">CX</span><span class="p">)</span>
-	<span class="nx">MOVQ</span>	<span class="nf">g</span><span class="p">(</span><span class="nx">CX</span><span class="p">),</span> <span class="nx">AX</span>
-	<span class="nx">MOVQ</span>	<span class="nf">g_m</span><span class="p">(</span><span class="nx">AX</span><span class="p">),</span> <span class="nx">BX</span>
-	<span class="nx">MOVQ</span>	<span class="nf">m_curg</span><span class="p">(</span><span class="nx">BX</span><span class="p">),</span> <span class="nx">AX</span>
-	<span class="nx">MOVQ</span>	<span class="nx">AX</span><span class="p">,</span> <span class="nf">g</span><span class="p">(</span><span class="nx">CX</span><span class="p">)</span>
-	<span class="nf">MOVQ</span>	<span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_sp</span><span class="p">)(</span><span class="nx">AX</span><span class="p">),</span> <span class="nx">SP</span>
-	<span class="nx">MOVQ</span>	<span class="err">$</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="nx">g_sched</span><span class="o">+</span><span class="nx">gobuf_sp</span><span class="p">)(</span><span class="nx">AX</span><span class="p">)</span>
-	<span class="nx">RET</span>
+	// 这里调用了fn函数
+	MOVQ	DI, DX
+	MOVQ	0(DI), DI
+	CALL	DI
 
-        <span class="o">...</span>
+	// switch back to g
+	get_tls(CX)
+	MOVQ	g(CX), AX
+	MOVQ	g_m(AX), BX
+	MOVQ	m_curg(BX), AX
+	MOVQ	AX, g(CX)
+	MOVQ	(g_sched+gobuf_sp)(AX), SP
+	MOVQ	$0, (g_sched+gobuf_sp)(AX)
+	RET
 
-</code></pre></div><ul>
+        ...
+
+</code></pre><ul>
 <li>procresize 如何分配p</li>
 </ul>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">procresize</span><span class="p">(</span><span class="nx">nprocs</span> <span class="kt">int32</span><span class="p">)</span> <span class="o">*</span><span class="nx">p</span> <span class="p">{</span>
@@ -695,8 +692,9 @@ ok:
 	<span class="p">}</span>
 <span class="p">}</span>
 
-</code></pre></div><p>到 runtime·schedinit时的状态图, 来自<code>https://qcrao.com/</code>的图:</p>
+</code></pre></div><p>到 runtime·schedinit时的状态图, 来自<img src="https://qcrao.com/ishare/go-scheduler/#true%E8%B0%83%E5%BA%A6%E5%BE%AA%E7%8E%AF%E7%9A%84%E5%BB%BA%E7%AB%8B" alt="https://qcrao.com">的图:</p>
 <p><img src="/images/golang/gmp-1.png" alt=""></p>
+<hr>
 <pre><code class="language-assembly" data-lang="assembly">        MOVQ	$runtime·mainPC(SB), AX
         // 入栈新的goroutine的地址
         PUSHQ	AX	  
@@ -709,7 +707,7 @@ ok:
 </code></pre><blockquote>
 <p>gmp已经初始化的差不多了, 现在可以创建main goroutine了</p>
 </blockquote>
-<h3 id="runtimenewproc-创建goroutine">runtime·newproc 创建goroutine<a href="#runtimenewproc-创建goroutine" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h3 id="创建g-newproc">创建g newproc<a href="#创建g-newproc" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// src/runtime/proc.go
 </span><span class="c1">// 两个参数, 一个是函数siz,一个是函数地址
 </span><span class="c1">// type funcval struct {
@@ -1058,7 +1056,7 @@ ok:
 </span><span class="c1"></span>	<span class="nx">q</span><span class="p">.</span><span class="nx">tail</span> <span class="p">=</span> <span class="nx">q2</span><span class="p">.</span><span class="nx">tail</span>
 <span class="p">}</span>
 
-</code></pre></div><h4 id="runtimemain">runtime.main()<a href="#runtimemain" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+</code></pre></div><h3 id="终于到main">终于到main()<a href="#终于到main" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
 	<span class="nx">g</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
 
@@ -1357,7 +1355,7 @@ ok:
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/golang">golang</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>3841 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>3845 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2021-11-17 09:31 &#43;0800</p>
 			</footer>
 		</article>
@@ -1370,8 +1368,10 @@ ok:
         <li><a href="#为什么需要p">为什么需要P</a></li>
         <li><a href="#gmp模型">GMP模型</a></li>
         <li><a href="#gmp结构体">gmp结构体</a></li>
-        <li><a href="#在此之前我们先看一下go启动的入口">在此之前我们先看一下go启动的入口</a></li>
-        <li><a href="#runtimenewproc-创建goroutine">runtime·newproc 创建goroutine</a></li>
+        <li><a href="#1-找到go函数真正的入口">1. 找到go函数真正的入口</a></li>
+        <li><a href="#2-schedinit-运行时初始化">2 schedinit 运行时初始化</a></li>
+        <li><a href="#创建g-newproc">创建g newproc</a></li>
+        <li><a href="#终于到main">终于到main()</a></li>
         <li><a href="#附录">附录</a></li>
       </ul>
     </li>
