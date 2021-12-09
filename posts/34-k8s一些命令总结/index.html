@@ -10,10 +10,10 @@
 <meta itemprop="name" content="k8s一些命令总结">
 <meta itemprop="description" content="记录一些kubectl命令
 kubectl命令表
-  常用命令 # 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111 kubectl proxy --address=&#39;192.168.1.111&#39; -p 10000 --accept-hosts=&#39;^172.*$&#39; # 查看api类型 kubectl api-versions # 让master也运行pod（默认master不运行pod,单机会用到） kubectl taint nodes --all node-role.kubernetes.io/master- # patch补丁, 强制更新 kubectl patch -f deployment.yaml -p &quot;{\&quot;spec\&quot;:{\&quot;template\&quot;:{\&quot;metadata\&quot;:{\&quot;annotations\&quot;:{\&quot;ci-last-updated\&quot;:\&quot;$(date &#43;&#39;%s&#39;)\&quot;}}}}}&quot; # 端口转发 kubectl -n default port-forward service/prometheus-server 30080:80   scale 使用 # 通过将rc的副本数重新设置为0后，再将副本数设置为2，达到重启nginx的效果。 kubectl scale deployment bq-front1 --replicas=0 -n web kubectl scale deployment bq-front1 --replicas=2 -n web   metrics 相关 # 查看node 资源 kubectl top nodes # 查看pods 资源 kubectl top pods -n php-dev # 获取metrics接口所有数据 kubectl get --raw /metrics # patch强制更新(慎用) kubectl patch -f deployment.">
+  常用命令 # 查看k8s版本 go list -m -versions github.com/kubernetes/kubernetes|sed &#39;s/ /\n/g&#39; # 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111 kubectl proxy --address=&#39;192.168.1.111&#39; -p 10000 --accept-hosts=&#39;^172.*$&#39; # 查看api类型 kubectl api-versions # 让master也运行pod（默认master不运行pod,单机会用到） kubectl taint nodes --all node-role.kubernetes.io/master- # patch补丁, 强制更新 kubectl patch -f deployment.yaml -p &quot;{\&quot;spec\&quot;:{\&quot;template\&quot;:{\&quot;metadata\&quot;:{\&quot;annotations\&quot;:{\&quot;ci-last-updated\&quot;:\&quot;$(date &#43;&#39;%s&#39;)\&quot;}}}}}&quot; # 端口转发 kubectl -n default port-forward service/prometheus-server 30080:80   scale 使用 # 通过将rc的副本数重新设置为0后，再将副本数设置为2，达到重启nginx的效果。 kubectl scale deployment bq-front1 --replicas=0 -n web kubectl scale deployment bq-front1 --replicas=2 -n web   metrics 相关 # 查看node 资源 kubectl top nodes # 查看pods 资源 kubectl top pods -n php-dev # 获取metrics接口所有数据 kubectl get --raw /metrics # patch强制更新(慎用) kubectl patch -f deployment.">
 <meta itemprop="datePublished" content="2019-12-05T09:25:59+00:00" />
 <meta itemprop="dateModified" content="2019-12-05T09:25:59+00:00" />
-<meta itemprop="wordCount" content="155">
+<meta itemprop="wordCount" content="164">
 
 
 
@@ -21,7 +21,7 @@ kubectl命令表
 <meta property="og:title" content="k8s一些命令总结" />
 <meta property="og:description" content="记录一些kubectl命令
 kubectl命令表
-  常用命令 # 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111 kubectl proxy --address=&#39;192.168.1.111&#39; -p 10000 --accept-hosts=&#39;^172.*$&#39; # 查看api类型 kubectl api-versions # 让master也运行pod（默认master不运行pod,单机会用到） kubectl taint nodes --all node-role.kubernetes.io/master- # patch补丁, 强制更新 kubectl patch -f deployment.yaml -p &quot;{\&quot;spec\&quot;:{\&quot;template\&quot;:{\&quot;metadata\&quot;:{\&quot;annotations\&quot;:{\&quot;ci-last-updated\&quot;:\&quot;$(date &#43;&#39;%s&#39;)\&quot;}}}}}&quot; # 端口转发 kubectl -n default port-forward service/prometheus-server 30080:80   scale 使用 # 通过将rc的副本数重新设置为0后，再将副本数设置为2，达到重启nginx的效果。 kubectl scale deployment bq-front1 --replicas=0 -n web kubectl scale deployment bq-front1 --replicas=2 -n web   metrics 相关 # 查看node 资源 kubectl top nodes # 查看pods 资源 kubectl top pods -n php-dev # 获取metrics接口所有数据 kubectl get --raw /metrics # patch强制更新(慎用) kubectl patch -f deployment." />
+  常用命令 # 查看k8s版本 go list -m -versions github.com/kubernetes/kubernetes|sed &#39;s/ /\n/g&#39; # 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111 kubectl proxy --address=&#39;192.168.1.111&#39; -p 10000 --accept-hosts=&#39;^172.*$&#39; # 查看api类型 kubectl api-versions # 让master也运行pod（默认master不运行pod,单机会用到） kubectl taint nodes --all node-role.kubernetes.io/master- # patch补丁, 强制更新 kubectl patch -f deployment.yaml -p &quot;{\&quot;spec\&quot;:{\&quot;template\&quot;:{\&quot;metadata\&quot;:{\&quot;annotations\&quot;:{\&quot;ci-last-updated\&quot;:\&quot;$(date &#43;&#39;%s&#39;)\&quot;}}}}}&quot; # 端口转发 kubectl -n default port-forward service/prometheus-server 30080:80   scale 使用 # 通过将rc的副本数重新设置为0后，再将副本数设置为2，达到重启nginx的效果。 kubectl scale deployment bq-front1 --replicas=0 -n web kubectl scale deployment bq-front1 --replicas=2 -n web   metrics 相关 # 查看node 资源 kubectl top nodes # 查看pods 资源 kubectl top pods -n php-dev # 获取metrics接口所有数据 kubectl get --raw /metrics # patch强制更新(慎用) kubectl patch -f deployment." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://www.ngirl.xyz/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/" />
 <meta property="article:published_time" content="2019-12-05T09:25:59+00:00" />
@@ -30,7 +30,7 @@ kubectl命令表
 <meta name="twitter:title" content="k8s一些命令总结"/>
 <meta name="twitter:description" content="记录一些kubectl命令
 kubectl命令表
-  常用命令 # 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111 kubectl proxy --address=&#39;192.168.1.111&#39; -p 10000 --accept-hosts=&#39;^172.*$&#39; # 查看api类型 kubectl api-versions # 让master也运行pod（默认master不运行pod,单机会用到） kubectl taint nodes --all node-role.kubernetes.io/master- # patch补丁, 强制更新 kubectl patch -f deployment.yaml -p &quot;{\&quot;spec\&quot;:{\&quot;template\&quot;:{\&quot;metadata\&quot;:{\&quot;annotations\&quot;:{\&quot;ci-last-updated\&quot;:\&quot;$(date &#43;&#39;%s&#39;)\&quot;}}}}}&quot; # 端口转发 kubectl -n default port-forward service/prometheus-server 30080:80   scale 使用 # 通过将rc的副本数重新设置为0后，再将副本数设置为2，达到重启nginx的效果。 kubectl scale deployment bq-front1 --replicas=0 -n web kubectl scale deployment bq-front1 --replicas=2 -n web   metrics 相关 # 查看node 资源 kubectl top nodes # 查看pods 资源 kubectl top pods -n php-dev # 获取metrics接口所有数据 kubectl get --raw /metrics # patch强制更新(慎用) kubectl patch -f deployment."/>
+  常用命令 # 查看k8s版本 go list -m -versions github.com/kubernetes/kubernetes|sed &#39;s/ /\n/g&#39; # 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111 kubectl proxy --address=&#39;192.168.1.111&#39; -p 10000 --accept-hosts=&#39;^172.*$&#39; # 查看api类型 kubectl api-versions # 让master也运行pod（默认master不运行pod,单机会用到） kubectl taint nodes --all node-role.kubernetes.io/master- # patch补丁, 强制更新 kubectl patch -f deployment.yaml -p &quot;{\&quot;spec\&quot;:{\&quot;template\&quot;:{\&quot;metadata\&quot;:{\&quot;annotations\&quot;:{\&quot;ci-last-updated\&quot;:\&quot;$(date &#43;&#39;%s&#39;)\&quot;}}}}}&quot; # 端口转发 kubectl -n default port-forward service/prometheus-server 30080:80   scale 使用 # 通过将rc的副本数重新设置为0后，再将副本数设置为2，达到重启nginx的效果。 kubectl scale deployment bq-front1 --replicas=0 -n web kubectl scale deployment bq-front1 --replicas=2 -n web   metrics 相关 # 查看node 资源 kubectl top nodes # 查看pods 资源 kubectl top pods -n php-dev # 获取metrics接口所有数据 kubectl get --raw /metrics # patch强制更新(慎用) kubectl patch -f deployment."/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -54,6 +54,7 @@ kubectl命令表
 				</div>
 				<nav class="site-nav hide-in-mobile">
 					<a href="https://www.ngirl.xyz/golang/">golang</a>
+					<a href="https://www.ngirl.xyz/k8s/">k8s</a>
 					<a href="https://www.ngirl.xyz/posts/">文章</a>
 				</nav>
 			</div>
@@ -86,11 +87,14 @@ kubectl命令表
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 </center>
 <h3 id="常用命令">常用命令<a href="#常用命令" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-<pre><code># 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111
+<pre><code># 查看k8s版本
+go list -m -versions github.com/kubernetes/kubernetes|sed 's/ /\n/g'
+
+# 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111
 kubectl proxy --address='192.168.1.111' -p 10000 --accept-hosts='^172.*$'
 
 # 查看api类型
-kubectl api-versions 
+kubectl api-versions
 
 # 让master也运行pod（默认master不运行pod,单机会用到）
 kubectl taint nodes --all node-role.kubernetes.io/master-
@@ -147,7 +151,7 @@ kubectl get ns --show-labels  # 查看标签,除了ns, 也可以是node,pod等
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/k8s">k8s</a></span><span class="tag"><a href="https://www.ngirl.xyz/tags/kubectl">kubectl</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>155 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>164 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-12-05 17:25 &#43;0800</p>
 			</footer>
 		</article>

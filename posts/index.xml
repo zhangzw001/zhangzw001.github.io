@@ -10521,7 +10521,7 @@ mount /data /dev/sdb3
 			<guid>https://www.ngirl.xyz/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</guid>
 			<description>记录一些kubectl命令
 kubectl命令表
-  常用命令 # 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111 kubectl proxy --address=&#39;192.168.1.111&#39; -p 10000 --accept-hosts=&#39;^172.*$&#39; # 查看api类型 kubectl api-versions # 让master也运行pod（默认master不运行pod,单机会用到） kubectl taint nodes --all node-role.kubernetes.io/master- # patch补丁, 强制更新 kubectl patch -f deployment.yaml -p &amp;quot;{\&amp;quot;spec\&amp;quot;:{\&amp;quot;template\&amp;quot;:{\&amp;quot;metadata\&amp;quot;:{\&amp;quot;annotations\&amp;quot;:{\&amp;quot;ci-last-updated\&amp;quot;:\&amp;quot;$(date +&#39;%s&#39;)\&amp;quot;}}}}}&amp;quot; # 端口转发 kubectl -n default port-forward service/prometheus-server 30080:80   scale 使用 # 通过将rc的副本数重新设置为0后，再将副本数设置为2，达到重启nginx的效果。 kubectl scale deployment bq-front1 --replicas=0 -n web kubectl scale deployment bq-front1 --replicas=2 -n web   metrics 相关 # 查看node 资源 kubectl top nodes # 查看pods 资源 kubectl top pods -n php-dev # 获取metrics接口所有数据 kubectl get --raw /metrics # patch强制更新(慎用) kubectl patch -f deployment.</description>
+  常用命令 # 查看k8s版本 go list -m -versions github.com/kubernetes/kubernetes|sed &#39;s/ /\n/g&#39; # 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111 kubectl proxy --address=&#39;192.168.1.111&#39; -p 10000 --accept-hosts=&#39;^172.*$&#39; # 查看api类型 kubectl api-versions # 让master也运行pod（默认master不运行pod,单机会用到） kubectl taint nodes --all node-role.kubernetes.io/master- # patch补丁, 强制更新 kubectl patch -f deployment.yaml -p &amp;quot;{\&amp;quot;spec\&amp;quot;:{\&amp;quot;template\&amp;quot;:{\&amp;quot;metadata\&amp;quot;:{\&amp;quot;annotations\&amp;quot;:{\&amp;quot;ci-last-updated\&amp;quot;:\&amp;quot;$(date +&#39;%s&#39;)\&amp;quot;}}}}}&amp;quot; # 端口转发 kubectl -n default port-forward service/prometheus-server 30080:80   scale 使用 # 通过将rc的副本数重新设置为0后，再将副本数设置为2，达到重启nginx的效果。 kubectl scale deployment bq-front1 --replicas=0 -n web kubectl scale deployment bq-front1 --replicas=2 -n web   metrics 相关 # 查看node 资源 kubectl top nodes # 查看pods 资源 kubectl top pods -n php-dev # 获取metrics接口所有数据 kubectl get --raw /metrics # patch强制更新(慎用) kubectl patch -f deployment.</description>
 			<content type="html"><![CDATA[<p>记录一些kubectl命令</p>
 <!-- more -->
 <p><a href="http://docs.kubernetes.org.cn/683.html">kubectl命令表</a></p>
@@ -10529,11 +10529,14 @@ kubectl命令表
 <img src="//zhangzw001.github.io/images/dockerniu.jpeg" width = "100" height = "100" style="border: 0"/>
 </center>
 <h3 id="常用命令">常用命令</h3>
-<pre><code># 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111
+<pre><code># 查看k8s版本
+go list -m -versions github.com/kubernetes/kubernetes|sed 's/ /\n/g'
+
+# 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111
 kubectl proxy --address='192.168.1.111' -p 10000 --accept-hosts='^172.*$'
 
 # 查看api类型
-kubectl api-versions 
+kubectl api-versions
 
 # 让master也运行pod（默认master不运行pod,单机会用到）
 kubectl taint nodes --all node-role.kubernetes.io/master-
@@ -12453,7 +12456,7 @@ default-character-set=utf8
 			
 			<guid>https://www.ngirl.xyz/posts/18-%E6%94%B6%E8%97%8F%E9%93%BE%E6%8E%A5/</guid>
 			<description>记录一些好的网址
- 容器    云原生图书编年史 云原生大佬博客汇总 (2000个) kubernetes 社群分享 QA 汇总 k8s CRD(CustomResourceDefinition)自定义controller sample k8s 集群部署运营实践总结 k8s 创建一个只读的用户权限 kubectl 创建 Pod 背后到底发生了什么？ 白话Kubernetes网络(推荐) 张馆长docker科普 cgroup相关  linux cgroups 简介 cgroups与systemd     计算机基础    MySQL 5.6, 5.7, 8.0版本的新特性大全 nginx+lua实现灰度发布 计算机网络 根域名的知识 常见状态码 你管这破玩意叫 IO 多路复用？ 异地多活架构   golang    go学习指南 go圣经 go-mod学习 go包 go相关源码  《Go 语言编程之旅：一起用 Go 做项目》 vue+go 利用go优越的性能-设计与实现高性能企业级微服务网关 Golang Sprintf 源码分析     常用的工具网址    不用翻墙就能谷歌 deepl 比谷歌翻译好用的翻译 tableconvert 在线excel转markdown processon 免费在线作图 表情锅 自制表情动图 在线解析 子网掩码换算等   其他文章    Raft 为什么是更易理解的分布式一致性算法 Raft 一步步动态教你理解raft协议 Raft 更多形象化理解 Elasticsearch分布式一致性原理剖析(一)-节点篇   想看的书籍    金字塔原理  </description>
+ 容器    云原生图书编年史 云原生大佬博客汇总 (2000个) kubernetes 社群分享 QA 汇总 k8s CRD(CustomResourceDefinition)自定义controller sample k8s 集群部署运营实践总结 k8s 创建一个只读的用户权限 kubectl 创建 Pod 背后到底发生了什么？ 白话Kubernetes网络(推荐) 张馆长docker科普 cgroup相关  linux cgroups 简介 cgroups与systemd     计算机基础    MySQL 5.6, 5.7, 8.0版本的新特性大全 nginx+lua实现灰度发布 计算机网络 根域名的知识 常见状态码 你管这破玩意叫 IO 多路复用？ 异地多活架构   golang    go学习指南 go圣经 go-mod学习 go包 go相关源码  《Go 语言编程之旅：一起用 Go 做项目》 vue+go 利用go优越的性能-设计与实现高性能企业级微服务网关 Golang Sprintf 源码分析 泛型slice包     常用的工具网址    不用翻墙就能谷歌 deepl 比谷歌翻译好用的翻译 tableconvert 在线excel转markdown processon 免费在线作图 表情锅 自制表情动图 在线解析 子网掩码换算等   其他文章    Raft 为什么是更易理解的分布式一致性算法 Raft 一步步动态教你理解raft协议 Raft 更多形象化理解 Elasticsearch分布式一致性原理剖析(一)-节点篇   想看的书籍    金字塔原理  </description>
 			<content type="html"><![CDATA[<p>记录一些好的网址</p>
 <!-- more -->
 <center>
@@ -12504,6 +12507,7 @@ default-character-set=utf8
 <li><a href="https://github.com/go-programming-tour-book">《Go 语言编程之旅：一起用 Go 做项目》</a></li>
 <li><a href="https://github.com/e421083458">vue+go 利用go优越的性能-设计与实现高性能企业级微服务网关</a></li>
 <li><a href="https://dafengge0913.github.io/golang-sprintf/">Golang Sprintf 源码分析</a></li>
+<li><a href="https://github.com/golang/exp/blob/master/slices/slices.go">泛型slice包</a></li>
 </ul>
 </li>
 </ul>
@@ -12763,23 +12767,17 @@ ENV LANG zh_CN.utf8
 		</item>
 		
 		<item>
-			<title>docker简介和使用</title>
-			<link>https://www.ngirl.xyz/posts/15-docker%E7%AE%80%E4%BB%8B%E5%92%8C%E4%BD%BF%E7%94%A8/</link>
+			<title>docker及相关工具</title>
+			<link>https://www.ngirl.xyz/posts/15-docker%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%B7%A5%E5%85%B7/</link>
 			<pubDate>Wed, 16 Oct 2019 15:31:08 +0000</pubDate>
 			
-			<guid>https://www.ngirl.xyz/posts/15-docker%E7%AE%80%E4%BB%8B%E5%92%8C%E4%BD%BF%E7%94%A8/</guid>
+			<guid>https://www.ngirl.xyz/posts/15-docker%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%B7%A5%E5%85%B7/</guid>
 			<description>简单介绍docker
-docker k8s支持的docker 版本查看 这里我们使用年份命名版本的docker-ce，假设我们要安装v1.16.3的k8s，我们去 https://github.com/kubernetes/kubernetes 里进对应版本的CHANGELOG-1.16.md里搜The list of validated docker versions remain查找支持的docker版本，docker版本不一定得在支持列表里，实际上19.03也能使用，这里我们使用docker官方的安装脚本安装docker(该脚本支持centos和ubuntu)
-export VERSION=19.03 curl -fsSL &amp;quot;https://get.docker.com/&amp;quot; | bash -s -- --mirror Aliyun harbor harbor中开启内容信任后签名的问题: https://github.com/zj1244/Blog/blob/master/2019/harbor%E7%9A%84Notary%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95.md harbor2.3安装问题 docker: 18.06.1-ce,19.03.13 由于维护过程需要停止或重启harbor服务,再次启动时postgresql会报错: ls: cannot access &#39;/var/lib/postgresql/data&#39;: Operation not permitted initdb: error: directory &amp;quot;/var/lib/postgresql/data/pg13&amp;quot; exists but is not empty 这里解决办法是修改一下 docker-compose.yml, 添加 privileged: true postgresql: image: goharbor/harbor-db:v2.3.4 container_name: harbor-db privileged: true #需要加入超级权限 从官方issue并没有看到更好的解决方法, 目前是添加超级权限解决 https://github.com/goharbor/harbor/issues/15456 </description>
+harbor harbor中开启内容信任后签名的问题: https://github.com/zj1244/Blog/blob/master/2019/harbor%E7%9A%84Notary%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95.md harbor2.3安装问题 docker: 18.06.1-ce,19.03.13 由于维护过程需要停止或重启harbor服务,再次启动时postgresql会报错: ls: cannot access &#39;/var/lib/postgresql/data&#39;: Operation not permitted initdb: error: directory &amp;quot;/var/lib/postgresql/data/pg13&amp;quot; exists but is not empty 这里解决办法是修改一下 docker-compose.yml, 添加 privileged: true postgresql: image: goharbor/harbor-db:v2.3.4 container_name: harbor-db privileged: true #需要加入超级权限 从官方issue并没有看到更好的解决方法, 目前是添加超级权限解决 https://github.com/goharbor/harbor/issues/15456 docker开启live-restore  注意: 如果服务器启动了docker swarm那么就无法正常启动docker了
+ cat /etc/docker/daemon.json { &amp;quot;exec-opts&amp;quot;:[&amp;quot;native.cgroupdriver=systemd&amp;quot;], &amp;quot;live-restore&amp;quot;: true, ... } </description>
 			<content type="html"><![CDATA[<p>简单介绍docker</p>
 <!-- more -->
-<h3 id="docker">docker</h3>
-<h3 id="k8s支持的docker-版本查看">k8s支持的docker 版本查看</h3>
-<p>这里我们使用年份命名版本的docker-ce，假设我们要安装v1.16.3的k8s，我们去 <a href="https://github.com/kubernetes/kubernetes">https://github.com/kubernetes/kubernetes</a> 里进对应版本的<code>CHANGELOG-1.16.md</code>里搜<code>The list of validated docker versions remain</code>查找支持的docker版本，docker版本不一定得在支持列表里，实际上19.03也能使用，这里我们使用docker官方的安装脚本安装docker(该脚本支持centos和ubuntu)</p>
-<pre><code>export VERSION=19.03
-curl -fsSL &quot;https://get.docker.com/&quot; | bash -s -- --mirror Aliyun
-
-</code></pre><h3 id="harbor">harbor</h3>
+<h3 id="harbor">harbor</h3>
 <pre><code>harbor中开启内容信任后签名的问题: https://github.com/zj1244/Blog/blob/master/2019/harbor%E7%9A%84Notary%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95.md
 </code></pre><h3 id="harbor23安装问题">harbor2.3安装问题</h3>
 <pre><code>docker: 18.06.1-ce,19.03.13
@@ -12796,6 +12794,16 @@ initdb: error: directory &quot;/var/lib/postgresql/data/pg13&quot; exists but is
 
 从官方issue并没有看到更好的解决方法, 目前是添加超级权限解决
 https://github.com/goharbor/harbor/issues/15456
+</code></pre><h3 id="docker开启live-restore">docker开启live-restore</h3>
+<blockquote>
+<p>注意: 如果服务器启动了docker swarm那么就无法正常启动docker了</p>
+</blockquote>
+<pre><code>cat /etc/docker/daemon.json
+{
+ &quot;exec-opts&quot;:[&quot;native.cgroupdriver=systemd&quot;],
+ &quot;live-restore&quot;: true,
+ ...
+}
 </code></pre>]]></content>
 		</item>
 		

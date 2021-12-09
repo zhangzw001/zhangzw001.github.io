@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>K8s on zhangzw</title>
+    <link>https://www.ngirl.xyz/k8s/</link>
+    <description>Recent content in K8s on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Wed, 08 Dec 2021 16:04:39 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/k8s/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>K8s学习 client-go延迟队列</title>
+      <link>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</link>
+      <pubDate>Wed, 08 Dec 2021 16:04:39 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</guid>
+      <description>我们从controller 找一个入口看一下, 一般在哪里初始化的延迟队列
+ 核心是 startDeploymentController 函数 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;deployment&amp;#34;] = startDeploymentController } 3. cmd/kube-controller-manager/app/apps.go startDeploymentController(...) (...) { dc, err := deployment.NewDeploymentController(...) go dc.Run(int(ctx.ComponentConfig.DeploymentController.ConcurrentDeploymentSyncs), ctx.Stop) } 3.1 pkg/controller/deployment/deployment_controller.go -&amp;gt; NewDeploymentController(...) (...) { dc := &amp;amp;DeploymentController{ queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), &amp;#34;deployment&amp;#34;), } } -&amp;gt; NewNamedRateLimitingQueue(...) RateLimitingInterface { return &amp;amp;rateLimitingType{ DelayingInterface: NewNamedDelayingQueue(name), rateLimiter: rateLimiter, // 限流器  } } -&amp;gt; NewNamedDelayingQueue(.</description>
+    </item>
+    
+    <item>
+      <title>K8s学习 Job源码分析</title>
+      <link>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
+      <pubDate>Tue, 07 Dec 2021 10:22:02 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
+      <description>首先我们知道cronjob和job是受控于controller manager组件的, 下面我们先看看job controller是怎么初始化的
+ 初始化的流程 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;job&amp;#34;] = startJobController // job的初始化  controllers[&amp;#34;cronjob&amp;#34;] = startCronJobController } 3. cmd/kube-controller-manager/app/batch.go startJobController(...) (...) -&amp;gt; NewJobController(...) *JobController // 返回一个JobController  { jm.syncHandler = jm.syncJob // 核心的handler初始化  } -&amp;gt; (jm *JobController) Run(...) -&amp;gt; (jm *JobController) worker() -&amp;gt; for jm.processNextWorkItem() {} // 这里是循环  -&amp;gt; jm.syncHandler(...) // 最终在processNextWorkItem的函数内部调用了syncHandler, 也就是上面初始化的syncJob 源码学习部分 JobController 结构体 type JobController struct { kubeClient clientset.</description>
+    </item>
+    
+  </channel>
+</rss>

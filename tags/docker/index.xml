@@ -30,14 +30,14 @@ Dockerfile 文件有自己的书写格式和支持的命令，常用的Dockerfil
     </item>
     
     <item>
-      <title>docker简介和使用</title>
-      <link>https://www.ngirl.xyz/posts/15-docker%E7%AE%80%E4%BB%8B%E5%92%8C%E4%BD%BF%E7%94%A8/</link>
+      <title>docker及相关工具</title>
+      <link>https://www.ngirl.xyz/posts/15-docker%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%B7%A5%E5%85%B7/</link>
       <pubDate>Wed, 16 Oct 2019 15:31:08 +0000</pubDate>
       
-      <guid>https://www.ngirl.xyz/posts/15-docker%E7%AE%80%E4%BB%8B%E5%92%8C%E4%BD%BF%E7%94%A8/</guid>
+      <guid>https://www.ngirl.xyz/posts/15-docker%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%B7%A5%E5%85%B7/</guid>
       <description>简单介绍docker
-docker k8s支持的docker 版本查看 这里我们使用年份命名版本的docker-ce，假设我们要安装v1.16.3的k8s，我们去 https://github.com/kubernetes/kubernetes 里进对应版本的CHANGELOG-1.16.md里搜The list of validated docker versions remain查找支持的docker版本，docker版本不一定得在支持列表里，实际上19.03也能使用，这里我们使用docker官方的安装脚本安装docker(该脚本支持centos和ubuntu)
-export VERSION=19.03 curl -fsSL &amp;quot;https://get.docker.com/&amp;quot; | bash -s -- --mirror Aliyun harbor harbor中开启内容信任后签名的问题: https://github.com/zj1244/Blog/blob/master/2019/harbor%E7%9A%84Notary%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95.md harbor2.3安装问题 docker: 18.06.1-ce,19.03.13 由于维护过程需要停止或重启harbor服务,再次启动时postgresql会报错: ls: cannot access &#39;/var/lib/postgresql/data&#39;: Operation not permitted initdb: error: directory &amp;quot;/var/lib/postgresql/data/pg13&amp;quot; exists but is not empty 这里解决办法是修改一下 docker-compose.yml, 添加 privileged: true postgresql: image: goharbor/harbor-db:v2.3.4 container_name: harbor-db privileged: true #需要加入超级权限 从官方issue并没有看到更好的解决方法, 目前是添加超级权限解决 https://github.com/goharbor/harbor/issues/15456 </description>
+harbor harbor中开启内容信任后签名的问题: https://github.com/zj1244/Blog/blob/master/2019/harbor%E7%9A%84Notary%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95.md harbor2.3安装问题 docker: 18.06.1-ce,19.03.13 由于维护过程需要停止或重启harbor服务,再次启动时postgresql会报错: ls: cannot access &#39;/var/lib/postgresql/data&#39;: Operation not permitted initdb: error: directory &amp;quot;/var/lib/postgresql/data/pg13&amp;quot; exists but is not empty 这里解决办法是修改一下 docker-compose.yml, 添加 privileged: true postgresql: image: goharbor/harbor-db:v2.3.4 container_name: harbor-db privileged: true #需要加入超级权限 从官方issue并没有看到更好的解决方法, 目前是添加超级权限解决 https://github.com/goharbor/harbor/issues/15456 docker开启live-restore  注意: 如果服务器启动了docker swarm那么就无法正常启动docker了
+ cat /etc/docker/daemon.json { &amp;quot;exec-opts&amp;quot;:[&amp;quot;native.cgroupdriver=systemd&amp;quot;], &amp;quot;live-restore&amp;quot;: true, ... } </description>
     </item>
     
   </channel>

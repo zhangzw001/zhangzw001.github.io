@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Mon, 22 Nov 2021 13:59:53 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 08 Dec 2021 16:04:39 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>linux遇到一些问题统计</title>
       <link>https://www.ngirl.xyz/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
@@ -33,6 +33,26 @@
     </item>
     
     <item>
+      <title>K8s学习 client-go延迟队列</title>
+      <link>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</link>
+      <pubDate>Wed, 08 Dec 2021 16:04:39 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</guid>
+      <description>我们从controller 找一个入口看一下, 一般在哪里初始化的延迟队列
+ 核心是 startDeploymentController 函数 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;deployment&amp;#34;] = startDeploymentController } 3. cmd/kube-controller-manager/app/apps.go startDeploymentController(...) (...) { dc, err := deployment.NewDeploymentController(...) go dc.Run(int(ctx.ComponentConfig.DeploymentController.ConcurrentDeploymentSyncs), ctx.Stop) } 3.1 pkg/controller/deployment/deployment_controller.go -&amp;gt; NewDeploymentController(...) (...) { dc := &amp;amp;DeploymentController{ queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), &amp;#34;deployment&amp;#34;), } } -&amp;gt; NewNamedRateLimitingQueue(...) RateLimitingInterface { return &amp;amp;rateLimitingType{ DelayingInterface: NewNamedDelayingQueue(name), rateLimiter: rateLimiter, // 限流器  } } -&amp;gt; NewNamedDelayingQueue(.</description>
+    </item>
+    
+    <item>
+      <title>K8s学习 Job源码分析</title>
+      <link>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
+      <pubDate>Tue, 07 Dec 2021 10:22:02 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
+      <description>首先我们知道cronjob和job是受控于controller manager组件的, 下面我们先看看job controller是怎么初始化的
+ 初始化的流程 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;job&amp;#34;] = startJobController // job的初始化  controllers[&amp;#34;cronjob&amp;#34;] = startCronJobController } 3. cmd/kube-controller-manager/app/batch.go startJobController(...) (...) -&amp;gt; NewJobController(...) *JobController // 返回一个JobController  { jm.syncHandler = jm.syncJob // 核心的handler初始化  } -&amp;gt; (jm *JobController) Run(...) -&amp;gt; (jm *JobController) worker() -&amp;gt; for jm.processNextWorkItem() {} // 这里是循环  -&amp;gt; jm.syncHandler(...) // 最终在processNextWorkItem的函数内部调用了syncHandler, 也就是上面初始化的syncJob 源码学习部分 JobController 结构体 type JobController struct { kubeClient clientset.</description>
+    </item>
+    
+    <item>
       <title>Go学习 Map源码分析</title>
       <link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-map%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
       <pubDate>Mon, 22 Nov 2021 13:59:53 +0800</pubDate>
@@ -47,7 +67,7 @@
       <pubDate>Wed, 17 Nov 2021 09:31:09 +0800</pubDate>
       
       <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-gmp%E6%A8%A1%E5%9E%8B/</guid>
-      <description>为什么需要P  如果没有P, 所有的G都必须在一个全局的队列中, 然后M一个个从全局队列中获取, 这种共享内存的方式并发必须需要加锁 如果没有P, 当前g1中包含了创建新协程g2(go func)时, 当前的M1还得继续执行g1, 因此M1必须主动转义g2给另外一个线程M2去执行,这就造成了不必要的转移,浪费cpu资源, 因为g1 g2是相关的, 如果都在本地M1上执行更好, 而不是调度出去执行  GMP模型 简介  全局队列（Global Queue）：存放等待运行的G。 P的本地队列：同全局队列类似，存放的也是等待运行的G，存的数量有限，不超过256个。新建G&amp;rsquo;时，G&amp;rsquo;优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列。 P列表：所有的P都在程序启动时创建，并保存在数组中，最多有GOMAXPROCS(可配置)个。 M：线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去。 g0: 一个比一比g大的多栈(64k), 可以用于 创建goroutine, deferproc函数里新建_defer,垃圾回收相关工资  何时会创建 P : 由启动时环境变量$GOMAXPROCS或者是由runtime的方法GOMAXPROCS()决定, 运行时系统就会创建 M : 如果P找不到空闲的M去绑定,就会创建M 调度器策略 work stealing : 当本地G队列为空时, 尝试从全局队列或者其他的线程绑定的P偷取G,而不是销毁线程 hand off : 当g阻塞时,实际是当前M线程会阻塞,那么 gmp结构体  m  // src/runtime/runtime2.go type m struct { g0 *g // 用于执行调度指令的 Goroutine 	gsignal *g // 处理 signal 的 g 	tls [6]uintptr // 线程本地存储 	curg *g // 当前运行的用户 Goroutine 	p puintptr // 执行 go 代码时持有的 p (如果没有执行则为 nil) 	preemptoff string // if !</description>
+      <description>GMP模型 为什么需要P  如果没有P, 所有的G都必须在一个全局的队列中, 然后M一个个从全局队列中获取, 这种共享内存的方式并发必须需要加锁 如果没有P, 当前g1中包含了创建新协程g2(go func)时, 当前的M1还得继续执行g1, 因此M1必须主动转移g2给另外一个线程M2去执行,这就造成了不必要的转移,浪费cpu资源, 因为g1 g2是相关的, 如果都在本地M1上执行更好, 而不是调度出去执行  简介  全局队列（Global Queue）：存放等待运行的G。 P的本地队列：同全局队列类似，存放的也是等待运行的G，存的数量有限，不超过256个。新建G&amp;rsquo;时，G&amp;rsquo;优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列。 P列表：所有的P都在程序启动时创建，并保存在数组中，最多有GOMAXPROCS(可配置)个。 M：线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去。 g0: 一个比一比g大的多栈(64k), 可以用于 创建goroutine, deferproc函数里新建_defer,垃圾回收相关工资  何时会创建 P : 由启动时环境变量$GOMAXPROCS或者是由runtime的方法GOMAXPROCS()决定, 运行时系统就会创建 M : 如果P找不到空闲的M去绑定,就会创建M 调度器策略 work stealing : 当本地G队列为空时, 尝试从全局队列或者其他的线程绑定的P偷取G,而不是销毁线程 hand off : 当g阻塞时,实际是当前M线程会阻塞, 如果是同步模式,M和G会一起阻塞 如果是非同步模式,G会被&amp;quot;net poller&amp;quot;代理进入阻塞,M不会阻塞,继续执行其他的G,效率更高 gmp结构体  m  // src/runtime/runtime2.go type m struct { g0 *g // 用于执行调度指令的 Goroutine 	gsignal *g // 处理 signal 的 g 	tls [6]uintptr // 线程本地存储 	curg *g // 当前运行的用户 Goroutine 	p puintptr // 执行 go 代码时持有的 p (如果没有执行则为 nil) 	preemptoff string // if !</description>
     </item>
     
     <item>
@@ -87,25 +107,6 @@
  动态规划五部曲 1. 定义dp数组 这里我们定义一个dp[i][j]的数组 i代表 物品的下标,0,1,2&amp;hellip; j代表 背包的容量,1kg,3kg,4kg&amp;hellip; dp[i][j]代表 可选的i个物品中,容量为j的背包能装下最大为dp[i][j]的价值
  这里i个物品 是有两种状态, 选择 和不选择
  2. 确定推导公式 首先我们可以想到i个物品的dp[i][j] 是可以由 i-1个物品的情况下, 选择i转入背包 和不装入背包两种情况得到的 那不装入物品i的价值 = dp[i-1][j] 那装入了物品i的价值 = dp[i-1][j-weight[i]] + price[i], 显然装了东西, 背包容量肯定减少, 总价值肯定是增加 那我们dp[i][j] 应该选择哪种情况呢? 答案是选择更大价值的 dp[i][j] = max(dp[i-1][j] , dp[i-1][j-weight[i]] + price[i] ) 3.</description>
-    </item>
-    
-    <item>
-      <title>Go算法学习 动态规划 分割等和子集</title>
-      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E5%88%86%E5%89%B2%E7%AD%89%E5%92%8C%E5%AD%90%E9%9B%86/</link>
-      <pubDate>Thu, 27 May 2021 18:36:38 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E5%88%86%E5%89%B2%E7%AD%89%E5%92%8C%E5%AD%90%E9%9B%86/</guid>
-      <description>dp 一维数组模板  例一
-    \ 重量 价值     物品0 1 15   物品1 3 20   物品2 4 30    for i:=0;i&amp;lt; 物品重量列表长度;i++ { for j:= 背包容量;j &amp;gt;= i物品的重量;j-- { dp[j] = max(dp[j], dp[j- 物品i的重量] + 物品i的价值) } } 物品重量: weight := []int{1,3,4} 物品价值: value := []int{15,20,30} for i:=0;i&amp;lt; len(weight);i++ { for j:= target ;j &amp;gt;= weight[i];j-- { dp[j] = max(dp[j], dp[j- weight[i]] + value[i]) } } # 背包问题简单测试 func bag01() { weight := []int{1, 3, 4} value := []int{15, 20, 30} target := 10 dp := make([]int,target+1) for i := 0; i &amp;lt; len(weight); i++ { for j := target; j &amp;gt;= weight[i]; j-- { dp[j] = max(dp[j], dp[j-weight[i]]+value[i]) } } fmt.</description>
-    </item>
-    
-    <item>
-      <title>Go算法学习 动态规划 整数拆分</title>
-      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E6%95%B4%E6%95%B0%E6%8B%86%E5%88%86/</link>
-      <pubDate>Thu, 27 May 2021 11:07:46 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-%E6%95%B4%E6%95%B0%E6%8B%86%E5%88%86/</guid>
-      <description>show me the code package main //https://github.com/youngyangyang04/leetcode-master/blob/master/problems/0343.%E6%95%B4%E6%95%B0%E6%8B%86%E5%88%86.md //343. 整数拆分 //题目链接：https://leetcode-cn.com/problems/integer-break/ // //给定一个正整数 n，将其拆分为至少两个正整数的和，并使这些整数的乘积最大化。 返回你可以获得的最大乘积。 // //示例 1: 输入: 2 输出: 1 解释: 2 = 1 + 1, 1 × 1 = 1。 // //示例 2: 输入: 10 输出: 36 解释: 10 = 3 + 3 + 4, 3 × 3 × 4 = 36。 说明: 你可以假设 n 不小于 2 且不大于 58。  // dp[i] 代表 i这个数 拆分得到最大的乘积 // 看看示例 // dp[0],dp[1] 不用考虑, 题目是n大于等于2 // dp[2] = 1 * 1 = 1 只有一个结果  // 1.</description>
     </item>
     
   </channel>
