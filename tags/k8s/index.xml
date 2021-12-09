@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 10 Nov 2020 14:06:41 +0000</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/k8s/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 08 Dec 2021 16:04:39 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/k8s/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>k8s遇到的一些问题统计总结</title>
       <link>https://www.ngirl.xyz/posts/3-k8s%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
@@ -18,6 +18,26 @@
   1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
   deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
  # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从`hub.</description>
+    </item>
+    
+    <item>
+      <title>K8s学习 client-go延迟队列</title>
+      <link>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</link>
+      <pubDate>Wed, 08 Dec 2021 16:04:39 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</guid>
+      <description>我们从controller 找一个入口看一下, 一般在哪里初始化的延迟队列
+ 核心是 startDeploymentController 函数 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;deployment&amp;#34;] = startDeploymentController } 3. cmd/kube-controller-manager/app/apps.go startDeploymentController(...) (...) { dc, err := deployment.NewDeploymentController(...) go dc.Run(int(ctx.ComponentConfig.DeploymentController.ConcurrentDeploymentSyncs), ctx.Stop) } 3.1 pkg/controller/deployment/deployment_controller.go -&amp;gt; NewDeploymentController(...) (...) { dc := &amp;amp;DeploymentController{ queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), &amp;#34;deployment&amp;#34;), } } -&amp;gt; NewNamedRateLimitingQueue(...) RateLimitingInterface { return &amp;amp;rateLimitingType{ DelayingInterface: NewNamedDelayingQueue(name), rateLimiter: rateLimiter, // 限流器  } } -&amp;gt; NewNamedDelayingQueue(.</description>
+    </item>
+    
+    <item>
+      <title>K8s学习 Job源码分析</title>
+      <link>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
+      <pubDate>Tue, 07 Dec 2021 10:22:02 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
+      <description>首先我们知道cronjob和job是受控于controller manager组件的, 下面我们先看看job controller是怎么初始化的
+ 初始化的流程 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;job&amp;#34;] = startJobController // job的初始化  controllers[&amp;#34;cronjob&amp;#34;] = startCronJobController } 3. cmd/kube-controller-manager/app/batch.go startJobController(...) (...) -&amp;gt; NewJobController(...) *JobController // 返回一个JobController  { jm.syncHandler = jm.syncJob // 核心的handler初始化  } -&amp;gt; (jm *JobController) Run(...) -&amp;gt; (jm *JobController) worker() -&amp;gt; for jm.processNextWorkItem() {} // 这里是循环  -&amp;gt; jm.syncHandler(...) // 最终在processNextWorkItem的函数内部调用了syncHandler, 也就是上面初始化的syncJob 源码学习部分 JobController 结构体 type JobController struct { kubeClient clientset.</description>
     </item>
     
     <item>
@@ -91,26 +111,6 @@
 haproxy负载均衡主要是让集群更健壮,三台master同时提供服务,keepalived 则防止单机故障,热备
  Centos7.6部署k8s v1.16.4高可用集群(主备模式) 使用kubeadm搭建高可用k8s v1.16.3集群(keepalived+haproxy)
    一、 安装准备  1.1 主机名  192.168.53.106 master01.k8s.io 192.168.53.107 master02.k8s.io 192.168.53.108 master03.k8s.io 192.168.53.137 master.k8s.io  1.2 同步时间, 设置时区  * * * * * /usr/sbin/ntpdate time.nist.gov timedatectl set-timezone Asia/Shanghai 或者 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime  1.3 关闭SElinux  setenforce 0 sed -i &amp;quot;s/^SELINUX=enforcing/SELINUX=disabled/g&amp;quot; /etc/sysconfig/selinux sed -i &amp;quot;s/^SELINUX=enforcing/SELINUX=disabled/g&amp;quot; /etc/selinux/config sed -i &amp;quot;s/^SELINUX=permissive/SELINUX=disabled/g&amp;quot; /etc/sysconfig/selinux sed -i &amp;quot;s/^SELINUX=permissive/SELINUX=disabled/g&amp;quot; /etc/selinux/config  1.</description>
-    </item>
-    
-    <item>
-      <title>k8s一些命令总结</title>
-      <link>https://www.ngirl.xyz/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</link>
-      <pubDate>Thu, 05 Dec 2019 09:25:59 +0000</pubDate>
-      
-      <guid>https://www.ngirl.xyz/posts/34-k8s%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/</guid>
-      <description>记录一些kubectl命令
-kubectl命令表
-  常用命令 # 查看k8s版本 go list -m -versions github.com/kubernetes/kubernetes|sed &#39;s/ /\n/g&#39; # 让内网可以访问 k8s proxy(k8smaster是:192.168.1.111 kubectl proxy --address=&#39;192.168.1.111&#39; -p 10000 --accept-hosts=&#39;^172.*$&#39; # 查看api类型 kubectl api-versions # 让master也运行pod（默认master不运行pod,单机会用到） kubectl taint nodes --all node-role.kubernetes.io/master- # patch补丁, 强制更新 kubectl patch -f deployment.yaml -p &amp;quot;{\&amp;quot;spec\&amp;quot;:{\&amp;quot;template\&amp;quot;:{\&amp;quot;metadata\&amp;quot;:{\&amp;quot;annotations\&amp;quot;:{\&amp;quot;ci-last-updated\&amp;quot;:\&amp;quot;$(date +&#39;%s&#39;)\&amp;quot;}}}}}&amp;quot; # 端口转发 kubectl -n default port-forward service/prometheus-server 30080:80   scale 使用 # 通过将rc的副本数重新设置为0后，再将副本数设置为2，达到重启nginx的效果。 kubectl scale deployment bq-front1 --replicas=0 -n web kubectl scale deployment bq-front1 --replicas=2 -n web   metrics 相关 # 查看node 资源 kubectl top nodes # 查看pods 资源 kubectl top pods -n php-dev # 获取metrics接口所有数据 kubectl get --raw /metrics # patch强制更新(慎用) kubectl patch -f deployment.</description>
-    </item>
-    
-    <item>
-      <title>k3s1.16部署nginx&#43;php5.2.17</title>
-      <link>https://www.ngirl.xyz/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</link>
-      <pubDate>Tue, 03 Dec 2019 11:46:42 +0000</pubDate>
-      
-      <guid>https://www.ngirl.xyz/posts/33-k3s1.16%E9%83%A8%E7%BD%B2nginx&#43;php5.2.17/</guid>
-      <description>&lt;p&gt;老项目是用php5.2.17的,自己编译打包镜像简单部署&lt;/p&gt;</description>
     </item>
     
   </channel>

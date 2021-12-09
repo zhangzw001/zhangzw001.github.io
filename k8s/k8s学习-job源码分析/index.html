@@ -16,7 +16,7 @@
 
 
 
-<meta itemprop="keywords" content="untagged," />
+<meta itemprop="keywords" content="k8s," />
 <meta property="og:title" content="K8s学习 Job源码分析" />
 <meta property="og:description" content="首先我们知道cronjob和job是受控于controller manager组件的, 下面我们先看看job controller是怎么初始化的
  初始化的流程 1. cmd/kube-controller-manager/controller-manager.go main() -&gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&gt; Run(...) -&gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&#34;job&#34;] = startJobController // job的初始化  controllers[&#34;cronjob&#34;] = startCronJobController } 3. cmd/kube-controller-manager/app/batch.go startJobController(...) (...) -&gt; NewJobController(...) *JobController // 返回一个JobController  { jm.syncHandler = jm.syncJob // 核心的handler初始化  } -&gt; (jm *JobController) Run(...) -&gt; (jm *JobController) worker() -&gt; for jm.processNextWorkItem() {} // 这里是循环  -&gt; jm.syncHandler(...) // 最终在processNextWorkItem的函数内部调用了syncHandler, 也就是上面初始化的syncJob 源码学习部分 JobController 结构体 type JobController struct { kubeClient clientset." />
@@ -70,10 +70,14 @@
 
 
 
-	<main class="site-main section-inner thin animated fadeIn faster">
-		<h1>K8s学习 Job源码分析</h1>
-		<div class="content">
-			<blockquote>
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Dec 7, 2021</span></div>
+				<h1>K8s学习 Job源码分析</h1>
+			</header>
+			<div class="content">
+				<blockquote>
 <p>首先我们知道cronjob和job是受控于controller manager组件的, 下面我们先看看job controller是怎么初始化的</p>
 </blockquote>
 <h3 id="初始化的流程">初始化的流程<a href="#初始化的流程" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
@@ -297,7 +301,7 @@
 		<span class="nx">now</span> <span class="o">:=</span> <span class="nx">metav1</span><span class="p">.</span><span class="nf">Now</span><span class="p">()</span>
                 <span class="c1">// 设置status
 </span><span class="c1"></span>		<span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">StartTime</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">now</span>
-		<span class="c1">// 如果设置 ActiveDeadlineSeconds 了
+		<span class="c1">// 如果设置 ActiveDeadlineSeconds 了,
 </span><span class="c1"></span>		<span class="k">if</span> <span class="nx">job</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">ActiveDeadlineSeconds</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
 			<span class="nx">klog</span><span class="p">.</span><span class="nf">V</span><span class="p">(</span><span class="mi">4</span><span class="p">).</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Job %s have ActiveDeadlineSeconds will sync after %d seconds&#34;</span><span class="p">,</span>
 				<span class="nx">key</span><span class="p">,</span> <span class="o">*</span><span class="nx">job</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">ActiveDeadlineSeconds</span><span class="p">)</span>
@@ -586,6 +590,36 @@
 	<span class="k">return</span> <span class="nx">calculated</span>
 <span class="p">}</span>
 </code></pre></div>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/k8s">k8s</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1869 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2021-12-07 10:22 &#43;0800</p>
+			</footer>
+		</article>
+		<aside id="toc" class="show-toc">
+			<div class="toc-title">Table of Contents</div>
+			<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#初始化的流程">初始化的流程</a></li>
+        <li><a href="#源码学习部分">源码学习部分</a></li>
+        <li><a href="#syncjob">syncJob</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+		</aside>
+		<div class="post-nav thin">
+			<a class="next-post" href="https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>K8s学习 client-go延迟队列</span>
+			</a>
 		</div>
 		<div id="comments" class="thin">
 						<script src="https://utteranc.es/client.js"
