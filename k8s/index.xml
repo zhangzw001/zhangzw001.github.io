@@ -15,12 +15,20 @@
 			<pubDate>Wed, 08 Dec 2021 16:04:39 +0800</pubDate>
 			
 			<guid>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</guid>
-			<description>我们从controller 找一个入口看一下, 一般在哪里初始化的延迟队列
- 核心是 startDeploymentController 函数 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;deployment&amp;#34;] = startDeploymentController } 3. cmd/kube-controller-manager/app/apps.go startDeploymentController(...) (...) { dc, err := deployment.NewDeploymentController(...) go dc.Run(int(ctx.ComponentConfig.DeploymentController.ConcurrentDeploymentSyncs), ctx.Stop) } 3.1 pkg/controller/deployment/deployment_controller.go -&amp;gt; NewDeploymentController(...) (...) { dc := &amp;amp;DeploymentController{ queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), &amp;#34;deployment&amp;#34;), } } -&amp;gt; NewNamedRateLimitingQueue(...) RateLimitingInterface { return &amp;amp;rateLimitingType{ DelayingInterface: NewNamedDelayingQueue(name), rateLimiter: rateLimiter, // 限流器  } } -&amp;gt; NewNamedDelayingQueue(.</description>
-			<content type="html"><![CDATA[<blockquote>
-<p>我们从controller 找一个入口看一下, 一般在哪里初始化的延迟队列</p>
+			<description>简介  我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试 那我们这里的重试间隔时间是如何控制的呢? 下面我们去了解一下 从 controller 找到 deployment 初始化方法看一下
+ deployment 初始化  k8s的大多组件代码格式结构是类似的
+ 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;deployment&amp;#34;] = startDeploymentController } 3. cmd/kube-controller-manager/app/apps.go startDeploymentController(...) (...) { dc, err := deployment.NewDeploymentController(...) go dc.Run(int(ctx.ComponentConfig.DeploymentController.ConcurrentDeploymentSyncs), ctx.Stop) } 3.1 pkg/controller/deployment/deployment_controller.go -&amp;gt; NewDeploymentController(...) (...) { dc := &amp;amp;DeploymentController{ queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), &amp;#34;deployment&amp;#34;), } } -&amp;gt; NewNamedRateLimitingQueue(.</description>
+			<content type="html"><![CDATA[<h1 id="简介">简介</h1>
+<blockquote>
+<p>我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试
+那我们这里的重试间隔时间是如何控制的呢?
+下面我们去了解一下
+从 controller 找到 deployment 初始化方法看一下</p>
 </blockquote>
-<h2 id="核心是-startdeploymentcontroller-函数">核心是 startDeploymentController 函数</h2>
+<h2 id="deployment-初始化">deployment 初始化</h2>
+<blockquote>
+<p>k8s的大多组件代码格式结构是类似的</p>
+</blockquote>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="mf">1.</span> <span class="nx">cmd</span><span class="o">/</span><span class="nx">kube</span><span class="o">-</span><span class="nx">controller</span><span class="o">-</span><span class="nx">manager</span><span class="o">/</span><span class="nx">controller</span><span class="o">-</span><span class="nx">manager</span><span class="p">.</span><span class="k">go</span>
         <span class="nf">main</span><span class="p">()</span>  
         <span class="o">-</span><span class="p">&gt;</span> <span class="nx">app</span><span class="p">.</span><span class="nf">NewControllerManagerCommand</span><span class="p">()</span>
@@ -73,7 +81,7 @@
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">rateLimitingType</span> <span class="nx">结构体实现了</span> <span class="nx">RateLimitingInterface</span> <span class="nx">限流队列接口</span>
 <span class="nx">delayingType</span> <span class="nx">结构体实现了</span> <span class="nx">DelayingInterface</span> <span class="nx">延迟队列接口</span>
 <span class="o">*</span><span class="nx">Type</span> <span class="nx">指针类型结构体实现了</span> <span class="nx">Interface</span> <span class="nx">同样队列接口</span>
-</code></pre></div><h3 id="以上接口">以上接口</h3>
+</code></pre></div><h2 id="队列接口">队列接口</h2>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// vendor/k8s.io/client-go/util/workqueue/rate_limiting_queue.go
 </span><span class="c1">// 限流接口
 </span><span class="c1"></span><span class="kd">type</span> <span class="nx">RateLimitingInterface</span> <span class="kd">interface</span> <span class="p">{</span>
@@ -107,7 +115,7 @@
 	<span class="nf">NumRequeues</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kt">int</span>
 <span class="p">}</span>
 
-</code></pre></div><h3 id="以上结构体">以上结构体</h3>
+</code></pre></div><h2 id="实现接口的结构体">实现接口的结构体</h2>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 限流结构体直接嵌套 延迟队列 接口的
 </span><span class="c1"></span><span class="kd">type</span> <span class="nx">rateLimitingType</span> <span class="kd">struct</span> <span class="p">{</span>
 	<span class="nx">DelayingInterface</span>
@@ -138,20 +146,20 @@
 </span><span class="c1"></span>	<span class="nx">processing</span> <span class="nx">set</span>
 	<span class="nx">cond</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">Cond</span>
 	<span class="nx">shuttingDown</span> <span class="kt">bool</span>
-	<span class="nx">metrics</span> <span class="nx">queueMetrics</span>
+	<span class="nx">metrics</span> <span class="nx">queueMetrics</span>   
 	<span class="nx">unfinishedWorkUpdatePeriod</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
 	<span class="nx">clock</span>                      <span class="nx">clock</span><span class="p">.</span><span class="nx">Clock</span>
 <span class="p">}</span>
 
-</code></pre></div><h2 id="详细看下-newdeploymentcontroller-代码">详细看下 NewDeploymentController 代码</h2>
-<ul>
-<li>queue</li>
-</ul>
+</code></pre></div><hr>
+<blockquote>
+<p>在 <code>startDeploymentController</code> 中核心就是两个方法, 一个是 <code>NewDeploymentController</code>, 一个是 <code>Run</code></p>
+</blockquote>
+<h1 id="newdeploymentcontroller">NewDeploymentController</h1>
+<h2 id="队列初始化">队列初始化</h2>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 从例子中deployment控制器的初始化我们看到queue的初始化
 </span><span class="c1"></span><span class="nx">queue</span><span class="p">:</span>         <span class="nx">workqueue</span><span class="p">.</span><span class="nf">NewNamedRateLimitingQueue</span><span class="p">(</span><span class="nx">workqueue</span><span class="p">.</span><span class="nf">DefaultControllerRateLimiter</span><span class="p">(),</span> <span class="s">&#34;deployment&#34;</span><span class="p">),</span>
-</code></pre></div><ul>
-<li>先看下第一个参数</li>
-</ul>
+</code></pre></div><h3 id="先看下第一个参数">先看下第一个参数</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// workqueue.DefaultControllerRateLimiter() 函数
 </span><span class="c1"></span><span class="kd">func</span> <span class="nf">DefaultControllerRateLimiter</span><span class="p">()</span> <span class="nx">RateLimiter</span> <span class="p">{</span>
 	<span class="k">return</span> <span class="nf">NewMaxOfRateLimiter</span><span class="p">(</span>
@@ -180,9 +188,7 @@
 		<span class="nx">burst</span><span class="p">:</span> <span class="nx">b</span><span class="p">,</span>
 	<span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><ul>
-<li>接着看下初始化函数</li>
-</ul>
+</code></pre></div><h3 id="接着看下初始化函数">接着看下初始化函数</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// NewNamedRateLimitingQueue 两个参数, 第一个 RateLimiter 接口, 第二个是名字字符串
 </span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewNamedRateLimitingQueue</span><span class="p">(</span><span class="nx">rateLimiter</span> <span class="nx">RateLimiter</span><span class="p">,</span> <span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="nx">RateLimitingInterface</span> <span class="p">{</span>
         <span class="c1">// 返回 rateLimitingType 这个结构体, 实现限流队列接口
@@ -212,7 +218,7 @@
 </span><span class="c1"></span>	<span class="k">go</span> <span class="nx">ret</span><span class="p">.</span><span class="nf">waitingLoop</span><span class="p">()</span>
 	<span class="k">return</span> <span class="nx">ret</span>
 <span class="p">}</span>
-</code></pre></div><h3 id="waitingloop">waitingLoop</h3>
+</code></pre></div><h3 id="核心的延迟循环">核心的延迟循环</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">q</span> <span class="o">*</span><span class="nx">delayingType</span><span class="p">)</span> <span class="nf">waitingLoop</span><span class="p">()</span> <span class="p">{</span>
 	<span class="k">defer</span> <span class="nx">utilruntime</span><span class="p">.</span><span class="nf">HandleCrash</span><span class="p">()</span>
 
@@ -299,7 +305,8 @@
 		<span class="p">}</span>
 	<span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><blockquote>
+</code></pre></div><h3 id="waitingloop-总结">waitingLoop 总结</h3>
+<blockquote>
 <p>看完 <code>waitingLoop</code> 我们发现, 延迟队列是通过一个 <code>waitForPriorityQueue</code> 队列实现, <code>waitForPriorityQueue</code> 其实 sort接口 和 heap接口</p>
 <p>从实现的 <code>Less</code> 方法我们知道, <code>readyAt</code> 最小的在堆顶</p>
 <p>通过循环 读取 <code>waitingForAddCh</code> 通道的数据, 然后添加到 <code>waitingForQueue</code>, 进行堆排, 然后执行 <code>time.After</code> 延迟后加入到 工作队列执行</p>
@@ -307,20 +314,18 @@
 <blockquote>
 <p>那么 <code>waitingForAddCh</code>通道的内容是在什么时候加进来的呢? 我们接着 <code>NewDeploymentController</code> 继续往下看</p>
 </blockquote>
-<h3 id="newdeploymentcontroller">NewDeploymentController</h3>
+<h2 id="synchandler">syncHandler</h2>
 <blockquote>
-<p>我们省略了其他初始化工作</p>
+<p>我们省略了其他初始化工作
+syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 </blockquote>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">NewDeploymentController</span><span class="p">(</span><span class="nx">dInformer</span> <span class="nx">appsinformers</span><span class="p">.</span><span class="nx">DeploymentInformer</span><span class="p">,</span> <span class="nx">rsInformer</span> <span class="nx">appsinformers</span><span class="p">.</span><span class="nx">ReplicaSetInformer</span><span class="p">,</span> <span class="nx">podInformer</span> <span class="nx">coreinformers</span><span class="p">.</span><span class="nx">PodInformer</span><span class="p">,</span> <span class="nx">client</span> <span class="nx">clientset</span><span class="p">.</span><span class="nx">Interface</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">DeploymentController</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
         <span class="o">...</span>
 	<span class="nx">dc</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">DeploymentController</span><span class="p">{</span>
-		<span class="nx">client</span><span class="p">:</span>        <span class="nx">client</span><span class="p">,</span>
-		<span class="nx">eventRecorder</span><span class="p">:</span> <span class="nx">eventBroadcaster</span><span class="p">.</span><span class="nf">NewRecorder</span><span class="p">(</span><span class="nx">scheme</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">,</span> <span class="nx">v1</span><span class="p">.</span><span class="nx">EventSource</span><span class="p">{</span><span class="nx">Component</span><span class="p">:</span> <span class="s">&#34;deployment-controller&#34;</span><span class="p">}),</span>
 		<span class="nx">queue</span><span class="p">:</span>         <span class="nx">workqueue</span><span class="p">.</span><span class="nf">NewNamedRateLimitingQueue</span><span class="p">(</span><span class="nx">workqueue</span><span class="p">.</span><span class="nf">DefaultControllerRateLimiter</span><span class="p">(),</span> <span class="s">&#34;deployment&#34;</span><span class="p">),</span>
 	<span class="p">}</span>
 	<span class="o">...</span>
-        <span class="c1">// 核心的同步 deployment的部署状态等
-</span><span class="c1"></span>	<span class="nx">dc</span><span class="p">.</span><span class="nx">syncHandler</span> <span class="p">=</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">syncDeployment</span>
+	<span class="nx">dc</span><span class="p">.</span><span class="nx">syncHandler</span> <span class="p">=</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">syncDeployment</span>
         <span class="o">...</span>
 	<span class="k">return</span> <span class="nx">dc</span><span class="p">,</span> <span class="kc">nil</span>
 <span class="p">}</span>
@@ -409,8 +414,8 @@
 	<span class="k">case</span> <span class="nx">q</span><span class="p">.</span><span class="nx">waitingForAddCh</span> <span class="o">&lt;-</span> <span class="o">&amp;</span><span class="nx">waitFor</span><span class="p">{</span><span class="nx">data</span><span class="p">:</span> <span class="nx">item</span><span class="p">,</span> <span class="nx">readyAt</span><span class="p">:</span> <span class="nx">q</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">Add</span><span class="p">(</span><span class="nx">duration</span><span class="p">)}:</span>
 	<span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><h2 id="run-代码">Run 代码</h2>
-<h3 id="dcrun">dc.Run</h3>
+</code></pre></div><h1 id="run-代码">Run 代码</h1>
+<h2 id="dcrun">dc.Run</h2>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// pkg/controller/deployment/deployment_controller.go
 </span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">Run</span><span class="p">(</span><span class="nx">workers</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
 	<span class="k">defer</span> <span class="nx">utilruntime</span><span class="p">.</span><span class="nf">HandleCrash</span><span class="p">()</span>
@@ -448,7 +453,7 @@
 
 	<span class="k">return</span> <span class="kc">true</span>
 <span class="p">}</span>
-</code></pre></div><h3 id="dchandleerr">dc.handleErr</h3>
+</code></pre></div><h2 id="dchandleerr">dc.handleErr</h2>
 <blockquote>
 <p>这里就看到了 限流器的代码</p>
 </blockquote>
@@ -479,7 +484,7 @@
 </span><span class="c1"></span>        <span class="c1">// 所以实际执行的是 MaxOfRateLimiter.When, 最终得到两个限流器中最大的延迟时间
 </span><span class="c1"></span>	<span class="nx">q</span><span class="p">.</span><span class="nx">DelayingInterface</span><span class="p">.</span><span class="nf">AddAfter</span><span class="p">(</span><span class="nx">item</span><span class="p">,</span> <span class="nx">q</span><span class="p">.</span><span class="nx">rateLimiter</span><span class="p">.</span><span class="nf">When</span><span class="p">(</span><span class="nx">item</span><span class="p">))</span>
 <span class="p">}</span>
-</code></pre></div><h3 id="maxofratelimiter">MaxOfRateLimiter</h3>
+</code></pre></div><h2 id="maxofratelimiter">MaxOfRateLimiter</h2>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// RateLimiter的包装, 实现了RateLimiter 接口
 </span><span class="c1"></span><span class="kd">type</span> <span class="nx">MaxOfRateLimiter</span> <span class="kd">struct</span> <span class="p">{</span>
 	<span class="nx">limiters</span> <span class="p">[]</span><span class="nx">RateLimiter</span>
@@ -501,9 +506,7 @@
 <p>上面一共初始化了两个限流器 一个是 <code>ItemExponentialFailureRateLimiter</code> , 一个是 <code>BucketRateLimiter</code></p>
 <p>分别来看下</p>
 </blockquote>
-<ul>
-<li>ItemExponentialFailureRateLimiter</li>
-</ul>
+<h2 id="itemexponentialfailureratelimiter">ItemExponentialFailureRateLimiter</h2>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 指数级, 实现了RateLimiter 接口
 </span><span class="c1"></span><span class="kd">type</span> <span class="nx">ItemExponentialFailureRateLimiter</span> <span class="kd">struct</span> <span class="p">{</span>
 	<span class="nx">failuresLock</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
@@ -533,9 +536,7 @@
 
 	<span class="k">return</span> <span class="nx">calculated</span>
 <span class="p">}</span>
-</code></pre></div><ul>
-<li>BucketRateLimiter</li>
-</ul>
+</code></pre></div><h2 id="bucketratelimiter">BucketRateLimiter</h2>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// BucketRateLimiter, 实现了RateLimiter 接口
 </span><span class="c1"></span><span class="kd">type</span> <span class="nx">BucketRateLimiter</span> <span class="kd">struct</span> <span class="p">{</span>
 	<span class="o">*</span><span class="nx">rate</span><span class="p">.</span><span class="nx">Limiter</span>
@@ -606,8 +607,11 @@
 	<span class="p">}</span>
 	<span class="k">return</span> <span class="nx">delay</span>
 <span class="p">}</span>
-</code></pre></div><ul>
-<li><a href="https://mp.weixin.qq.com/s?__biz=MzAxMTA4Njc0OQ==&amp;mid=2651441921&amp;idx=3&amp;sn=3d2b7a0013e1ee5c377782bdc30575f1&amp;chksm=80bb15f3b7cc9ce5360c6df591a6cef8bbfaebe431b6ce57f391dd7a0b49e8d4f70e44ceadaf&amp;scene=21#wechat_redirect"></a></li>
+</code></pre></div><hr>
+<h1 id="参考资料">参考资料</h1>
+<ul>
+<li><a href="https://mp.weixin.qq.com/s?__biz=MzAxMTA4Njc0OQ==&amp;mid=2651441921&amp;idx=3&amp;sn=3d2b7a0013e1ee5c377782bdc30575f1&amp;chksm=80bb15f3b7cc9ce5360c6df591a6cef8bbfaebe431b6ce57f391dd7a0b49e8d4f70e44ceadaf&amp;scene=21#wechat_redirect">K8s 延迟队列</a></li>
+<li><a href="https://jishuin.proginn.com/p/763bfbd2dcfe">k8s 限速队列</a></li>
 </ul>
 ]]></content>
 		</item>
