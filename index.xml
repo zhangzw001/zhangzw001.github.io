@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Wed, 08 Dec 2021 16:04:39 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 09 Dec 2021 10:22:02 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>linux遇到一些问题统计</title>
       <link>https://www.ngirl.xyz/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
@@ -33,24 +33,24 @@
     </item>
     
     <item>
-      <title>K8s学习 client-go延迟队列</title>
-      <link>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</link>
-      <pubDate>Wed, 08 Dec 2021 16:04:39 +0800</pubDate>
+      <title>K8s源码学习 Job源码分析</title>
+      <link>https://www.ngirl.xyz/k8s/k8s%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
+      <pubDate>Thu, 09 Dec 2021 10:22:02 +0800</pubDate>
       
-      <guid>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</guid>
-      <description>简介  我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试 那我们这里的重试间隔时间是如何控制的呢? 下面我们去了解一下 从 controller 找到 deployment 初始化方法看一下
- deployment 初始化  k8s的大多组件代码格式结构是类似的
- 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;deployment&amp;#34;] = startDeploymentController } 3. cmd/kube-controller-manager/app/apps.go startDeploymentController(...) (...) { dc, err := deployment.NewDeploymentController(...) go dc.Run(int(ctx.ComponentConfig.DeploymentController.ConcurrentDeploymentSyncs), ctx.Stop) } 3.1 pkg/controller/deployment/deployment_controller.go -&amp;gt; NewDeploymentController(...) (...) { dc := &amp;amp;DeploymentController{ queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), &amp;#34;deployment&amp;#34;), } } -&amp;gt; NewNamedRateLimitingQueue(.</description>
+      <guid>https://www.ngirl.xyz/k8s/k8s%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
+      <description>首先我们知道cronjob和job是受控于controller manager组件的, 下面我们先看看job controller是怎么初始化的
+ 初始化的流程 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;job&amp;#34;] = startJobController // job的初始化  controllers[&amp;#34;cronjob&amp;#34;] = startCronJobController } 3. cmd/kube-controller-manager/app/batch.go startJobController(...) (...) -&amp;gt; NewJobController(...) *JobController // 返回一个JobController  { jm.syncHandler = jm.syncJob // 核心的handler初始化  } -&amp;gt; (jm *JobController) Run(...) -&amp;gt; (jm *JobController) worker() -&amp;gt; for jm.processNextWorkItem() {} // 这里是循环  -&amp;gt; jm.syncHandler(...) // 最终在processNextWorkItem的函数内部调用了syncHandler, 也就是上面初始化的syncJob JobController 结构体 type JobController struct { kubeClient clientset.</description>
     </item>
     
     <item>
-      <title>K8s学习 Job源码分析</title>
-      <link>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
-      <pubDate>Tue, 07 Dec 2021 10:22:02 +0800</pubDate>
+      <title>K8s源码学习 client-go延迟队列</title>
+      <link>https://www.ngirl.xyz/k8s/k8s%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</link>
+      <pubDate>Wed, 08 Dec 2021 16:04:39 +0800</pubDate>
       
-      <guid>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
-      <description>首先我们知道cronjob和job是受控于controller manager组件的, 下面我们先看看job controller是怎么初始化的
- 初始化的流程 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;job&amp;#34;] = startJobController // job的初始化  controllers[&amp;#34;cronjob&amp;#34;] = startCronJobController } 3. cmd/kube-controller-manager/app/batch.go startJobController(...) (...) -&amp;gt; NewJobController(...) *JobController // 返回一个JobController  { jm.syncHandler = jm.syncJob // 核心的handler初始化  } -&amp;gt; (jm *JobController) Run(...) -&amp;gt; (jm *JobController) worker() -&amp;gt; for jm.processNextWorkItem() {} // 这里是循环  -&amp;gt; jm.syncHandler(...) // 最终在processNextWorkItem的函数内部调用了syncHandler, 也就是上面初始化的syncJob 源码学习部分 JobController 结构体 type JobController struct { kubeClient clientset.</description>
+      <guid>https://www.ngirl.xyz/k8s/k8s%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</guid>
+      <description>我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试 那我们这里的重试间隔时间是如何控制的呢? 下面我们去了解一下 从 controller 找到 deployment 初始化方法看一下
+ 1 deployment 初始化  k8s的大多组件代码格式结构是类似的
+ 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;deployment&amp;#34;] = startDeploymentController } 3. cmd/kube-controller-manager/app/apps.go startDeploymentController(...) (...) { dc, err := deployment.NewDeploymentController(...) go dc.Run(int(ctx.ComponentConfig.DeploymentController.ConcurrentDeploymentSyncs), ctx.Stop) } 3.1 pkg/controller/deployment/deployment_controller.go -&amp;gt; NewDeploymentController(...) (...) { dc := &amp;amp;DeploymentController{ queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), &amp;#34;deployment&amp;#34;), } } -&amp;gt; NewNamedRateLimitingQueue(.</description>
     </item>
     
     <item>

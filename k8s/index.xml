@@ -6,628 +6,21 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Wed, 08 Dec 2021 16:04:39 +0800</lastBuildDate>
+		<lastBuildDate>Thu, 09 Dec 2021 10:22:02 +0800</lastBuildDate>
 		<atom:link href="https://www.ngirl.xyz/k8s/index.xml" rel="self" type="application/rss+xml" />
 		
 		<item>
-			<title>K8s学习 client-go延迟队列</title>
-			<link>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</link>
-			<pubDate>Wed, 08 Dec 2021 16:04:39 +0800</pubDate>
+			<title>K8s源码学习 Job源码分析</title>
+			<link>https://www.ngirl.xyz/k8s/k8s%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
+			<pubDate>Thu, 09 Dec 2021 10:22:02 +0800</pubDate>
 			
-			<guid>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</guid>
-			<description>简介  我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试 那我们这里的重试间隔时间是如何控制的呢? 下面我们去了解一下 从 controller 找到 deployment 初始化方法看一下
- deployment 初始化  k8s的大多组件代码格式结构是类似的
- 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;deployment&amp;#34;] = startDeploymentController } 3. cmd/kube-controller-manager/app/apps.go startDeploymentController(...) (...) { dc, err := deployment.NewDeploymentController(...) go dc.Run(int(ctx.ComponentConfig.DeploymentController.ConcurrentDeploymentSyncs), ctx.Stop) } 3.1 pkg/controller/deployment/deployment_controller.go -&amp;gt; NewDeploymentController(...) (...) { dc := &amp;amp;DeploymentController{ queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), &amp;#34;deployment&amp;#34;), } } -&amp;gt; NewNamedRateLimitingQueue(.</description>
-			<content type="html"><![CDATA[<h1 id="简介">简介</h1>
-<blockquote>
-<p>我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试
-那我们这里的重试间隔时间是如何控制的呢?
-下面我们去了解一下
-从 controller 找到 deployment 初始化方法看一下</p>
-</blockquote>
-<h2 id="deployment-初始化">deployment 初始化</h2>
-<blockquote>
-<p>k8s的大多组件代码格式结构是类似的</p>
-</blockquote>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="mf">1.</span> <span class="nx">cmd</span><span class="o">/</span><span class="nx">kube</span><span class="o">-</span><span class="nx">controller</span><span class="o">-</span><span class="nx">manager</span><span class="o">/</span><span class="nx">controller</span><span class="o">-</span><span class="nx">manager</span><span class="p">.</span><span class="k">go</span>
-        <span class="nf">main</span><span class="p">()</span>  
-        <span class="o">-</span><span class="p">&gt;</span> <span class="nx">app</span><span class="p">.</span><span class="nf">NewControllerManagerCommand</span><span class="p">()</span>
-<span class="mf">2.</span> <span class="nx">cmd</span><span class="o">/</span><span class="nx">kube</span><span class="o">-</span><span class="nx">controller</span><span class="o">-</span><span class="nx">manager</span><span class="o">/</span><span class="nx">app</span><span class="o">/</span><span class="nx">controllermanager</span><span class="p">.</span><span class="k">go</span>
-        <span class="nf">NewControllerManagerCommand</span><span class="p">()</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span>
-        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">Run</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">NewControllerInitializers</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">InitFunc</span>   <span class="c1">// 这里返回控制器的map,后续会对他遍历执行InitFunc
-</span><span class="c1"></span>                <span class="p">{</span>
-                        <span class="nx">controllers</span><span class="p">[</span><span class="s">&#34;deployment&#34;</span><span class="p">]</span> <span class="p">=</span> <span class="nx">startDeploymentController</span>
-                <span class="p">}</span>
-<span class="mf">3.</span> <span class="nx">cmd</span><span class="o">/</span><span class="nx">kube</span><span class="o">-</span><span class="nx">controller</span><span class="o">-</span><span class="nx">manager</span><span class="o">/</span><span class="nx">app</span><span class="o">/</span><span class="nx">apps</span><span class="p">.</span><span class="k">go</span>
-        <span class="nf">startDeploymentController</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">dc</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">deployment</span><span class="p">.</span><span class="nf">NewDeploymentController</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-                <span class="k">go</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">ComponentConfig</span><span class="p">.</span><span class="nx">DeploymentController</span><span class="p">.</span><span class="nx">ConcurrentDeploymentSyncs</span><span class="p">),</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">Stop</span><span class="p">)</span>
-
-        <span class="p">}</span>
-<span class="mf">3.1</span> <span class="nx">pkg</span><span class="o">/</span><span class="nx">controller</span><span class="o">/</span><span class="nx">deployment</span><span class="o">/</span><span class="nx">deployment_controller</span><span class="p">.</span><span class="k">go</span>
-        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">NewDeploymentController</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">dc</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">DeploymentController</span><span class="p">{</span>
-                        <span class="nx">queue</span><span class="p">:</span>         <span class="nx">workqueue</span><span class="p">.</span><span class="nf">NewNamedRateLimitingQueue</span><span class="p">(</span><span class="nx">workqueue</span><span class="p">.</span><span class="nf">DefaultControllerRateLimiter</span><span class="p">(),</span> <span class="s">&#34;deployment&#34;</span><span class="p">),</span>
-                <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">NewNamedRateLimitingQueue</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="nx">RateLimitingInterface</span> <span class="p">{</span>
-                <span class="k">return</span> <span class="o">&amp;</span><span class="nx">rateLimitingType</span><span class="p">{</span>
-                        <span class="nx">DelayingInterface</span><span class="p">:</span> <span class="nf">NewNamedDelayingQueue</span><span class="p">(</span><span class="nx">name</span><span class="p">),</span>
-                        <span class="nx">rateLimiter</span><span class="p">:</span>       <span class="nx">rateLimiter</span><span class="p">,</span> <span class="c1">// 限流器
-</span><span class="c1"></span>                <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">NewNamedDelayingQueue</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="nx">DelayingInterface</span>
-        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">newDelayingQueue</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="nx">DelayingInterface</span> <span class="p">{</span>
-                <span class="nx">ret</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">delayingType</span><span class="p">{</span>
-        		<span class="nx">Interface</span><span class="p">:</span>       <span class="nf">NewNamed</span><span class="p">(</span><span class="nx">name</span><span class="p">),</span>
-        	       <span class="p">}</span>
-                <span class="p">}</span>
-        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">NewNamed</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="o">*</span><span class="nx">Type</span>
-
-<span class="mf">3.2</span> <span class="nx">pkg</span><span class="o">/</span><span class="nx">controller</span><span class="o">/</span><span class="nx">deployment</span><span class="o">/</span><span class="nx">deployment_controller</span><span class="p">.</span><span class="k">go</span>
-        <span class="nf">Run</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-        <span class="o">-</span><span class="p">&gt;</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">worker</span><span class="p">()</span> <span class="p">{</span>
-                <span class="k">for</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">processNextWorkItem</span><span class="p">()</span> <span class="p">{</span>
-	        <span class="p">}</span>
-           <span class="p">}</span>
-        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">processNextWorkItem</span><span class="p">()</span> <span class="p">{</span>
-                <span class="nx">err</span> <span class="o">:=</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">syncHandler</span><span class="p">(</span><span class="nx">key</span><span class="p">.(</span><span class="kt">string</span><span class="p">))</span>
-                <span class="nx">dc</span><span class="p">.</span><span class="nf">handleErr</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span>
-           <span class="p">}</span>
-</code></pre></div><blockquote>
-<p>看到以上流程, 我们知道</p>
-</blockquote>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">rateLimitingType</span> <span class="nx">结构体实现了</span> <span class="nx">RateLimitingInterface</span> <span class="nx">限流队列接口</span>
-<span class="nx">delayingType</span> <span class="nx">结构体实现了</span> <span class="nx">DelayingInterface</span> <span class="nx">延迟队列接口</span>
-<span class="o">*</span><span class="nx">Type</span> <span class="nx">指针类型结构体实现了</span> <span class="nx">Interface</span> <span class="nx">同样队列接口</span>
-</code></pre></div><h2 id="队列接口">队列接口</h2>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// vendor/k8s.io/client-go/util/workqueue/rate_limiting_queue.go
-</span><span class="c1">// 限流接口
-</span><span class="c1"></span><span class="kd">type</span> <span class="nx">RateLimitingInterface</span> <span class="kd">interface</span> <span class="p">{</span>
-	<span class="nx">DelayingInterface</span>
-	<span class="nf">AddRateLimited</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
-	<span class="nf">Forget</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
-	<span class="nf">NumRequeues</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kt">int</span>
-<span class="p">}</span>
-
-<span class="c1">// vendor/k8s.io/client-go/util/workqueue/delaying_queue.go
-</span><span class="c1">// 延迟接口
-</span><span class="c1"></span><span class="kd">type</span> <span class="nx">DelayingInterface</span> <span class="kd">interface</span> <span class="p">{</span>
-	<span class="nx">Interface</span>      <span class="c1">// 通用接口
-</span><span class="c1"></span>	<span class="nf">AddAfter</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">duration</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span>     
-<span class="p">}</span>
-
-<span class="c1">// vendor/k8s.io/client-go/util/workqueue/queue.go
-</span><span class="c1">// 通用接口
-</span><span class="c1"></span><span class="kd">type</span> <span class="nx">Interface</span> <span class="kd">interface</span> <span class="p">{</span>
-	<span class="nf">Add</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
-	<span class="nf">Len</span><span class="p">()</span> <span class="kt">int</span>
-	<span class="nf">Get</span><span class="p">()</span> <span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">shutdown</span> <span class="kt">bool</span><span class="p">)</span>
-	<span class="nf">Done</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
-	<span class="nf">ShutDown</span><span class="p">()</span>
-	<span class="nf">ShuttingDown</span><span class="p">()</span> <span class="kt">bool</span>
-<span class="p">}</span>
-<span class="c1">// 限流接口
-</span><span class="c1"></span><span class="kd">type</span> <span class="nx">RateLimiter</span> <span class="kd">interface</span> <span class="p">{</span>
-	<span class="nf">When</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
-	<span class="nf">Forget</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
-	<span class="nf">NumRequeues</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kt">int</span>
-<span class="p">}</span>
-
-</code></pre></div><h2 id="实现接口的结构体">实现接口的结构体</h2>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 限流结构体直接嵌套 延迟队列 接口的
-</span><span class="c1"></span><span class="kd">type</span> <span class="nx">rateLimitingType</span> <span class="kd">struct</span> <span class="p">{</span>
-	<span class="nx">DelayingInterface</span>
-	<span class="nx">rateLimiter</span> <span class="nx">RateLimiter</span>
-<span class="p">}</span>
-<span class="c1">// 延迟结构体 同样嵌套 同样队列接口
-</span><span class="c1"></span><span class="kd">type</span> <span class="nx">delayingType</span> <span class="kd">struct</span> <span class="p">{</span>
-	<span class="nx">Interface</span>
-	<span class="c1">// 时钟
-</span><span class="c1"></span>	<span class="nx">clock</span> <span class="nx">clock</span><span class="p">.</span><span class="nx">Clock</span>
-	<span class="c1">// 退出信号
-</span><span class="c1"></span>	<span class="nx">stopCh</span> <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}</span>
-	<span class="nx">stopOnce</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">Once</span>
-	<span class="nx">heartbeat</span> <span class="nx">clock</span><span class="p">.</span><span class="nx">Ticker</span>
-	<span class="nx">waitingForAddCh</span> <span class="kd">chan</span> <span class="o">*</span><span class="nx">waitFor</span>  <span class="c1">// 用于保存到小顶堆中的 channel 通道
-</span><span class="c1"></span>	<span class="c1">// 重试的次数, retryMetrics 接口 只有一个retry() 方法
-</span><span class="c1"></span>	<span class="nx">metrics</span> <span class="nx">retryMetrics</span>
-<span class="p">}</span>
-<span class="kd">type</span> <span class="nx">waitFor</span> <span class="kd">struct</span> <span class="p">{</span>
-	<span class="nx">data</span>    <span class="nx">t</span>              <span class="c1">// 元素
-</span><span class="c1"></span>	<span class="nx">readyAt</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>      <span class="c1">// 延迟多久添加到队列
-</span><span class="c1"></span>	<span class="nx">index</span> <span class="kt">int</span>              <span class="c1">// 小顶堆的索引
-</span><span class="c1"></span><span class="p">}</span>
-<span class="c1">// 工作队列
-</span><span class="c1"></span><span class="kd">type</span> <span class="nx">Type</span> <span class="kd">struct</span> <span class="p">{</span>
-	<span class="nx">queue</span> <span class="p">[]</span><span class="nx">t</span>      <span class="c1">// type t interface{}
-</span><span class="c1"></span>	<span class="nx">dirty</span> <span class="nx">set</span>      <span class="c1">// type set map[t]empty
-</span><span class="c1"></span>	<span class="nx">processing</span> <span class="nx">set</span>
-	<span class="nx">cond</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">Cond</span>
-	<span class="nx">shuttingDown</span> <span class="kt">bool</span>
-	<span class="nx">metrics</span> <span class="nx">queueMetrics</span>   
-	<span class="nx">unfinishedWorkUpdatePeriod</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
-	<span class="nx">clock</span>                      <span class="nx">clock</span><span class="p">.</span><span class="nx">Clock</span>
-<span class="p">}</span>
-
-</code></pre></div><hr>
-<blockquote>
-<p>在 <code>startDeploymentController</code> 中核心就是两个方法, 一个是 <code>NewDeploymentController</code>, 一个是 <code>Run</code></p>
-</blockquote>
-<h1 id="newdeploymentcontroller">NewDeploymentController</h1>
-<h2 id="队列初始化">队列初始化</h2>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 从例子中deployment控制器的初始化我们看到queue的初始化
-</span><span class="c1"></span><span class="nx">queue</span><span class="p">:</span>         <span class="nx">workqueue</span><span class="p">.</span><span class="nf">NewNamedRateLimitingQueue</span><span class="p">(</span><span class="nx">workqueue</span><span class="p">.</span><span class="nf">DefaultControllerRateLimiter</span><span class="p">(),</span> <span class="s">&#34;deployment&#34;</span><span class="p">),</span>
-</code></pre></div><h3 id="先看下第一个参数">先看下第一个参数</h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// workqueue.DefaultControllerRateLimiter() 函数
-</span><span class="c1"></span><span class="kd">func</span> <span class="nf">DefaultControllerRateLimiter</span><span class="p">()</span> <span class="nx">RateLimiter</span> <span class="p">{</span>
-	<span class="k">return</span> <span class="nf">NewMaxOfRateLimiter</span><span class="p">(</span>
-                <span class="c1">// 第一个限流器,指数级, 设置失败的item的限流队列, 并设置 baseDelay 和maxDelay
-</span><span class="c1"></span>		<span class="nf">NewItemExponentialFailureRateLimiter</span><span class="p">(</span><span class="mi">5</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span><span class="p">,</span> <span class="mi">1000</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">),</span>
-                <span class="c1">// 第二个限流器,令牌桶常数级, 10qps,100的桶, 这是一个令牌桶
-</span><span class="c1"></span>		<span class="o">&amp;</span><span class="nx">BucketRateLimiter</span><span class="p">{</span><span class="nx">Limiter</span><span class="p">:</span> <span class="nx">rate</span><span class="p">.</span><span class="nf">NewLimiter</span><span class="p">(</span><span class="nx">rate</span><span class="p">.</span><span class="nf">Limit</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="mi">100</span><span class="p">)},</span>
-	<span class="p">)</span>
-<span class="p">}</span>
-<span class="c1">// 一个[]RateLimiter 列表
-</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewMaxOfRateLimiter</span><span class="p">(</span><span class="nx">limiters</span> <span class="o">...</span><span class="nx">RateLimiter</span><span class="p">)</span> <span class="nx">RateLimiter</span> <span class="p">{</span>
-	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">MaxOfRateLimiter</span><span class="p">{</span><span class="nx">limiters</span><span class="p">:</span> <span class="nx">limiters</span><span class="p">}</span>
-<span class="p">}</span>
-<span class="c1">// 第一个限流器 NewItemExponentialFailureRateLimiter
-</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewItemExponentialFailureRateLimiter</span><span class="p">(</span><span class="nx">baseDelay</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">,</span> <span class="nx">maxDelay</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="nx">RateLimiter</span> <span class="p">{</span>
-	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">ItemExponentialFailureRateLimiter</span><span class="p">{</span>
-		<span class="nx">failures</span><span class="p">:</span>  <span class="kd">map</span><span class="p">[</span><span class="kd">interface</span><span class="p">{}]</span><span class="kt">int</span><span class="p">{},</span>
-		<span class="nx">baseDelay</span><span class="p">:</span> <span class="nx">baseDelay</span><span class="p">,</span>
-		<span class="nx">maxDelay</span><span class="p">:</span>  <span class="nx">maxDelay</span><span class="p">,</span>
-	<span class="p">}</span>
-<span class="p">}</span>
-<span class="c1">// 第二个令牌桶 BucketRateLimiter
-</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewLimiter</span><span class="p">(</span><span class="nx">r</span> <span class="nx">Limit</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">Limiter</span> <span class="p">{</span>
-	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">Limiter</span><span class="p">{</span>
-		<span class="nx">limit</span><span class="p">:</span> <span class="nx">r</span><span class="p">,</span>
-		<span class="nx">burst</span><span class="p">:</span> <span class="nx">b</span><span class="p">,</span>
-	<span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><h3 id="接着看下初始化函数">接着看下初始化函数</h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// NewNamedRateLimitingQueue 两个参数, 第一个 RateLimiter 接口, 第二个是名字字符串
-</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewNamedRateLimitingQueue</span><span class="p">(</span><span class="nx">rateLimiter</span> <span class="nx">RateLimiter</span><span class="p">,</span> <span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="nx">RateLimitingInterface</span> <span class="p">{</span>
-        <span class="c1">// 返回 rateLimitingType 这个结构体, 实现限流队列接口
-</span><span class="c1"></span>	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">rateLimitingType</span><span class="p">{</span>
-                <span class="c1">// 延迟队列的初始化
-</span><span class="c1"></span>		<span class="nx">DelayingInterface</span><span class="p">:</span> <span class="nf">NewNamedDelayingQueue</span><span class="p">(</span><span class="nx">name</span><span class="p">),</span>
-		<span class="nx">rateLimiter</span><span class="p">:</span>       <span class="nx">rateLimiter</span><span class="p">,</span>
-	<span class="p">}</span>
-<span class="p">}</span>
-<span class="c1">// NewNamedDelayingQueue
-</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewNamedDelayingQueue</span><span class="p">(</span><span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="nx">DelayingInterface</span> <span class="p">{</span>
-        <span class="c1">// RealClock结构体没有元素, RealClock really calls time.Now()
-</span><span class="c1"></span>	<span class="k">return</span> <span class="nf">newDelayingQueue</span><span class="p">(</span><span class="nx">clock</span><span class="p">.</span><span class="nx">RealClock</span><span class="p">{},</span> <span class="nx">name</span><span class="p">)</span>
-<span class="p">}</span>
-<span class="kd">func</span> <span class="nf">newDelayingQueue</span><span class="p">(</span><span class="nx">clock</span> <span class="nx">clock</span><span class="p">.</span><span class="nx">Clock</span><span class="p">,</span> <span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="nx">DelayingInterface</span> <span class="p">{</span>
-        <span class="c1">// delayingType 结构体初始化
-</span><span class="c1"></span>	<span class="nx">ret</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">delayingType</span><span class="p">{</span>
-                <span class="c1">// 同样接口初始化
-</span><span class="c1"></span>		<span class="nx">Interface</span><span class="p">:</span>       <span class="nf">NewNamed</span><span class="p">(</span><span class="nx">name</span><span class="p">),</span>
-		<span class="nx">clock</span><span class="p">:</span>           <span class="nx">clock</span><span class="p">,</span>
-		<span class="nx">heartbeat</span><span class="p">:</span>       <span class="nx">clock</span><span class="p">.</span><span class="nf">NewTicker</span><span class="p">(</span><span class="nx">maxWait</span><span class="p">),</span>
-		<span class="nx">stopCh</span><span class="p">:</span>          <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}),</span>
-		<span class="nx">waitingForAddCh</span><span class="p">:</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="o">*</span><span class="nx">waitFor</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span>
-		<span class="nx">metrics</span><span class="p">:</span>         <span class="nf">newRetryMetrics</span><span class="p">(</span><span class="nx">name</span><span class="p">),</span>
-	<span class="p">}</span>
-        <span class="c1">// 协程循环
-</span><span class="c1"></span>	<span class="k">go</span> <span class="nx">ret</span><span class="p">.</span><span class="nf">waitingLoop</span><span class="p">()</span>
-	<span class="k">return</span> <span class="nx">ret</span>
-<span class="p">}</span>
-</code></pre></div><h3 id="核心的延迟循环">核心的延迟循环</h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">q</span> <span class="o">*</span><span class="nx">delayingType</span><span class="p">)</span> <span class="nf">waitingLoop</span><span class="p">()</span> <span class="p">{</span>
-	<span class="k">defer</span> <span class="nx">utilruntime</span><span class="p">.</span><span class="nf">HandleCrash</span><span class="p">()</span>
-
-	<span class="c1">// 赋值nextReadyAt,首次pass
-</span><span class="c1"></span>	<span class="nx">never</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="o">&lt;-</span><span class="kd">chan</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">)</span>
-        <span class="c1">// waitForPriorityQueue 结构体是一个堆的实现
-</span><span class="c1"></span>	<span class="nx">waitingForQueue</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">waitForPriorityQueue</span><span class="p">{}</span>
-        <span class="c1">// 初始化 小顶堆
-</span><span class="c1"></span>	<span class="nx">heap</span><span class="p">.</span><span class="nf">Init</span><span class="p">(</span><span class="nx">waitingForQueue</span><span class="p">)</span>
-        <span class="c1">// 定义一个map存储 waitfor
-</span><span class="c1"></span>	<span class="nx">waitingEntryByData</span> <span class="o">:=</span> <span class="kd">map</span><span class="p">[</span><span class="nx">t</span><span class="p">]</span><span class="o">*</span><span class="nx">waitFor</span><span class="p">{}</span>
-	<span class="k">for</span> <span class="p">{</span>
-                <span class="c1">// 如果 工作队列正在结束, 就是看shuttingDown的标志位
-</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">q</span><span class="p">.</span><span class="nx">Interface</span><span class="p">.</span><span class="nf">ShuttingDown</span><span class="p">()</span> <span class="p">{</span>
-			<span class="k">return</span>
-		<span class="p">}</span>
-                <span class="c1">// 当前时间戳 time.Now()
-</span><span class="c1"></span>		<span class="nx">now</span> <span class="o">:=</span> <span class="nx">q</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">Now</span><span class="p">()</span>
-
-		<span class="c1">// 如果 堆 不空
-</span><span class="c1"></span>		<span class="k">for</span> <span class="nx">waitingForQueue</span><span class="p">.</span><span class="nf">Len</span><span class="p">()</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
-                        <span class="c1">// 堆顶, 也就是时间戳最小的元素, 拿出来看一眼先
-</span><span class="c1"></span>			<span class="nx">entry</span> <span class="o">:=</span> <span class="nx">waitingForQueue</span><span class="p">.</span><span class="nf">Peek</span><span class="p">().(</span><span class="o">*</span><span class="nx">waitFor</span><span class="p">)</span>
-                        <span class="c1">// entry.readyAt 时间如果晚于 now, 说明第一个还没到时间, 那么就退出循环
-</span><span class="c1"></span>			<span class="k">if</span> <span class="nx">entry</span><span class="p">.</span><span class="nx">readyAt</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">now</span><span class="p">)</span> <span class="p">{</span>
-				<span class="k">break</span>
-			<span class="p">}</span>
-                        <span class="c1">// 否则的话, 看过了没问题, 现在就真的要出堆了
-</span><span class="c1"></span>                        <span class="c1">// 因为是小顶堆, 所以先把最后一个和第一个(堆顶)交换, 然后对最后一个进行下沉操作, 最后返回从堆顶交换下来的(旧堆顶)出堆
-</span><span class="c1"></span>			<span class="nx">entry</span> <span class="p">=</span> <span class="nx">heap</span><span class="p">.</span><span class="nf">Pop</span><span class="p">(</span><span class="nx">waitingForQueue</span><span class="p">).(</span><span class="o">*</span><span class="nx">waitFor</span><span class="p">)</span>
-                        <span class="c1">// Add是Interface通用接口的方法
-</span><span class="c1"></span>                        <span class="c1">// 往工作队列中添加 data 去消费了
-</span><span class="c1"></span>			<span class="nx">q</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">entry</span><span class="p">.</span><span class="nx">data</span><span class="p">)</span>
-                        <span class="c1">// 然后把waitingEntryByData 表清理一下
-</span><span class="c1"></span>			<span class="nb">delete</span><span class="p">(</span><span class="nx">waitingEntryByData</span><span class="p">,</span> <span class="nx">entry</span><span class="p">.</span><span class="nx">data</span><span class="p">)</span>
-		<span class="p">}</span>
-
-		<span class="c1">// 走到这里的话 说明waitingForQueue.Len() == 0
-</span><span class="c1"></span>                <span class="c1">// 首次初始化的情况
-</span><span class="c1"></span>		<span class="nx">nextReadyAt</span> <span class="o">:=</span> <span class="nx">never</span>
-                <span class="c1">// 如果还有元素
-</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">waitingForQueue</span><span class="p">.</span><span class="nf">Len</span><span class="p">()</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
-                        <span class="c1">// 再看一眼
-</span><span class="c1"></span>			<span class="nx">entry</span> <span class="o">:=</span> <span class="nx">waitingForQueue</span><span class="p">.</span><span class="nf">Peek</span><span class="p">().(</span><span class="o">*</span><span class="nx">waitFor</span><span class="p">)</span>
-                        <span class="c1">// entry.readyAt.Sub 是把这个元素的时间 entry.readyAt 减去 当前时间now
-</span><span class="c1"></span>                        <span class="c1">// q.clock.After 实际就是 time.After, 所以就是延迟了
-</span><span class="c1"></span>			<span class="nx">nextReadyAt</span> <span class="p">=</span> <span class="nx">q</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">entry</span><span class="p">.</span><span class="nx">readyAt</span><span class="p">.</span><span class="nf">Sub</span><span class="p">(</span><span class="nx">now</span><span class="p">))</span>
-		<span class="p">}</span>
-
-		<span class="k">select</span> <span class="p">{</span>
-		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">q</span><span class="p">.</span><span class="nx">stopCh</span><span class="p">:</span>
-			<span class="k">return</span>
-                <span class="c1">// ticker
-</span><span class="c1"></span>		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">q</span><span class="p">.</span><span class="nx">heartbeat</span><span class="p">.</span><span class="nf">C</span><span class="p">():</span>
-                <span class="c1">// 如果上面拿到元素了就可以直接循环去处理那个看过的entry
-</span><span class="c1"></span>                <span class="c1">// 当然如果没有元素, 这里就是never, 会被pass
-</span><span class="c1"></span>		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">nextReadyAt</span><span class="p">:</span>
-			<span class="c1">// continue the loop, which will add ready items
-</span><span class="c1"></span>                <span class="c1">// waitingForAddCh channel 有写入, 一般在Affter函数中
-</span><span class="c1"></span>		<span class="k">case</span> <span class="nx">waitEntry</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">q</span><span class="p">.</span><span class="nx">waitingForAddCh</span><span class="p">:</span>
-                        <span class="c1">// 同样比较一个 waitEntry.readyAt 是否 大于 当前时间戳
-</span><span class="c1"></span>			<span class="k">if</span> <span class="nx">waitEntry</span><span class="p">.</span><span class="nx">readyAt</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">q</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">Now</span><span class="p">())</span> <span class="p">{</span>
-                                <span class="c1">// 大于的话就加入到等待队列
-</span><span class="c1"></span>				<span class="nf">insert</span><span class="p">(</span><span class="nx">waitingForQueue</span><span class="p">,</span> <span class="nx">waitingEntryByData</span><span class="p">,</span> <span class="nx">waitEntry</span><span class="p">)</span>
-			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                                <span class="c1">// 否则就处理工作
-</span><span class="c1"></span>				<span class="nx">q</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">waitEntry</span><span class="p">.</span><span class="nx">data</span><span class="p">)</span>
-			<span class="p">}</span>
-                        <span class="c1">// 批量处理, 把waitingForAddCh 取完
-</span><span class="c1"></span>			<span class="nx">drained</span> <span class="o">:=</span> <span class="kc">false</span>
-			<span class="k">for</span> <span class="p">!</span><span class="nx">drained</span> <span class="p">{</span>
-				<span class="k">select</span> <span class="p">{</span>
-				<span class="k">case</span> <span class="nx">waitEntry</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">q</span><span class="p">.</span><span class="nx">waitingForAddCh</span><span class="p">:</span>
-					<span class="k">if</span> <span class="nx">waitEntry</span><span class="p">.</span><span class="nx">readyAt</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">q</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">Now</span><span class="p">())</span> <span class="p">{</span>
-						<span class="nf">insert</span><span class="p">(</span><span class="nx">waitingForQueue</span><span class="p">,</span> <span class="nx">waitingEntryByData</span><span class="p">,</span> <span class="nx">waitEntry</span><span class="p">)</span>
-					<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-						<span class="nx">q</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">waitEntry</span><span class="p">.</span><span class="nx">data</span><span class="p">)</span>
-					<span class="p">}</span>
-                                <span class="c1">// 取完了
-</span><span class="c1"></span>				<span class="k">default</span><span class="p">:</span>
-					<span class="nx">drained</span> <span class="p">=</span> <span class="kc">true</span>
-				<span class="p">}</span>
-			<span class="p">}</span>
-		<span class="p">}</span>
-	<span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><h3 id="waitingloop-总结">waitingLoop 总结</h3>
-<blockquote>
-<p>看完 <code>waitingLoop</code> 我们发现, 延迟队列是通过一个 <code>waitForPriorityQueue</code> 队列实现, <code>waitForPriorityQueue</code> 其实 sort接口 和 heap接口</p>
-<p>从实现的 <code>Less</code> 方法我们知道, <code>readyAt</code> 最小的在堆顶</p>
-<p>通过循环 读取 <code>waitingForAddCh</code> 通道的数据, 然后添加到 <code>waitingForQueue</code>, 进行堆排, 然后执行 <code>time.After</code> 延迟后加入到 工作队列执行</p>
-</blockquote>
-<blockquote>
-<p>那么 <code>waitingForAddCh</code>通道的内容是在什么时候加进来的呢? 我们接着 <code>NewDeploymentController</code> 继续往下看</p>
-</blockquote>
-<h2 id="synchandler">syncHandler</h2>
-<blockquote>
-<p>我们省略了其他初始化工作
-syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
-</blockquote>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">NewDeploymentController</span><span class="p">(</span><span class="nx">dInformer</span> <span class="nx">appsinformers</span><span class="p">.</span><span class="nx">DeploymentInformer</span><span class="p">,</span> <span class="nx">rsInformer</span> <span class="nx">appsinformers</span><span class="p">.</span><span class="nx">ReplicaSetInformer</span><span class="p">,</span> <span class="nx">podInformer</span> <span class="nx">coreinformers</span><span class="p">.</span><span class="nx">PodInformer</span><span class="p">,</span> <span class="nx">client</span> <span class="nx">clientset</span><span class="p">.</span><span class="nx">Interface</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">DeploymentController</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
-        <span class="o">...</span>
-	<span class="nx">dc</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">DeploymentController</span><span class="p">{</span>
-		<span class="nx">queue</span><span class="p">:</span>         <span class="nx">workqueue</span><span class="p">.</span><span class="nf">NewNamedRateLimitingQueue</span><span class="p">(</span><span class="nx">workqueue</span><span class="p">.</span><span class="nf">DefaultControllerRateLimiter</span><span class="p">(),</span> <span class="s">&#34;deployment&#34;</span><span class="p">),</span>
-	<span class="p">}</span>
-	<span class="o">...</span>
-	<span class="nx">dc</span><span class="p">.</span><span class="nx">syncHandler</span> <span class="p">=</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">syncDeployment</span>
-        <span class="o">...</span>
-	<span class="k">return</span> <span class="nx">dc</span><span class="p">,</span> <span class="kc">nil</span>
-<span class="p">}</span>
-
-</code></pre></div><h3 id="syncdeployment">syncDeployment</h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// pkg/controller/deployment/deployment_controller.go
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">syncDeployment</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
-        <span class="o">...</span>
-	<span class="nx">namespace</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">cache</span><span class="p">.</span><span class="nf">SplitMetaNamespaceKey</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
-        <span class="o">...</span>
-	<span class="nx">deployment</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">dLister</span><span class="p">.</span><span class="nf">Deployments</span><span class="p">(</span><span class="nx">namespace</span><span class="p">).</span><span class="nf">Get</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
-        <span class="o">...</span>
-        <span class="c1">// 深copy一份
-</span><span class="c1"></span>	<span class="nx">d</span> <span class="o">:=</span> <span class="nx">deployment</span><span class="p">.</span><span class="nf">DeepCopy</span><span class="p">()</span>
-
-	<span class="o">...</span>
-        <span class="c1">// 查看 deployment的状态
-</span><span class="c1"></span>	<span class="k">switch</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">Strategy</span><span class="p">.</span><span class="nx">Type</span> <span class="p">{</span>
-        <span class="c1">// &#34;Recreate&#34;
-</span><span class="c1"></span>	<span class="k">case</span> <span class="nx">apps</span><span class="p">.</span><span class="nx">RecreateDeploymentStrategyType</span><span class="p">:</span>
-		<span class="k">return</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">rolloutRecreate</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">rsList</span><span class="p">,</span> <span class="nx">podMap</span><span class="p">)</span>
-        <span class="c1">// &#34;RollingUpdate&#34;
-</span><span class="c1"></span>	<span class="k">case</span> <span class="nx">apps</span><span class="p">.</span><span class="nx">RollingUpdateDeploymentStrategyType</span><span class="p">:</span>
-		<span class="k">return</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">rolloutRolling</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">rsList</span><span class="p">)</span>
-	<span class="p">}</span>
-	<span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;unexpected deployment strategy type: %s&#34;</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">Strategy</span><span class="p">.</span><span class="nx">Type</span><span class="p">)</span>
-<span class="p">}</span>
-
-<span class="c1">// 不管是 Recreate 还是 RollingUpdate 最终都会调用 syncRolloutStatus
-</span><span class="c1">// pkg/controller/deployment/progress.go
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">syncRolloutStatus</span><span class="p">(</span><span class="nx">allRSs</span> <span class="p">[]</span><span class="o">*</span><span class="nx">apps</span><span class="p">.</span><span class="nx">ReplicaSet</span><span class="p">,</span> <span class="nx">newRS</span> <span class="o">*</span><span class="nx">apps</span><span class="p">.</span><span class="nx">ReplicaSet</span><span class="p">,</span> <span class="nx">d</span> <span class="o">*</span><span class="nx">apps</span><span class="p">.</span><span class="nx">Deployment</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
-        <span class="nx">newStatus</span> <span class="o">:=</span> <span class="nf">calculateStatus</span><span class="p">(</span><span class="nx">allRSs</span><span class="p">,</span> <span class="nx">newRS</span><span class="p">,</span> <span class="nx">d</span><span class="p">)</span>
-        <span class="o">...</span>
-        <span class="c1">// 如果没有新的更新
-</span><span class="c1"></span>        <span class="k">if</span> <span class="nx">reflect</span><span class="p">.</span><span class="nf">DeepEqual</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">Status</span><span class="p">,</span> <span class="nx">newStatus</span><span class="p">)</span> <span class="p">{</span>
-                <span class="c1">// 这个时候就去调用延迟队列了
-</span><span class="c1"></span>                <span class="nx">dc</span><span class="p">.</span><span class="nf">requeueStuckDeployment</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">newStatus</span><span class="p">)</span>
-                <span class="k">return</span> <span class="kc">nil</span>
-        <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="c1">// requeueStuckDeployment
-</span><span class="c1">// pkg/controller/deployment/progress.go
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">requeueStuckDeployment</span><span class="p">(</span><span class="nx">d</span> <span class="o">*</span><span class="nx">apps</span><span class="p">.</span><span class="nx">Deployment</span><span class="p">,</span> <span class="nx">newStatus</span> <span class="nx">apps</span><span class="p">.</span><span class="nx">DeploymentStatus</span><span class="p">)</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="p">{</span>
-	<span class="nx">currentCond</span> <span class="o">:=</span> <span class="nx">util</span><span class="p">.</span><span class="nf">GetDeploymentCondition</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">Status</span><span class="p">,</span> <span class="nx">apps</span><span class="p">.</span><span class="nx">DeploymentProgressing</span><span class="p">)</span>
-	<span class="c1">// 如果没有设置 spec.ProgressDeadlineSeconds的话 就直接退出了, 不会延迟
-</span><span class="c1"></span>	<span class="k">if</span> <span class="p">!</span><span class="nx">util</span><span class="p">.</span><span class="nf">HasProgressDeadline</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="o">||</span> <span class="nx">currentCond</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-		<span class="k">return</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-	<span class="p">}</span>
-        <span class="c1">// 已经完成了 或者超时的原因 也直接退出
-</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">util</span><span class="p">.</span><span class="nf">DeploymentComplete</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">newStatus</span><span class="p">)</span> <span class="o">||</span> <span class="nx">currentCond</span><span class="p">.</span><span class="nx">Reason</span> <span class="o">==</span> <span class="nx">util</span><span class="p">.</span><span class="nx">TimedOutReason</span> <span class="p">{</span>
-		<span class="k">return</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-	<span class="p">}</span>
-	<span class="c1">// 计算要延迟的时间
-</span><span class="c1"></span>        <span class="c1">// = LastUpdateTime + ProgressDeadlineSeconds - time.now()
-</span><span class="c1"></span>	<span class="nx">after</span> <span class="o">:=</span> <span class="nx">currentCond</span><span class="p">.</span><span class="nx">LastUpdateTime</span><span class="p">.</span><span class="nx">Time</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="o">*</span><span class="nx">d</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">ProgressDeadlineSeconds</span><span class="p">)</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">).</span><span class="nf">Sub</span><span class="p">(</span><span class="nf">nowFn</span><span class="p">())</span>
-	<span class="o">...</span>
-        <span class="c1">// 要延迟 after + 1 秒
-</span><span class="c1"></span>	<span class="nx">dc</span><span class="p">.</span><span class="nf">enqueueAfter</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">after</span><span class="o">+</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
-	<span class="k">return</span> <span class="nx">after</span>
-<span class="p">}</span>
-<span class="c1">// enqueueAfter
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">enqueueAfter</span><span class="p">(</span><span class="nx">deployment</span> <span class="o">*</span><span class="nx">apps</span><span class="p">.</span><span class="nx">Deployment</span><span class="p">,</span> <span class="nx">after</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="p">{</span>
-        <span class="o">...</span>
-        <span class="c1">// queue 我们知道在 初始化是 被rateLimitingType 结构体实现的 , 但它并没有AddAfter 方法, 因为它嵌套了 DelayingInterface
-</span><span class="c1"></span>        <span class="c1">// 而 DelayingInterface 又被 NewNamedDelayingQueue() 方法初始化 由 delayingType 结构体来实现
-</span><span class="c1"></span>	<span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">AddAfter</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">after</span><span class="p">)</span>
-<span class="p">}</span>
-<span class="c1">// 因此我们找到了 delayingType 的 AddAfter 方法
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">q</span> <span class="o">*</span><span class="nx">delayingType</span><span class="p">)</span> <span class="nf">AddAfter</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">duration</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="p">{</span>
-	<span class="c1">// don&#39;t add if we&#39;re already shutting down
-</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">q</span><span class="p">.</span><span class="nf">ShuttingDown</span><span class="p">()</span> <span class="p">{</span>
-		<span class="k">return</span>
-	<span class="p">}</span>
-        <span class="c1">// 重试次数增加
-</span><span class="c1"></span>	<span class="nx">q</span><span class="p">.</span><span class="nx">metrics</span><span class="p">.</span><span class="nf">retry</span><span class="p">()</span>
-
-	<span class="c1">// immediately add things with no delay
-</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">duration</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="p">{</span>
-		<span class="nx">q</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span>
-		<span class="k">return</span>
-	<span class="p">}</span>
-        <span class="c1">// 终于我们看到了什么时候 写入 waitingForAddCh channel中
-</span><span class="c1"></span>	<span class="k">select</span> <span class="p">{</span>
-	<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">q</span><span class="p">.</span><span class="nx">stopCh</span><span class="p">:</span>
-	<span class="k">case</span> <span class="nx">q</span><span class="p">.</span><span class="nx">waitingForAddCh</span> <span class="o">&lt;-</span> <span class="o">&amp;</span><span class="nx">waitFor</span><span class="p">{</span><span class="nx">data</span><span class="p">:</span> <span class="nx">item</span><span class="p">,</span> <span class="nx">readyAt</span><span class="p">:</span> <span class="nx">q</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">Add</span><span class="p">(</span><span class="nx">duration</span><span class="p">)}:</span>
-	<span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><h1 id="run-代码">Run 代码</h1>
-<h2 id="dcrun">dc.Run</h2>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// pkg/controller/deployment/deployment_controller.go
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">Run</span><span class="p">(</span><span class="nx">workers</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
-	<span class="k">defer</span> <span class="nx">utilruntime</span><span class="p">.</span><span class="nf">HandleCrash</span><span class="p">()</span>
-	<span class="k">defer</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">ShutDown</span><span class="p">()</span>
-
-	<span class="nx">klog</span><span class="p">.</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Starting deployment controller&#34;</span><span class="p">)</span>
-	<span class="k">defer</span> <span class="nx">klog</span><span class="p">.</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Shutting down deployment controller&#34;</span><span class="p">)</span>
-
-	<span class="k">if</span> <span class="p">!</span><span class="nx">cache</span><span class="p">.</span><span class="nf">WaitForNamedCacheSync</span><span class="p">(</span><span class="s">&#34;deployment&#34;</span><span class="p">,</span> <span class="nx">stopCh</span><span class="p">,</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">dListerSynced</span><span class="p">,</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">rsListerSynced</span><span class="p">,</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">podListerSynced</span><span class="p">)</span> <span class="p">{</span>
-		<span class="k">return</span>
-	<span class="p">}</span>
-
-	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">workers</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
-		<span class="k">go</span> <span class="nx">wait</span><span class="p">.</span><span class="nf">Until</span><span class="p">(</span><span class="nx">dc</span><span class="p">.</span><span class="nx">worker</span><span class="p">,</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span> <span class="nx">stopCh</span><span class="p">)</span>
-	<span class="p">}</span>
-
-	<span class="o">&lt;-</span><span class="nx">stopCh</span>
-<span class="p">}</span>
-
-<span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">worker</span><span class="p">()</span> <span class="p">{</span>
-	<span class="k">for</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">processNextWorkItem</span><span class="p">()</span> <span class="p">{</span>
-	<span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">processNextWorkItem</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
-	<span class="nx">key</span><span class="p">,</span> <span class="nx">quit</span> <span class="o">:=</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">Get</span><span class="p">()</span>
-	<span class="k">if</span> <span class="nx">quit</span> <span class="p">{</span>
-		<span class="k">return</span> <span class="kc">false</span>
-	<span class="p">}</span>
-	<span class="k">defer</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">Done</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
-        <span class="c1">// 这里就是syncDeployment, 上面已经详细介绍过了
-</span><span class="c1"></span>	<span class="nx">err</span> <span class="o">:=</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">syncHandler</span><span class="p">(</span><span class="nx">key</span><span class="p">.(</span><span class="kt">string</span><span class="p">))</span>
-        <span class="c1">// 这里会写入延迟队列的 channel
-</span><span class="c1"></span>	<span class="nx">dc</span><span class="p">.</span><span class="nf">handleErr</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span>
-
-	<span class="k">return</span> <span class="kc">true</span>
-<span class="p">}</span>
-</code></pre></div><h2 id="dchandleerr">dc.handleErr</h2>
-<blockquote>
-<p>这里就看到了 限流器的代码</p>
-</blockquote>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">handleErr</span><span class="p">(</span><span class="nx">err</span> <span class="kt">error</span><span class="p">,</span> <span class="nx">key</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
-	<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-		<span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">Forget</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
-		<span class="k">return</span>
-	<span class="p">}</span>
-        <span class="c1">// 没有超过最大重试次数
-</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">NumRequeues</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">&lt;</span> <span class="nx">maxRetries</span> <span class="p">{</span>
-                <span class="c1">// 把key加入到限流队列中, 实际调用 rateLimitingType.AddRateLimited
-</span><span class="c1"></span>		<span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">AddRateLimited</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
-		<span class="k">return</span>
-	<span class="p">}</span>
-
-	<span class="nx">utilruntime</span><span class="p">.</span><span class="nf">HandleError</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
-	<span class="nx">klog</span><span class="p">.</span><span class="nf">V</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Dropping deployment %q out of the queue: %v&#34;</span><span class="p">,</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
-	<span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">Forget</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
-<span class="p">}</span>
-
-<span class="c1">// AddRateLimited 方法
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">q</span> <span class="o">*</span><span class="nx">rateLimitingType</span><span class="p">)</span> <span class="nf">AddRateLimited</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
-        <span class="c1">// 1. 调用个延迟队列的 AddAfter
-</span><span class="c1"></span>        <span class="c1">// 上面介绍到了 NewNamedDelayingQueue() 函数初始化的 延迟队列接口 DelayingInterface
-</span><span class="c1"></span>        <span class="c1">// 所以实际执行的是 delayingType.AddAfter, 也就是上面介绍的delayingType.AddAfter , 对延迟队列channel 写入 waitfor
-</span><span class="c1"></span>        <span class="c1">// 2. When 方法是调用了 令牌桶
-</span><span class="c1"></span>        <span class="c1">// 上面介绍到 DefaultControllerRateLimiter() 函数初始化的 令牌桶接口 RateLimiter
-</span><span class="c1"></span>        <span class="c1">// 所以实际执行的是 MaxOfRateLimiter.When, 最终得到两个限流器中最大的延迟时间
-</span><span class="c1"></span>	<span class="nx">q</span><span class="p">.</span><span class="nx">DelayingInterface</span><span class="p">.</span><span class="nf">AddAfter</span><span class="p">(</span><span class="nx">item</span><span class="p">,</span> <span class="nx">q</span><span class="p">.</span><span class="nx">rateLimiter</span><span class="p">.</span><span class="nf">When</span><span class="p">(</span><span class="nx">item</span><span class="p">))</span>
-<span class="p">}</span>
-</code></pre></div><h2 id="maxofratelimiter">MaxOfRateLimiter</h2>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// RateLimiter的包装, 实现了RateLimiter 接口
-</span><span class="c1"></span><span class="kd">type</span> <span class="nx">MaxOfRateLimiter</span> <span class="kd">struct</span> <span class="p">{</span>
-	<span class="nx">limiters</span> <span class="p">[]</span><span class="nx">RateLimiter</span>
-<span class="p">}</span>
-<span class="c1">// 这其实是包装了多个限流器, 迭代执行When
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">MaxOfRateLimiter</span><span class="p">)</span> <span class="nf">When</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="p">{</span>
-	<span class="nx">ret</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">limiter</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">r</span><span class="p">.</span><span class="nx">limiters</span> <span class="p">{</span>
-		<span class="nx">curr</span> <span class="o">:=</span> <span class="nx">limiter</span><span class="p">.</span><span class="nf">When</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span>
-                <span class="c1">// 大于就保存
-</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">curr</span> <span class="p">&gt;</span> <span class="nx">ret</span> <span class="p">{</span>
-			<span class="nx">ret</span> <span class="p">=</span> <span class="nx">curr</span>
-		<span class="p">}</span>
-	<span class="p">}</span>
-        <span class="c1">// 返回所有 限流器里面的最大值
-</span><span class="c1"></span>	<span class="k">return</span> <span class="nx">ret</span>
-<span class="p">}</span>
-</code></pre></div><blockquote>
-<p>上面一共初始化了两个限流器 一个是 <code>ItemExponentialFailureRateLimiter</code> , 一个是 <code>BucketRateLimiter</code></p>
-<p>分别来看下</p>
-</blockquote>
-<h2 id="itemexponentialfailureratelimiter">ItemExponentialFailureRateLimiter</h2>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 指数级, 实现了RateLimiter 接口
-</span><span class="c1"></span><span class="kd">type</span> <span class="nx">ItemExponentialFailureRateLimiter</span> <span class="kd">struct</span> <span class="p">{</span>
-	<span class="nx">failuresLock</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
-	<span class="nx">failures</span>     <span class="kd">map</span><span class="p">[</span><span class="kd">interface</span><span class="p">{}]</span><span class="kt">int</span>
-
-	<span class="nx">baseDelay</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
-	<span class="nx">maxDelay</span>  <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
-<span class="p">}</span>
-
-<span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">ItemExponentialFailureRateLimiter</span><span class="p">)</span> <span class="nf">When</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="p">{</span>
-	<span class="nx">r</span><span class="p">.</span><span class="nx">failuresLock</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
-	<span class="k">defer</span> <span class="nx">r</span><span class="p">.</span><span class="nx">failuresLock</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
-
-	<span class="nx">exp</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">failures</span><span class="p">[</span><span class="nx">item</span><span class="p">]</span>
-	<span class="nx">r</span><span class="p">.</span><span class="nx">failures</span><span class="p">[</span><span class="nx">item</span><span class="p">]</span> <span class="p">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">failures</span><span class="p">[</span><span class="nx">item</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-
-        <span class="c1">// 根据失败的次数 指数级增加
-</span><span class="c1"></span>	<span class="nx">backoff</span> <span class="o">:=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">baseDelay</span><span class="p">.</span><span class="nf">Nanoseconds</span><span class="p">())</span> <span class="o">*</span> <span class="nx">math</span><span class="p">.</span><span class="nf">Pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">exp</span><span class="p">))</span>
-	<span class="k">if</span> <span class="nx">backoff</span> <span class="p">&gt;</span> <span class="nx">math</span><span class="p">.</span><span class="nx">MaxInt64</span> <span class="p">{</span>
-		<span class="k">return</span> <span class="nx">r</span><span class="p">.</span><span class="nx">maxDelay</span>
-	<span class="p">}</span>
-
-	<span class="nx">calculated</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">backoff</span><span class="p">)</span>
-	<span class="k">if</span> <span class="nx">calculated</span> <span class="p">&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">maxDelay</span> <span class="p">{</span>
-		<span class="k">return</span> <span class="nx">r</span><span class="p">.</span><span class="nx">maxDelay</span>
-	<span class="p">}</span>
-
-	<span class="k">return</span> <span class="nx">calculated</span>
-<span class="p">}</span>
-</code></pre></div><h2 id="bucketratelimiter">BucketRateLimiter</h2>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// BucketRateLimiter, 实现了RateLimiter 接口
-</span><span class="c1"></span><span class="kd">type</span> <span class="nx">BucketRateLimiter</span> <span class="kd">struct</span> <span class="p">{</span>
-	<span class="o">*</span><span class="nx">rate</span><span class="p">.</span><span class="nx">Limiter</span>
-<span class="p">}</span>
-
-<span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">BucketRateLimiter</span><span class="p">)</span> <span class="nf">When</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="p">{</span>
-	<span class="k">return</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Limiter</span><span class="p">.</span><span class="nf">Reserve</span><span class="p">().</span><span class="nf">Delay</span><span class="p">()</span>
-<span class="p">}</span>
-<span class="kd">func</span> <span class="p">(</span><span class="nx">lim</span> <span class="o">*</span><span class="nx">Limiter</span><span class="p">)</span> <span class="nf">Reserve</span><span class="p">()</span> <span class="o">*</span><span class="nx">Reservation</span> <span class="p">{</span>
-	<span class="k">return</span> <span class="nx">lim</span><span class="p">.</span><span class="nf">ReserveN</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
-<span class="p">}</span>
-<span class="kd">func</span> <span class="p">(</span><span class="nx">lim</span> <span class="o">*</span><span class="nx">Limiter</span><span class="p">)</span> <span class="nf">ReserveN</span><span class="p">(</span><span class="nx">now</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span> <span class="nx">n</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">Reservation</span> <span class="p">{</span>
-        <span class="c1">// InfDuration = time.Duration(1&lt;&lt;63-1) 最大的64位数
-</span><span class="c1"></span>	<span class="nx">r</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nf">reserveN</span><span class="p">(</span><span class="nx">now</span><span class="p">,</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">InfDuration</span><span class="p">)</span>
-	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">r</span>
-<span class="p">}</span>
-<span class="kd">func</span> <span class="p">(</span><span class="nx">lim</span> <span class="o">*</span><span class="nx">Limiter</span><span class="p">)</span> <span class="nf">reserveN</span><span class="p">(</span><span class="nx">now</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span> <span class="nx">n</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">maxFutureReserve</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="nx">Reservation</span> <span class="p">{</span>
-	<span class="nx">lim</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
-        <span class="o">...</span>
-	<span class="nx">now</span><span class="p">,</span> <span class="nx">last</span><span class="p">,</span> <span class="nx">tokens</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nf">advance</span><span class="p">(</span><span class="nx">now</span><span class="p">)</span>
-
-	<span class="c1">// Calculate the remaining number of tokens resulting from the request.
-</span><span class="c1"></span>	<span class="nx">tokens</span> <span class="o">-=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span>
-
-	<span class="c1">// Calculate the wait duration
-</span><span class="c1"></span>	<span class="kd">var</span> <span class="nx">waitDuration</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
-	<span class="k">if</span> <span class="nx">tokens</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="p">{</span>
-		<span class="nx">waitDuration</span> <span class="p">=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">limit</span><span class="p">.</span><span class="nf">durationFromTokens</span><span class="p">(</span><span class="o">-</span><span class="nx">tokens</span><span class="p">)</span>
-	<span class="p">}</span>
-
-	<span class="c1">//
-</span><span class="c1"></span>	<span class="nx">ok</span> <span class="o">:=</span> <span class="nx">n</span> <span class="o">&lt;=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">burst</span> <span class="o">&amp;&amp;</span> <span class="nx">waitDuration</span> <span class="o">&lt;=</span> <span class="nx">maxFutureReserve</span>
-
-	<span class="c1">// Prepare reservation
-</span><span class="c1"></span>	<span class="nx">r</span> <span class="o">:=</span> <span class="nx">Reservation</span><span class="p">{</span>
-		<span class="nx">ok</span><span class="p">:</span>    <span class="nx">ok</span><span class="p">,</span>
-		<span class="nx">lim</span><span class="p">:</span>   <span class="nx">lim</span><span class="p">,</span>
-		<span class="nx">limit</span><span class="p">:</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">limit</span><span class="p">,</span>
-	<span class="p">}</span>
-	<span class="k">if</span> <span class="nx">ok</span> <span class="p">{</span>
-		<span class="nx">r</span><span class="p">.</span><span class="nx">tokens</span> <span class="p">=</span> <span class="nx">n</span>
-		<span class="nx">r</span><span class="p">.</span><span class="nx">timeToAct</span> <span class="p">=</span> <span class="nx">now</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">waitDuration</span><span class="p">)</span>
-	<span class="p">}</span>
-
-	<span class="c1">// Update state
-</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">ok</span> <span class="p">{</span>
-		<span class="nx">lim</span><span class="p">.</span><span class="nx">last</span> <span class="p">=</span> <span class="nx">now</span>
-		<span class="nx">lim</span><span class="p">.</span><span class="nx">tokens</span> <span class="p">=</span> <span class="nx">tokens</span>
-		<span class="nx">lim</span><span class="p">.</span><span class="nx">lastEvent</span> <span class="p">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">timeToAct</span>
-	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-		<span class="nx">lim</span><span class="p">.</span><span class="nx">last</span> <span class="p">=</span> <span class="nx">last</span>
-	<span class="p">}</span>
-
-	<span class="nx">lim</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
-	<span class="k">return</span> <span class="nx">r</span>
-<span class="p">}</span>
-
-<span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Reservation</span><span class="p">)</span> <span class="nf">Delay</span><span class="p">()</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="p">{</span>
-	<span class="k">return</span> <span class="nx">r</span><span class="p">.</span><span class="nf">DelayFrom</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">())</span>
-<span class="p">}</span>
-<span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Reservation</span><span class="p">)</span> <span class="nf">DelayFrom</span><span class="p">(</span><span class="nx">now</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">)</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="p">{</span>
-	<span class="k">if</span> <span class="p">!</span><span class="nx">r</span><span class="p">.</span><span class="nx">ok</span> <span class="p">{</span>
-		<span class="k">return</span> <span class="nx">InfDuration</span>
-	<span class="p">}</span>
-	<span class="nx">delay</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">timeToAct</span><span class="p">.</span><span class="nf">Sub</span><span class="p">(</span><span class="nx">now</span><span class="p">)</span>
-	<span class="k">if</span> <span class="nx">delay</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="p">{</span>
-		<span class="k">return</span> <span class="mi">0</span>
-	<span class="p">}</span>
-	<span class="k">return</span> <span class="nx">delay</span>
-<span class="p">}</span>
-</code></pre></div><hr>
-<h1 id="参考资料">参考资料</h1>
-<ul>
-<li><a href="https://mp.weixin.qq.com/s?__biz=MzAxMTA4Njc0OQ==&amp;mid=2651441921&amp;idx=3&amp;sn=3d2b7a0013e1ee5c377782bdc30575f1&amp;chksm=80bb15f3b7cc9ce5360c6df591a6cef8bbfaebe431b6ce57f391dd7a0b49e8d4f70e44ceadaf&amp;scene=21#wechat_redirect">K8s 延迟队列</a></li>
-<li><a href="https://jishuin.proginn.com/p/763bfbd2dcfe">k8s 限速队列</a></li>
-</ul>
-]]></content>
-		</item>
-		
-		<item>
-			<title>K8s学习 Job源码分析</title>
-			<link>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
-			<pubDate>Tue, 07 Dec 2021 10:22:02 +0800</pubDate>
-			
-			<guid>https://www.ngirl.xyz/k8s/k8s%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
+			<guid>https://www.ngirl.xyz/k8s/k8s%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
 			<description>首先我们知道cronjob和job是受控于controller manager组件的, 下面我们先看看job controller是怎么初始化的
- 初始化的流程 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;job&amp;#34;] = startJobController // job的初始化  controllers[&amp;#34;cronjob&amp;#34;] = startCronJobController } 3. cmd/kube-controller-manager/app/batch.go startJobController(...) (...) -&amp;gt; NewJobController(...) *JobController // 返回一个JobController  { jm.syncHandler = jm.syncJob // 核心的handler初始化  } -&amp;gt; (jm *JobController) Run(...) -&amp;gt; (jm *JobController) worker() -&amp;gt; for jm.processNextWorkItem() {} // 这里是循环  -&amp;gt; jm.syncHandler(...) // 最终在processNextWorkItem的函数内部调用了syncHandler, 也就是上面初始化的syncJob 源码学习部分 JobController 结构体 type JobController struct { kubeClient clientset.</description>
+ 初始化的流程 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;job&amp;#34;] = startJobController // job的初始化  controllers[&amp;#34;cronjob&amp;#34;] = startCronJobController } 3. cmd/kube-controller-manager/app/batch.go startJobController(...) (...) -&amp;gt; NewJobController(...) *JobController // 返回一个JobController  { jm.syncHandler = jm.syncJob // 核心的handler初始化  } -&amp;gt; (jm *JobController) Run(...) -&amp;gt; (jm *JobController) worker() -&amp;gt; for jm.processNextWorkItem() {} // 这里是循环  -&amp;gt; jm.syncHandler(...) // 最终在processNextWorkItem的函数内部调用了syncHandler, 也就是上面初始化的syncJob JobController 结构体 type JobController struct { kubeClient clientset.</description>
 			<content type="html"><![CDATA[<blockquote>
 <p>首先我们知道cronjob和job是受控于controller manager组件的, 下面我们先看看job controller是怎么初始化的</p>
 </blockquote>
-<h3 id="初始化的流程">初始化的流程</h3>
+<h2 id="初始化的流程">初始化的流程</h2>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="mf">1.</span> <span class="nx">cmd</span><span class="o">/</span><span class="nx">kube</span><span class="o">-</span><span class="nx">controller</span><span class="o">-</span><span class="nx">manager</span><span class="o">/</span><span class="nx">controller</span><span class="o">-</span><span class="nx">manager</span><span class="p">.</span><span class="k">go</span>
         <span class="nf">main</span><span class="p">()</span>  
         <span class="o">-</span><span class="p">&gt;</span> <span class="nx">app</span><span class="p">.</span><span class="nf">NewControllerManagerCommand</span><span class="p">()</span>
@@ -649,38 +42,25 @@ syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
         <span class="o">-</span><span class="p">&gt;</span>  <span class="p">(</span><span class="nx">jm</span> <span class="o">*</span><span class="nx">JobController</span><span class="p">)</span> <span class="nf">worker</span><span class="p">()</span>
         <span class="o">-</span><span class="p">&gt;</span>  <span class="k">for</span> <span class="nx">jm</span><span class="p">.</span><span class="nf">processNextWorkItem</span><span class="p">()</span> <span class="p">{}</span>     <span class="c1">// 这里是循环
 </span><span class="c1"></span>        <span class="o">-</span><span class="p">&gt;</span>  <span class="nx">jm</span><span class="p">.</span><span class="nf">syncHandler</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="c1">// 最终在processNextWorkItem的函数内部调用了syncHandler, 也就是上面初始化的syncJob
-</span></code></pre></div><h3 id="源码学习部分">源码学习部分</h3>
-<h4 id="jobcontroller-结构体">JobController 结构体</h4>
+</span></code></pre></div><h2 id="jobcontroller-结构体">JobController 结构体</h2>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">JobController</span> <span class="kd">struct</span> <span class="p">{</span>
 	<span class="nx">kubeClient</span> <span class="nx">clientset</span><span class="p">.</span><span class="nx">Interface</span>
 	<span class="nx">podControl</span> <span class="nx">controller</span><span class="p">.</span><span class="nx">PodControlInterface</span>
 
-	<span class="c1">// To allow injection of updateJobStatus for testing.
-</span><span class="c1"></span>	<span class="nx">updateHandler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">job</span> <span class="o">*</span><span class="nx">batch</span><span class="p">.</span><span class="nx">Job</span><span class="p">)</span> <span class="kt">error</span>
-	<span class="nx">syncHandler</span>   <span class="kd">func</span><span class="p">(</span><span class="nx">jobKey</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
-	<span class="c1">// podStoreSynced returns true if the pod store has been synced at least once.
-</span><span class="c1"></span>	<span class="c1">// Added as a member to the struct to allow injection for testing.
-</span><span class="c1"></span>	<span class="nx">podStoreSynced</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">InformerSynced</span>
-	<span class="c1">// jobStoreSynced returns true if the job store has been synced at least once.
-</span><span class="c1"></span>	<span class="c1">// Added as a member to the struct to allow injection for testing.
-</span><span class="c1"></span>	<span class="nx">jobStoreSynced</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">InformerSynced</span>
-
-	<span class="c1">// A TTLCache of pod creates/deletes each rc expects to see
-</span><span class="c1"></span>	<span class="nx">expectations</span> <span class="nx">controller</span><span class="p">.</span><span class="nx">ControllerExpectationsInterface</span>
-
-	<span class="c1">// A store of jobs
-</span><span class="c1"></span>	<span class="nx">jobLister</span> <span class="nx">batchv1listers</span><span class="p">.</span><span class="nx">JobLister</span>
-
-	<span class="c1">// A store of pods, populated by the podController
-</span><span class="c1"></span>	<span class="nx">podStore</span> <span class="nx">corelisters</span><span class="p">.</span><span class="nx">PodLister</span>
-
-	<span class="c1">// 需要更新的job队列
+	<span class="nx">updateHandler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">job</span> <span class="o">*</span><span class="nx">batch</span><span class="p">.</span><span class="nx">Job</span><span class="p">)</span> <span class="kt">error</span>
+        <span class="c1">// sync同步发光法
+</span><span class="c1"></span>	<span class="nx">syncHandler</span>   <span class="kd">func</span><span class="p">(</span><span class="nx">jobKey</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+	<span class="nx">podStoreSynced</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">InformerSynced</span>
+	<span class="nx">jobStoreSynced</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">InformerSynced</span>
+	<span class="nx">expectations</span> <span class="nx">controller</span><span class="p">.</span><span class="nx">ControllerExpectationsInterface</span>
+	<span class="nx">jobLister</span> <span class="nx">batchv1listers</span><span class="p">.</span><span class="nx">JobLister</span>
+	<span class="nx">podStore</span> <span class="nx">corelisters</span><span class="p">.</span><span class="nx">PodLister</span>
+	<span class="c1">// 延迟队列
 </span><span class="c1"></span>	<span class="nx">queue</span> <span class="nx">workqueue</span><span class="p">.</span><span class="nx">RateLimitingInterface</span>
-
 	<span class="nx">recorder</span> <span class="nx">record</span><span class="p">.</span><span class="nx">EventRecorder</span>
 <span class="p">}</span>
 
-</code></pre></div><h4 id="startjobcontroller">startJobController</h4>
+</code></pre></div><h2 id="startjobcontroller">startJobController</h2>
 <blockquote>
 <p>首先看下初始化的过程</p>
 </blockquote>
@@ -701,7 +81,7 @@ syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 </span><span class="c1"></span>	<span class="p">).</span><span class="nf">Run</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">ComponentConfig</span><span class="p">.</span><span class="nx">JobController</span><span class="p">.</span><span class="nx">ConcurrentJobSyncs</span><span class="p">),</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">Stop</span><span class="p">)</span>
 	<span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">true</span><span class="p">,</span> <span class="kc">nil</span>
 <span class="p">}</span>
-</code></pre></div><h4 id="newjobcontroller">NewJobController</h4>
+</code></pre></div><h3 id="newjobcontroller">NewJobController</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">NewJobController</span><span class="p">(</span><span class="nx">podInformer</span> <span class="nx">coreinformers</span><span class="p">.</span><span class="nx">PodInformer</span><span class="p">,</span> <span class="nx">jobInformer</span> <span class="nx">batchinformers</span><span class="p">.</span><span class="nx">JobInformer</span><span class="p">,</span> <span class="nx">kubeClient</span> <span class="nx">clientset</span><span class="p">.</span><span class="nx">Interface</span><span class="p">)</span> <span class="o">*</span><span class="nx">JobController</span> <span class="p">{</span>
 	<span class="o">...</span>
         <span class="c1">// 初始化的JobController
@@ -746,7 +126,7 @@ syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 	<span class="k">return</span> <span class="nx">jm</span>
 <span class="p">}</span>
 
-</code></pre></div><h4 id="run">Run</h4>
+</code></pre></div><h3 id="run">Run</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">jm</span> <span class="o">*</span><span class="nx">JobController</span><span class="p">)</span> <span class="nf">Run</span><span class="p">(</span><span class="nx">workers</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
 	<span class="k">defer</span> <span class="nx">utilruntime</span><span class="p">.</span><span class="nf">HandleCrash</span><span class="p">()</span>
 	<span class="k">defer</span> <span class="nx">jm</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">ShutDown</span><span class="p">()</span>
@@ -792,7 +172,7 @@ syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 
 	<span class="k">return</span> <span class="kc">true</span>
 <span class="p">}</span>
-</code></pre></div><h3 id="syncjob">syncJob</h3>
+</code></pre></div><h2 id="syncjob">syncJob</h2>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">jm</span> <span class="o">*</span><span class="nx">JobController</span><span class="p">)</span> <span class="nf">syncJob</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">startTime</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">()</span>
 	<span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
@@ -826,52 +206,47 @@ syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 
 	<span class="c1">// 重试次数
 </span><span class="c1"></span>	<span class="nx">previousRetry</span> <span class="o">:=</span> <span class="nx">jm</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">NumRequeues</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
-
-	<span class="c1">// Check the expectations of the job before counting active pods, otherwise a new pod can sneak in
-</span><span class="c1"></span>	<span class="c1">// and update the expectations after we&#39;ve retrieved active pods from the store. If a new pod enters
-</span><span class="c1"></span>	<span class="c1">// the store after we&#39;ve checked the expectation, the job sync is just deferred till the next relist.
+        <span class="c1">// 判断是否需要 同步pod
 </span><span class="c1"></span>	<span class="nx">jobNeedsSync</span> <span class="o">:=</span> <span class="nx">jm</span><span class="p">.</span><span class="nx">expectations</span><span class="p">.</span><span class="nf">SatisfiedExpectations</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
         <span class="c1">// 详细说明3
 </span><span class="c1"></span>	<span class="nx">pods</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">jm</span><span class="p">.</span><span class="nf">getPodsForJob</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">job</span><span class="p">)</span>
 	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
 		<span class="k">return</span> <span class="kc">false</span><span class="p">,</span> <span class="nx">err</span>
 	<span class="p">}</span>
-
-	<span class="nx">activePods</span> <span class="o">:=</span> <span class="nx">controller</span><span class="p">.</span><span class="nf">FilterActivePods</span><span class="p">(</span><span class="nx">pods</span><span class="p">)</span>
+        <span class="c1">// 得到运行中pod的列表
+</span><span class="c1"></span>        <span class="c1">// v1.PodSucceeded != p.Status.Phase &amp;&amp; v1.PodFailed != p.Status.Phase &amp;&amp;p.DeletionTimestamp == nil
+</span><span class="c1"></span>	<span class="nx">activePods</span> <span class="o">:=</span> <span class="nx">controller</span><span class="p">.</span><span class="nf">FilterActivePods</span><span class="p">(</span><span class="nx">pods</span><span class="p">)</span>
         <span class="c1">// 当前运行的pod数量
 </span><span class="c1"></span>	<span class="nx">active</span> <span class="o">:=</span> <span class="nb">int32</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">activePods</span><span class="p">))</span>
         <span class="c1">// 分别计算成功和失败的数量
 </span><span class="c1"></span>	<span class="nx">succeeded</span><span class="p">,</span> <span class="nx">failed</span> <span class="o">:=</span> <span class="nf">getStatus</span><span class="p">(</span><span class="nx">pods</span><span class="p">)</span>
-	<span class="nx">conditions</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Conditions</span><span class="p">)</span>
+        <span class="c1">// conditions 的长度
+</span><span class="c1"></span>	<span class="nx">conditions</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Conditions</span><span class="p">)</span>
 	<span class="c1">// 首次运行
 </span><span class="c1"></span>	<span class="k">if</span> <span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">StartTime</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
 		<span class="nx">now</span> <span class="o">:=</span> <span class="nx">metav1</span><span class="p">.</span><span class="nf">Now</span><span class="p">()</span>
                 <span class="c1">// 设置status
 </span><span class="c1"></span>		<span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">StartTime</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">now</span>
-		<span class="c1">// 如果设置 ActiveDeadlineSeconds 了,
+		<span class="c1">// 如果设置 ActiveDeadlineSeconds 了, 那么就需要加入到 延迟队列,
+</span><span class="c1"></span>                <span class="c1">// 详细 延迟队列讲解, 见文末链接 &#34;k8s源码学习-client-go延迟队列&#34;,(标注1)
 </span><span class="c1"></span>		<span class="k">if</span> <span class="nx">job</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">ActiveDeadlineSeconds</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-			<span class="nx">klog</span><span class="p">.</span><span class="nf">V</span><span class="p">(</span><span class="mi">4</span><span class="p">).</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Job %s have ActiveDeadlineSeconds will sync after %d seconds&#34;</span><span class="p">,</span>
-				<span class="nx">key</span><span class="p">,</span> <span class="o">*</span><span class="nx">job</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">ActiveDeadlineSeconds</span><span class="p">)</span>
 			<span class="nx">jm</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">AddAfter</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="o">*</span><span class="nx">job</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">ActiveDeadlineSeconds</span><span class="p">)</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
 		<span class="p">}</span>
 	<span class="p">}</span>
 
 	<span class="kd">var</span> <span class="nx">manageJobErr</span> <span class="kt">error</span>
 	<span class="nx">jobFailed</span> <span class="o">:=</span> <span class="kc">false</span>
-	<span class="kd">var</span> <span class="nx">failureReason</span> <span class="kt">string</span>
+        <span class="c1">// 失败原因, 会记录到job.Status.Conditions 和Event
+</span><span class="c1"></span>	<span class="kd">var</span> <span class="nx">failureReason</span> <span class="kt">string</span>
 	<span class="kd">var</span> <span class="nx">failureMessage</span> <span class="kt">string</span>
 
 	<span class="nx">jobHaveNewFailure</span> <span class="o">:=</span> <span class="nx">failed</span> <span class="p">&gt;</span> <span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Failed</span>
-	<span class="c1">// new failures happen when status does not reflect the failures and active
-</span><span class="c1"></span>	<span class="c1">// is different than parallelism, otherwise the previous controller loop
-</span><span class="c1"></span>	<span class="c1">// failed updating status so even if we pick up failure it is not a new one
+        <span class="c1">// BackoffLimit 默认被初始化为6, SetDefaults_Job() 
 </span><span class="c1"></span>	<span class="nx">exceedsBackoffLimit</span> <span class="o">:=</span> <span class="nx">jobHaveNewFailure</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">active</span> <span class="o">!=</span> <span class="o">*</span><span class="nx">job</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">Parallelism</span><span class="p">)</span> <span class="o">&amp;&amp;</span>
 		<span class="p">(</span><span class="nb">int32</span><span class="p">(</span><span class="nx">previousRetry</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span> <span class="p">&gt;</span> <span class="o">*</span><span class="nx">job</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">BackoffLimit</span><span class="p">)</span>
 
 	<span class="k">if</span> <span class="nx">exceedsBackoffLimit</span> <span class="o">||</span> <span class="nf">pastBackoffLimitOnFailure</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">job</span><span class="p">,</span> <span class="nx">pods</span><span class="p">)</span> <span class="p">{</span>
-		<span class="c1">// check if the number of pod restart exceeds backoff (for restart OnFailure only)
-</span><span class="c1"></span>		<span class="c1">// OR if the number of failed jobs increased since the last syncJob
-</span><span class="c1"></span>		<span class="nx">jobFailed</span> <span class="p">=</span> <span class="kc">true</span>
+		<span class="nx">jobFailed</span> <span class="p">=</span> <span class="kc">true</span>
 		<span class="nx">failureReason</span> <span class="p">=</span> <span class="s">&#34;BackoffLimitExceeded&#34;</span>
 		<span class="nx">failureMessage</span> <span class="p">=</span> <span class="s">&#34;Job has reached the specified backoff limit&#34;</span>
 	<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nf">pastActiveDeadline</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">job</span><span class="p">)</span> <span class="p">{</span>
@@ -964,7 +339,9 @@ syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 	<span class="k">return</span> <span class="nx">forget</span><span class="p">,</span> <span class="nx">manageJobErr</span>
 <span class="p">}</span>
 
-</code></pre></div><h4 id="详细说明1-jmjoblisterjobsnsgetname">详细说明1 jm.jobLister.Jobs(ns).Get(name)</h4>
+</code></pre></div><hr>
+<h2 id="其他">其他</h2>
+<h3 id="详细说明1-jmjoblisterjobsnsgetname">详细说明1 jm.jobLister.Jobs(ns).Get(name)</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">如何看这个方法是哪个结构体实现</span><span class="o">...</span>
 <span class="nx">首先找到</span> <span class="nx">jobLister</span> <span class="nx">的初始化</span> <span class="nx">在</span> <span class="nx">NewJobController</span> <span class="nx">中被设置</span> <span class="nx">jm</span><span class="p">.</span><span class="nx">jobLister</span> <span class="p">=</span> <span class="nx">jobInformer</span><span class="p">.</span><span class="nf">Lister</span><span class="p">()</span>
 <span class="nx">jobInformer</span> <span class="nx">是</span> <span class="nx">NewJobController的入参</span><span class="p">,</span> <span class="nx">在</span> <span class="nx">startJobController</span> <span class="nx">函数内可以看到是</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">InformerFactory</span><span class="p">.</span><span class="nf">Batch</span><span class="p">().</span><span class="nf">V1</span><span class="p">().</span><span class="nf">Jobs</span><span class="p">()</span>
@@ -1021,7 +398,7 @@ syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 	<span class="k">return</span> <span class="nx">obj</span><span class="p">.(</span><span class="o">*</span><span class="nx">v1</span><span class="p">.</span><span class="nx">Job</span><span class="p">),</span> <span class="kc">nil</span>
 <span class="p">}</span>
 
-</code></pre></div><h4 id="详细说明2-isjobfinished">详细说明2 IsJobFinished</h4>
+</code></pre></div><h3 id="详细说明2-isjobfinished">详细说明2 IsJobFinished</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">IsJobFinished</span><span class="p">(</span><span class="nx">j</span> <span class="o">*</span><span class="nx">batch</span><span class="p">.</span><span class="nx">Job</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
         <span class="c1">// 对status.Conditions字段遍历
 </span><span class="c1"></span>	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">c</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">j</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Conditions</span> <span class="p">{</span>
@@ -1032,7 +409,7 @@ syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 	<span class="p">}</span>
 	<span class="k">return</span> <span class="kc">false</span>
 <span class="p">}</span>
-</code></pre></div><h4 id="详细说明3-getpodsforjob">详细说明3 getPodsForJob</h4>
+</code></pre></div><h3 id="详细说明3-getpodsforjob">详细说明3 getPodsForJob</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">jm</span> <span class="o">*</span><span class="nx">JobController</span><span class="p">)</span> <span class="nf">getPodsForJob</span><span class="p">(</span><span class="nx">j</span> <span class="o">*</span><span class="nx">batch</span><span class="p">.</span><span class="nx">Job</span><span class="p">)</span> <span class="p">([]</span><span class="o">*</span><span class="nx">v1</span><span class="p">.</span><span class="nx">Pod</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">selector</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">metav1</span><span class="p">.</span><span class="nf">LabelSelectorAsSelector</span><span class="p">(</span><span class="nx">j</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">Selector</span><span class="p">)</span>
 	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
@@ -1059,7 +436,7 @@ syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 	<span class="nx">cm</span> <span class="o">:=</span> <span class="nx">controller</span><span class="p">.</span><span class="nf">NewPodControllerRefManager</span><span class="p">(</span><span class="nx">jm</span><span class="p">.</span><span class="nx">podControl</span><span class="p">,</span> <span class="nx">j</span><span class="p">,</span> <span class="nx">selector</span><span class="p">,</span> <span class="nx">controllerKind</span><span class="p">,</span> <span class="nx">canAdoptFunc</span><span class="p">)</span>
 	<span class="k">return</span> <span class="nx">cm</span><span class="p">.</span><span class="nf">ClaimPods</span><span class="p">(</span><span class="nx">pods</span><span class="p">)</span>
 <span class="p">}</span>
-</code></pre></div><h4 id="详细说明4-updatejobstatus">详细说明4 updateJobStatus</h4>
+</code></pre></div><h3 id="详细说明4-updatejobstatus">详细说明4 updateJobStatus</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">jm</span> <span class="o">*</span><span class="nx">JobController</span><span class="p">)</span> <span class="nf">updateJobStatus</span><span class="p">(</span><span class="nx">job</span> <span class="o">*</span><span class="nx">batch</span><span class="p">.</span><span class="nx">Job</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
 	<span class="nx">jobClient</span> <span class="o">:=</span> <span class="nx">jm</span><span class="p">.</span><span class="nx">kubeClient</span><span class="p">.</span><span class="nf">BatchV1</span><span class="p">().</span><span class="nf">Jobs</span><span class="p">(</span><span class="nx">job</span><span class="p">.</span><span class="nx">Namespace</span><span class="p">)</span>
 	<span class="kd">var</span> <span class="nx">err</span> <span class="kt">error</span>
@@ -1077,7 +454,7 @@ syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 
 	<span class="k">return</span> <span class="nx">err</span>
 <span class="p">}</span>
-</code></pre></div><h4 id="详细说明">详细说明</h4>
+</code></pre></div><h3 id="详细说明5-addafter">详细说明5 AddAfter</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">q</span> <span class="o">*</span><span class="nx">delayingType</span><span class="p">)</span> <span class="nf">AddAfter</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">duration</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="p">{</span>
 	<span class="c1">// don&#39;t add if we&#39;re already shutting down
 </span><span class="c1"></span>	<span class="k">if</span> <span class="nx">q</span><span class="p">.</span><span class="nf">ShuttingDown</span><span class="p">()</span> <span class="p">{</span>
@@ -1098,7 +475,7 @@ syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 </span><span class="c1"></span>	<span class="k">case</span> <span class="nx">q</span><span class="p">.</span><span class="nx">waitingForAddCh</span> <span class="o">&lt;-</span> <span class="o">&amp;</span><span class="nx">waitFor</span><span class="p">{</span><span class="nx">data</span><span class="p">:</span> <span class="nx">item</span><span class="p">,</span> <span class="nx">readyAt</span><span class="p">:</span> <span class="nx">q</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">Add</span><span class="p">(</span><span class="nx">duration</span><span class="p">)}:</span>
 	<span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><h4 id="详细说明11">详细说明11</h4>
+</code></pre></div><h3 id="详细说明11-addratelimited">详细说明11 AddRateLimited</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
 <span class="c1">// 给item 元素添加一个延迟时间
 </span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">q</span> <span class="o">*</span><span class="nx">rateLimitingType</span><span class="p">)</span> <span class="nf">AddRateLimited</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
@@ -1136,7 +513,639 @@ syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 
 	<span class="k">return</span> <span class="nx">calculated</span>
 <span class="p">}</span>
-</code></pre></div>]]></content>
+</code></pre></div><hr>
+<h2 id="资料">资料</h2>
+<ul>
+<li>(标注1)<strong><a href="/k8s/k8s%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/">K8s源码学习 client-go延迟队列</a></strong></li>
+</ul>
+]]></content>
+		</item>
+		
+		<item>
+			<title>K8s源码学习 client-go延迟队列</title>
+			<link>https://www.ngirl.xyz/k8s/k8s%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</link>
+			<pubDate>Wed, 08 Dec 2021 16:04:39 +0800</pubDate>
+			
+			<guid>https://www.ngirl.xyz/k8s/k8s%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</guid>
+			<description>我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试 那我们这里的重试间隔时间是如何控制的呢? 下面我们去了解一下 从 controller 找到 deployment 初始化方法看一下
+ 1 deployment 初始化  k8s的大多组件代码格式结构是类似的
+ 1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;deployment&amp;#34;] = startDeploymentController } 3. cmd/kube-controller-manager/app/apps.go startDeploymentController(...) (...) { dc, err := deployment.NewDeploymentController(...) go dc.Run(int(ctx.ComponentConfig.DeploymentController.ConcurrentDeploymentSyncs), ctx.Stop) } 3.1 pkg/controller/deployment/deployment_controller.go -&amp;gt; NewDeploymentController(...) (...) { dc := &amp;amp;DeploymentController{ queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), &amp;#34;deployment&amp;#34;), } } -&amp;gt; NewNamedRateLimitingQueue(.</description>
+			<content type="html"><![CDATA[<blockquote>
+<p>我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试
+那我们这里的重试间隔时间是如何控制的呢?
+下面我们去了解一下
+从 controller 找到 deployment 初始化方法看一下</p>
+</blockquote>
+<h2 id="1-deployment-初始化">1 deployment 初始化</h2>
+<blockquote>
+<p>k8s的大多组件代码格式结构是类似的</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="mf">1.</span> <span class="nx">cmd</span><span class="o">/</span><span class="nx">kube</span><span class="o">-</span><span class="nx">controller</span><span class="o">-</span><span class="nx">manager</span><span class="o">/</span><span class="nx">controller</span><span class="o">-</span><span class="nx">manager</span><span class="p">.</span><span class="k">go</span>
+        <span class="nf">main</span><span class="p">()</span>  
+        <span class="o">-</span><span class="p">&gt;</span> <span class="nx">app</span><span class="p">.</span><span class="nf">NewControllerManagerCommand</span><span class="p">()</span>
+<span class="mf">2.</span> <span class="nx">cmd</span><span class="o">/</span><span class="nx">kube</span><span class="o">-</span><span class="nx">controller</span><span class="o">-</span><span class="nx">manager</span><span class="o">/</span><span class="nx">app</span><span class="o">/</span><span class="nx">controllermanager</span><span class="p">.</span><span class="k">go</span>
+        <span class="nf">NewControllerManagerCommand</span><span class="p">()</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span>
+        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">Run</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">NewControllerInitializers</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">InitFunc</span>   <span class="c1">// 这里返回控制器的map,后续会对他遍历执行InitFunc
+</span><span class="c1"></span>                <span class="p">{</span>
+                        <span class="nx">controllers</span><span class="p">[</span><span class="s">&#34;deployment&#34;</span><span class="p">]</span> <span class="p">=</span> <span class="nx">startDeploymentController</span>
+                <span class="p">}</span>
+<span class="mf">3.</span> <span class="nx">cmd</span><span class="o">/</span><span class="nx">kube</span><span class="o">-</span><span class="nx">controller</span><span class="o">-</span><span class="nx">manager</span><span class="o">/</span><span class="nx">app</span><span class="o">/</span><span class="nx">apps</span><span class="p">.</span><span class="k">go</span>
+        <span class="nf">startDeploymentController</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">dc</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">deployment</span><span class="p">.</span><span class="nf">NewDeploymentController</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+                <span class="k">go</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">ComponentConfig</span><span class="p">.</span><span class="nx">DeploymentController</span><span class="p">.</span><span class="nx">ConcurrentDeploymentSyncs</span><span class="p">),</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">Stop</span><span class="p">)</span>
+
+        <span class="p">}</span>
+<span class="mf">3.1</span> <span class="nx">pkg</span><span class="o">/</span><span class="nx">controller</span><span class="o">/</span><span class="nx">deployment</span><span class="o">/</span><span class="nx">deployment_controller</span><span class="p">.</span><span class="k">go</span>
+        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">NewDeploymentController</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">dc</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">DeploymentController</span><span class="p">{</span>
+                        <span class="nx">queue</span><span class="p">:</span>         <span class="nx">workqueue</span><span class="p">.</span><span class="nf">NewNamedRateLimitingQueue</span><span class="p">(</span><span class="nx">workqueue</span><span class="p">.</span><span class="nf">DefaultControllerRateLimiter</span><span class="p">(),</span> <span class="s">&#34;deployment&#34;</span><span class="p">),</span>
+                <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">NewNamedRateLimitingQueue</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="nx">RateLimitingInterface</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="o">&amp;</span><span class="nx">rateLimitingType</span><span class="p">{</span>
+                        <span class="nx">DelayingInterface</span><span class="p">:</span> <span class="nf">NewNamedDelayingQueue</span><span class="p">(</span><span class="nx">name</span><span class="p">),</span>
+                        <span class="nx">rateLimiter</span><span class="p">:</span>       <span class="nx">rateLimiter</span><span class="p">,</span> <span class="c1">// 限流器
+</span><span class="c1"></span>                <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">NewNamedDelayingQueue</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="nx">DelayingInterface</span>
+        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">newDelayingQueue</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="nx">DelayingInterface</span> <span class="p">{</span>
+                <span class="nx">ret</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">delayingType</span><span class="p">{</span>
+        		<span class="nx">Interface</span><span class="p">:</span>       <span class="nf">NewNamed</span><span class="p">(</span><span class="nx">name</span><span class="p">),</span>
+        	       <span class="p">}</span>
+                <span class="p">}</span>
+        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">NewNamed</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="o">*</span><span class="nx">Type</span>
+
+<span class="mf">3.2</span> <span class="nx">pkg</span><span class="o">/</span><span class="nx">controller</span><span class="o">/</span><span class="nx">deployment</span><span class="o">/</span><span class="nx">deployment_controller</span><span class="p">.</span><span class="k">go</span>
+        <span class="nf">Run</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+        <span class="o">-</span><span class="p">&gt;</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">worker</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">for</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">processNextWorkItem</span><span class="p">()</span> <span class="p">{</span>
+	        <span class="p">}</span>
+           <span class="p">}</span>
+        <span class="o">-</span><span class="p">&gt;</span> <span class="nf">processNextWorkItem</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">err</span> <span class="o">:=</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">syncHandler</span><span class="p">(</span><span class="nx">key</span><span class="p">.(</span><span class="kt">string</span><span class="p">))</span>
+                <span class="nx">dc</span><span class="p">.</span><span class="nf">handleErr</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span>
+           <span class="p">}</span>
+</code></pre></div><blockquote>
+<p>看到以上流程, 我们知道</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">rateLimitingType</span> <span class="nx">结构体实现了</span> <span class="nx">RateLimitingInterface</span> <span class="nx">限流队列接口</span>
+<span class="nx">delayingType</span> <span class="nx">结构体实现了</span> <span class="nx">DelayingInterface</span> <span class="nx">延迟队列接口</span>
+<span class="o">*</span><span class="nx">Type</span> <span class="nx">指针类型结构体实现了</span> <span class="nx">Interface</span> <span class="nx">同样队列接口</span>
+</code></pre></div><h3 id="11-队列接口">1.1 队列接口</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// vendor/k8s.io/client-go/util/workqueue/rate_limiting_queue.go
+</span><span class="c1">// 限流接口
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">RateLimitingInterface</span> <span class="kd">interface</span> <span class="p">{</span>
+	<span class="nx">DelayingInterface</span>
+	<span class="nf">AddRateLimited</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+	<span class="nf">Forget</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+	<span class="nf">NumRequeues</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kt">int</span>
+<span class="p">}</span>
+
+<span class="c1">// vendor/k8s.io/client-go/util/workqueue/delaying_queue.go
+</span><span class="c1">// 延迟接口
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">DelayingInterface</span> <span class="kd">interface</span> <span class="p">{</span>
+	<span class="nx">Interface</span>      <span class="c1">// 通用接口
+</span><span class="c1"></span>	<span class="nf">AddAfter</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">duration</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span>     
+<span class="p">}</span>
+
+<span class="c1">// vendor/k8s.io/client-go/util/workqueue/queue.go
+</span><span class="c1">// 通用接口
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">Interface</span> <span class="kd">interface</span> <span class="p">{</span>
+	<span class="nf">Add</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+	<span class="nf">Len</span><span class="p">()</span> <span class="kt">int</span>
+	<span class="nf">Get</span><span class="p">()</span> <span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">shutdown</span> <span class="kt">bool</span><span class="p">)</span>
+	<span class="nf">Done</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+	<span class="nf">ShutDown</span><span class="p">()</span>
+	<span class="nf">ShuttingDown</span><span class="p">()</span> <span class="kt">bool</span>
+<span class="p">}</span>
+<span class="c1">// 限流接口
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">RateLimiter</span> <span class="kd">interface</span> <span class="p">{</span>
+	<span class="nf">When</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
+	<span class="nf">Forget</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+	<span class="nf">NumRequeues</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kt">int</span>
+<span class="p">}</span>
+
+</code></pre></div><h3 id="12-实现接口的结构体">1.2 实现接口的结构体</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 限流结构体直接嵌套 延迟队列 接口的
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">rateLimitingType</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">DelayingInterface</span>
+	<span class="nx">rateLimiter</span> <span class="nx">RateLimiter</span>
+<span class="p">}</span>
+<span class="c1">// 延迟结构体 同样嵌套 同样队列接口
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">delayingType</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Interface</span>
+	<span class="c1">// 时钟
+</span><span class="c1"></span>	<span class="nx">clock</span> <span class="nx">clock</span><span class="p">.</span><span class="nx">Clock</span>
+	<span class="c1">// 退出信号
+</span><span class="c1"></span>	<span class="nx">stopCh</span> <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}</span>
+	<span class="nx">stopOnce</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">Once</span>
+	<span class="nx">heartbeat</span> <span class="nx">clock</span><span class="p">.</span><span class="nx">Ticker</span>
+	<span class="nx">waitingForAddCh</span> <span class="kd">chan</span> <span class="o">*</span><span class="nx">waitFor</span>  <span class="c1">// 用于保存到小顶堆中的 channel 通道
+</span><span class="c1"></span>	<span class="c1">// 重试的次数, retryMetrics 接口 只有一个retry() 方法
+</span><span class="c1"></span>	<span class="nx">metrics</span> <span class="nx">retryMetrics</span>
+<span class="p">}</span>
+<span class="kd">type</span> <span class="nx">waitFor</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">data</span>    <span class="nx">t</span>              <span class="c1">// 元素
+</span><span class="c1"></span>	<span class="nx">readyAt</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>      <span class="c1">// 延迟多久添加到队列
+</span><span class="c1"></span>	<span class="nx">index</span> <span class="kt">int</span>              <span class="c1">// 小顶堆的索引
+</span><span class="c1"></span><span class="p">}</span>
+<span class="c1">// 工作队列
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">Type</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">queue</span> <span class="p">[]</span><span class="nx">t</span>      <span class="c1">// type t interface{}
+</span><span class="c1"></span>	<span class="nx">dirty</span> <span class="nx">set</span>      <span class="c1">// type set map[t]empty
+</span><span class="c1"></span>	<span class="nx">processing</span> <span class="nx">set</span>
+	<span class="nx">cond</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">Cond</span>
+	<span class="nx">shuttingDown</span> <span class="kt">bool</span>
+	<span class="nx">metrics</span> <span class="nx">queueMetrics</span>   
+	<span class="nx">unfinishedWorkUpdatePeriod</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
+	<span class="nx">clock</span>                      <span class="nx">clock</span><span class="p">.</span><span class="nx">Clock</span>
+<span class="p">}</span>
+
+</code></pre></div><hr>
+<blockquote>
+<p>在 <code>startDeploymentController</code> 中核心就是两个方法, 一个是 <code>NewDeploymentController</code>, 一个是 <code>Run</code></p>
+</blockquote>
+<h2 id="2-newdeploymentcontroller">2 NewDeploymentController</h2>
+<h3 id="21-队列初始化">2.1 队列初始化</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 从例子中deployment控制器的初始化我们看到queue的初始化
+</span><span class="c1"></span><span class="nx">queue</span><span class="p">:</span>         <span class="nx">workqueue</span><span class="p">.</span><span class="nf">NewNamedRateLimitingQueue</span><span class="p">(</span><span class="nx">workqueue</span><span class="p">.</span><span class="nf">DefaultControllerRateLimiter</span><span class="p">(),</span> <span class="s">&#34;deployment&#34;</span><span class="p">),</span>
+</code></pre></div><ul>
+<li>先看下第一个参数</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// workqueue.DefaultControllerRateLimiter() 函数
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">DefaultControllerRateLimiter</span><span class="p">()</span> <span class="nx">RateLimiter</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nf">NewMaxOfRateLimiter</span><span class="p">(</span>
+                <span class="c1">// 第一个限流器,指数级, 设置失败的item的限流队列, 并设置 baseDelay 和maxDelay
+</span><span class="c1"></span>		<span class="nf">NewItemExponentialFailureRateLimiter</span><span class="p">(</span><span class="mi">5</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span><span class="p">,</span> <span class="mi">1000</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">),</span>
+                <span class="c1">// 第二个限流器,令牌桶常数级, 10qps,100的桶, 这是一个令牌桶
+</span><span class="c1"></span>		<span class="o">&amp;</span><span class="nx">BucketRateLimiter</span><span class="p">{</span><span class="nx">Limiter</span><span class="p">:</span> <span class="nx">rate</span><span class="p">.</span><span class="nf">NewLimiter</span><span class="p">(</span><span class="nx">rate</span><span class="p">.</span><span class="nf">Limit</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="mi">100</span><span class="p">)},</span>
+	<span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">// 一个[]RateLimiter 列表
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewMaxOfRateLimiter</span><span class="p">(</span><span class="nx">limiters</span> <span class="o">...</span><span class="nx">RateLimiter</span><span class="p">)</span> <span class="nx">RateLimiter</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">MaxOfRateLimiter</span><span class="p">{</span><span class="nx">limiters</span><span class="p">:</span> <span class="nx">limiters</span><span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">// 第一个限流器 NewItemExponentialFailureRateLimiter
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewItemExponentialFailureRateLimiter</span><span class="p">(</span><span class="nx">baseDelay</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">,</span> <span class="nx">maxDelay</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="nx">RateLimiter</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">ItemExponentialFailureRateLimiter</span><span class="p">{</span>
+		<span class="nx">failures</span><span class="p">:</span>  <span class="kd">map</span><span class="p">[</span><span class="kd">interface</span><span class="p">{}]</span><span class="kt">int</span><span class="p">{},</span>
+		<span class="nx">baseDelay</span><span class="p">:</span> <span class="nx">baseDelay</span><span class="p">,</span>
+		<span class="nx">maxDelay</span><span class="p">:</span>  <span class="nx">maxDelay</span><span class="p">,</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">// 第二个令牌桶 BucketRateLimiter
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewLimiter</span><span class="p">(</span><span class="nx">r</span> <span class="nx">Limit</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">Limiter</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">Limiter</span><span class="p">{</span>
+		<span class="nx">limit</span><span class="p">:</span> <span class="nx">r</span><span class="p">,</span>
+		<span class="nx">burst</span><span class="p">:</span> <span class="nx">b</span><span class="p">,</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>接着看下初始化函数</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// NewNamedRateLimitingQueue 两个参数, 第一个 RateLimiter 接口, 第二个是名字字符串
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewNamedRateLimitingQueue</span><span class="p">(</span><span class="nx">rateLimiter</span> <span class="nx">RateLimiter</span><span class="p">,</span> <span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="nx">RateLimitingInterface</span> <span class="p">{</span>
+        <span class="c1">// 返回 rateLimitingType 这个结构体, 实现限流队列接口
+</span><span class="c1"></span>	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">rateLimitingType</span><span class="p">{</span>
+                <span class="c1">// 延迟队列的初始化
+</span><span class="c1"></span>		<span class="nx">DelayingInterface</span><span class="p">:</span> <span class="nf">NewNamedDelayingQueue</span><span class="p">(</span><span class="nx">name</span><span class="p">),</span>
+		<span class="nx">rateLimiter</span><span class="p">:</span>       <span class="nx">rateLimiter</span><span class="p">,</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">// NewNamedDelayingQueue
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewNamedDelayingQueue</span><span class="p">(</span><span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="nx">DelayingInterface</span> <span class="p">{</span>
+        <span class="c1">// RealClock结构体没有元素, RealClock really calls time.Now()
+</span><span class="c1"></span>	<span class="k">return</span> <span class="nf">newDelayingQueue</span><span class="p">(</span><span class="nx">clock</span><span class="p">.</span><span class="nx">RealClock</span><span class="p">{},</span> <span class="nx">name</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="nf">newDelayingQueue</span><span class="p">(</span><span class="nx">clock</span> <span class="nx">clock</span><span class="p">.</span><span class="nx">Clock</span><span class="p">,</span> <span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="nx">DelayingInterface</span> <span class="p">{</span>
+        <span class="c1">// delayingType 结构体初始化
+</span><span class="c1"></span>	<span class="nx">ret</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">delayingType</span><span class="p">{</span>
+                <span class="c1">// 同样接口初始化
+</span><span class="c1"></span>		<span class="nx">Interface</span><span class="p">:</span>       <span class="nf">NewNamed</span><span class="p">(</span><span class="nx">name</span><span class="p">),</span>
+		<span class="nx">clock</span><span class="p">:</span>           <span class="nx">clock</span><span class="p">,</span>
+		<span class="nx">heartbeat</span><span class="p">:</span>       <span class="nx">clock</span><span class="p">.</span><span class="nf">NewTicker</span><span class="p">(</span><span class="nx">maxWait</span><span class="p">),</span>
+		<span class="nx">stopCh</span><span class="p">:</span>          <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}),</span>
+		<span class="nx">waitingForAddCh</span><span class="p">:</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="o">*</span><span class="nx">waitFor</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span>
+		<span class="nx">metrics</span><span class="p">:</span>         <span class="nf">newRetryMetrics</span><span class="p">(</span><span class="nx">name</span><span class="p">),</span>
+	<span class="p">}</span>
+        <span class="c1">// 协程循环
+</span><span class="c1"></span>	<span class="k">go</span> <span class="nx">ret</span><span class="p">.</span><span class="nf">waitingLoop</span><span class="p">()</span>
+	<span class="k">return</span> <span class="nx">ret</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>核心的延迟循环</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">q</span> <span class="o">*</span><span class="nx">delayingType</span><span class="p">)</span> <span class="nf">waitingLoop</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">defer</span> <span class="nx">utilruntime</span><span class="p">.</span><span class="nf">HandleCrash</span><span class="p">()</span>
+
+	<span class="c1">// 赋值nextReadyAt,首次pass
+</span><span class="c1"></span>	<span class="nx">never</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="o">&lt;-</span><span class="kd">chan</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">)</span>
+        <span class="c1">// waitForPriorityQueue 结构体是一个堆的实现
+</span><span class="c1"></span>	<span class="nx">waitingForQueue</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">waitForPriorityQueue</span><span class="p">{}</span>
+        <span class="c1">// 初始化 小顶堆
+</span><span class="c1"></span>	<span class="nx">heap</span><span class="p">.</span><span class="nf">Init</span><span class="p">(</span><span class="nx">waitingForQueue</span><span class="p">)</span>
+        <span class="c1">// 定义一个map存储 waitfor
+</span><span class="c1"></span>	<span class="nx">waitingEntryByData</span> <span class="o">:=</span> <span class="kd">map</span><span class="p">[</span><span class="nx">t</span><span class="p">]</span><span class="o">*</span><span class="nx">waitFor</span><span class="p">{}</span>
+	<span class="k">for</span> <span class="p">{</span>
+                <span class="c1">// 如果 工作队列正在结束, 就是看shuttingDown的标志位
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">q</span><span class="p">.</span><span class="nx">Interface</span><span class="p">.</span><span class="nf">ShuttingDown</span><span class="p">()</span> <span class="p">{</span>
+			<span class="k">return</span>
+		<span class="p">}</span>
+                <span class="c1">// 当前时间戳 time.Now()
+</span><span class="c1"></span>		<span class="nx">now</span> <span class="o">:=</span> <span class="nx">q</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">Now</span><span class="p">()</span>
+
+		<span class="c1">// 如果 堆 不空
+</span><span class="c1"></span>		<span class="k">for</span> <span class="nx">waitingForQueue</span><span class="p">.</span><span class="nf">Len</span><span class="p">()</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+                        <span class="c1">// 堆顶, 也就是时间戳最小的元素, 拿出来看一眼先
+</span><span class="c1"></span>			<span class="nx">entry</span> <span class="o">:=</span> <span class="nx">waitingForQueue</span><span class="p">.</span><span class="nf">Peek</span><span class="p">().(</span><span class="o">*</span><span class="nx">waitFor</span><span class="p">)</span>
+                        <span class="c1">// entry.readyAt 时间如果晚于 now, 说明第一个还没到时间, 那么就退出循环
+</span><span class="c1"></span>			<span class="k">if</span> <span class="nx">entry</span><span class="p">.</span><span class="nx">readyAt</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">now</span><span class="p">)</span> <span class="p">{</span>
+				<span class="k">break</span>
+			<span class="p">}</span>
+                        <span class="c1">// 否则的话, 看过了没问题, 现在就真的要出堆了
+</span><span class="c1"></span>                        <span class="c1">// 因为是小顶堆, 所以先把最后一个和第一个(堆顶)交换, 然后对最后一个进行下沉操作, 最后返回从堆顶交换下来的(旧堆顶)出堆
+</span><span class="c1"></span>			<span class="nx">entry</span> <span class="p">=</span> <span class="nx">heap</span><span class="p">.</span><span class="nf">Pop</span><span class="p">(</span><span class="nx">waitingForQueue</span><span class="p">).(</span><span class="o">*</span><span class="nx">waitFor</span><span class="p">)</span>
+                        <span class="c1">// Add是Interface通用接口的方法
+</span><span class="c1"></span>                        <span class="c1">// 往工作队列中添加 data 去消费了
+</span><span class="c1"></span>			<span class="nx">q</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">entry</span><span class="p">.</span><span class="nx">data</span><span class="p">)</span>
+                        <span class="c1">// 然后把waitingEntryByData 表清理一下
+</span><span class="c1"></span>			<span class="nb">delete</span><span class="p">(</span><span class="nx">waitingEntryByData</span><span class="p">,</span> <span class="nx">entry</span><span class="p">.</span><span class="nx">data</span><span class="p">)</span>
+		<span class="p">}</span>
+
+		<span class="c1">// 走到这里的话 说明waitingForQueue.Len() == 0
+</span><span class="c1"></span>                <span class="c1">// 首次初始化的情况
+</span><span class="c1"></span>		<span class="nx">nextReadyAt</span> <span class="o">:=</span> <span class="nx">never</span>
+                <span class="c1">// 如果还有元素
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">waitingForQueue</span><span class="p">.</span><span class="nf">Len</span><span class="p">()</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+                        <span class="c1">// 再看一眼
+</span><span class="c1"></span>			<span class="nx">entry</span> <span class="o">:=</span> <span class="nx">waitingForQueue</span><span class="p">.</span><span class="nf">Peek</span><span class="p">().(</span><span class="o">*</span><span class="nx">waitFor</span><span class="p">)</span>
+                        <span class="c1">// entry.readyAt.Sub 是把这个元素的时间 entry.readyAt 减去 当前时间now
+</span><span class="c1"></span>                        <span class="c1">// q.clock.After 实际就是 time.After, 所以就是延迟了
+</span><span class="c1"></span>			<span class="nx">nextReadyAt</span> <span class="p">=</span> <span class="nx">q</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">entry</span><span class="p">.</span><span class="nx">readyAt</span><span class="p">.</span><span class="nf">Sub</span><span class="p">(</span><span class="nx">now</span><span class="p">))</span>
+		<span class="p">}</span>
+
+		<span class="k">select</span> <span class="p">{</span>
+		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">q</span><span class="p">.</span><span class="nx">stopCh</span><span class="p">:</span>
+			<span class="k">return</span>
+                <span class="c1">// ticker
+</span><span class="c1"></span>		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">q</span><span class="p">.</span><span class="nx">heartbeat</span><span class="p">.</span><span class="nf">C</span><span class="p">():</span>
+                <span class="c1">// 如果上面拿到元素了就可以直接循环去处理那个看过的entry
+</span><span class="c1"></span>                <span class="c1">// 当然如果没有元素, 这里就是never, 会被pass
+</span><span class="c1"></span>		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">nextReadyAt</span><span class="p">:</span>
+			<span class="c1">// continue the loop, which will add ready items
+</span><span class="c1"></span>                <span class="c1">// waitingForAddCh channel 有写入, 一般在Affter函数中
+</span><span class="c1"></span>		<span class="k">case</span> <span class="nx">waitEntry</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">q</span><span class="p">.</span><span class="nx">waitingForAddCh</span><span class="p">:</span>
+                        <span class="c1">// 同样比较一个 waitEntry.readyAt 是否 大于 当前时间戳
+</span><span class="c1"></span>			<span class="k">if</span> <span class="nx">waitEntry</span><span class="p">.</span><span class="nx">readyAt</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">q</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">Now</span><span class="p">())</span> <span class="p">{</span>
+                                <span class="c1">// 大于的话就加入到等待队列
+</span><span class="c1"></span>				<span class="nf">insert</span><span class="p">(</span><span class="nx">waitingForQueue</span><span class="p">,</span> <span class="nx">waitingEntryByData</span><span class="p">,</span> <span class="nx">waitEntry</span><span class="p">)</span>
+			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                                <span class="c1">// 否则就处理工作
+</span><span class="c1"></span>				<span class="nx">q</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">waitEntry</span><span class="p">.</span><span class="nx">data</span><span class="p">)</span>
+			<span class="p">}</span>
+                        <span class="c1">// 批量处理, 把waitingForAddCh 取完
+</span><span class="c1"></span>			<span class="nx">drained</span> <span class="o">:=</span> <span class="kc">false</span>
+			<span class="k">for</span> <span class="p">!</span><span class="nx">drained</span> <span class="p">{</span>
+				<span class="k">select</span> <span class="p">{</span>
+				<span class="k">case</span> <span class="nx">waitEntry</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">q</span><span class="p">.</span><span class="nx">waitingForAddCh</span><span class="p">:</span>
+					<span class="k">if</span> <span class="nx">waitEntry</span><span class="p">.</span><span class="nx">readyAt</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">q</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">Now</span><span class="p">())</span> <span class="p">{</span>
+						<span class="nf">insert</span><span class="p">(</span><span class="nx">waitingForQueue</span><span class="p">,</span> <span class="nx">waitingEntryByData</span><span class="p">,</span> <span class="nx">waitEntry</span><span class="p">)</span>
+					<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+						<span class="nx">q</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">waitEntry</span><span class="p">.</span><span class="nx">data</span><span class="p">)</span>
+					<span class="p">}</span>
+                                <span class="c1">// 取完了
+</span><span class="c1"></span>				<span class="k">default</span><span class="p">:</span>
+					<span class="nx">drained</span> <span class="p">=</span> <span class="kc">true</span>
+				<span class="p">}</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>waitingLoop 总结</li>
+</ul>
+<blockquote>
+<p>看完 <code>waitingLoop</code> 我们发现, 延迟队列是通过一个 <code>waitForPriorityQueue</code> 队列实现, <code>waitForPriorityQueue</code> 其实 sort接口 和 heap接口</p>
+<p>从实现的 <code>Less</code> 方法我们知道, <code>readyAt</code> 最小的在堆顶</p>
+<p>通过循环 读取 <code>waitingForAddCh</code> 通道的数据, 然后添加到 <code>waitingForQueue</code>, 进行堆排, 然后执行 <code>time.After</code> 延迟后加入到 工作队列执行</p>
+</blockquote>
+<blockquote>
+<p>那么 <code>waitingForAddCh</code>通道的内容是在什么时候加进来的呢? 我们接着 <code>NewDeploymentController</code> 继续往下看</p>
+</blockquote>
+<h3 id="22-sync方法">2.2 sync方法</h3>
+<blockquote>
+<p>我们省略了其他初始化工作
+syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">NewDeploymentController</span><span class="p">(</span><span class="nx">dInformer</span> <span class="nx">appsinformers</span><span class="p">.</span><span class="nx">DeploymentInformer</span><span class="p">,</span> <span class="nx">rsInformer</span> <span class="nx">appsinformers</span><span class="p">.</span><span class="nx">ReplicaSetInformer</span><span class="p">,</span> <span class="nx">podInformer</span> <span class="nx">coreinformers</span><span class="p">.</span><span class="nx">PodInformer</span><span class="p">,</span> <span class="nx">client</span> <span class="nx">clientset</span><span class="p">.</span><span class="nx">Interface</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">DeploymentController</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="o">...</span>
+	<span class="nx">dc</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">DeploymentController</span><span class="p">{</span>
+		<span class="nx">queue</span><span class="p">:</span>         <span class="nx">workqueue</span><span class="p">.</span><span class="nf">NewNamedRateLimitingQueue</span><span class="p">(</span><span class="nx">workqueue</span><span class="p">.</span><span class="nf">DefaultControllerRateLimiter</span><span class="p">(),</span> <span class="s">&#34;deployment&#34;</span><span class="p">),</span>
+	<span class="p">}</span>
+	<span class="o">...</span>
+	<span class="nx">dc</span><span class="p">.</span><span class="nx">syncHandler</span> <span class="p">=</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">syncDeployment</span>
+        <span class="o">...</span>
+	<span class="k">return</span> <span class="nx">dc</span><span class="p">,</span> <span class="kc">nil</span>
+<span class="p">}</span>
+
+</code></pre></div><ul>
+<li>syncDeployment</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// pkg/controller/deployment/deployment_controller.go
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">syncDeployment</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+        <span class="o">...</span>
+	<span class="nx">namespace</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">cache</span><span class="p">.</span><span class="nf">SplitMetaNamespaceKey</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
+        <span class="o">...</span>
+	<span class="nx">deployment</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">dLister</span><span class="p">.</span><span class="nf">Deployments</span><span class="p">(</span><span class="nx">namespace</span><span class="p">).</span><span class="nf">Get</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
+        <span class="o">...</span>
+        <span class="c1">// 深copy一份
+</span><span class="c1"></span>	<span class="nx">d</span> <span class="o">:=</span> <span class="nx">deployment</span><span class="p">.</span><span class="nf">DeepCopy</span><span class="p">()</span>
+
+	<span class="o">...</span>
+        <span class="c1">// 查看 deployment的状态
+</span><span class="c1"></span>	<span class="k">switch</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">Strategy</span><span class="p">.</span><span class="nx">Type</span> <span class="p">{</span>
+        <span class="c1">// &#34;Recreate&#34;
+</span><span class="c1"></span>	<span class="k">case</span> <span class="nx">apps</span><span class="p">.</span><span class="nx">RecreateDeploymentStrategyType</span><span class="p">:</span>
+		<span class="k">return</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">rolloutRecreate</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">rsList</span><span class="p">,</span> <span class="nx">podMap</span><span class="p">)</span>
+        <span class="c1">// &#34;RollingUpdate&#34;
+</span><span class="c1"></span>	<span class="k">case</span> <span class="nx">apps</span><span class="p">.</span><span class="nx">RollingUpdateDeploymentStrategyType</span><span class="p">:</span>
+		<span class="k">return</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">rolloutRolling</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">rsList</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;unexpected deployment strategy type: %s&#34;</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">Strategy</span><span class="p">.</span><span class="nx">Type</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">// 不管是 Recreate 还是 RollingUpdate 最终都会调用 syncRolloutStatus
+</span><span class="c1">// pkg/controller/deployment/progress.go
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">syncRolloutStatus</span><span class="p">(</span><span class="nx">allRSs</span> <span class="p">[]</span><span class="o">*</span><span class="nx">apps</span><span class="p">.</span><span class="nx">ReplicaSet</span><span class="p">,</span> <span class="nx">newRS</span> <span class="o">*</span><span class="nx">apps</span><span class="p">.</span><span class="nx">ReplicaSet</span><span class="p">,</span> <span class="nx">d</span> <span class="o">*</span><span class="nx">apps</span><span class="p">.</span><span class="nx">Deployment</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+        <span class="nx">newStatus</span> <span class="o">:=</span> <span class="nf">calculateStatus</span><span class="p">(</span><span class="nx">allRSs</span><span class="p">,</span> <span class="nx">newRS</span><span class="p">,</span> <span class="nx">d</span><span class="p">)</span>
+        <span class="o">...</span>
+        <span class="c1">// 如果没有新的更新
+</span><span class="c1"></span>        <span class="k">if</span> <span class="nx">reflect</span><span class="p">.</span><span class="nf">DeepEqual</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">Status</span><span class="p">,</span> <span class="nx">newStatus</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// 这个时候就去调用延迟队列了
+</span><span class="c1"></span>                <span class="nx">dc</span><span class="p">.</span><span class="nf">requeueStuckDeployment</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">newStatus</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">nil</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// requeueStuckDeployment
+</span><span class="c1">// pkg/controller/deployment/progress.go
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">requeueStuckDeployment</span><span class="p">(</span><span class="nx">d</span> <span class="o">*</span><span class="nx">apps</span><span class="p">.</span><span class="nx">Deployment</span><span class="p">,</span> <span class="nx">newStatus</span> <span class="nx">apps</span><span class="p">.</span><span class="nx">DeploymentStatus</span><span class="p">)</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="p">{</span>
+	<span class="nx">currentCond</span> <span class="o">:=</span> <span class="nx">util</span><span class="p">.</span><span class="nf">GetDeploymentCondition</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">Status</span><span class="p">,</span> <span class="nx">apps</span><span class="p">.</span><span class="nx">DeploymentProgressing</span><span class="p">)</span>
+	<span class="c1">// 如果没有设置 spec.ProgressDeadlineSeconds的话 就直接退出了, 不会延迟
+</span><span class="c1"></span>	<span class="k">if</span> <span class="p">!</span><span class="nx">util</span><span class="p">.</span><span class="nf">HasProgressDeadline</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="o">||</span> <span class="nx">currentCond</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+	<span class="p">}</span>
+        <span class="c1">// 已经完成了 或者超时的原因 也直接退出
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">util</span><span class="p">.</span><span class="nf">DeploymentComplete</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">newStatus</span><span class="p">)</span> <span class="o">||</span> <span class="nx">currentCond</span><span class="p">.</span><span class="nx">Reason</span> <span class="o">==</span> <span class="nx">util</span><span class="p">.</span><span class="nx">TimedOutReason</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="c1">// 计算要延迟的时间
+</span><span class="c1"></span>        <span class="c1">// = LastUpdateTime + ProgressDeadlineSeconds - time.now()
+</span><span class="c1"></span>	<span class="nx">after</span> <span class="o">:=</span> <span class="nx">currentCond</span><span class="p">.</span><span class="nx">LastUpdateTime</span><span class="p">.</span><span class="nx">Time</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="o">*</span><span class="nx">d</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">ProgressDeadlineSeconds</span><span class="p">)</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">).</span><span class="nf">Sub</span><span class="p">(</span><span class="nf">nowFn</span><span class="p">())</span>
+	<span class="o">...</span>
+        <span class="c1">// 要延迟 after + 1 秒
+</span><span class="c1"></span>	<span class="nx">dc</span><span class="p">.</span><span class="nf">enqueueAfter</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">after</span><span class="o">+</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+	<span class="k">return</span> <span class="nx">after</span>
+<span class="p">}</span>
+<span class="c1">// enqueueAfter
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">enqueueAfter</span><span class="p">(</span><span class="nx">deployment</span> <span class="o">*</span><span class="nx">apps</span><span class="p">.</span><span class="nx">Deployment</span><span class="p">,</span> <span class="nx">after</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="p">{</span>
+        <span class="o">...</span>
+        <span class="c1">// queue 我们知道在 初始化是 被rateLimitingType 结构体实现的 , 但它并没有AddAfter 方法, 因为它嵌套了 DelayingInterface
+</span><span class="c1"></span>        <span class="c1">// 而 DelayingInterface 又被 NewNamedDelayingQueue() 方法初始化 由 delayingType 结构体来实现
+</span><span class="c1"></span>	<span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">AddAfter</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">after</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">// 因此我们找到了 delayingType 的 AddAfter 方法
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">q</span> <span class="o">*</span><span class="nx">delayingType</span><span class="p">)</span> <span class="nf">AddAfter</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">duration</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">// don&#39;t add if we&#39;re already shutting down
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">q</span><span class="p">.</span><span class="nf">ShuttingDown</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+        <span class="c1">// 重试次数增加
+</span><span class="c1"></span>	<span class="nx">q</span><span class="p">.</span><span class="nx">metrics</span><span class="p">.</span><span class="nf">retry</span><span class="p">()</span>
+
+	<span class="c1">// immediately add things with no delay
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">duration</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">q</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+        <span class="c1">// 终于我们看到了什么时候 写入 waitingForAddCh channel中
+</span><span class="c1"></span>	<span class="k">select</span> <span class="p">{</span>
+	<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">q</span><span class="p">.</span><span class="nx">stopCh</span><span class="p">:</span>
+	<span class="k">case</span> <span class="nx">q</span><span class="p">.</span><span class="nx">waitingForAddCh</span> <span class="o">&lt;-</span> <span class="o">&amp;</span><span class="nx">waitFor</span><span class="p">{</span><span class="nx">data</span><span class="p">:</span> <span class="nx">item</span><span class="p">,</span> <span class="nx">readyAt</span><span class="p">:</span> <span class="nx">q</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">Add</span><span class="p">(</span><span class="nx">duration</span><span class="p">)}:</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="3-run">3 Run</h2>
+<h3 id="31-dcrun">3.1 dc.Run</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// pkg/controller/deployment/deployment_controller.go
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">Run</span><span class="p">(</span><span class="nx">workers</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
+	<span class="k">defer</span> <span class="nx">utilruntime</span><span class="p">.</span><span class="nf">HandleCrash</span><span class="p">()</span>
+	<span class="k">defer</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">ShutDown</span><span class="p">()</span>
+
+	<span class="nx">klog</span><span class="p">.</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Starting deployment controller&#34;</span><span class="p">)</span>
+	<span class="k">defer</span> <span class="nx">klog</span><span class="p">.</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Shutting down deployment controller&#34;</span><span class="p">)</span>
+
+	<span class="k">if</span> <span class="p">!</span><span class="nx">cache</span><span class="p">.</span><span class="nf">WaitForNamedCacheSync</span><span class="p">(</span><span class="s">&#34;deployment&#34;</span><span class="p">,</span> <span class="nx">stopCh</span><span class="p">,</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">dListerSynced</span><span class="p">,</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">rsListerSynced</span><span class="p">,</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">podListerSynced</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+
+	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">workers</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="k">go</span> <span class="nx">wait</span><span class="p">.</span><span class="nf">Until</span><span class="p">(</span><span class="nx">dc</span><span class="p">.</span><span class="nx">worker</span><span class="p">,</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span> <span class="nx">stopCh</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="o">&lt;-</span><span class="nx">stopCh</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">worker</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">processNextWorkItem</span><span class="p">()</span> <span class="p">{</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">processNextWorkItem</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
+	<span class="nx">key</span><span class="p">,</span> <span class="nx">quit</span> <span class="o">:=</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">Get</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nx">quit</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="kc">false</span>
+	<span class="p">}</span>
+	<span class="k">defer</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">Done</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
+        <span class="c1">// 这里就是syncDeployment, 上面已经详细介绍过了
+</span><span class="c1"></span>	<span class="nx">err</span> <span class="o">:=</span> <span class="nx">dc</span><span class="p">.</span><span class="nf">syncHandler</span><span class="p">(</span><span class="nx">key</span><span class="p">.(</span><span class="kt">string</span><span class="p">))</span>
+        <span class="c1">// 这里会写入延迟队列的 channel
+</span><span class="c1"></span>	<span class="nx">dc</span><span class="p">.</span><span class="nf">handleErr</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span>
+
+	<span class="k">return</span> <span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>dc.handleErr</li>
+</ul>
+<blockquote>
+<p>这里就看到了 限流器的代码</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">*</span><span class="nx">DeploymentController</span><span class="p">)</span> <span class="nf">handleErr</span><span class="p">(</span><span class="nx">err</span> <span class="kt">error</span><span class="p">,</span> <span class="nx">key</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">Forget</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+        <span class="c1">// 没有超过最大重试次数
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">NumRequeues</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">&lt;</span> <span class="nx">maxRetries</span> <span class="p">{</span>
+                <span class="c1">// 把key加入到限流队列中, 实际调用 rateLimitingType.AddRateLimited
+</span><span class="c1"></span>		<span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">AddRateLimited</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+
+	<span class="nx">utilruntime</span><span class="p">.</span><span class="nf">HandleError</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+	<span class="nx">klog</span><span class="p">.</span><span class="nf">V</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Dropping deployment %q out of the queue: %v&#34;</span><span class="p">,</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+	<span class="nx">dc</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">Forget</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">// AddRateLimited 方法
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">q</span> <span class="o">*</span><span class="nx">rateLimitingType</span><span class="p">)</span> <span class="nf">AddRateLimited</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+        <span class="c1">// 1. 调用个延迟队列的 AddAfter
+</span><span class="c1"></span>        <span class="c1">// 上面介绍到了 NewNamedDelayingQueue() 函数初始化的 延迟队列接口 DelayingInterface
+</span><span class="c1"></span>        <span class="c1">// 所以实际执行的是 delayingType.AddAfter, 也就是上面介绍的delayingType.AddAfter , 对延迟队列channel 写入 waitfor
+</span><span class="c1"></span>        <span class="c1">// 2. When 方法是调用了 令牌桶
+</span><span class="c1"></span>        <span class="c1">// 上面介绍到 DefaultControllerRateLimiter() 函数初始化的 令牌桶接口 RateLimiter
+</span><span class="c1"></span>        <span class="c1">// 所以实际执行的是 MaxOfRateLimiter.When, 最终得到两个限流器中最大的延迟时间
+</span><span class="c1"></span>	<span class="nx">q</span><span class="p">.</span><span class="nx">DelayingInterface</span><span class="p">.</span><span class="nf">AddAfter</span><span class="p">(</span><span class="nx">item</span><span class="p">,</span> <span class="nx">q</span><span class="p">.</span><span class="nx">rateLimiter</span><span class="p">.</span><span class="nf">When</span><span class="p">(</span><span class="nx">item</span><span class="p">))</span>
+<span class="p">}</span>
+</code></pre></div><h3 id="32-maxofratelimiter">3.2 MaxOfRateLimiter</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// RateLimiter的包装, 实现了RateLimiter 接口
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">MaxOfRateLimiter</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">limiters</span> <span class="p">[]</span><span class="nx">RateLimiter</span>
+<span class="p">}</span>
+<span class="c1">// 这其实是包装了多个限流器, 迭代执行When
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">MaxOfRateLimiter</span><span class="p">)</span> <span class="nf">When</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="p">{</span>
+	<span class="nx">ret</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">limiter</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">r</span><span class="p">.</span><span class="nx">limiters</span> <span class="p">{</span>
+		<span class="nx">curr</span> <span class="o">:=</span> <span class="nx">limiter</span><span class="p">.</span><span class="nf">When</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span>
+                <span class="c1">// 大于就保存
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">curr</span> <span class="p">&gt;</span> <span class="nx">ret</span> <span class="p">{</span>
+			<span class="nx">ret</span> <span class="p">=</span> <span class="nx">curr</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+        <span class="c1">// 返回所有 限流器里面的最大值
+</span><span class="c1"></span>	<span class="k">return</span> <span class="nx">ret</span>
+<span class="p">}</span>
+</code></pre></div><blockquote>
+<p>上面一共初始化了两个限流器 一个是 <code>ItemExponentialFailureRateLimiter</code> , 一个是 <code>BucketRateLimiter</code></p>
+<p>分别来看下</p>
+</blockquote>
+<ul>
+<li>ItemExponentialFailureRateLimiter</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 指数级, 实现了RateLimiter 接口
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">ItemExponentialFailureRateLimiter</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">failuresLock</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
+	<span class="nx">failures</span>     <span class="kd">map</span><span class="p">[</span><span class="kd">interface</span><span class="p">{}]</span><span class="kt">int</span>
+
+	<span class="nx">baseDelay</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
+	<span class="nx">maxDelay</span>  <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">ItemExponentialFailureRateLimiter</span><span class="p">)</span> <span class="nf">When</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="p">{</span>
+	<span class="nx">r</span><span class="p">.</span><span class="nx">failuresLock</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+	<span class="k">defer</span> <span class="nx">r</span><span class="p">.</span><span class="nx">failuresLock</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+
+	<span class="nx">exp</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">failures</span><span class="p">[</span><span class="nx">item</span><span class="p">]</span>
+	<span class="nx">r</span><span class="p">.</span><span class="nx">failures</span><span class="p">[</span><span class="nx">item</span><span class="p">]</span> <span class="p">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">failures</span><span class="p">[</span><span class="nx">item</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1">// 根据失败的次数 指数级增加
+</span><span class="c1"></span>	<span class="nx">backoff</span> <span class="o">:=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">baseDelay</span><span class="p">.</span><span class="nf">Nanoseconds</span><span class="p">())</span> <span class="o">*</span> <span class="nx">math</span><span class="p">.</span><span class="nf">Pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">exp</span><span class="p">))</span>
+	<span class="k">if</span> <span class="nx">backoff</span> <span class="p">&gt;</span> <span class="nx">math</span><span class="p">.</span><span class="nx">MaxInt64</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">r</span><span class="p">.</span><span class="nx">maxDelay</span>
+	<span class="p">}</span>
+
+	<span class="nx">calculated</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">backoff</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">calculated</span> <span class="p">&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">maxDelay</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">r</span><span class="p">.</span><span class="nx">maxDelay</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span> <span class="nx">calculated</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>BucketRateLimiter</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// BucketRateLimiter, 实现了RateLimiter 接口
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">BucketRateLimiter</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="o">*</span><span class="nx">rate</span><span class="p">.</span><span class="nx">Limiter</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">BucketRateLimiter</span><span class="p">)</span> <span class="nf">When</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Limiter</span><span class="p">.</span><span class="nf">Reserve</span><span class="p">().</span><span class="nf">Delay</span><span class="p">()</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">lim</span> <span class="o">*</span><span class="nx">Limiter</span><span class="p">)</span> <span class="nf">Reserve</span><span class="p">()</span> <span class="o">*</span><span class="nx">Reservation</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nx">lim</span><span class="p">.</span><span class="nf">ReserveN</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">lim</span> <span class="o">*</span><span class="nx">Limiter</span><span class="p">)</span> <span class="nf">ReserveN</span><span class="p">(</span><span class="nx">now</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span> <span class="nx">n</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">Reservation</span> <span class="p">{</span>
+        <span class="c1">// InfDuration = time.Duration(1&lt;&lt;63-1) 最大的64位数
+</span><span class="c1"></span>	<span class="nx">r</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nf">reserveN</span><span class="p">(</span><span class="nx">now</span><span class="p">,</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">InfDuration</span><span class="p">)</span>
+	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">r</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">lim</span> <span class="o">*</span><span class="nx">Limiter</span><span class="p">)</span> <span class="nf">reserveN</span><span class="p">(</span><span class="nx">now</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span> <span class="nx">n</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">maxFutureReserve</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="nx">Reservation</span> <span class="p">{</span>
+	<span class="nx">lim</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+        <span class="o">...</span>
+        <span class="c1">// 调整当前的令牌桶的资源
+</span><span class="c1"></span>	<span class="nx">now</span><span class="p">,</span> <span class="nx">last</span><span class="p">,</span> <span class="nx">tokens</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nf">advance</span><span class="p">(</span><span class="nx">now</span><span class="p">)</span>
+
+	<span class="c1">// 除去需要拿走 n 个token, 这里是1, 得到剩余的tokens
+</span><span class="c1"></span>	<span class="nx">tokens</span> <span class="o">-=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span>
+
+	<span class="c1">// Calculate the wait duration
+</span><span class="c1"></span>	<span class="kd">var</span> <span class="nx">waitDuration</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
+        <span class="c1">// 如果tokens少于0了
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">tokens</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="p">{</span>
+                <span class="c1">// 算出需要等待多久 我们的 令牌桶中 才有n个tokens
+</span><span class="c1"></span>		<span class="nx">waitDuration</span> <span class="p">=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">limit</span><span class="p">.</span><span class="nf">durationFromTokens</span><span class="p">(</span><span class="o">-</span><span class="nx">tokens</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="c1">// n 前面传的是1 , 就是需要拿一个token
+</span><span class="c1"></span>	<span class="nx">ok</span> <span class="o">:=</span> <span class="nx">n</span> <span class="o">&lt;=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">burst</span> <span class="o">&amp;&amp;</span> <span class="nx">waitDuration</span> <span class="o">&lt;=</span> <span class="nx">maxFutureReserve</span>
+
+	<span class="c1">// 构建Reservation
+</span><span class="c1"></span>	<span class="nx">r</span> <span class="o">:=</span> <span class="nx">Reservation</span><span class="p">{</span>
+		<span class="nx">ok</span><span class="p">:</span>    <span class="nx">ok</span><span class="p">,</span>
+		<span class="nx">lim</span><span class="p">:</span>   <span class="nx">lim</span><span class="p">,</span>
+		<span class="nx">limit</span><span class="p">:</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">limit</span><span class="p">,</span>
+	<span class="p">}</span>
+        <span class="c1">// 可以拿到token
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">ok</span> <span class="p">{</span>
+		<span class="nx">r</span><span class="p">.</span><span class="nx">tokens</span> <span class="p">=</span> <span class="nx">n</span>
+		<span class="nx">r</span><span class="p">.</span><span class="nx">timeToAct</span> <span class="p">=</span> <span class="nx">now</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">waitDuration</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="c1">// 更新状态
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">ok</span> <span class="p">{</span>
+		<span class="nx">lim</span><span class="p">.</span><span class="nx">last</span> <span class="p">=</span> <span class="nx">now</span>
+		<span class="nx">lim</span><span class="p">.</span><span class="nx">tokens</span> <span class="p">=</span> <span class="nx">tokens</span>
+		<span class="nx">lim</span><span class="p">.</span><span class="nx">lastEvent</span> <span class="p">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">timeToAct</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+		<span class="nx">lim</span><span class="p">.</span><span class="nx">last</span> <span class="p">=</span> <span class="nx">last</span>
+	<span class="p">}</span>
+
+	<span class="nx">lim</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+	<span class="k">return</span> <span class="nx">r</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Reservation</span><span class="p">)</span> <span class="nf">Delay</span><span class="p">()</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nx">r</span><span class="p">.</span><span class="nf">DelayFrom</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">())</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Reservation</span><span class="p">)</span> <span class="nf">DelayFrom</span><span class="p">(</span><span class="nx">now</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">)</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="p">!</span><span class="nx">r</span><span class="p">.</span><span class="nx">ok</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">InfDuration</span>
+	<span class="p">}</span>
+        <span class="c1">// 这里 timeToAct 在拿到token的时候会被更新
+</span><span class="c1"></span>	<span class="nx">delay</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">timeToAct</span><span class="p">.</span><span class="nf">Sub</span><span class="p">(</span><span class="nx">now</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">delay</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="mi">0</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">delay</span>
+<span class="p">}</span>
+</code></pre></div><hr>
+<h2 id="-参考资料">~ 参考资料</h2>
+<ul>
+<li><a href="https://mp.weixin.qq.com/s?__biz=MzAxMTA4Njc0OQ==&amp;mid=2651441921&amp;idx=3&amp;sn=3d2b7a0013e1ee5c377782bdc30575f1&amp;chksm=80bb15f3b7cc9ce5360c6df591a6cef8bbfaebe431b6ce57f391dd7a0b49e8d4f70e44ceadaf&amp;scene=21#wechat_redirect">K8s 延迟队列</a></li>
+<li><a href="https://jishuin.proginn.com/p/763bfbd2dcfe">k8s 限速队列</a></li>
+</ul>
+]]></content>
 		</item>
 		
 	</channel>
