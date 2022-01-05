@@ -1,3 +1,45 @@
 <html>
-<iframe style="border: 1px solid rgba(0, 0, 0, 0.1);" width="1216" height="682" src="https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FIX8vrIX1djNwRE7wNyHKA8%2FUntitled%3Fpage-id%3D0%253A1%26node-id%3D35%253A634%26viewport%3D241%252C48%252C0.5%26scaling%3Dmin-zoom%26starting-point-node-id%3D13%253A209" allowfullscreen></iframe>
+<head>
+  <script type="text/javascript">
+    function showS()
+    {
+      document.getElementById("test").scrolling="yes";
+      document.getElementById("test").style.overflow="scroll";
+      //alert(document.getElementById("test").scrolling);
+  
+    }
+    function hideS()
+    {
+      document.getElementById("test").scrolling="no";
+      document.getElementById("test").style.overflow="hidden";
+      //alert(document.getElementById("test").style.overflow);
+    }
+  </script>
+  
+  <style>
+    <!-- .ifr{width:600px;height:600px;background:#fff;overflow:hidden;display:block;position:absolute;top: 0;left: 0;right: 0;} -->
+  </style>
+</head>
+<body>
+<div class="ifr" onMouseOut="hideS()" onMouseOver="showS()" style="  width: 100%;  height: 100%;">
+  <iframe id="test" width="100%" height="100%" frameborder="0" src="" style="margin:0px;" >
+  </iframe>
+  <script language="JavaScript">
+    var iframe = document.getElementById("test");
+    iframe.src = "https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FIX8vrIX1djNwRE7wNyHKA8%2FUntitled%3Fpage-id%3D0%253A1%26node-id%3D35%253A634%26viewport%3D241%252C48%252C0.5%26scaling%3Dmin-zoom%26starting-point-node-id%3D13%253A209";//这里填写src路径
+    //以下判断iframe是否加载完,并且隐藏滚动条
+    if (iframe.attachEvent){
+      iframe.attachEvent("onload", function(){
+        //hideS();
+        //document.getElementById("loading").style.display="none";
+      });
+    } else {
+      iframe.onload = function(){
+        //  hideS();
+        //document.getElementById("loading").style.display="none";
+      };
+    }
+  </script>
+</div>
+</body>
 </html>
