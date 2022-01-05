@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Thu, 09 Dec 2021 10:22:02 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 10 Dec 2021 15:32:16 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>linux遇到一些问题统计</title>
       <link>https://www.ngirl.xyz/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
@@ -30,6 +30,15 @@
   1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
   deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
  # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从`hub.</description>
+    </item>
+    
+    <item>
+      <title>Go学习 令牌桶</title>
+      <link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-%E4%BB%A4%E7%89%8C%E6%A1%B6/</link>
+      <pubDate>Fri, 10 Dec 2021 15:32:16 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-%E4%BB%A4%E7%89%8C%E6%A1%B6/</guid>
+      <description>首先看个简单例子 package main import ( &amp;#34;fmt&amp;#34; &amp;#34;github.com/gin-gonic/gin&amp;#34; &amp;#34;golang.org/x/time/rate&amp;#34; &amp;#34;net/http&amp;#34; &amp;#34;time&amp;#34; &amp;#34;errors&amp;#34; &amp;#34;io/ioutil&amp;#34; ) var ( limit = rate.NewLimiter(rate.Limit(1), 2) ) func limitMiddleware() func(*gin.Context) { return func(ctx *gin.Context) { if !limit.Allow() { ctx.String(http.StatusServiceUnavailable, &amp;#34;服务器忙...&amp;#34;) ctx.Abort() return } ctx.Next() } } func GetOnce(addr string) ([]byte,error) { resp, err := http.Get(&amp;#34;http://&amp;#34;+addr) if err != nil { return nil, err } defer resp.Body.Close() b,err := ioutil.ReadAll(resp.Body) if err != nil { return nil, err } if resp.</description>
     </item>
     
     <item>
@@ -96,18 +105,6 @@
       
       <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E9%93%BE%E8%A1%A8-%E8%AE%BE%E8%AE%A1%E9%93%BE%E8%A1%A8/</guid>
       <description>show me the code package main import ( &amp;#34;fmt&amp;#34; ) // https://leetcode-cn.com/problems/design-linked-list/  type MyLinkedList struct { Len int // 判断索引是否有效 	Dummy *Node // 伪头, 第-1号索引, .Next 才是 MyLinkedList的第0号索引的内容 } type Node struct { Val int // value 	Next *Node // 链 } // Constructor Initialize your data structure here. func Constructor() MyLinkedList { return MyLinkedList{ Len: 0, // 不包括伪头, 所以是0 	Dummy: &amp;amp;Node{}, // 初始化伪头 	} } // Get the value of the index-th node in the linked list.</description>
-    </item>
-    
-    <item>
-      <title>Go算法学习 动态规划 01背包基础</title>
-      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-01%E8%83%8C%E5%8C%85%E5%9F%BA%E7%A1%80/</link>
-      <pubDate>Mon, 07 Jun 2021 10:06:09 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-01%E8%83%8C%E5%8C%85%E5%9F%BA%E7%A1%80/</guid>
-      <description>参考文档  carl 背包理论基础01背包 二维dp carl 背包理论基础01背包 一维dp  背包问题分类 01背包例子 题目说明: 有一堆物品, 背包的容量只有j,想要拿走最贵的东西,怎么装? weight := []int{1,3,4} //kg price := []int{15,20,30} //¥  01背包说明: 每个物品只能使用一次
- 动态规划五部曲 1. 定义dp数组 这里我们定义一个dp[i][j]的数组 i代表 物品的下标,0,1,2&amp;hellip; j代表 背包的容量,1kg,3kg,4kg&amp;hellip; dp[i][j]代表 可选的i个物品中,容量为j的背包能装下最大为dp[i][j]的价值
- 这里i个物品 是有两种状态, 选择 和不选择
- 2. 确定推导公式 首先我们可以想到i个物品的dp[i][j] 是可以由 i-1个物品的情况下, 选择i转入背包 和不装入背包两种情况得到的 那不装入物品i的价值 = dp[i-1][j] 那装入了物品i的价值 = dp[i-1][j-weight[i]] + price[i], 显然装了东西, 背包容量肯定减少, 总价值肯定是增加 那我们dp[i][j] 应该选择哪种情况呢? 答案是选择更大价值的 dp[i][j] = max(dp[i-1][j] , dp[i-1][j-weight[i]] + price[i] ) 3.</description>
     </item>
     
   </channel>

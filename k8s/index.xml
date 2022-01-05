@@ -241,23 +241,26 @@
 	<span class="kd">var</span> <span class="nx">failureMessage</span> <span class="kt">string</span>
 
 	<span class="nx">jobHaveNewFailure</span> <span class="o">:=</span> <span class="nx">failed</span> <span class="p">&gt;</span> <span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Failed</span>
-        <span class="c1">// BackoffLimit 默认被初始化为6, SetDefaults_Job() 
+        <span class="c1">// BackoffLimit 默认被初始化为6, 在SetDefaults_Job() 函数初始化
+</span><span class="c1"></span>        <span class="c1">// 如果失败了, 并且活跃数不等于并行数, 并且当前重试次数已经达到6次了
 </span><span class="c1"></span>	<span class="nx">exceedsBackoffLimit</span> <span class="o">:=</span> <span class="nx">jobHaveNewFailure</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">active</span> <span class="o">!=</span> <span class="o">*</span><span class="nx">job</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">Parallelism</span><span class="p">)</span> <span class="o">&amp;&amp;</span>
 		<span class="p">(</span><span class="nb">int32</span><span class="p">(</span><span class="nx">previousRetry</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span> <span class="p">&gt;</span> <span class="o">*</span><span class="nx">job</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">BackoffLimit</span><span class="p">)</span>
-
-	<span class="k">if</span> <span class="nx">exceedsBackoffLimit</span> <span class="o">||</span> <span class="nf">pastBackoffLimitOnFailure</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">job</span><span class="p">,</span> <span class="nx">pods</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// 标记为 BackoffLimitExceeded
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">exceedsBackoffLimit</span> <span class="o">||</span> <span class="nf">pastBackoffLimitOnFailure</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">job</span><span class="p">,</span> <span class="nx">pods</span><span class="p">)</span> <span class="p">{</span>
 		<span class="nx">jobFailed</span> <span class="p">=</span> <span class="kc">true</span>
 		<span class="nx">failureReason</span> <span class="p">=</span> <span class="s">&#34;BackoffLimitExceeded&#34;</span>
 		<span class="nx">failureMessage</span> <span class="p">=</span> <span class="s">&#34;Job has reached the specified backoff limit&#34;</span>
-	<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nf">pastActiveDeadline</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">job</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Deadline 的状态
+</span><span class="c1"></span>	<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nf">pastActiveDeadline</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">job</span><span class="p">)</span> <span class="p">{</span>
 		<span class="nx">jobFailed</span> <span class="p">=</span> <span class="kc">true</span>
 		<span class="nx">failureReason</span> <span class="p">=</span> <span class="s">&#34;DeadlineExceeded&#34;</span>
 		<span class="nx">failureMessage</span> <span class="p">=</span> <span class="s">&#34;Job was active longer than specified deadline&#34;</span>
 	<span class="p">}</span>
-
-	<span class="k">if</span> <span class="nx">jobFailed</span> <span class="p">{</span>
+        <span class="c1">// 如果是失败了的, 说明要么就是 BackoffLimitExceeded 要么就是 DeadlineExceeded
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">jobFailed</span> <span class="p">{</span>
 		<span class="nx">errCh</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">error</span><span class="p">,</span> <span class="nx">active</span><span class="p">)</span>
-		<span class="nx">jm</span><span class="p">.</span><span class="nf">deleteJobPods</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">job</span><span class="p">,</span> <span class="nx">activePods</span><span class="p">,</span> <span class="nx">errCh</span><span class="p">)</span>
+                <span class="c1">// 删除activepod
+</span><span class="c1"></span>		<span class="nx">jm</span><span class="p">.</span><span class="nf">deleteJobPods</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">job</span><span class="p">,</span> <span class="nx">activePods</span><span class="p">,</span> <span class="nx">errCh</span><span class="p">)</span>
 		<span class="k">select</span> <span class="p">{</span>
 		<span class="k">case</span> <span class="nx">manageJobErr</span> <span class="p">=</span> <span class="o">&lt;-</span><span class="nx">errCh</span><span class="p">:</span>
 			<span class="k">if</span> <span class="nx">manageJobErr</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
@@ -266,32 +269,28 @@
 		<span class="k">default</span><span class="p">:</span>
 		<span class="p">}</span>
 
-		<span class="c1">// update status values accordingly
+		<span class="c1">// 增加失败的个数
 </span><span class="c1"></span>		<span class="nx">failed</span> <span class="o">+=</span> <span class="nx">active</span>
 		<span class="nx">active</span> <span class="p">=</span> <span class="mi">0</span>
-		<span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Conditions</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Conditions</span><span class="p">,</span> <span class="nf">newCondition</span><span class="p">(</span><span class="nx">batch</span><span class="p">.</span><span class="nx">JobFailed</span><span class="p">,</span> <span class="nx">failureReason</span><span class="p">,</span> <span class="nx">failureMessage</span><span class="p">))</span>
-		<span class="nx">jm</span><span class="p">.</span><span class="nx">recorder</span><span class="p">.</span><span class="nf">Event</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">job</span><span class="p">,</span> <span class="nx">v1</span><span class="p">.</span><span class="nx">EventTypeWarning</span><span class="p">,</span> <span class="nx">failureReason</span><span class="p">,</span> <span class="nx">failureMessage</span><span class="p">)</span>
+                <span class="c1">// job.Status.Conditions 中添加新的状态
+</span><span class="c1"></span>		<span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Conditions</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Conditions</span><span class="p">,</span> <span class="nf">newCondition</span><span class="p">(</span><span class="nx">batch</span><span class="p">.</span><span class="nx">JobFailed</span><span class="p">,</span> <span class="nx">failureReason</span><span class="p">,</span> <span class="nx">failureMessage</span><span class="p">))</span>
+                <span class="c1">// Event 更新
+</span><span class="c1"></span>		<span class="nx">jm</span><span class="p">.</span><span class="nx">recorder</span><span class="p">.</span><span class="nf">Event</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">job</span><span class="p">,</span> <span class="nx">v1</span><span class="p">.</span><span class="nx">EventTypeWarning</span><span class="p">,</span> <span class="nx">failureReason</span><span class="p">,</span> <span class="nx">failureMessage</span><span class="p">)</span>
 	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-		<span class="k">if</span> <span class="nx">jobNeedsSync</span> <span class="o">&amp;&amp;</span> <span class="nx">job</span><span class="p">.</span><span class="nx">DeletionTimestamp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+                <span class="c1">// 如果需要继续同步
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">jobNeedsSync</span> <span class="o">&amp;&amp;</span> <span class="nx">job</span><span class="p">.</span><span class="nx">DeletionTimestamp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
 			<span class="nx">active</span><span class="p">,</span> <span class="nx">manageJobErr</span> <span class="p">=</span> <span class="nx">jm</span><span class="p">.</span><span class="nf">manageJob</span><span class="p">(</span><span class="nx">activePods</span><span class="p">,</span> <span class="nx">succeeded</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">job</span><span class="p">)</span>
 		<span class="p">}</span>
-		<span class="nx">completions</span> <span class="o">:=</span> <span class="nx">succeeded</span>
+                <span class="c1">// 标记完成
+</span><span class="c1"></span>		<span class="nx">completions</span> <span class="o">:=</span> <span class="nx">succeeded</span>
 		<span class="nx">complete</span> <span class="o">:=</span> <span class="kc">false</span>
 		<span class="k">if</span> <span class="nx">job</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">Completions</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-			<span class="c1">// This type of job is complete when any pod exits with success.
-</span><span class="c1"></span>			<span class="c1">// Each pod is capable of
-</span><span class="c1"></span>			<span class="c1">// determining whether or not the entire Job is done.  Subsequent pods are
-</span><span class="c1"></span>			<span class="c1">// not expected to fail, but if they do, the failure is ignored.  Once any
-</span><span class="c1"></span>			<span class="c1">// pod succeeds, the controller waits for remaining pods to finish, and
-</span><span class="c1"></span>			<span class="c1">// then the job is complete.
+			<span class="c1">// 没有正常执行的了, 并且1个以上成功的就算完成,
 </span><span class="c1"></span>			<span class="k">if</span> <span class="nx">succeeded</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">active</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
 				<span class="nx">complete</span> <span class="p">=</span> <span class="kc">true</span>
 			<span class="p">}</span>
 		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-			<span class="c1">// Job specifies a number of completions.  This type of job signals
-</span><span class="c1"></span>			<span class="c1">// success by having that number of successes.  Since we do not
-</span><span class="c1"></span>			<span class="c1">// start more pods than there are remaining completions, there should
-</span><span class="c1"></span>			<span class="c1">// not be any remaining active pods once this count is reached.
+			<span class="c1">// 完成的pod数 已经达到job.Spec.Completions预期, 默认是1, 也在SetDefaults_Job() 函数初始化
 </span><span class="c1"></span>			<span class="k">if</span> <span class="nx">completions</span> <span class="o">&gt;=</span> <span class="o">*</span><span class="nx">job</span><span class="p">.</span><span class="nx">Spec</span><span class="p">.</span><span class="nx">Completions</span> <span class="p">{</span>
 				<span class="nx">complete</span> <span class="p">=</span> <span class="kc">true</span>
 				<span class="k">if</span> <span class="nx">active</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
@@ -302,7 +301,8 @@
 				<span class="p">}</span>
 			<span class="p">}</span>
 		<span class="p">}</span>
-		<span class="k">if</span> <span class="nx">complete</span> <span class="p">{</span>
+                <span class="c1">// 修改完成的状态状况
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">complete</span> <span class="p">{</span>
 			<span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Conditions</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Conditions</span><span class="p">,</span> <span class="nf">newCondition</span><span class="p">(</span><span class="nx">batch</span><span class="p">.</span><span class="nx">JobComplete</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">))</span>
 			<span class="nx">now</span> <span class="o">:=</span> <span class="nx">metav1</span><span class="p">.</span><span class="nf">Now</span><span class="p">()</span>
 			<span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">CompletionTime</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">now</span>
@@ -310,15 +310,11 @@
 	<span class="p">}</span>
 
 	<span class="nx">forget</span> <span class="o">:=</span> <span class="kc">false</span>
-	<span class="c1">// Check if the number of jobs succeeded increased since the last check. If yes &#34;forget&#34; should be true
-</span><span class="c1"></span>	<span class="c1">// This logic is linked to the issue: https://github.com/kubernetes/kubernetes/issues/56853 that aims to
-</span><span class="c1"></span>	<span class="c1">// improve the Job backoff policy when parallelism &gt; 1 and few Jobs failed but others succeed.
-</span><span class="c1"></span>	<span class="c1">// In this case, we should clear the backoff delay.
-</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Succeeded</span> <span class="p">&lt;</span> <span class="nx">succeeded</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Succeeded</span> <span class="p">&lt;</span> <span class="nx">succeeded</span> <span class="p">{</span>
 		<span class="nx">forget</span> <span class="p">=</span> <span class="kc">true</span>
 	<span class="p">}</span>
 
-	<span class="c1">// no need to update the job if the status hasn&#39;t changed since last time
+	<span class="c1">// 是否有任何状态 更新
 </span><span class="c1"></span>	<span class="k">if</span> <span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Active</span> <span class="o">!=</span> <span class="nx">active</span> <span class="o">||</span> <span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Succeeded</span> <span class="o">!=</span> <span class="nx">succeeded</span> <span class="o">||</span> <span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Failed</span> <span class="o">!=</span> <span class="nx">failed</span> <span class="o">||</span> <span class="nb">len</span><span class="p">(</span><span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Conditions</span><span class="p">)</span> <span class="o">!=</span> <span class="nx">conditions</span> <span class="p">{</span>
 		<span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Active</span> <span class="p">=</span> <span class="nx">active</span>
 		<span class="nx">job</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">Succeeded</span> <span class="p">=</span> <span class="nx">succeeded</span>
@@ -329,8 +325,7 @@
 		<span class="p">}</span>
 
 		<span class="k">if</span> <span class="nx">jobHaveNewFailure</span> <span class="o">&amp;&amp;</span> <span class="p">!</span><span class="nf">IsJobFinished</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">job</span><span class="p">)</span> <span class="p">{</span>
-			<span class="c1">// returning an error will re-enqueue Job after the backoff period
-</span><span class="c1"></span>			<span class="k">return</span> <span class="nx">forget</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;failed pod(s) detected for job key %q&#34;</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span>
+			<span class="k">return</span> <span class="nx">forget</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;failed pod(s) detected for job key %q&#34;</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span>
 		<span class="p">}</span>
 
 		<span class="nx">forget</span> <span class="p">=</span> <span class="kc">true</span>
@@ -351,7 +346,7 @@
 <span class="nx">然后找到</span> <span class="nf">CreateControllerContext</span><span class="p">()</span> <span class="nx">初始化的ctx</span><span class="p">,</span> <span class="nx">ControllerContext</span><span class="p">.</span><span class="nx">InformerFactory</span> <span class="nx">是被</span> <span class="nx">informers</span><span class="p">.</span><span class="nf">NewSharedInformerFactory</span><span class="p">()</span> <span class="nx">设置</span>
 <span class="nx">最终返回的是一个</span> <span class="nx">sharedInformerFactory</span> <span class="nx">结构体</span> <span class="nx">来实现SharedInformerFactory</span> <span class="nx">接口</span>
 
-<span class="nx">那我们就可以看到</span> <span class="nx">SharedInformerFactory</span> <span class="nx">的方法</span>
+<span class="nx">SharedInformerFactory</span> <span class="nx">的方法</span>
 <span class="c1">// ctx.InformerFactory.Batch()
 </span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">sharedInformerFactory</span><span class="p">)</span> <span class="nf">Batch</span><span class="p">()</span> <span class="nx">batch</span><span class="p">.</span><span class="nx">Interface</span> <span class="p">{</span>
 	<span class="k">return</span> <span class="nx">batch</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">f</span><span class="p">.</span><span class="nx">namespace</span><span class="p">,</span> <span class="nx">f</span><span class="p">.</span><span class="nx">tweakListOptions</span><span class="p">)</span>
@@ -436,7 +431,7 @@
 	<span class="nx">cm</span> <span class="o">:=</span> <span class="nx">controller</span><span class="p">.</span><span class="nf">NewPodControllerRefManager</span><span class="p">(</span><span class="nx">jm</span><span class="p">.</span><span class="nx">podControl</span><span class="p">,</span> <span class="nx">j</span><span class="p">,</span> <span class="nx">selector</span><span class="p">,</span> <span class="nx">controllerKind</span><span class="p">,</span> <span class="nx">canAdoptFunc</span><span class="p">)</span>
 	<span class="k">return</span> <span class="nx">cm</span><span class="p">.</span><span class="nf">ClaimPods</span><span class="p">(</span><span class="nx">pods</span><span class="p">)</span>
 <span class="p">}</span>
-</code></pre></div><h3 id="详细说明4-updatejobstatus">详细说明4 updateJobStatus</h3>
+</code></pre></div><h3 id="详细说明4-updatehandler">详细说明4 updateHandler</h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">jm</span> <span class="o">*</span><span class="nx">JobController</span><span class="p">)</span> <span class="nf">updateJobStatus</span><span class="p">(</span><span class="nx">job</span> <span class="o">*</span><span class="nx">batch</span><span class="p">.</span><span class="nx">Job</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
 	<span class="nx">jobClient</span> <span class="o">:=</span> <span class="nx">jm</span><span class="p">.</span><span class="nx">kubeClient</span><span class="p">.</span><span class="nf">BatchV1</span><span class="p">().</span><span class="nf">Jobs</span><span class="p">(</span><span class="nx">job</span><span class="p">.</span><span class="nx">Namespace</span><span class="p">)</span>
 	<span class="kd">var</span> <span class="nx">err</span> <span class="kt">error</span>

@@ -6,8 +6,367 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Mon, 22 Nov 2021 13:59:53 +0800</lastBuildDate>
+		<lastBuildDate>Fri, 10 Dec 2021 15:32:16 +0800</lastBuildDate>
 		<atom:link href="https://www.ngirl.xyz/golang/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Go学习 令牌桶</title>
+			<link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-%E4%BB%A4%E7%89%8C%E6%A1%B6/</link>
+			<pubDate>Fri, 10 Dec 2021 15:32:16 +0800</pubDate>
+			
+			<guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-%E4%BB%A4%E7%89%8C%E6%A1%B6/</guid>
+			<description>首先看个简单例子 package main import ( &amp;#34;fmt&amp;#34; &amp;#34;github.com/gin-gonic/gin&amp;#34; &amp;#34;golang.org/x/time/rate&amp;#34; &amp;#34;net/http&amp;#34; &amp;#34;time&amp;#34; &amp;#34;errors&amp;#34; &amp;#34;io/ioutil&amp;#34; ) var ( limit = rate.NewLimiter(rate.Limit(1), 2) ) func limitMiddleware() func(*gin.Context) { return func(ctx *gin.Context) { if !limit.Allow() { ctx.String(http.StatusServiceUnavailable, &amp;#34;服务器忙...&amp;#34;) ctx.Abort() return } ctx.Next() } } func GetOnce(addr string) ([]byte,error) { resp, err := http.Get(&amp;#34;http://&amp;#34;+addr) if err != nil { return nil, err } defer resp.Body.Close() b,err := ioutil.ReadAll(resp.Body) if err != nil { return nil, err } if resp.</description>
+			<content type="html"><![CDATA[<h2 id="首先看个简单例子">首先看个简单例子</h2>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&#34;fmt&#34;</span>
+	<span class="s">&#34;github.com/gin-gonic/gin&#34;</span>
+	<span class="s">&#34;golang.org/x/time/rate&#34;</span>
+	<span class="s">&#34;net/http&#34;</span>
+	<span class="s">&#34;time&#34;</span>
+        <span class="s">&#34;errors&#34;</span>
+        <span class="s">&#34;io/ioutil&#34;</span>
+<span class="p">)</span>
+
+<span class="kd">var</span> <span class="p">(</span>
+	<span class="nx">limit</span> <span class="p">=</span> <span class="nx">rate</span><span class="p">.</span><span class="nf">NewLimiter</span><span class="p">(</span><span class="nx">rate</span><span class="p">.</span><span class="nf">Limit</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="kd">func</span> <span class="nf">limitMiddleware</span><span class="p">()</span> <span class="kd">func</span><span class="p">(</span><span class="o">*</span><span class="nx">gin</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ctx</span> <span class="o">*</span><span class="nx">gin</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="p">!</span><span class="nx">limit</span><span class="p">.</span><span class="nf">Allow</span><span class="p">()</span> <span class="p">{</span>
+			<span class="nx">ctx</span><span class="p">.</span><span class="nf">String</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusServiceUnavailable</span><span class="p">,</span> <span class="s">&#34;服务器忙...&#34;</span><span class="p">)</span>
+			<span class="nx">ctx</span><span class="p">.</span><span class="nf">Abort</span><span class="p">()</span>
+			<span class="k">return</span>
+		<span class="p">}</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nf">Next</span><span class="p">()</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="nf">GetOnce</span><span class="p">(</span><span class="nx">addr</span> <span class="kt">string</span><span class="p">)</span> <span class="p">([]</span><span class="kt">byte</span><span class="p">,</span><span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">resp</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">http</span><span class="p">.</span><span class="nf">Get</span><span class="p">(</span><span class="s">&#34;http://&#34;</span><span class="o">+</span><span class="nx">addr</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+	<span class="p">}</span>
+	<span class="k">defer</span> <span class="nx">resp</span><span class="p">.</span><span class="nx">Body</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+        <span class="nx">b</span><span class="p">,</span><span class="nx">err</span> <span class="o">:=</span> <span class="nx">ioutil</span><span class="p">.</span><span class="nf">ReadAll</span><span class="p">(</span><span class="nx">resp</span><span class="p">.</span><span class="nx">Body</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">resp</span><span class="p">.</span><span class="nx">StatusCode</span> <span class="o">!=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">StatusOK</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="kc">nil</span> <span class="p">,</span><span class="nx">errors</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="nb">string</span><span class="p">(</span><span class="nx">b</span><span class="p">))</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">b</span><span class="p">,</span><span class="kc">nil</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">clientGin</span><span class="p">(</span><span class="nx">n</span> <span class="kt">int</span> <span class="p">,</span><span class="nx">url</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">n</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">b</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nf">GetOnce</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;#%v: %v\n&#34;</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+			<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span> <span class="o">*</span> <span class="mi">200</span><span class="p">)</span>
+			<span class="k">continue</span>
+		<span class="p">}</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;#%v: %v\n&#34;</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nb">string</span><span class="p">(</span><span class="nx">b</span><span class="p">))</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">r</span> <span class="o">:=</span> <span class="nx">gin</span><span class="p">.</span><span class="nf">Default</span><span class="p">()</span>
+	<span class="nx">r</span><span class="p">.</span><span class="nf">Use</span><span class="p">(</span><span class="nf">limitMiddleware</span><span class="p">())</span>
+	<span class="nx">r</span><span class="p">.</span><span class="nf">GET</span><span class="p">(</span><span class="s">&#34;/limit&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">gin</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">c</span><span class="p">.</span><span class="nf">String</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusOK</span><span class="p">,</span> <span class="s">&#34;ok&#34;</span><span class="p">)</span>
+	<span class="p">})</span>
+	<span class="k">go</span> <span class="nf">clientGin</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="s">&#34;localhost:8080/limit&#34;</span><span class="p">)</span>
+	<span class="nx">r</span><span class="p">.</span><span class="nf">Run</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="c1">// 执行结果
+</span><span class="c1"></span><span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">GET</span>    <span class="o">/</span><span class="nx">limit</span>                    <span class="o">--</span><span class="p">&gt;</span> <span class="nx">main</span><span class="p">.</span><span class="nx">main</span><span class="p">.</span><span class="nf">func1</span> <span class="p">(</span><span class="mi">4</span> <span class="nx">handlers</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">Environment</span> <span class="nx">variable</span> <span class="nx">PORT</span> <span class="nx">is</span> <span class="nx">undefined</span><span class="p">.</span> <span class="nx">Using</span> <span class="nx">port</span> <span class="p">:</span><span class="mi">8080</span> <span class="nx">by</span> <span class="k">default</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">Listening</span> <span class="nx">and</span> <span class="nx">serving</span> <span class="nx">HTTP</span> <span class="nx">on</span> <span class="p">:</span><span class="mi">8080</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="p">]</span> <span class="mi">2021</span><span class="o">/</span><span class="mi">12</span><span class="o">/</span><span class="mi">10</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">23</span> <span class="p">|</span> <span class="mi">200</span> <span class="p">|</span>      <span class="mf">90.569</span><span class="nx">µs</span> <span class="p">|</span>             <span class="p">::</span><span class="mi">1</span> <span class="p">|</span> <span class="nx">GET</span>      <span class="s">&#34;/limit&#34;</span>
+<span class="err">#</span><span class="mi">0</span><span class="p">:</span> <span class="nx">ok</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="p">]</span> <span class="mi">2021</span><span class="o">/</span><span class="mi">12</span><span class="o">/</span><span class="mi">10</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">23</span> <span class="p">|</span> <span class="mi">200</span> <span class="p">|</span>      <span class="mf">12.282</span><span class="nx">µs</span> <span class="p">|</span>             <span class="p">::</span><span class="mi">1</span> <span class="p">|</span> <span class="nx">GET</span>      <span class="s">&#34;/limit&#34;</span>
+<span class="err">#</span><span class="mi">1</span><span class="p">:</span> <span class="nx">ok</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="p">]</span> <span class="mi">2021</span><span class="o">/</span><span class="mi">12</span><span class="o">/</span><span class="mi">10</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">23</span> <span class="p">|</span> <span class="mi">503</span> <span class="p">|</span>      <span class="mf">14.045</span><span class="nx">µs</span> <span class="p">|</span>             <span class="p">::</span><span class="mi">1</span> <span class="p">|</span> <span class="nx">GET</span>      <span class="s">&#34;/limit&#34;</span>
+<span class="err">#</span><span class="mi">2</span><span class="p">:</span> <span class="nx">服务器忙</span><span class="o">...</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="p">]</span> <span class="mi">2021</span><span class="o">/</span><span class="mi">12</span><span class="o">/</span><span class="mi">10</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">23</span> <span class="p">|</span> <span class="mi">503</span> <span class="p">|</span>       <span class="mf">6.766</span><span class="nx">µs</span> <span class="p">|</span>             <span class="p">::</span><span class="mi">1</span> <span class="p">|</span> <span class="nx">GET</span>      <span class="s">&#34;/limit&#34;</span>
+<span class="err">#</span><span class="mi">3</span><span class="p">:</span> <span class="nx">服务器忙</span><span class="o">...</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="p">]</span> <span class="mi">2021</span><span class="o">/</span><span class="mi">12</span><span class="o">/</span><span class="mi">10</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">23</span> <span class="p">|</span> <span class="mi">503</span> <span class="p">|</span>        <span class="mf">5.36</span><span class="nx">µs</span> <span class="p">|</span>             <span class="p">::</span><span class="mi">1</span> <span class="p">|</span> <span class="nx">GET</span>      <span class="s">&#34;/limit&#34;</span>
+<span class="err">#</span><span class="mi">4</span><span class="p">:</span> <span class="nx">服务器忙</span><span class="o">...</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="p">]</span> <span class="mi">2021</span><span class="o">/</span><span class="mi">12</span><span class="o">/</span><span class="mi">10</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">23</span> <span class="p">|</span> <span class="mi">503</span> <span class="p">|</span>       <span class="mf">44.56</span><span class="nx">µs</span> <span class="p">|</span>             <span class="p">::</span><span class="mi">1</span> <span class="p">|</span> <span class="nx">GET</span>      <span class="s">&#34;/limit&#34;</span>
+<span class="err">#</span><span class="mi">5</span><span class="p">:</span> <span class="nx">服务器忙</span><span class="o">...</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="p">]</span> <span class="mi">2021</span><span class="o">/</span><span class="mi">12</span><span class="o">/</span><span class="mi">10</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">23</span> <span class="p">|</span> <span class="mi">503</span> <span class="p">|</span>      <span class="mf">11.402</span><span class="nx">µs</span> <span class="p">|</span>             <span class="p">::</span><span class="mi">1</span> <span class="p">|</span> <span class="nx">GET</span>      <span class="s">&#34;/limit&#34;</span>
+<span class="err">#</span><span class="mi">6</span><span class="p">:</span> <span class="nx">服务器忙</span><span class="o">...</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="p">]</span> <span class="mi">2021</span><span class="o">/</span><span class="mi">12</span><span class="o">/</span><span class="mi">10</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">24</span> <span class="p">|</span> <span class="mi">200</span> <span class="p">|</span>      <span class="mf">21.299</span><span class="nx">µs</span> <span class="p">|</span>             <span class="p">::</span><span class="mi">1</span> <span class="p">|</span> <span class="nx">GET</span>      <span class="s">&#34;/limit&#34;</span>
+<span class="err">#</span><span class="mi">7</span><span class="p">:</span> <span class="nx">ok</span>
+</code></pre></div><blockquote>
+<p>以上就是 go官方提供的令牌桶的实现, 简单好用</p>
+<p>接下来我们详细看下源码实现</p>
+</blockquote>
+<h2 id="limiter">Limiter</h2>
+<blockquote>
+<p>我们从上面例子中的初始化函数入手</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// limit 字段表示qps, burst 表示桶的大小
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewLimiter</span><span class="p">(</span><span class="nx">r</span> <span class="nx">Limit</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">Limiter</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">Limiter</span><span class="p">{</span>
+		<span class="nx">limit</span><span class="p">:</span> <span class="nx">r</span><span class="p">,</span>
+		<span class="nx">burst</span><span class="p">:</span> <span class="nx">b</span><span class="p">,</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h3 id="limiter-struct">Limiter struct</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Limiter</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">mu</span>     <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>      <span class="c1">// 锁
+</span><span class="c1"></span>	<span class="nx">limit</span>  <span class="nx">Limit</span>           <span class="c1">// qps
+</span><span class="c1"></span>	<span class="nx">burst</span>  <span class="kt">int</span>             <span class="c1">// 桶的容量
+</span><span class="c1"></span>	<span class="nx">tokens</span> <span class="kt">float64</span>         <span class="c1">// 剩余的tokens数
+</span><span class="c1"></span>	<span class="nx">last</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>         <span class="c1">// 最近发放token的时间
+</span><span class="c1"></span>	<span class="nx">lastEvent</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>    <span class="c1">// 最近限流的时间
+</span><span class="c1"></span><span class="p">}</span>
+
+</code></pre></div><h2 id="allow-函数">Allow() 函数</h2>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 对AllowN 包装, 获取一个token
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">lim</span> <span class="o">*</span><span class="nx">Limiter</span><span class="p">)</span> <span class="nf">Allow</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nx">lim</span><span class="p">.</span><span class="nf">AllowN</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">// 对reserveN 包装, 延迟时间是0
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">lim</span> <span class="o">*</span><span class="nx">Limiter</span><span class="p">)</span> <span class="nf">AllowN</span><span class="p">(</span><span class="nx">now</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span> <span class="nx">n</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nx">lim</span><span class="p">.</span><span class="nf">reserveN</span><span class="p">(</span><span class="nx">now</span><span class="p">,</span> <span class="nx">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">).</span><span class="nx">ok</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">lim</span> <span class="o">*</span><span class="nx">Limiter</span><span class="p">)</span> <span class="nf">reserveN</span><span class="p">(</span><span class="nx">now</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span> <span class="nx">n</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">maxFutureReserve</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="nx">Reservation</span> <span class="p">{</span>
+        <span class="c1">// 限流器的字段修改前要加锁的
+</span><span class="c1"></span>	<span class="nx">lim</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+	<span class="k">defer</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+        <span class="c1">// Inf 是 math.MaxFloat64
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">limit</span> <span class="o">==</span> <span class="nx">Inf</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">Reservation</span><span class="p">{</span>
+                        <span class="c1">// 这里ok字段直接返回true
+</span><span class="c1"></span>			<span class="nx">ok</span><span class="p">:</span>        <span class="kc">true</span><span class="p">,</span>
+			<span class="nx">lim</span><span class="p">:</span>       <span class="nx">lim</span><span class="p">,</span>
+			<span class="nx">tokens</span><span class="p">:</span>    <span class="nx">n</span><span class="p">,</span>
+			<span class="nx">timeToAct</span><span class="p">:</span> <span class="nx">now</span><span class="p">,</span>
+		<span class="p">}</span>
+        <span class="c1">// 如果这里 qps设置为0
+</span><span class="c1"></span>	<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">limit</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">ok</span> <span class="kt">bool</span>
+                <span class="c1">// 判断桶里面是否有存货
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">burst</span> <span class="o">&gt;=</span> <span class="nx">n</span> <span class="p">{</span>
+                        <span class="c1">// 有存货直接设置为true
+</span><span class="c1"></span>			<span class="nx">ok</span> <span class="p">=</span> <span class="kc">true</span>
+                        <span class="c1">// 并且减少存货
+</span><span class="c1"></span>			<span class="nx">lim</span><span class="p">.</span><span class="nx">burst</span> <span class="o">-=</span> <span class="nx">n</span>
+		<span class="p">}</span>
+		<span class="k">return</span> <span class="nx">Reservation</span><span class="p">{</span>
+			<span class="nx">ok</span><span class="p">:</span>        <span class="nx">ok</span><span class="p">,</span>
+			<span class="nx">lim</span><span class="p">:</span>       <span class="nx">lim</span><span class="p">,</span>
+			<span class="nx">tokens</span><span class="p">:</span>    <span class="nx">lim</span><span class="p">.</span><span class="nx">burst</span><span class="p">,</span>
+			<span class="nx">timeToAct</span><span class="p">:</span> <span class="nx">now</span><span class="p">,</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+        <span class="c1">// 如果 0 &lt; qps &lt; math.MaxFloat64 ,
+</span><span class="c1"></span>        <span class="c1">// 那么就计算当前时间now距离last时间内 , 我们一共可以有多少个令牌发放, tokens最大只能是burst
+</span><span class="c1"></span>        <span class="c1">// 详细见 &#34;说明1&#34;
+</span><span class="c1"></span>	<span class="nx">now</span><span class="p">,</span> <span class="nx">last</span><span class="p">,</span> <span class="nx">tokens</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nf">advance</span><span class="p">(</span><span class="nx">now</span><span class="p">)</span>
+
+	<span class="c1">// 减去本次要发的令牌数
+</span><span class="c1"></span>	<span class="nx">tokens</span> <span class="o">-=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span>
+
+	<span class="c1">// 计算要等待的时间
+</span><span class="c1"></span>	<span class="kd">var</span> <span class="nx">waitDuration</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
+        <span class="c1">// 如果没有足够的token可以发放
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">tokens</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="p">{</span>
+                <span class="c1">// 计算大概要多久才能有足够的token发放
+</span><span class="c1"></span>                <span class="c1">// (-tokens)/qps 秒
+</span><span class="c1"></span>		<span class="nx">waitDuration</span> <span class="p">=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">limit</span><span class="p">.</span><span class="nf">durationFromTokens</span><span class="p">(</span><span class="o">-</span><span class="nx">tokens</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="c1">// 桶的容量 要大于n 并且 等待的时间 小于等于 maxFutureReserve(这里是0)
+</span><span class="c1"></span>        <span class="c1">// 在这里的情况, 如果要ok=true的话 就必须burst大于等于n, 而且tokens也要大于等于n,这样waitDuration才大于等于0呢
+</span><span class="c1"></span>        <span class="c1">// 当然其他函数调用 reserveN 时 maxFutureReserve 可能不通
+</span><span class="c1"></span>	<span class="nx">ok</span> <span class="o">:=</span> <span class="nx">n</span> <span class="o">&lt;=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">burst</span> <span class="o">&amp;&amp;</span> <span class="nx">waitDuration</span> <span class="o">&lt;=</span> <span class="nx">maxFutureReserve</span>
+
+	<span class="c1">// Prepare reservation
+</span><span class="c1"></span>	<span class="nx">r</span> <span class="o">:=</span> <span class="nx">Reservation</span><span class="p">{</span>
+		<span class="nx">ok</span><span class="p">:</span>    <span class="nx">ok</span><span class="p">,</span>
+		<span class="nx">lim</span><span class="p">:</span>   <span class="nx">lim</span><span class="p">,</span>
+		<span class="nx">limit</span><span class="p">:</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">limit</span><span class="p">,</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">ok</span> <span class="p">{</span>
+		<span class="nx">r</span><span class="p">.</span><span class="nx">tokens</span> <span class="p">=</span> <span class="nx">n</span>
+                <span class="c1">// 在maxFutureReserve 非0的时候, waitDuration 也可能非0, 所以可能要延迟
+</span><span class="c1"></span>		<span class="nx">r</span><span class="p">.</span><span class="nx">timeToAct</span> <span class="p">=</span> <span class="nx">now</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">waitDuration</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="c1">// 更新状态
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">ok</span> <span class="p">{</span>
+		<span class="nx">lim</span><span class="p">.</span><span class="nx">last</span> <span class="p">=</span> <span class="nx">now</span>
+		<span class="nx">lim</span><span class="p">.</span><span class="nx">tokens</span> <span class="p">=</span> <span class="nx">tokens</span>
+		<span class="nx">lim</span><span class="p">.</span><span class="nx">lastEvent</span> <span class="p">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">timeToAct</span>
+        <span class="c1">// 没拿到token, 还是还原数据
+</span><span class="c1"></span>	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+		<span class="nx">lim</span><span class="p">.</span><span class="nx">last</span> <span class="p">=</span> <span class="nx">last</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span> <span class="nx">r</span>
+<span class="p">}</span>
+
+</code></pre></div><blockquote>
+<p>看完我们发现,  令牌桶的设计就是一个 tokens 来计数, 通过 now时间last的时间差 , qps, burst 来计算和调整新的tokens 数</p>
+<p>接着我们看一下另外一个函数, Wait()</p>
+</blockquote>
+<h2 id="wait-函数">Wait() 函数</h2>
+<blockquote>
+<p>Wait 顾名思义是会阻塞一直等待获得到token, 而Allow() 则直接返回 bool</p>
+<p>Wait 还可以传入一个 ctx参数, 可以设置超时时间 或者结束时间</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 包装WaitN
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">lim</span> <span class="o">*</span><span class="nx">Limiter</span><span class="p">)</span> <span class="nf">Wait</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">(</span><span class="nx">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// 同样获取1个token
+</span><span class="c1"></span>	<span class="k">return</span> <span class="nx">lim</span><span class="p">.</span><span class="nf">WaitN</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">lim</span> <span class="o">*</span><span class="nx">Limiter</span><span class="p">)</span> <span class="nf">WaitN</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">n</span> <span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="nx">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// 同样需要锁
+</span><span class="c1"></span>	<span class="nx">lim</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+        <span class="c1">// 读取桶大小和qps
+</span><span class="c1"></span>	<span class="nx">burst</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">burst</span>
+	<span class="nx">limit</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">limit</span>
+	<span class="nx">lim</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+
+	<span class="k">if</span> <span class="nx">n</span> <span class="p">&gt;</span> <span class="nx">burst</span> <span class="o">&amp;&amp;</span> <span class="nx">limit</span> <span class="o">!=</span> <span class="nx">Inf</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;rate: Wait(n=%d) exceeds limiter&#39;s burst %d&#34;</span><span class="p">,</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">burst</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="c1">// 查看ctx是否已经结束
+</span><span class="c1"></span>	<span class="k">select</span> <span class="p">{</span>
+	<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">ctx</span><span class="p">.</span><span class="nf">Done</span><span class="p">():</span>
+		<span class="k">return</span> <span class="nx">ctx</span><span class="p">.</span><span class="nf">Err</span><span class="p">()</span>
+	<span class="k">default</span><span class="p">:</span>
+	<span class="p">}</span>
+	<span class="c1">// Determine wait limit
+</span><span class="c1"></span>	<span class="nx">now</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">()</span>
+        <span class="c1">// InfDuration = 1&lt;&lt;63-1
+</span><span class="c1"></span>	<span class="nx">waitLimit</span> <span class="o">:=</span> <span class="nx">InfDuration</span>
+        <span class="c1">// deadline 就是 ctx设置的
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">deadline</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nf">Deadline</span><span class="p">();</span> <span class="nx">ok</span> <span class="p">{</span>
+                <span class="c1">// waitLimit 表示ctx 结束时间
+</span><span class="c1"></span>		<span class="nx">waitLimit</span> <span class="p">=</span> <span class="nx">deadline</span><span class="p">.</span><span class="nf">Sub</span><span class="p">(</span><span class="nx">now</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="c1">// 这里调用reserveN 和Allow()不同的是, 延迟时间参数waitLimit
+</span><span class="c1"></span>        <span class="c1">// waitLimit 既然表示ctx cancel() 的最后时间, 那么意思是 waitDuration 只要小于等于 结束时间 就有可能 r.ok == true
+</span><span class="c1"></span>	<span class="nx">r</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nf">reserveN</span><span class="p">(</span><span class="nx">now</span><span class="p">,</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">waitLimit</span><span class="p">)</span>
+	<span class="k">if</span> <span class="p">!</span><span class="nx">r</span><span class="p">.</span><span class="nx">ok</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;rate: Wait(n=%d) would exceed context deadline&#34;</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="c1">// 这里是把 r.timeToAct - now, r.timeToAct 我们知道在reserveN 函数内部被更新了
+</span><span class="c1"></span>	<span class="nx">delay</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">DelayFrom</span><span class="p">(</span><span class="nx">now</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">delay</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="kc">nil</span>
+	<span class="p">}</span>
+        <span class="c1">// 新建一个定时器
+</span><span class="c1"></span>	<span class="nx">t</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">NewTimer</span><span class="p">(</span><span class="nx">delay</span><span class="p">)</span>
+	<span class="k">defer</span> <span class="nx">t</span><span class="p">.</span><span class="nf">Stop</span><span class="p">()</span>
+	<span class="k">select</span> <span class="p">{</span>
+        <span class="c1">// 延迟
+</span><span class="c1"></span>	<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">t</span><span class="p">.</span><span class="nx">C</span><span class="p">:</span>
+		<span class="c1">// We can proceed.
+</span><span class="c1"></span>		<span class="k">return</span> <span class="kc">nil</span>
+        <span class="c1">// 也有可能ctx 被设置结束了
+</span><span class="c1"></span>	<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">ctx</span><span class="p">.</span><span class="nf">Done</span><span class="p">():</span>
+                <span class="c1">// Reservation 是包含了 limiter的
+</span><span class="c1"></span>                <span class="c1">// 通过Reservation对令牌桶的数据进行还原, 详细见 &#34;说明2&#34;
+</span><span class="c1"></span>		<span class="nx">r</span><span class="p">.</span><span class="nf">Cancel</span><span class="p">()</span>
+		<span class="k">return</span> <span class="nx">ctx</span><span class="p">.</span><span class="nf">Err</span><span class="p">()</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div><hr>
+<h2 id="详细说明">详细说明</h2>
+<h3 id="说明1">说明1</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">lim</span> <span class="o">*</span><span class="nx">Limiter</span><span class="p">)</span> <span class="nf">advance</span><span class="p">(</span><span class="nx">now</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">)</span> <span class="p">(</span><span class="nx">newNow</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span> <span class="nx">newLast</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span> <span class="nx">newTokens</span> <span class="kt">float64</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// 最近发放token的时间
+</span><span class="c1"></span>	<span class="nx">last</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">last</span>
+        <span class="c1">// 如果 now &lt; last
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">now</span><span class="p">.</span><span class="nf">Before</span><span class="p">(</span><span class="nx">last</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">last</span> <span class="p">=</span> <span class="nx">now</span>
+	<span class="p">}</span>
+        <span class="c1">// 到这里 now 肯定是 &gt;= last
+</span><span class="c1"></span>	<span class="c1">// now - last &gt;= 0
+</span><span class="c1"></span>	<span class="nx">elapsed</span> <span class="o">:=</span> <span class="nx">now</span><span class="p">.</span><span class="nf">Sub</span><span class="p">(</span><span class="nx">last</span><span class="p">)</span>
+        <span class="c1">// 获得这段时间中 可以有几个令牌
+</span><span class="c1"></span>	<span class="nx">delta</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">limit</span><span class="p">.</span><span class="nf">tokensFromDuration</span><span class="p">(</span><span class="nx">elapsed</span><span class="p">)</span>
+        <span class="c1">// 获得最新可以发放的总令牌数
+</span><span class="c1"></span>	<span class="nx">tokens</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">tokens</span> <span class="o">+</span> <span class="nx">delta</span>
+        <span class="c1">// 如果超过了桶的容量, 那没办法, 最大是桶的容量
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">burst</span> <span class="o">:=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">lim</span><span class="p">.</span><span class="nx">burst</span><span class="p">);</span> <span class="nx">tokens</span> <span class="p">&gt;</span> <span class="nx">burst</span> <span class="p">{</span>
+		<span class="nx">tokens</span> <span class="p">=</span> <span class="nx">burst</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">now</span><span class="p">,</span> <span class="nx">last</span><span class="p">,</span> <span class="nx">tokens</span>
+<span class="p">}</span>
+
+<span class="c1">// 比如qps=5, 表示1秒可以有5个token
+</span><span class="c1">// 那假如 now-last 差是1s
+</span><span class="c1">// 那么说明1s我没有发放token了, 那我应该要发放 5个token
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">limit</span> <span class="nx">Limit</span><span class="p">)</span> <span class="nf">tokensFromDuration</span><span class="p">(</span><span class="nx">d</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="kt">float64</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">limit</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="mi">0</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nf">Seconds</span><span class="p">()</span> <span class="o">*</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">limit</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div><h3 id="说明2">说明2</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Reservation</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">ok</span>        <span class="kt">bool</span>         <span class="c1">// 是否拿到了token
+</span><span class="c1"></span>	<span class="nx">lim</span>       <span class="o">*</span><span class="nx">Limiter</span>     <span class="c1">// 令牌桶地址
+</span><span class="c1"></span>	<span class="nx">tokens</span>    <span class="kt">int</span>          <span class="c1">// 令牌桶剩余的token数
+</span><span class="c1"></span>	<span class="nx">timeToAct</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>    <span class="c1">// 发放令牌的时间(可能是未来时间)
+</span><span class="c1"></span>	<span class="nx">limit</span> <span class="nx">Limit</span>            <span class="c1">// qps
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Reservation</span><span class="p">)</span> <span class="nf">Cancel</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">r</span><span class="p">.</span><span class="nf">CancelAt</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">())</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Reservation</span><span class="p">)</span> <span class="nf">CancelAt</span><span class="p">(</span><span class="nx">now</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="p">!</span><span class="nx">r</span><span class="p">.</span><span class="nx">ok</span> <span class="p">{</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+        <span class="c1">// 上锁
+</span><span class="c1"></span>	<span class="nx">r</span><span class="p">.</span><span class="nx">lim</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+	<span class="k">defer</span> <span class="nx">r</span><span class="p">.</span><span class="nx">lim</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+        <span class="c1">// 这种情况 都不用处理直接返回
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">lim</span><span class="p">.</span><span class="nx">limit</span> <span class="o">==</span> <span class="nx">Inf</span> <span class="o">||</span> <span class="nx">r</span><span class="p">.</span><span class="nx">tokens</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">r</span><span class="p">.</span><span class="nx">timeToAct</span><span class="p">.</span><span class="nf">Before</span><span class="p">(</span><span class="nx">now</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+
+	<span class="c1">// calculate tokens to restore
+</span><span class="c1"></span>	<span class="c1">// The duration between lim.lastEvent and r.timeToAct tells us how many tokens were reserved
+</span><span class="c1"></span>	<span class="c1">// after r was obtained. These tokens should not be restored.
+</span><span class="c1"></span>	<span class="nx">restoreTokens</span> <span class="o">:=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">tokens</span><span class="p">)</span> <span class="o">-</span> <span class="nx">r</span><span class="p">.</span><span class="nx">limit</span><span class="p">.</span><span class="nf">tokensFromDuration</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">lim</span><span class="p">.</span><span class="nx">lastEvent</span><span class="p">.</span><span class="nf">Sub</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">timeToAct</span><span class="p">))</span>
+	<span class="k">if</span> <span class="nx">restoreTokens</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="c1">// advance time to now
+</span><span class="c1"></span>	<span class="nx">now</span><span class="p">,</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">tokens</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">lim</span><span class="p">.</span><span class="nf">advance</span><span class="p">(</span><span class="nx">now</span><span class="p">)</span>
+	<span class="c1">// calculate new number of tokens
+</span><span class="c1"></span>	<span class="nx">tokens</span> <span class="o">+=</span> <span class="nx">restoreTokens</span>
+	<span class="k">if</span> <span class="nx">burst</span> <span class="o">:=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">lim</span><span class="p">.</span><span class="nx">burst</span><span class="p">);</span> <span class="nx">tokens</span> <span class="p">&gt;</span> <span class="nx">burst</span> <span class="p">{</span>
+		<span class="nx">tokens</span> <span class="p">=</span> <span class="nx">burst</span>
+	<span class="p">}</span>
+	<span class="c1">// update state
+</span><span class="c1"></span>	<span class="nx">r</span><span class="p">.</span><span class="nx">lim</span><span class="p">.</span><span class="nx">last</span> <span class="p">=</span> <span class="nx">now</span>
+	<span class="nx">r</span><span class="p">.</span><span class="nx">lim</span><span class="p">.</span><span class="nx">tokens</span> <span class="p">=</span> <span class="nx">tokens</span>
+	<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">timeToAct</span> <span class="o">==</span> <span class="nx">r</span><span class="p">.</span><span class="nx">lim</span><span class="p">.</span><span class="nx">lastEvent</span> <span class="p">{</span>
+		<span class="nx">prevEvent</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">timeToAct</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">limit</span><span class="p">.</span><span class="nf">durationFromTokens</span><span class="p">(</span><span class="nb">float64</span><span class="p">(</span><span class="o">-</span><span class="nx">r</span><span class="p">.</span><span class="nx">tokens</span><span class="p">)))</span>
+		<span class="k">if</span> <span class="p">!</span><span class="nx">prevEvent</span><span class="p">.</span><span class="nf">Before</span><span class="p">(</span><span class="nx">now</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">r</span><span class="p">.</span><span class="nx">lim</span><span class="p">.</span><span class="nx">lastEvent</span> <span class="p">=</span> <span class="nx">prevEvent</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div><p>1</p>
+]]></content>
+		</item>
 		
 		<item>
 			<title>Go学习 Map源码分析</title>
