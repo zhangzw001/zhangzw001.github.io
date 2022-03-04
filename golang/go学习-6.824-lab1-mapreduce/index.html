@@ -8,7 +8,7 @@
 	<meta name="theme-color" content="#494f5c">
 	<meta name="msapplication-TileColor" content="#494f5c">
 <meta itemprop="name" content="Go学习 6.824-lab1-MapReduce实验">
-<meta itemprop="description" content="相关知识点了解 课程翻译内容  mit6.824课程 中文翻译 文字版 mit6.824课程 2021 lab1-MapReduce实验翻译   了解以上内容之后, 对MapReduce概念上 和lab1实验的内容有了大概的了解了
+<meta itemprop="description" content="相关知识点了解 课程翻译内容  mit6.824课程 中文翻译 文字版 mit6.824课程 2021 lab1-MapReduce实验翻译   阅读以上内容之后, 对MapReduce概念上 和lab1实验的内容有了大概的了解了
  代码逻辑 简单的流程分析 通过lab1实验内容的了解, 我们知道 我们需要实现的内容是 src/mr/目录的三个文件coordinator.go, rpc.go, worker.go coordinator.go 主要是服务端, 实现任务调度功能(master) worker.go 主要是客户端, 实现任务执行功能(node) rpc.go 主要是rpc端, 实现一些rpc数据传输的结构体 晚上代码的编写之后,我们可以首先测试wc.go的功能 cd 6.824/src/main # 在当前目录生成wc.so文件(之后测试rtiming.go, crash.go同样) go build -race -buildmode=plugin ../mrapps/wc.go # 启动服务端 go run -race mrcoordinator.go pg-*.txt # 启动客户端 go run -race mrworker.go wc.so # 完整之后, 客户端和服务端都会退出, 当前目录生成如下文件: # 其中 mr-X-Y.txt 是map 函数生成的中间文件 NMap * NReduce个 # 其中 mr-out-Y.">
 <meta itemprop="datePublished" content="2022-03-04T13:55:22+08:00" />
 <meta itemprop="dateModified" content="2022-03-04T13:55:22+08:00" />
@@ -18,7 +18,7 @@
 
 <meta itemprop="keywords" content="golang,6.824," />
 <meta property="og:title" content="Go学习 6.824-lab1-MapReduce实验" />
-<meta property="og:description" content="相关知识点了解 课程翻译内容  mit6.824课程 中文翻译 文字版 mit6.824课程 2021 lab1-MapReduce实验翻译   了解以上内容之后, 对MapReduce概念上 和lab1实验的内容有了大概的了解了
+<meta property="og:description" content="相关知识点了解 课程翻译内容  mit6.824课程 中文翻译 文字版 mit6.824课程 2021 lab1-MapReduce实验翻译   阅读以上内容之后, 对MapReduce概念上 和lab1实验的内容有了大概的了解了
  代码逻辑 简单的流程分析 通过lab1实验内容的了解, 我们知道 我们需要实现的内容是 src/mr/目录的三个文件coordinator.go, rpc.go, worker.go coordinator.go 主要是服务端, 实现任务调度功能(master) worker.go 主要是客户端, 实现任务执行功能(node) rpc.go 主要是rpc端, 实现一些rpc数据传输的结构体 晚上代码的编写之后,我们可以首先测试wc.go的功能 cd 6.824/src/main # 在当前目录生成wc.so文件(之后测试rtiming.go, crash.go同样) go build -race -buildmode=plugin ../mrapps/wc.go # 启动服务端 go run -race mrcoordinator.go pg-*.txt # 启动客户端 go run -race mrworker.go wc.so # 完整之后, 客户端和服务端都会退出, 当前目录生成如下文件: # 其中 mr-X-Y.txt 是map 函数生成的中间文件 NMap * NReduce个 # 其中 mr-out-Y." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab1-mapreduce/" />
@@ -26,7 +26,7 @@
 <meta property="article:modified_time" content="2022-03-04T13:55:22+08:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Go学习 6.824-lab1-MapReduce实验"/>
-<meta name="twitter:description" content="相关知识点了解 课程翻译内容  mit6.824课程 中文翻译 文字版 mit6.824课程 2021 lab1-MapReduce实验翻译   了解以上内容之后, 对MapReduce概念上 和lab1实验的内容有了大概的了解了
+<meta name="twitter:description" content="相关知识点了解 课程翻译内容  mit6.824课程 中文翻译 文字版 mit6.824课程 2021 lab1-MapReduce实验翻译   阅读以上内容之后, 对MapReduce概念上 和lab1实验的内容有了大概的了解了
  代码逻辑 简单的流程分析 通过lab1实验内容的了解, 我们知道 我们需要实现的内容是 src/mr/目录的三个文件coordinator.go, rpc.go, worker.go coordinator.go 主要是服务端, 实现任务调度功能(master) worker.go 主要是客户端, 实现任务执行功能(node) rpc.go 主要是rpc端, 实现一些rpc数据传输的结构体 晚上代码的编写之后,我们可以首先测试wc.go的功能 cd 6.824/src/main # 在当前目录生成wc.so文件(之后测试rtiming.go, crash.go同样) go build -race -buildmode=plugin ../mrapps/wc.go # 启动服务端 go run -race mrcoordinator.go pg-*.txt # 启动客户端 go run -race mrworker.go wc.so # 完整之后, 客户端和服务端都会退出, 当前目录生成如下文件: # 其中 mr-X-Y.txt 是map 函数生成的中间文件 NMap * NReduce个 # 其中 mr-out-Y."/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -84,27 +84,27 @@
 <li><a href="https://blog.csdn.net/hh1986170901/article/details/120262227">mit6.824课程 2021 lab1-MapReduce实验翻译</a></li>
 </ul>
 <blockquote>
-<p>了解以上内容之后, 对MapReduce概念上 和lab1实验的内容有了大概的了解了</p>
+<p>阅读以上内容之后, 对MapReduce概念上 和lab1实验的内容有了大概的了解了</p>
 </blockquote>
 <h3 id="代码逻辑">代码逻辑<a href="#代码逻辑" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <h4 id="简单的流程分析">简单的流程分析<a href="#简单的流程分析" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
-<pre><code>通过lab1实验内容的了解, 我们知道
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">通过lab1实验内容的了解, 我们知道
 我们需要实现的内容是 src/mr/目录的三个文件coordinator.go, rpc.go, worker.go
-  coordinator.go 主要是服务端, 实现任务调度功能(master)
-  worker.go      主要是客户端, 实现任务执行功能(node)
+  coordinator.go 主要是服务端, 实现任务调度功能<span class="o">(</span>master<span class="o">)</span>
+  worker.go      主要是客户端, 实现任务执行功能<span class="o">(</span>node<span class="o">)</span>
   rpc.go         主要是rpc端, 实现一些rpc数据传输的结构体
 
 晚上代码的编写之后,我们可以首先测试wc.go的功能
-cd 6.824/src/main
-# 在当前目录生成wc.so文件(之后测试rtiming.go, crash.go同样)
-go build -race -buildmode=plugin ../mrapps/wc.go
-# 启动服务端
+<span class="nb">cd</span> 6.824/src/main
+<span class="c1"># 在当前目录生成wc.so文件(之后测试rtiming.go, crash.go同样)</span>
+go build -race -buildmode<span class="o">=</span>plugin ../mrapps/wc.go
+<span class="c1"># 启动服务端</span>
 go run -race mrcoordinator.go pg-*.txt
-# 启动客户端
+<span class="c1"># 启动客户端</span>
 go run -race mrworker.go wc.so
-# 完整之后, 客户端和服务端都会退出, 当前目录生成如下文件:
-# 其中 mr-X-Y.txt 是map 函数生成的中间文件 NMap * NReduce个
-# 其中 mr-out-Y.txt 是reduce 函数生成最终文件 NReduce个
+<span class="c1"># 完整之后, 客户端和服务端都会退出, 当前目录生成如下文件:</span>
+<span class="c1"># 其中 mr-X-Y.txt 是map 函数生成的中间文件 NMap * NReduce个</span>
+<span class="c1"># 其中 mr-out-Y.txt 是reduce 函数生成最终文件 NReduce个</span>
 mr-0-0.txt   mr-0-8.txt   mr-1-6.txt   mr-2-4.txt   mr-3-2.txt   mr-4-0.txt   mr-4-8.txt   mr-5-6.txt   mr-6-4.txt   mr-7-2.txt   
 mr-0-1.txt   mr-0-9.txt   mr-1-7.txt   mr-2-5.txt   mr-3-3.txt   mr-4-1.txt   mr-4-9.txt   mr-5-7.txt   mr-6-5.txt   mr-7-3.txt    
 mr-0-2.txt   mr-1-0.txt   mr-1-8.txt   mr-2-6.txt   mr-3-4.txt   mr-4-2.txt   mr-5-0.txt   mr-5-8.txt   mr-6-6.txt   mr-7-4.txt   
@@ -115,37 +115,37 @@ mr-0-6.txt   mr-1-4.txt   mr-2-2.txt   mr-3-0.txt   mr-3-8.txt   mr-4-6.txt   mr
 mr-0-7.txt   mr-1-5.txt   mr-2-3.txt   mr-3-1.txt   mr-3-9.txt   mr-4-7.txt   mr-5-5.txt   mr-6-3.txt   mr-7-1.txt   mr-7-9.txt   
 mr-out-0.txt mr-out-1.txt mr-out-2.txt mr-out-3.txt mr-out-4.txt mr-out-5.txt mr-out-6.txt mr-out-7.txt mr-out-8.txt mr-out-9.txt
 
-# 之后我们就可以进行全部功能测试
+<span class="c1"># 之后我们就可以进行全部功能测试</span>
 bash test-mr.sh
-# 结果如下
+<span class="c1"># 结果如下</span>
 *** Starting wc test.
-2022/03/04 14:52:03 rpc.Register: method &quot;Done&quot; has 1 input parameters; needs exactly three
+2022/03/04 14:52:03 rpc.Register: method <span class="s2">&#34;Done&#34;</span> has <span class="m">1</span> input parameters<span class="p">;</span> needs exactly three
 --- wc test: PASS
 *** Starting indexer test.
-2022/03/04 14:52:27 rpc.Register: method &quot;Done&quot; has 1 input parameters; needs exactly three
+2022/03/04 14:52:27 rpc.Register: method <span class="s2">&#34;Done&#34;</span> has <span class="m">1</span> input parameters<span class="p">;</span> needs exactly three
 --- indexer test: PASS
 *** Starting map parallelism test.
-2022/03/04 14:52:37 rpc.Register: method &quot;Done&quot; has 1 input parameters; needs exactly three
+2022/03/04 14:52:37 rpc.Register: method <span class="s2">&#34;Done&#34;</span> has <span class="m">1</span> input parameters<span class="p">;</span> needs exactly three
 --- map parallelism test: PASS
 *** Starting reduce parallelism test.
-2022/03/04 14:52:47 rpc.Register: method &quot;Done&quot; has 1 input parameters; needs exactly three
+2022/03/04 14:52:47 rpc.Register: method <span class="s2">&#34;Done&#34;</span> has <span class="m">1</span> input parameters<span class="p">;</span> needs exactly three
 --- reduce parallelism test: PASS
 *** Starting job count test.
-2022/03/04 14:53:00 rpc.Register: method &quot;Done&quot; has 1 input parameters; needs exactly three
+2022/03/04 14:53:00 rpc.Register: method <span class="s2">&#34;Done&#34;</span> has <span class="m">1</span> input parameters<span class="p">;</span> needs exactly three
 2022/03/04 14:53:22 dialing:dial-http unix /var/tmp/824-mr-501: unexpected EOF
 2022/03/04 14:53:22 dialing:dial unix /var/tmp/824-mr-501: connect: connection refused
 --- job count test: PASS
-*** Starting early exit test.
-2022/03/04 14:53:22 rpc.Register: method &quot;Done&quot; has 1 input parameters; needs exactly three
---- early exit test: PASS
+*** Starting early <span class="nb">exit</span> test.
+2022/03/04 14:53:22 rpc.Register: method <span class="s2">&#34;Done&#34;</span> has <span class="m">1</span> input parameters<span class="p">;</span> needs exactly three
+--- early <span class="nb">exit</span> test: PASS
 *** Starting crash test.
-2022/03/04 14:53:32 rpc.Register: method &quot;Done&quot; has 1 input parameters; needs exactly three
+2022/03/04 14:53:32 rpc.Register: method <span class="s2">&#34;Done&#34;</span> has <span class="m">1</span> input parameters<span class="p">;</span> needs exactly three
 2022/03/04 14:54:13 dialing:dial unix /var/tmp/824-mr-501: connect: connection refused
 2022/03/04 14:54:13 dialing:dial unix /var/tmp/824-mr-501: connect: connection refused
 2022/03/04 14:54:13 dialing:dial unix /var/tmp/824-mr-501: connect: connection refused
 --- crash test: PASS
 *** PASSED ALL TESTS
-</code></pre><h4 id="代码分析">代码分析<a href="#代码分析" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+</code></pre></div><h4 id="代码分析">代码分析<a href="#代码分析" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
 <pre><code>我们先从worker的角度看一下
 1. worker 是包括了map和reduce的, 这里我们先完成map的所有工作之后, 在继续完成reduce
 2. map worker需要通过rpc的方式调用master, master告知worker一个token或者告知一个错误, 没有token了,或者没有任务了,
@@ -744,7 +744,7 @@ bash test-mr.sh
 <h3 id="总结">总结<a href="#总结" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="mf">1.</span> <span class="nx">需要注意一些锁的问题</span><span class="p">,</span><span class="nx">在正确的位置释放锁</span> <span class="p">,</span> <span class="nx">否则可能导致死锁</span>
 <span class="mf">2.</span> <span class="nx">通过队列来分配任务是比较好用的一种方式</span>
-<span class="mf">3.</span> <span class="nx">对于写文件通过临时文件是比较好的方式</span><span class="p">,</span> <span class="nx">反之crash的任务但是创建了mr</span><span class="o">-</span><span class="nx">out</span><span class="p">,</span><span class="nx">同时ioutil</span><span class="p">.</span><span class="nx">TempFile的dir是必须存在的</span><span class="p">,</span> <span class="nx">如果不存在会报错</span><span class="p">,</span> <span class="nx">由于我这里忽略了错误</span><span class="p">,</span><span class="nx">导致一开始有点问题</span>
+<span class="mf">3.</span> <span class="nx">对于写文件通过临时文件是比较好的方式</span><span class="p">,</span> <span class="nx">防止crash的任务但是创建了mr</span><span class="o">-</span><span class="nx">out</span><span class="p">,</span><span class="nx">同时ioutil</span><span class="p">.</span><span class="nx">TempFile的dir是必须存在的</span><span class="p">,</span> <span class="nx">如果不存在会报错</span><span class="p">,</span> <span class="nx">由于我这里忽略了错误</span><span class="p">,</span><span class="nx">导致一开始有点问题</span>
 </code></pre></div>
 			</div>
    
