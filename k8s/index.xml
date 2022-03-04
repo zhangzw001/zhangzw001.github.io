@@ -522,14 +522,17 @@
 			<pubDate>Wed, 08 Dec 2021 16:04:39 +0800</pubDate>
 			
 			<guid>https://www.ngirl.xyz/k8s/k8s%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</guid>
-			<description>我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试 那我们这里的重试间隔时间是如何控制的呢? 下面我们去了解一下 从 controller 找到 deployment 初始化方法看一下
+			<description>我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试
+那我们这里的重试间隔时间是如何控制的呢?
+下面我们去了解一下
+从 controller 找到 deployment 初始化方法看一下
  1 deployment 初始化  k8s的大多组件代码格式结构是类似的
  1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;deployment&amp;#34;] = startDeploymentController } 3. cmd/kube-controller-manager/app/apps.go startDeploymentController(...) (...) { dc, err := deployment.NewDeploymentController(...) go dc.Run(int(ctx.ComponentConfig.DeploymentController.ConcurrentDeploymentSyncs), ctx.Stop) } 3.1 pkg/controller/deployment/deployment_controller.go -&amp;gt; NewDeploymentController(...) (...) { dc := &amp;amp;DeploymentController{ queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), &amp;#34;deployment&amp;#34;), } } -&amp;gt; NewNamedRateLimitingQueue(.</description>
 			<content type="html"><![CDATA[<blockquote>
-<p>我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试
-那我们这里的重试间隔时间是如何控制的呢?
-下面我们去了解一下
-从 controller 找到 deployment 初始化方法看一下</p>
+<p>我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试</p>
+<p>那我们这里的重试间隔时间是如何控制的呢?</p>
+<p>下面我们去了解一下</p>
+<p>从 controller 找到 deployment 初始化方法看一下</p>
 </blockquote>
 <h2 id="1-deployment-初始化">1 deployment 初始化</h2>
 <blockquote>
@@ -789,7 +792,7 @@
 </span><span class="c1"></span>                <span class="c1">// 当然如果没有元素, 这里就是never, 会被pass
 </span><span class="c1"></span>		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">nextReadyAt</span><span class="p">:</span>
 			<span class="c1">// continue the loop, which will add ready items
-</span><span class="c1"></span>                <span class="c1">// waitingForAddCh channel 有写入, 一般在Affter函数中
+</span><span class="c1"></span>                <span class="c1">// waitingForAddCh channel 有写入, 一般在After函数中
 </span><span class="c1"></span>		<span class="k">case</span> <span class="nx">waitEntry</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">q</span><span class="p">.</span><span class="nx">waitingForAddCh</span><span class="p">:</span>
                         <span class="c1">// 同样比较一个 waitEntry.readyAt 是否 大于 当前时间戳
 </span><span class="c1"></span>			<span class="k">if</span> <span class="nx">waitEntry</span><span class="p">.</span><span class="nx">readyAt</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">q</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">Now</span><span class="p">())</span> <span class="p">{</span>
@@ -830,8 +833,7 @@
 </blockquote>
 <h3 id="22-sync方法">2.2 sync方法</h3>
 <blockquote>
-<p>我们省略了其他初始化工作
-syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
+<p>syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 </blockquote>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">NewDeploymentController</span><span class="p">(</span><span class="nx">dInformer</span> <span class="nx">appsinformers</span><span class="p">.</span><span class="nx">DeploymentInformer</span><span class="p">,</span> <span class="nx">rsInformer</span> <span class="nx">appsinformers</span><span class="p">.</span><span class="nx">ReplicaSetInformer</span><span class="p">,</span> <span class="nx">podInformer</span> <span class="nx">coreinformers</span><span class="p">.</span><span class="nx">PodInformer</span><span class="p">,</span> <span class="nx">client</span> <span class="nx">clientset</span><span class="p">.</span><span class="nx">Interface</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">DeploymentController</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
         <span class="o">...</span>

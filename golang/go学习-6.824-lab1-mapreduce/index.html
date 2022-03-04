@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="Go学习 6">
+<meta itemprop="description" content="相关知识点了解 课程翻译内容  mit6.824课程 中文翻译 文字版 mit6.824课程 2021 lab1-MapReduce实验翻译   了解以上内容之后, 对MapReduce概念上 和lab1实验的内容有了大概的了解了
+ 代码逻辑 简单的流程分析 通过lab1实验内容的了解, 我们知道 我们需要实现的内容是 src/mr/目录的三个文件coordinator.go, rpc.go, worker.go coordinator.go 主要是服务端, 实现任务调度功能(master) worker.go 主要是客户端, 实现任务执行功能(node) rpc.go 主要是rpc端, 实现一些rpc数据传输的结构体 晚上代码的编写之后,我们可以首先测试wc.go的功能 cd 6.824/src/main # 在当前目录生成wc.so文件(之后测试rtiming.go, crash.go同样) go build -race -buildmode=plugin ../mrapps/wc.go # 启动服务端 go run -race mrcoordinator.go pg-*.txt # 启动客户端 go run -race mrworker.go wc.so # 完整之后, 客户端和服务端都会退出, 当前目录生成如下文件: # 其中 mr-X-Y.txt 是map 函数生成的中间文件 NMap * NReduce个 # 其中 mr-out-Y.">
+<meta itemprop="datePublished" content="2022-03-04T13:55:22+08:00" />
+<meta itemprop="dateModified" content="2022-03-04T13:55:22+08:00" />
+<meta itemprop="wordCount" content="1883">
+
+
+
+<meta itemprop="keywords" content="golang,6.824," />
+<meta property="og:title" content="Go学习 6" />
+<meta property="og:description" content="相关知识点了解 课程翻译内容  mit6.824课程 中文翻译 文字版 mit6.824课程 2021 lab1-MapReduce实验翻译   了解以上内容之后, 对MapReduce概念上 和lab1实验的内容有了大概的了解了
+ 代码逻辑 简单的流程分析 通过lab1实验内容的了解, 我们知道 我们需要实现的内容是 src/mr/目录的三个文件coordinator.go, rpc.go, worker.go coordinator.go 主要是服务端, 实现任务调度功能(master) worker.go 主要是客户端, 实现任务执行功能(node) rpc.go 主要是rpc端, 实现一些rpc数据传输的结构体 晚上代码的编写之后,我们可以首先测试wc.go的功能 cd 6.824/src/main # 在当前目录生成wc.so文件(之后测试rtiming.go, crash.go同样) go build -race -buildmode=plugin ../mrapps/wc.go # 启动服务端 go run -race mrcoordinator.go pg-*.txt # 启动客户端 go run -race mrworker.go wc.so # 完整之后, 客户端和服务端都会退出, 当前目录生成如下文件: # 其中 mr-X-Y.txt 是map 函数生成的中间文件 NMap * NReduce个 # 其中 mr-out-Y." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab1-mapreduce/" />
+<meta property="article:published_time" content="2022-03-04T13:55:22+08:00" />
+<meta property="article:modified_time" content="2022-03-04T13:55:22+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Go学习 6"/>
+<meta name="twitter:description" content="相关知识点了解 课程翻译内容  mit6.824课程 中文翻译 文字版 mit6.824课程 2021 lab1-MapReduce实验翻译   了解以上内容之后, 对MapReduce概念上 和lab1实验的内容有了大概的了解了
+ 代码逻辑 简单的流程分析 通过lab1实验内容的了解, 我们知道 我们需要实现的内容是 src/mr/目录的三个文件coordinator.go, rpc.go, worker.go coordinator.go 主要是服务端, 实现任务调度功能(master) worker.go 主要是客户端, 实现任务执行功能(node) rpc.go 主要是rpc端, 实现一些rpc数据传输的结构体 晚上代码的编写之后,我们可以首先测试wc.go的功能 cd 6.824/src/main # 在当前目录生成wc.so文件(之后测试rtiming.go, crash.go同样) go build -race -buildmode=plugin ../mrapps/wc.go # 启动服务端 go run -race mrcoordinator.go pg-*.txt # 启动客户端 go run -race mrworker.go wc.so # 完整之后, 客户端和服务端都会退出, 当前目录生成如下文件: # 其中 mr-X-Y.txt 是map 函数生成的中间文件 NMap * NReduce个 # 其中 mr-out-Y."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>Go学习 6</title>
+	<link rel="stylesheet" href="https://www.ngirl.xyz/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://www.ngirl.xyz">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://www.ngirl.xyz/golang/">golang</a>
+					<a href="https://www.ngirl.xyz/k8s/">k8s</a>
+					<a href="https://www.ngirl.xyz/posts/">文章</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://www.ngirl.xyz/posts/">文章</a></li>
+			<li><a href="https://www.ngirl.xyz/tags/">标签</a></li>
+			<li><a href="https://www.ngirl.xyz/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Mar 4, 2022</span></div>
+				<h1>Go学习 6</h1>
+			</header>
+			<div class="content">
+				<h3 id="相关知识点了解">相关知识点了解<a href="#相关知识点了解" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="课程翻译内容">课程翻译内容<a href="#课程翻译内容" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<ul>
+<li><a href="https://mit-public-courses-cn-translatio.gitbook.io/mit6-824/lecture-01-introduction">mit6.824课程 中文翻译 文字版</a></li>
+<li><a href="https://blog.csdn.net/hh1986170901/article/details/120262227">mit6.824课程 2021 lab1-MapReduce实验翻译</a></li>
+</ul>
+<blockquote>
+<p>了解以上内容之后, 对MapReduce概念上 和lab1实验的内容有了大概的了解了</p>
+</blockquote>
+<h3 id="代码逻辑">代码逻辑<a href="#代码逻辑" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h4 id="简单的流程分析">简单的流程分析<a href="#简单的流程分析" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>通过lab1实验内容的了解, 我们知道
+我们需要实现的内容是 src/mr/目录的三个文件coordinator.go, rpc.go, worker.go
+  coordinator.go 主要是服务端, 实现任务调度功能(master)
+  worker.go      主要是客户端, 实现任务执行功能(node)
+  rpc.go         主要是rpc端, 实现一些rpc数据传输的结构体
+
+晚上代码的编写之后,我们可以首先测试wc.go的功能
+cd 6.824/src/main
+# 在当前目录生成wc.so文件(之后测试rtiming.go, crash.go同样)
+go build -race -buildmode=plugin ../mrapps/wc.go
+# 启动服务端
+go run -race mrcoordinator.go pg-*.txt
+# 启动客户端
+go run -race mrworker.go wc.so
+# 完整之后, 客户端和服务端都会退出, 当前目录生成如下文件:
+# 其中 mr-X-Y.txt 是map 函数生成的中间文件 NMap * NReduce个
+# 其中 mr-out-Y.txt 是reduce 函数生成最终文件 NReduce个
+mr-0-0.txt   mr-0-8.txt   mr-1-6.txt   mr-2-4.txt   mr-3-2.txt   mr-4-0.txt   mr-4-8.txt   mr-5-6.txt   mr-6-4.txt   mr-7-2.txt   
+mr-0-1.txt   mr-0-9.txt   mr-1-7.txt   mr-2-5.txt   mr-3-3.txt   mr-4-1.txt   mr-4-9.txt   mr-5-7.txt   mr-6-5.txt   mr-7-3.txt    
+mr-0-2.txt   mr-1-0.txt   mr-1-8.txt   mr-2-6.txt   mr-3-4.txt   mr-4-2.txt   mr-5-0.txt   mr-5-8.txt   mr-6-6.txt   mr-7-4.txt   
+mr-0-3.txt   mr-1-1.txt   mr-1-9.txt   mr-2-7.txt   mr-3-5.txt   mr-4-3.txt   mr-5-1.txt   mr-5-9.txt   mr-6-7.txt   mr-7-5.txt   
+mr-0-4.txt   mr-1-2.txt   mr-2-0.txt   mr-2-8.txt   mr-3-6.txt   mr-4-4.txt   mr-5-2.txt   mr-6-0.txt   mr-6-8.txt   mr-7-6.txt   
+mr-0-5.txt   mr-1-3.txt   mr-2-1.txt   mr-2-9.txt   mr-3-7.txt   mr-4-5.txt   mr-5-3.txt   mr-6-1.txt   mr-6-9.txt   mr-7-7.txt   
+mr-0-6.txt   mr-1-4.txt   mr-2-2.txt   mr-3-0.txt   mr-3-8.txt   mr-4-6.txt   mr-5-4.txt   mr-6-2.txt   mr-7-0.txt   mr-7-8.txt   
+mr-0-7.txt   mr-1-5.txt   mr-2-3.txt   mr-3-1.txt   mr-3-9.txt   mr-4-7.txt   mr-5-5.txt   mr-6-3.txt   mr-7-1.txt   mr-7-9.txt   
+mr-out-0.txt mr-out-1.txt mr-out-2.txt mr-out-3.txt mr-out-4.txt mr-out-5.txt mr-out-6.txt mr-out-7.txt mr-out-8.txt mr-out-9.txt
+
+# 之后我们就可以进行全部功能测试
+bash test-mr.sh
+# 结果如下
+*** Starting wc test.
+2022/03/04 14:52:03 rpc.Register: method &quot;Done&quot; has 1 input parameters; needs exactly three
+--- wc test: PASS
+*** Starting indexer test.
+2022/03/04 14:52:27 rpc.Register: method &quot;Done&quot; has 1 input parameters; needs exactly three
+--- indexer test: PASS
+*** Starting map parallelism test.
+2022/03/04 14:52:37 rpc.Register: method &quot;Done&quot; has 1 input parameters; needs exactly three
+--- map parallelism test: PASS
+*** Starting reduce parallelism test.
+2022/03/04 14:52:47 rpc.Register: method &quot;Done&quot; has 1 input parameters; needs exactly three
+--- reduce parallelism test: PASS
+*** Starting job count test.
+2022/03/04 14:53:00 rpc.Register: method &quot;Done&quot; has 1 input parameters; needs exactly three
+2022/03/04 14:53:22 dialing:dial-http unix /var/tmp/824-mr-501: unexpected EOF
+2022/03/04 14:53:22 dialing:dial unix /var/tmp/824-mr-501: connect: connection refused
+--- job count test: PASS
+*** Starting early exit test.
+2022/03/04 14:53:22 rpc.Register: method &quot;Done&quot; has 1 input parameters; needs exactly three
+--- early exit test: PASS
+*** Starting crash test.
+2022/03/04 14:53:32 rpc.Register: method &quot;Done&quot; has 1 input parameters; needs exactly three
+2022/03/04 14:54:13 dialing:dial unix /var/tmp/824-mr-501: connect: connection refused
+2022/03/04 14:54:13 dialing:dial unix /var/tmp/824-mr-501: connect: connection refused
+2022/03/04 14:54:13 dialing:dial unix /var/tmp/824-mr-501: connect: connection refused
+--- crash test: PASS
+*** PASSED ALL TESTS
+</code></pre><h4 id="代码分析">代码分析<a href="#代码分析" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<pre><code>我们先从worker的角度看一下
+1. worker 是包括了map和reduce的, 这里我们先完成map的所有工作之后, 在继续完成reduce
+2. map worker需要通过rpc的方式调用master, master告知worker一个token或者告知一个错误, 没有token了,或者没有任务了,
+    2.1 运气很好, 我拿到了token如果,那么worker就可以工作了
+        2.1.1 工作的很好,一切顺利, 我完成了文件的读取,并且通过json编码写入到了临时文件,最后mapf执行的也没有问题, 没有crash,我把临时文件重命名为中间文件(mapworker的输出),最后一步rpc通知master,我完成了工作, perfect!!! (master默默的在本子上记录一笔,worker0记录✔️!)
+        2.1.2 工作的不顺利, 各种问题,导致最终并没有通知master (master很没有耐心,在10秒钟以后, 给worker0 记录了×!)
+    2.2 糟糕, 我失业了...我只能游手好闲一段时间...
+    2.3 不管是工作完成, 还是失业, 接下来都要继续去找工作-&gt; 回到2
+3. 我们必须要有一个wait程序, 等待map worker全部完成, wait通过rpc调用master 询问所有的工作都完成了吗?
+    3.1 rpc调用发现map的所有任务都完成了, 那就终止wait等待
+    3.2 rpc调用发现map的任务还有未完成
+    3.3 注意, 这个wait循环的rpc调用需要很简单, 不能存在较多的计算
+4. reduce worker 同样类似步骤2
+...
+
+从master的角度看一下
+1. master首先需要如下几个rpc服务
+    1.1 GetMapWorker(...) error 分配map worker
+    1.2 GetReduceWorker(...) error 分配reduce worker
+    1.3 SetMapDoneOne(...) error 设置某个map worker完成
+    1.4 SetReduceDoneOne(...) error 设置某个reduce worker完成
+    1.5 GetMapFinish(...) error 查看所有的map 是否都完成
+    1.6 GetReduceFinish(...) error 查看所有的reduce 是否都完成
+2. 我们首先需要一个分配worker的队列
+3. 我们需要定义worker, 记录id,timeout 和step, step是记录在map步骤还是reduce步骤
+4. 我们需要一个后台循环程序,检测是否完成了step1, 然后完成后,在检测是否完成了step2,最后 Done()掉master服务,Done的逻辑是改lab的逻辑,显然我们不希望真是服务端mster宕机
+5. 我们还需要一个后台循环程序,检测是否有step1的超时,然后在检测是否有step2的超时
+6. 我们需要设置锁来支持分布式
+7. 针对mapf可能会crash的情况, 这里是通过timeout来解决, 当worker crash了, 则会达到10秒的超时时间,此时我们将该token继续放到队列中,并且清理worker, 当然如果真实执行了这么久,也直接忽略了
+8. 服务端master收到了GetMapWorker或者GetReduceWorker的rpc请求之后, 会查询队列是否有token可以提供,返回客户端node成功或失败
+9. 服务端master收到了SetMapDoneOne 或者SetReduceDoneOne 的rpc请求, 会将对应的token id的worker设置为完成状态
+10. 服务端master收到了GetMapFinish 或者GetReduceFinish 的rpc请求, 会将对应finish字段返回
+</code></pre><h3 id="服务端的代码">服务端的代码<a href="#服务端的代码" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>coordinator.go</p>
+</blockquote>
+<h4 id="队列">队列<a href="#队列" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<ul>
+<li>queues结构体</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">queues</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">ids</span> <span class="p">[]</span><span class="kt">int</span>      <span class="c1">// 存储token
+</span><span class="c1"></span>	<span class="nx">mu</span>  <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>对应的出入队列</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">q</span> <span class="o">*</span><span class="nx">queues</span><span class="p">)</span> <span class="nf">Pop</span><span class="p">()</span> <span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">q</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">q</span><span class="p">.</span><span class="nx">ids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nx">errors</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s">&#34;queue is null&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="nx">i</span> <span class="o">:=</span> <span class="nx">q</span><span class="p">.</span><span class="nx">ids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+	<span class="nx">q</span><span class="p">.</span><span class="nx">ids</span> <span class="p">=</span> <span class="nx">q</span><span class="p">.</span><span class="nx">ids</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+	<span class="k">return</span> <span class="nx">i</span><span class="p">,</span> <span class="kc">nil</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">q</span> <span class="o">*</span><span class="nx">queues</span><span class="p">)</span> <span class="nf">Push</span><span class="p">(</span><span class="nx">id</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">q</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+        <span class="k">defer</span> <span class="nx">q</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+	<span class="nx">q</span><span class="p">.</span><span class="nx">ids</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">q</span><span class="p">.</span><span class="nx">ids</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div><h4 id="每个工作记录">每个工作记录<a href="#每个工作记录" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<ul>
+<li>job和jobs结构体</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">const</span> <span class="p">(</span>
+	<span class="nx">step0</span> <span class="p">=</span> <span class="kc">iota</span>
+	<span class="nx">step1</span>
+	<span class="nx">step2</span>
+<span class="p">)</span>
+<span class="kd">var</span> <span class="p">(</span>
+	<span class="nx">defaultTimeout</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="p">=</span> <span class="mi">10</span>
+<span class="p">)</span>
+
+<span class="kd">type</span> <span class="nx">job</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">id</span>      <span class="kt">int</span>              <span class="c1">// 这是一个任务id
+</span><span class="c1"></span>	<span class="nx">timeout</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span> <span class="c1">// 超时时间
+</span><span class="c1"></span>	<span class="nx">step</span>    <span class="kt">int</span>              <span class="c1">// 记录到第几步, step1: map完成, step2: reduce完成
+</span><span class="c1"></span><span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">jobs</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">tokens</span>    <span class="o">*</span><span class="nx">queues</span>       <span class="c1">// tokens 队列,实现分配给worker并发
+</span><span class="c1"></span>	<span class="nx">workers</span>   <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">job</span>  <span class="c1">// 记录worker的状态,每个worker对应一个job
+</span><span class="c1"></span>	<span class="nx">maxThread</span> <span class="kt">int</span>           <span class="c1">// 用于记录当前jobs的最大并发数
+</span><span class="c1"></span>	<span class="nx">mu</span>        <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span> <span class="c1">// 锁
+</span><span class="c1"></span>	<span class="nx">finish</span>    <span class="kt">bool</span>          <span class="c1">// 记录jobs是否全部完成
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><ul>
+<li>客户端获取token的相关操作</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="c1">// 从队列获取token
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">j</span> <span class="o">*</span><span class="nx">jobs</span><span class="p">)</span> <span class="nf">getToken</span><span class="p">()</span> <span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nx">j</span><span class="p">.</span><span class="nx">tokens</span><span class="p">.</span><span class="nf">Pop</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="c1">// 记录jobs当前有哪些work在运行
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">j</span> <span class="o">*</span><span class="nx">jobs</span><span class="p">)</span> <span class="nf">addJob</span><span class="p">(</span><span class="nx">token</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+	<span class="nx">jobN</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">job</span><span class="p">{</span>
+		<span class="nx">id</span><span class="p">:</span>      <span class="nx">token</span><span class="p">,</span>
+		<span class="nx">timeout</span><span class="p">:</span> <span class="nx">time</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span> <span class="o">*</span> <span class="nx">defaultTimeout</span><span class="p">),</span>
+	<span class="p">}</span>
+	<span class="nx">j</span><span class="p">.</span><span class="nx">workers</span><span class="p">[</span><span class="nx">token</span><span class="p">]</span> <span class="p">=</span> <span class="nx">jobN</span>
+	<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>客户端worker完成后的状态设置</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 设置worker完成
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">j</span> <span class="o">*</span><span class="nx">jobs</span><span class="p">)</span> <span class="nf">SetDoneOne</span><span class="p">(</span><span class="nx">arg</span> <span class="o">*</span><span class="nx">InWorker</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+	<span class="c1">// arg.Step 可能是step1 也可能是step2
+</span><span class="c1"></span>	<span class="c1">// 防止是step2 被改成了step1, 并发下是有可能的
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">arg</span><span class="p">.</span><span class="nx">Step</span> <span class="p">&gt;</span> <span class="nx">j</span><span class="p">.</span><span class="nx">workers</span><span class="p">[</span><span class="nx">arg</span><span class="p">.</span><span class="nx">Token</span><span class="p">].</span><span class="nx">step</span> <span class="p">{</span>
+		<span class="nx">j</span><span class="p">.</span><span class="nx">workers</span><span class="p">[</span><span class="nx">arg</span><span class="p">.</span><span class="nx">Token</span><span class="p">].</span><span class="nx">step</span> <span class="p">=</span> <span class="nx">arg</span><span class="p">.</span><span class="nx">Step</span>
+	<span class="p">}</span>
+	<span class="c1">//log.Printf(&#34;[server] &gt;&gt;&gt; SetDoneOne step: %v\n&#34;, arg.Step)
+</span><span class="c1"></span>	<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+	<span class="k">return</span> <span class="kc">nil</span>
+<span class="p">}</span>
+</code></pre></div><blockquote>
+<p>其他方法稍后慢慢说明</p>
+<p>接着我们看下 Coordinator</p>
+</blockquote>
+<h4 id="rpc注册的结构体">rpc注册的结构体<a href="#rpc注册的结构体" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<blockquote>
+<p>我们对Map 和Reduce使用同样的jobs, 这样后续可以直接调用jobs的方法</p>
+</blockquote>
+<ul>
+<li>Coordinator</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Coordinator</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">mu</span>       <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span>
+	<span class="nx">mapFiles</span> <span class="p">[]</span><span class="kt">string</span> <span class="c1">// 用于存储map中需要读取的文件列表
+</span><span class="c1"></span>	<span class="nx">M</span>        <span class="o">*</span><span class="nx">jobs</span>
+	<span class="nx">R</span>        <span class="o">*</span><span class="nx">jobs</span>
+<span class="p">}</span>
+</code></pre></div><h4 id="客户端获取worker的rpc方法">客户端获取worker的rpc方法<a href="#客户端获取worker的rpc方法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<ul>
+<li>GetMapWorker rpc</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="c1">// GetMapWorker rpc接口
+</span><span class="c1">// arg *InWorker 不需要输入参数
+</span><span class="c1">// reply *OutWorker 输出参数
+</span><span class="c1">// 	Token: 每个token对应一个任务,对应一个文件
+</span><span class="c1">// 	Filename: mapf 需要处理的文件名
+</span><span class="c1">//	NReduce: 这是reducef的并发数, 同样在mapf中也需要, 因为mapf会生成 NMap*NReduce 个中间临时文件
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Coordinator</span><span class="p">)</span> <span class="nf">GetMapWorker</span><span class="p">(</span><span class="nx">arg</span> <span class="o">*</span><span class="nx">InWorker</span><span class="p">,</span> <span class="nx">reply</span> <span class="o">*</span><span class="nx">OutWorker</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="c1">// 直接从队列获取token
+</span><span class="c1"></span>	<span class="nx">token</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">M</span><span class="p">.</span><span class="nf">getToken</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">err</span>
+	<span class="p">}</span>
+	<span class="c1">// 通过token索引获取文件名
+</span><span class="c1"></span>	<span class="nx">filename</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">getMapFile</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">err</span>
+	<span class="p">}</span>
+	<span class="c1">// 当前jobs记录下token对应的job
+</span><span class="c1"></span>	<span class="nx">c</span><span class="p">.</span><span class="nx">M</span><span class="p">.</span><span class="nf">addJob</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span>
+	<span class="c1">// 写入rpc的返回值中
+</span><span class="c1"></span>	<span class="nx">reply</span><span class="p">.</span><span class="nx">Token</span> <span class="p">=</span> <span class="nx">token</span>
+	<span class="nx">reply</span><span class="p">.</span><span class="nx">Filename</span> <span class="p">=</span> <span class="nx">filename</span>
+	<span class="c1">// 这里要注意是nReduce
+</span><span class="c1"></span>	<span class="nx">reply</span><span class="p">.</span><span class="nx">NReduce</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">R</span><span class="p">.</span><span class="nx">maxThread</span>
+	<span class="k">return</span> <span class="kc">nil</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>getMapFile 仅map worker需要</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Coordinator</span><span class="p">)</span> <span class="nf">getMapFile</span><span class="p">(</span><span class="nx">id</span> <span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
+	<span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+	<span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nx">mapFiles</span><span class="p">[</span><span class="nx">id</span><span class="p">],</span> <span class="kc">nil</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>GetReduceWorker rpc</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Coordinator</span><span class="p">)</span> <span class="nf">GetReduceWorker</span><span class="p">(</span><span class="nx">arg</span> <span class="o">*</span><span class="nx">InWorker</span><span class="p">,</span> <span class="nx">reply</span> <span class="o">*</span><span class="nx">OutWorker</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="nx">token</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">R</span><span class="p">.</span><span class="nf">getToken</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">err</span>
+	<span class="p">}</span>
+	<span class="nx">c</span><span class="p">.</span><span class="nx">R</span><span class="p">.</span><span class="nf">addJob</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span>
+	<span class="nx">reply</span><span class="p">.</span><span class="nx">Token</span> <span class="p">=</span> <span class="nx">token</span>
+	<span class="nx">reply</span><span class="p">.</span><span class="nx">NReduce</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">R</span><span class="p">.</span><span class="nx">maxThread</span>
+	<span class="k">return</span> <span class="kc">nil</span>
+<span class="p">}</span>
+</code></pre></div><h4 id="客户端完成任务后的rpc方法">客户端完成任务后的rpc方法<a href="#客户端完成任务后的rpc方法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<ul>
+<li>这里实际上直接调用了上面的 jobs.SetDoneOne 方法</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// SetMapDoneOne rpc是对 jobs.SetDoneOne的封装
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Coordinator</span><span class="p">)</span> <span class="nf">SetMapDoneOne</span><span class="p">(</span><span class="nx">arg</span> <span class="o">*</span><span class="nx">InWorker</span><span class="p">,</span> <span class="nx">reply</span> <span class="o">*</span><span class="nx">OutWorker</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nx">M</span><span class="p">.</span><span class="nf">SetDoneOne</span><span class="p">(</span><span class="nx">arg</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Coordinator</span><span class="p">)</span> <span class="nf">SetReduceDoneOne</span><span class="p">(</span><span class="nx">arg</span> <span class="o">*</span><span class="nx">InWorker</span><span class="p">,</span> <span class="nx">reply</span> <span class="o">*</span><span class="nx">OutWorker</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nx">R</span><span class="p">.</span><span class="nf">SetDoneOne</span><span class="p">(</span><span class="nx">arg</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div><h4 id="客户端wait中检测的是否全部完成的rpc方法">客户端wait中检测的是否全部完成的rpc方法<a href="#客户端wait中检测的是否全部完成的rpc方法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<ul>
+<li>GetMapFinish 和 GetReduceFinish 的rpc</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Coordinator</span><span class="p">)</span> <span class="nf">GetMapFinish</span><span class="p">(</span><span class="nx">arg</span> <span class="o">*</span><span class="nx">InWorker</span><span class="p">,</span> <span class="nx">reply</span> <span class="o">*</span><span class="nx">OutWorker</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">M</span><span class="p">.</span><span class="nf">getFinish</span><span class="p">()</span> <span class="o">==</span> <span class="kc">true</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="kc">nil</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">errors</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s">&#34;map running &#34;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Coordinator</span><span class="p">)</span> <span class="nf">GetReduceFinish</span><span class="p">(</span><span class="nx">arg</span> <span class="o">*</span><span class="nx">InWorker</span><span class="p">,</span> <span class="nx">reply</span> <span class="o">*</span><span class="nx">OutWorker</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">R</span><span class="p">.</span><span class="nf">getFinish</span><span class="p">()</span> <span class="o">==</span> <span class="kc">true</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="kc">nil</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">errors</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s">&#34;reduce running &#34;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>实际的返回finish 字段</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">j</span> <span class="o">*</span><span class="nx">jobs</span><span class="p">)</span> <span class="nf">getFinish</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
+	<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
+	<span class="k">defer</span> <span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+	<span class="k">return</span> <span class="nx">j</span><span class="p">.</span><span class="nx">finish</span>
+<span class="p">}</span>
+</code></pre></div><blockquote>
+<p>以上与客户端交互的rpc方法都介绍完了</p>
+</blockquote>
+<h4 id="服务端的初始化代码">服务端的初始化代码<a href="#服务端的初始化代码" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">MakeCoordinator</span><span class="p">(</span><span class="nx">files</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="nx">nReduce</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">Coordinator</span> <span class="p">{</span>
+	<span class="c1">// mapf的tokens的数量是和文件数保持一致的
+</span><span class="c1"></span>	<span class="nx">numMap</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">files</span><span class="p">)</span>
+	<span class="nx">map1</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">jobs</span><span class="p">{</span>
+		<span class="nx">mu</span><span class="p">:</span>        <span class="o">&amp;</span><span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span><span class="p">{},</span>
+		<span class="nx">maxThread</span><span class="p">:</span> <span class="nx">numMap</span><span class="p">,</span>
+		<span class="nx">workers</span><span class="p">:</span>   <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">job</span><span class="p">,</span> <span class="nx">numMap</span><span class="p">),</span>
+		<span class="nx">tokens</span><span class="p">:</span> <span class="o">&amp;</span><span class="nx">queues</span><span class="p">{</span>
+			<span class="nx">mu</span><span class="p">:</span>  <span class="o">&amp;</span><span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span><span class="p">{},</span>
+			<span class="nx">ids</span><span class="p">:</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">numMap</span><span class="p">),</span>
+		<span class="p">},</span>
+	<span class="p">}</span>
+        <span class="c1">// 设置workers这个map的key 和队列
+</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">numMap</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">map1</span><span class="p">.</span><span class="nx">workers</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="kc">nil</span>
+		<span class="nx">map1</span><span class="p">.</span><span class="nx">tokens</span><span class="p">.</span><span class="nx">ids</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">i</span>
+	<span class="p">}</span>
+	<span class="c1">// reducef的数量是和nReduce一致
+</span><span class="c1"></span>	<span class="nx">reduce1</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">jobs</span><span class="p">{</span>
+		<span class="nx">mu</span><span class="p">:</span>        <span class="o">&amp;</span><span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span><span class="p">{},</span>
+		<span class="nx">maxThread</span><span class="p">:</span> <span class="nx">nReduce</span><span class="p">,</span>
+		<span class="nx">workers</span><span class="p">:</span>   <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="o">*</span><span class="nx">job</span><span class="p">,</span> <span class="nx">nReduce</span><span class="p">),</span>
+		<span class="nx">tokens</span><span class="p">:</span> <span class="o">&amp;</span><span class="nx">queues</span><span class="p">{</span>
+			<span class="nx">mu</span><span class="p">:</span>  <span class="o">&amp;</span><span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span><span class="p">{},</span>
+			<span class="nx">ids</span><span class="p">:</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">nReduce</span><span class="p">),</span>
+		<span class="p">},</span>
+	<span class="p">}</span>
+        <span class="c1">// 设置workers这个map的key 和队列
+</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">nReduce</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">reduce1</span><span class="p">.</span><span class="nx">workers</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="kc">nil</span>
+		<span class="nx">reduce1</span><span class="p">.</span><span class="nx">tokens</span><span class="p">.</span><span class="nx">ids</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">i</span>
+	<span class="p">}</span>
+	<span class="nx">c</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Coordinator</span><span class="p">{</span>
+		<span class="nx">mu</span><span class="p">:</span>       <span class="o">&amp;</span><span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span><span class="p">{},</span>
+		<span class="nx">mapFiles</span><span class="p">:</span> <span class="nx">files</span><span class="p">,</span>
+		<span class="nx">M</span><span class="p">:</span>        <span class="nx">map1</span><span class="p">,</span>
+		<span class="nx">R</span><span class="p">:</span>        <span class="nx">reduce1</span><span class="p">,</span>
+	<span class="p">}</span>
+	<span class="nx">c</span><span class="p">.</span><span class="nf">server</span><span class="p">()</span>
+	<span class="k">return</span> <span class="nx">c</span>
+<span class="p">}</span>
+
+</code></pre></div><h4 id="服务端的后台循环脚本">服务端的后台循环脚本<a href="#服务端的后台循环脚本" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<blockquote>
+<p>这里我是放在了Done()的方法里面</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Coordinator</span><span class="p">)</span> <span class="nf">Done</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
+	<span class="nx">ret</span> <span class="o">:=</span> <span class="kc">false</span>
+	<span class="c1">// 后台检测是否完成了所有的任务
+</span><span class="c1"></span>	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                <span class="c1">// 实际调用jobs.Finish
+</span><span class="c1"></span>                <span class="c1">// 这等价于 for ;!c.M.Finish(&amp;InWorker{Step: step1}) ; {}
+</span><span class="c1"></span>                <span class="c1">// 只要有一次Finish返回为true,就会退出循环
+</span><span class="c1"></span>		<span class="k">for</span> <span class="p">!</span><span class="nx">c</span><span class="p">.</span><span class="nx">M</span><span class="p">.</span><span class="nf">Finish</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">InWorker</span><span class="p">{</span><span class="nx">Step</span><span class="p">:</span> <span class="nx">step1</span><span class="p">})</span> <span class="p">{</span>
+		<span class="p">}</span>
+		<span class="k">for</span> <span class="p">!</span><span class="nx">c</span><span class="p">.</span><span class="nx">R</span><span class="p">.</span><span class="nf">Finish</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">InWorker</span><span class="p">{</span><span class="nx">Step</span><span class="p">:</span> <span class="nx">step2</span><span class="p">})</span> <span class="p">{</span>
+		<span class="p">}</span>
+	<span class="p">}()</span>
+	<span class="c1">// 如果 mapf jobs没有全部完成
+</span><span class="c1"></span>	<span class="k">for</span> <span class="p">!</span><span class="nx">c</span><span class="p">.</span><span class="nx">M</span><span class="p">.</span><span class="nf">getFinish</span><span class="p">()</span> <span class="p">{</span>
+                <span class="c1">// 那就需要查看是否有超时
+</span><span class="c1"></span>		<span class="nx">c</span><span class="p">.</span><span class="nx">M</span><span class="p">.</span><span class="nf">GetTimeoutJob</span><span class="p">(</span><span class="nx">step1</span><span class="p">)</span>
+		<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">for</span> <span class="p">!</span><span class="nx">c</span><span class="p">.</span><span class="nx">R</span><span class="p">.</span><span class="nf">getFinish</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">c</span><span class="p">.</span><span class="nx">R</span><span class="p">.</span><span class="nf">GetTimeoutJob</span><span class="p">(</span><span class="nx">step2</span><span class="p">)</span>
+		<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="nx">ret</span> <span class="p">=</span> <span class="kc">true</span>
+	<span class="k">return</span> <span class="nx">ret</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>jobs.Finish的方法会设置finish字段</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 检测jobs是不是已经全部完成
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">j</span> <span class="o">*</span><span class="nx">jobs</span><span class="p">)</span> <span class="nf">Finish</span><span class="p">(</span><span class="nx">arg</span> <span class="o">*</span><span class="nx">InWorker</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+	<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+	<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">j</span><span class="p">.</span><span class="nx">workers</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">v</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+			<span class="k">return</span> <span class="kc">false</span>
+		<span class="p">}</span>
+                <span class="c1">// 如果传入的arg.Step(step1) &gt; v.step(step0),那么就说明worker还未完成
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">arg</span><span class="p">.</span><span class="nx">Step</span> <span class="p">&gt;</span> <span class="nx">v</span><span class="p">.</span><span class="nx">step</span> <span class="p">{</span>
+			<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+			<span class="k">return</span> <span class="kc">false</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+        <span class="c1">// 在这之前需要释放读锁, 否则setFinish中无法拿到写锁
+</span><span class="c1"></span>	<span class="nx">j</span><span class="p">.</span><span class="nf">setFinish</span><span class="p">()</span>
+	<span class="k">return</span> <span class="kc">true</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">j</span> <span class="o">*</span><span class="nx">jobs</span><span class="p">)</span> <span class="nf">setFinish</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+	<span class="k">defer</span> <span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+	<span class="nx">j</span><span class="p">.</span><span class="nx">finish</span> <span class="p">=</span> <span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>GetTimeoutJob的方法</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 查看是否有超时job
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">j</span> <span class="o">*</span><span class="nx">jobs</span><span class="p">)</span> <span class="nf">GetTimeoutJob</span><span class="p">(</span><span class="nx">step</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">w</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">j</span><span class="p">.</span><span class="nx">workers</span> <span class="p">{</span>
+		<span class="c1">// 必须是add过的job
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">w</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="c1">// 如果是已经完成的任务, 不需要验证是否过期
+</span><span class="c1"></span>			<span class="k">if</span> <span class="nx">w</span><span class="p">.</span><span class="nx">step</span> <span class="o">==</span> <span class="nx">step</span> <span class="p">{</span>
+				<span class="k">continue</span>
+			<span class="p">}</span>
+			<span class="k">select</span> <span class="p">{</span>
+			<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">w</span><span class="p">.</span><span class="nx">timeout</span><span class="p">:</span>
+				<span class="c1">// 再看一眼是否完成了
+</span><span class="c1"></span>				<span class="k">if</span> <span class="nx">w</span><span class="p">.</span><span class="nx">step</span> <span class="o">==</span> <span class="nx">step</span> <span class="p">{</span>
+					<span class="k">continue</span>
+				<span class="p">}</span>
+				<span class="nx">id</span> <span class="o">:=</span> <span class="nx">w</span><span class="p">.</span><span class="nx">id</span>
+				<span class="c1">// 这里必须先释放读锁, 因为后面的push和removejob都需要获取 写锁,
+</span><span class="c1"></span>				<span class="c1">// 写锁和其他锁都是互斥的, 读锁只与读锁兼容
+</span><span class="c1"></span>				<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+				<span class="nx">j</span><span class="p">.</span><span class="nx">tokens</span><span class="p">.</span><span class="nf">Push</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span>
+				<span class="nx">j</span><span class="p">.</span><span class="nf">removeJob</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span>
+				<span class="c1">// push和removejob 执行完之后还需要在 开启读锁
+</span><span class="c1"></span>				<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
+			<span class="k">default</span><span class="p">:</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="c1">// 最后需要是否读锁
+</span><span class="c1"></span>	<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>jobs.removeJob</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 超时的job需要剔除
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">j</span> <span class="o">*</span><span class="nx">jobs</span><span class="p">)</span> <span class="nf">removeJob</span><span class="p">(</span><span class="nx">token</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nx">j</span><span class="p">.</span><span class="nx">workers</span><span class="p">[</span><span class="nx">token</span><span class="p">]</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+
+	<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+	<span class="nx">j</span><span class="p">.</span><span class="nx">workers</span><span class="p">[</span><span class="nx">token</span><span class="p">]</span> <span class="p">=</span> <span class="kc">nil</span>
+	<span class="c1">// j.finish = false
+</span><span class="c1"></span>	<span class="nx">j</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div><h4 id="rpc的数据传输的结构体">rpc的数据传输的结构体<a href="#rpc的数据传输的结构体" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">InWorker</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Token</span> <span class="kt">int</span>
+	<span class="nx">Step</span> <span class="kt">int</span>
+	<span class="nx">Filename</span> <span class="kt">string</span>
+<span class="p">}</span>
+<span class="kd">type</span> <span class="nx">OutWorker</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Token</span> <span class="kt">int</span>
+	<span class="nx">Filename</span> <span class="kt">string</span>
+	<span class="nx">NReduce</span> <span class="kt">int</span>
+<span class="p">}</span>
+</code></pre></div><blockquote>
+<p>以上除了课程默认的 rpc的server没介绍, 其他的所有服务端的程序都介绍完了</p>
+</blockquote>
+<h3 id="客户端的代码">客户端的代码<a href="#客户端的代码" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<blockquote>
+<p>worker.go</p>
+</blockquote>
+<h4 id="首先我们直接看下worker方法">首先我们直接看下worker方法<a href="#首先我们直接看下worker方法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">Worker</span><span class="p">(</span><span class="nx">mapf</span> <span class="kd">func</span><span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">string</span><span class="p">)</span> <span class="p">[]</span><span class="nx">KeyValue</span><span class="p">,</span>
+	<span class="nx">reducef</span> <span class="kd">func</span><span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">//###################### map ###########################################
+</span><span class="c1"></span>	<span class="nx">replyMap</span> <span class="o">:=</span> <span class="nx">OutWorker</span><span class="p">{}</span>
+        <span class="c1">// 获取token的协程
+</span><span class="c1"></span>	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">n</span> <span class="o">:=</span> <span class="mi">1</span>
+		<span class="k">for</span> <span class="p">{</span>
+			<span class="k">select</span> <span class="p">{</span>
+                        <span class="c1">// wait方法中,如果检测到master已经完成了所有的任务,则直接break
+</span><span class="c1"></span>			<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">step1Done</span><span class="p">:</span>
+				<span class="k">break</span>
+			<span class="k">default</span><span class="p">:</span>
+                                <span class="c1">// rpc调用GetMapWorker 方法, 得到replyMap
+</span><span class="c1"></span>				<span class="k">if</span> <span class="nf">call</span><span class="p">(</span><span class="s">&#34;Coordinator.GetMapWorker&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">InWorker</span><span class="p">{},</span> <span class="o">&amp;</span><span class="nx">replyMap</span><span class="p">)</span> <span class="p">{</span>
+                                        <span class="c1">// 这里我们并不需要goroutine的方式执行, 因为实际场景和测试脚本是通过多进程运行的, 而不需要我们go去多线程了
+</span><span class="c1"></span>                                        <span class="c1">// 实际场景也同样是在多个服务器上运行的客户端
+</span><span class="c1"></span>					<span class="nf">mapWorker</span><span class="p">(</span><span class="nx">mapf</span><span class="p">,</span> <span class="nx">replyMap</span><span class="p">)</span>
+				<span class="p">}</span>
+				<span class="c1">// 100ms 200ms 400ms 800ms 800ms
+</span><span class="c1"></span>				<span class="k">if</span> <span class="nx">n</span> <span class="p">&lt;</span> <span class="mi">8</span> <span class="p">{</span>
+					<span class="nx">n</span>  <span class="o">*=</span> <span class="mi">2</span>
+				<span class="p">}</span>
+				<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">n</span> <span class="o">*</span><span class="mi">100</span><span class="p">)</span> <span class="p">)</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">}()</span>
+	<span class="c1">// 等待 mapf执行完毕
+</span><span class="c1"></span>	<span class="nf">wait</span><span class="p">(</span><span class="s">&#34;Coordinator.GetMapFinish&#34;</span><span class="p">,</span> <span class="nx">step1</span><span class="p">,</span> <span class="nx">step1Done</span><span class="p">)</span>
+	<span class="c1">//###################### reduce ###########################################
+</span><span class="c1"></span>	<span class="nx">replyReduce</span> <span class="o">:=</span> <span class="nx">OutWorker</span><span class="p">{}</span>
+	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">n</span> <span class="o">:=</span> <span class="mi">1</span>
+		<span class="k">for</span> <span class="p">{</span>
+			<span class="k">select</span> <span class="p">{</span>
+			<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">step2Done</span><span class="p">:</span>
+				<span class="k">break</span>
+			<span class="k">default</span><span class="p">:</span>
+				<span class="k">if</span> <span class="nf">call</span><span class="p">(</span><span class="s">&#34;Coordinator.GetReduceWorker&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">InWorker</span><span class="p">{},</span> <span class="o">&amp;</span><span class="nx">replyReduce</span><span class="p">)</span> <span class="p">{</span>
+					<span class="nf">reduceWorker</span><span class="p">(</span><span class="nx">reducef</span><span class="p">,</span> <span class="nx">replyReduce</span><span class="p">)</span>
+				<span class="p">}</span>
+                                <span class="k">if</span> <span class="nx">n</span> <span class="p">&lt;</span> <span class="mi">8</span> <span class="p">{</span>
+                                        <span class="nx">n</span>  <span class="o">*=</span> <span class="mi">2</span>
+                                <span class="p">}</span>
+                                <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">n</span> <span class="o">*</span><span class="mi">100</span><span class="p">)</span> <span class="p">)</span>			<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">}()</span>
+	<span class="nf">wait</span><span class="p">(</span><span class="s">&#34;Coordinator.GetReduceFinish&#34;</span><span class="p">,</span> <span class="nx">step2</span><span class="p">,</span> <span class="nx">step2Done</span><span class="p">)</span>
+	<span class="c1">// uncomment to send the Example RPC to the coordinator.
+</span><span class="c1"></span>	<span class="c1">//CallExample()
+</span><span class="c1"></span>
+<span class="p">}</span>
+</code></pre></div><h4 id="先看下默认的数据类型-keyvalue">先看下默认的数据类型 KeyValue<a href="#先看下默认的数据类型-keyvalue" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">KeyValue</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Key</span>   <span class="kt">string</span>
+	<span class="nx">Value</span> <span class="kt">string</span>
+<span class="p">}</span>
+</code></pre></div><h4 id="一个从示例代码copy的快排">一个从示例代码copy的快排<a href="#一个从示例代码copy的快排" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// for sorting by key.
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">ByKey</span> <span class="p">[]</span><span class="nx">KeyValue</span>
+
+<span class="c1">// for sorting by key.
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">a</span> <span class="nx">ByKey</span><span class="p">)</span> <span class="nf">Len</span><span class="p">()</span> <span class="kt">int</span>           <span class="p">{</span> <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">a</span> <span class="nx">ByKey</span><span class="p">)</span> <span class="nf">Swap</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">j</span> <span class="kt">int</span><span class="p">)</span>      <span class="p">{</span> <span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">a</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="p">=</span> <span class="nx">a</span><span class="p">[</span><span class="nx">j</span><span class="p">],</span> <span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">a</span> <span class="nx">ByKey</span><span class="p">)</span> <span class="nf">Less</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">j</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">Key</span> <span class="p">&lt;</span> <span class="nx">a</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">Key</span> <span class="p">}</span>
+
+</code></pre></div><h4 id="继续看下mapworker">继续看下mapWorker<a href="#继续看下mapworker" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<blockquote>
+<p>部分可以从示例copy</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">mapWorker</span><span class="p">(</span><span class="nx">mapf</span> <span class="kd">func</span><span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">string</span><span class="p">)</span> <span class="p">[]</span><span class="nx">KeyValue</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">OutWorker</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// 定义中间
+</span><span class="c1"></span>	<span class="nx">intermediate</span> <span class="o">:=</span> <span class="p">[]</span><span class="nx">KeyValue</span><span class="p">{}</span>
+	<span class="nx">file</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nf">Open</span><span class="p">(</span><span class="nx">in</span><span class="p">.</span><span class="nx">Filename</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="c1">//log.Printf(&#34;%s read err : %v\n&#34;, filename, err)
+</span><span class="c1"></span>		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="nx">content</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">ioutil</span><span class="p">.</span><span class="nf">ReadAll</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="c1">//log.Printf(&#34;cannot read %v&#34;, filename)
+</span><span class="c1"></span>		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="nx">file</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+	<span class="nx">kva</span> <span class="o">:=</span> <span class="nf">mapf</span><span class="p">(</span><span class="nx">in</span><span class="p">.</span><span class="nx">Filename</span><span class="p">,</span> <span class="nb">string</span><span class="p">(</span><span class="nx">content</span><span class="p">))</span>
+	<span class="nx">intermediate</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">intermediate</span><span class="p">,</span> <span class="nx">kva</span><span class="o">...</span><span class="p">)</span>
+        <span class="c1">// 以上几乎都来自于mrsequential.go
+</span><span class="c1"></span>
+        <span class="c1">// 这里新建中间文件, 每个map worker可能写入到NReduce个文件中
+</span><span class="c1"></span>	<span class="nx">files</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="o">*</span><span class="nx">os</span><span class="p">.</span><span class="nx">File</span><span class="p">,</span> <span class="nx">in</span><span class="p">.</span><span class="nx">NReduce</span><span class="p">)</span>
+	<span class="nx">encs</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="o">*</span><span class="nx">json</span><span class="p">.</span><span class="nx">Encoder</span><span class="p">,</span> <span class="nx">in</span><span class="p">.</span><span class="nx">NReduce</span><span class="p">)</span>
+	<span class="c1">// 这个mapf函数内不变
+</span><span class="c1"></span>	<span class="nx">mapId</span> <span class="o">:=</span> <span class="nx">strconv</span><span class="p">.</span><span class="nf">Itoa</span><span class="p">(</span><span class="nx">in</span><span class="p">.</span><span class="nx">Token</span><span class="p">)</span>
+	<span class="c1">// 生成临时文件
+</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">in</span><span class="p">.</span><span class="nx">NReduce</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">files</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">_</span> <span class="p">=</span> <span class="nx">ioutil</span><span class="p">.</span><span class="nf">TempFile</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;mr-map-tmp-%s-*&#34;</span><span class="p">,</span> <span class="nx">mapId</span><span class="p">))</span>
+		<span class="nx">encs</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">json</span><span class="p">.</span><span class="nf">NewEncoder</span><span class="p">(</span><span class="nx">files</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span>
+	<span class="p">}</span>
+	<span class="c1">// 写入临时文件
+</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">intermediate</span> <span class="p">{</span>
+		<span class="nx">nr</span> <span class="o">:=</span> <span class="nf">ihash</span><span class="p">(</span><span class="nx">v</span><span class="p">.</span><span class="nx">Key</span><span class="p">)</span> <span class="o">%</span> <span class="nx">in</span><span class="p">.</span><span class="nx">NReduce</span>
+		<span class="nx">_</span> <span class="p">=</span> <span class="nx">encs</span><span class="p">[</span><span class="nx">nr</span><span class="p">].</span><span class="nf">Encode</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">v</span><span class="p">)</span>
+	<span class="p">}</span>
+        <span class="c1">// 把零食文件重命名
+</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">f</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">files</span> <span class="p">{</span>
+		<span class="nx">fName</span> <span class="o">:=</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;mr-%s-%s.txt&#34;</span><span class="p">,</span> <span class="nx">mapId</span><span class="p">,</span> <span class="nx">strconv</span><span class="p">.</span><span class="nf">Itoa</span><span class="p">(</span><span class="nx">i</span><span class="p">))</span>
+		<span class="k">if</span> <span class="nx">f</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">files</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="nx">encs</span><span class="p">))</span>
+		<span class="p">}</span>
+		<span class="nx">os</span><span class="p">.</span><span class="nf">Rename</span><span class="p">(</span><span class="nx">filepath</span><span class="p">.</span><span class="nf">Join</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nf">Name</span><span class="p">()),</span> <span class="nx">fName</span><span class="p">)</span>
+		<span class="nx">files</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nf">Close</span><span class="p">()</span>
+	<span class="p">}</span>
+	<span class="nx">inWorker</span> <span class="o">:=</span> <span class="nx">InWorker</span><span class="p">{</span>
+		<span class="nx">Filename</span><span class="p">:</span> <span class="nx">in</span><span class="p">.</span><span class="nx">Filename</span><span class="p">,</span>
+		<span class="nx">Step</span><span class="p">:</span>     <span class="nx">step1</span><span class="p">,</span>
+		<span class="nx">Token</span><span class="p">:</span>    <span class="nx">in</span><span class="p">.</span><span class="nx">Token</span><span class="p">,</span>
+	<span class="p">}</span>
+        <span class="c1">// 调用rpc方法
+</span><span class="c1"></span>	<span class="nf">call</span><span class="p">(</span><span class="s">&#34;Coordinator.SetMapDoneOne&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">inWorker</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">OutWorker</span><span class="p">{})</span>
+<span class="p">}</span>
+</code></pre></div><h4 id="再来看下">再来看下<a href="#再来看下" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="kd">func</span> <span class="nf">reduceWorker</span><span class="p">(</span><span class="nx">reducef</span> <span class="kd">func</span><span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">OutWorker</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">// 这个reducef函数内不变, 比如当前reduce worker的token是0
+</span><span class="c1"></span>        <span class="c1">// 那么后续我会把所有mr-X-0.txt的文件的数据聚合
+</span><span class="c1"></span>	<span class="nx">reduceId</span> <span class="o">:=</span> <span class="nx">strconv</span><span class="p">.</span><span class="nf">Itoa</span><span class="p">(</span><span class="nx">in</span><span class="p">.</span><span class="nx">Token</span><span class="p">)</span>
+	<span class="kd">var</span> <span class="nx">kvs</span> <span class="p">[]</span><span class="nx">KeyValue</span>
+	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">in</span><span class="p">.</span><span class="nx">NReduce</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">mapId</span> <span class="o">:=</span> <span class="nx">strconv</span><span class="p">.</span><span class="nf">Itoa</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span>
+		<span class="nx">fName</span> <span class="o">:=</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;mr-%s-%s.txt&#34;</span><span class="p">,</span> <span class="nx">mapId</span><span class="p">,</span> <span class="nx">reduceId</span><span class="p">)</span>
+		<span class="nx">file</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nf">Open</span><span class="p">(</span><span class="nx">fName</span><span class="p">)</span>
+                <span class="c1">// 这里同样通过json读取
+</span><span class="c1"></span>		<span class="nx">dec</span> <span class="o">:=</span> <span class="nx">json</span><span class="p">.</span><span class="nf">NewDecoder</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span>
+		<span class="k">for</span> <span class="p">{</span>
+			<span class="kd">var</span> <span class="nx">kv</span> <span class="nx">KeyValue</span>
+			<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">dec</span><span class="p">.</span><span class="nf">Decode</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">kv</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+				<span class="k">break</span>
+			<span class="p">}</span>
+			<span class="nx">kvs</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">kvs</span><span class="p">,</span> <span class="nx">kv</span><span class="p">)</span>
+		<span class="p">}</span>
+		<span class="nx">_</span> <span class="p">=</span> <span class="nx">file</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+	<span class="p">}</span>
+
+	<span class="c1">// 排序
+</span><span class="c1"></span>	<span class="nx">sort</span><span class="p">.</span><span class="nf">Sort</span><span class="p">(</span><span class="nf">ByKey</span><span class="p">(</span><span class="nx">kvs</span><span class="p">))</span>
+	<span class="c1">// 写入到 mr-out-Y.txt文件中
+</span><span class="c1"></span>        <span class="c1">// 同样是通过临时文件的方式, 而不是create
+</span><span class="c1"></span>	<span class="nx">oFile</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">ioutil</span><span class="p">.</span><span class="nf">TempFile</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;mr-reduce-tmp-%s-*&#34;</span><span class="p">,</span> <span class="nx">reduceId</span><span class="p">))</span>
+	<span class="c1">//oFile, err := os.Create(fmt.Sprintf(&#34;mr-out-%s.txt&#34;, reduceId))
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;[reduceWorker] os.Create error : %v\n&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span>
+	<span class="k">for</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">kvs</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">j</span> <span class="o">:=</span> <span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span>
+		<span class="c1">// 因为是有序的, 所以我们期望找到相同的key一次性处理
+</span><span class="c1"></span>		<span class="k">for</span> <span class="nx">j</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">kvs</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">kvs</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">Key</span> <span class="o">==</span> <span class="nx">kvs</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">Key</span> <span class="p">{</span>
+			<span class="nx">j</span><span class="o">++</span>
+		<span class="p">}</span>
+		<span class="nx">values</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{}</span>
+		<span class="c1">// 把所有相同的key的value聚合, 这里value都是字符串&#34;1&#34;
+</span><span class="c1"></span>		<span class="k">for</span> <span class="nx">k</span> <span class="o">:=</span> <span class="nx">i</span><span class="p">;</span> <span class="nx">k</span> <span class="p">&lt;</span> <span class="nx">j</span><span class="p">;</span> <span class="nx">k</span><span class="o">++</span> <span class="p">{</span>
+			<span class="nx">values</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">values</span><span class="p">,</span> <span class="nx">kvs</span><span class="p">[</span><span class="nx">k</span><span class="p">].</span><span class="nx">Value</span><span class="p">)</span>
+		<span class="p">}</span>
+		<span class="c1">// reducef 直接结算values的长度即可
+</span><span class="c1"></span>		<span class="nx">output</span> <span class="o">:=</span> <span class="nf">reducef</span><span class="p">(</span><span class="nx">kvs</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">Key</span><span class="p">,</span> <span class="nx">values</span><span class="p">)</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Fprintf</span><span class="p">(</span><span class="nx">oFile</span><span class="p">,</span> <span class="s">&#34;%v %v\n&#34;</span><span class="p">,</span> <span class="nx">kvs</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">Key</span><span class="p">,</span> <span class="nx">output</span><span class="p">)</span>
+		<span class="nx">i</span> <span class="p">=</span> <span class="nx">j</span>
+	<span class="p">}</span>
+	<span class="nx">os</span><span class="p">.</span><span class="nf">Rename</span><span class="p">(</span><span class="nx">oFile</span><span class="p">.</span><span class="nf">Name</span><span class="p">(),</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;mr-out-%s.txt&#34;</span><span class="p">,</span> <span class="nx">reduceId</span><span class="p">))</span>
+	<span class="nx">oFile</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+	<span class="c1">// 通知coordinator 完成reduce
+</span><span class="c1"></span>	<span class="nx">inWorker</span> <span class="o">:=</span> <span class="nx">InWorker</span><span class="p">{</span>
+		<span class="nx">Step</span><span class="p">:</span>  <span class="nx">step2</span><span class="p">,</span>
+		<span class="nx">Token</span><span class="p">:</span> <span class="nx">in</span><span class="p">.</span><span class="nx">Token</span><span class="p">,</span>
+	<span class="p">}</span>
+	<span class="nf">call</span><span class="p">(</span><span class="s">&#34;Coordinator.SetReduceDoneOne&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">inWorker</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">OutWorker</span><span class="p">{})</span>
+
+<span class="p">}</span>
+
+</code></pre></div><h4 id="最后一个wait方法">最后一个wait方法<a href="#最后一个wait方法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">wait</span><span class="p">(</span><span class="nx">rpcname</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">step</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">stepDone</span> <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="p">{</span>
+		<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nf">call</span><span class="p">(</span><span class="nx">rpcname</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">InWorker</span><span class="p">{</span><span class="nx">Step</span><span class="p">:</span> <span class="nx">step</span><span class="p">},</span> <span class="o">&amp;</span><span class="nx">OutWorker</span><span class="p">{})</span> <span class="p">{</span>
+			<span class="k">break</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="nx">stepDone</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
+<span class="p">}</span>
+</code></pre></div><blockquote>
+<p>以上worker.go的代码也都介绍完了</p>
+</blockquote>
+<h3 id="总结">总结<a href="#总结" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="mf">1.</span> <span class="nx">需要注意一些锁的问题</span><span class="p">,</span><span class="nx">在正确的位置释放锁</span> <span class="p">,</span> <span class="nx">否则可能导致死锁</span>
+<span class="mf">2.</span> <span class="nx">通过队列来分配任务是比较好用的一种方式</span>
+<span class="mf">3.</span> <span class="nx">对于写文件通过临时文件是比较好的方式</span><span class="p">,</span> <span class="nx">反之crash的任务但是创建了mr</span><span class="o">-</span><span class="nx">out</span><span class="p">,</span><span class="nx">同时ioutil</span><span class="p">.</span><span class="nx">TempFile的dir是必须存在的</span><span class="p">,</span> <span class="nx">如果不存在会报错</span><span class="p">,</span> <span class="nx">由于我这里忽略了错误</span><span class="p">,</span><span class="nx">导致一开始有点问题</span>
+</code></pre></div>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/golang">golang</a></span><span class="tag"><a href="https://www.ngirl.xyz/tags/6.824">6.824</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1883 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2022-03-04 13:55 &#43;0800</p>
+			</footer>
+		</article>
+		<aside id="toc" class="show-toc">
+			<div class="toc-title">→Go学习 6←</div>
+			<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#相关知识点了解">相关知识点了解</a></li>
+        <li><a href="#代码逻辑">代码逻辑</a></li>
+        <li><a href="#服务端的代码">服务端的代码</a></li>
+        <li><a href="#客户端的代码">客户端的代码</a></li>
+        <li><a href="#总结">总结</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+		</aside>
+		<div class="post-nav thin">
+			<a class="prev-post" href="https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-%E4%BB%A4%E7%89%8C%E6%A1%B6/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Go学习 令牌桶</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2022 <a href="https://www.ngirl.xyz">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://www.ngirl.xyz/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://www.ngirl.xyz/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-180942795-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

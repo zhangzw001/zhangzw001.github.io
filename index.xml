@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 10 Dec 2021 15:32:16 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 04 Mar 2022 13:55:22 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>linux遇到一些问题统计</title>
       <link>https://www.ngirl.xyz/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
@@ -30,6 +30,16 @@
   1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
   deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
  # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从`hub.</description>
+    </item>
+    
+    <item>
+      <title>Go学习 6</title>
+      <link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab1-mapreduce/</link>
+      <pubDate>Fri, 04 Mar 2022 13:55:22 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab1-mapreduce/</guid>
+      <description>相关知识点了解 课程翻译内容  mit6.824课程 中文翻译 文字版 mit6.824课程 2021 lab1-MapReduce实验翻译   了解以上内容之后, 对MapReduce概念上 和lab1实验的内容有了大概的了解了
+ 代码逻辑 简单的流程分析 通过lab1实验内容的了解, 我们知道 我们需要实现的内容是 src/mr/目录的三个文件coordinator.go, rpc.go, worker.go coordinator.go 主要是服务端, 实现任务调度功能(master) worker.go 主要是客户端, 实现任务执行功能(node) rpc.go 主要是rpc端, 实现一些rpc数据传输的结构体 晚上代码的编写之后,我们可以首先测试wc.go的功能 cd 6.824/src/main # 在当前目录生成wc.so文件(之后测试rtiming.go, crash.go同样) go build -race -buildmode=plugin ../mrapps/wc.go # 启动服务端 go run -race mrcoordinator.go pg-*.txt # 启动客户端 go run -race mrworker.go wc.so # 完整之后, 客户端和服务端都会退出, 当前目录生成如下文件: # 其中 mr-X-Y.txt 是map 函数生成的中间文件 NMap * NReduce个 # 其中 mr-out-Y.</description>
     </item>
     
     <item>
@@ -57,7 +67,10 @@
       <pubDate>Wed, 08 Dec 2021 16:04:39 +0800</pubDate>
       
       <guid>https://www.ngirl.xyz/k8s/k8s%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-client-go%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/</guid>
-      <description>我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试 那我们这里的重试间隔时间是如何控制的呢? 下面我们去了解一下 从 controller 找到 deployment 初始化方法看一下
+      <description>我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试
+那我们这里的重试间隔时间是如何控制的呢?
+下面我们去了解一下
+从 controller 找到 deployment 初始化方法看一下
  1 deployment 初始化  k8s的大多组件代码格式结构是类似的
  1. cmd/kube-controller-manager/controller-manager.go main() -&amp;gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&amp;gt; Run(...) -&amp;gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&amp;#34;deployment&amp;#34;] = startDeploymentController } 3. cmd/kube-controller-manager/app/apps.go startDeploymentController(...) (...) { dc, err := deployment.NewDeploymentController(...) go dc.Run(int(ctx.ComponentConfig.DeploymentController.ConcurrentDeploymentSyncs), ctx.Stop) } 3.1 pkg/controller/deployment/deployment_controller.go -&amp;gt; NewDeploymentController(...) (...) { dc := &amp;amp;DeploymentController{ queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), &amp;#34;deployment&amp;#34;), } } -&amp;gt; NewNamedRateLimitingQueue(.</description>
     </item>
@@ -96,15 +109,6 @@
       
       <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
       <description>根据以下代码我们逐个看下channel的实现 package main /* $ go tool compile -S channel源码分析.go|grep runtime|grep chan|grep -v &amp;#34;print&amp;#34; 0x003a 00058 (channel源码分析.go:32)	CALL	runtime.newobject(SB) 0x0060 00096 (channel源码分析.go:32)	CALL	runtime.makechan(SB) 0x006a 00106 (channel源码分析.go:32)	CMPL	runtime.writeBarrier(SB), $0 0x0097 00151 (channel源码分析.go:34)	CALL	runtime.newproc(SB) 0x00b1 00177 (channel源码分析.go:40)	CALL	runtime.chanrecv1(SB) 0x00cb 00203 (channel源码分析.go:42)	CALL	runtime.chanrecv2(SB) 0x0100 00256 (channel源码分析.go:44)	CALL	runtime.chanrecv2(SB) 0x0120 00288 (channel源码分析.go:47)	CALL	runtime.makechan(SB) 0x012a 00298 (channel源码分析.go:47)	CMPL	runtime.writeBarrier(SB), $0 0x01eb 00491 (channel源码分析.go:50)	CALL	runtime.selectgo(SB) 0x02c0 00704 (channel源码分析.go:47)	CALL	runtime.</description>
-    </item>
-    
-    <item>
-      <title>Go算法学习 链表 设计链表</title>
-      <link>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E9%93%BE%E8%A1%A8-%E8%AE%BE%E8%AE%A1%E9%93%BE%E8%A1%A8/</link>
-      <pubDate>Fri, 16 Jul 2021 14:07:27 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/go%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0-%E9%93%BE%E8%A1%A8-%E8%AE%BE%E8%AE%A1%E9%93%BE%E8%A1%A8/</guid>
-      <description>show me the code package main import ( &amp;#34;fmt&amp;#34; ) // https://leetcode-cn.com/problems/design-linked-list/  type MyLinkedList struct { Len int // 判断索引是否有效 	Dummy *Node // 伪头, 第-1号索引, .Next 才是 MyLinkedList的第0号索引的内容 } type Node struct { Val int // value 	Next *Node // 链 } // Constructor Initialize your data structure here. func Constructor() MyLinkedList { return MyLinkedList{ Len: 0, // 不包括伪头, 所以是0 	Dummy: &amp;amp;Node{}, // 初始化伪头 	} } // Get the value of the index-th node in the linked list.</description>
     </item>
     
   </channel>

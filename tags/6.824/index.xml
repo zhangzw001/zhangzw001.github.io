@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>6.824 on zhangzw</title>
+    <link>https://www.ngirl.xyz/tags/6.824/</link>
+    <description>Recent content in 6.824 on zhangzw</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Fri, 04 Mar 2022 13:55:22 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/tags/6.824/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go学习 6</title>
+      <link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab1-mapreduce/</link>
+      <pubDate>Fri, 04 Mar 2022 13:55:22 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab1-mapreduce/</guid>
+      <description>相关知识点了解 课程翻译内容  mit6.824课程 中文翻译 文字版 mit6.824课程 2021 lab1-MapReduce实验翻译   了解以上内容之后, 对MapReduce概念上 和lab1实验的内容有了大概的了解了
+ 代码逻辑 简单的流程分析 通过lab1实验内容的了解, 我们知道 我们需要实现的内容是 src/mr/目录的三个文件coordinator.go, rpc.go, worker.go coordinator.go 主要是服务端, 实现任务调度功能(master) worker.go 主要是客户端, 实现任务执行功能(node) rpc.go 主要是rpc端, 实现一些rpc数据传输的结构体 晚上代码的编写之后,我们可以首先测试wc.go的功能 cd 6.824/src/main # 在当前目录生成wc.so文件(之后测试rtiming.go, crash.go同样) go build -race -buildmode=plugin ../mrapps/wc.go # 启动服务端 go run -race mrcoordinator.go pg-*.txt # 启动客户端 go run -race mrworker.go wc.so # 完整之后, 客户端和服务端都会退出, 当前目录生成如下文件: # 其中 mr-X-Y.txt 是map 函数生成的中间文件 NMap * NReduce个 # 其中 mr-out-Y.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -8,18 +8,24 @@
 	<meta name="theme-color" content="#494f5c">
 	<meta name="msapplication-TileColor" content="#494f5c">
 <meta itemprop="name" content="K8s源码学习 client-go延迟队列">
-<meta itemprop="description" content="我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试 那我们这里的重试间隔时间是如何控制的呢? 下面我们去了解一下 从 controller 找到 deployment 初始化方法看一下
+<meta itemprop="description" content="我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试
+那我们这里的重试间隔时间是如何控制的呢?
+下面我们去了解一下
+从 controller 找到 deployment 初始化方法看一下
  1 deployment 初始化  k8s的大多组件代码格式结构是类似的
  1. cmd/kube-controller-manager/controller-manager.go main() -&gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&gt; Run(...) -&gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&#34;deployment&#34;] = startDeploymentController } 3. cmd/kube-controller-manager/app/apps.go startDeploymentController(...) (...) { dc, err := deployment.NewDeploymentController(...) go dc.Run(int(ctx.ComponentConfig.DeploymentController.ConcurrentDeploymentSyncs), ctx.Stop) } 3.1 pkg/controller/deployment/deployment_controller.go -&gt; NewDeploymentController(...) (...) { dc := &amp;DeploymentController{ queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), &#34;deployment&#34;), } } -&gt; NewNamedRateLimitingQueue(.">
 <meta itemprop="datePublished" content="2021-12-08T16:04:39+08:00" />
 <meta itemprop="dateModified" content="2021-12-08T16:04:39+08:00" />
-<meta itemprop="wordCount" content="1576">
+<meta itemprop="wordCount" content="1575">
 
 
 
 <meta itemprop="keywords" content="k8s," />
 <meta property="og:title" content="K8s源码学习 client-go延迟队列" />
-<meta property="og:description" content="我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试 那我们这里的重试间隔时间是如何控制的呢? 下面我们去了解一下 从 controller 找到 deployment 初始化方法看一下
+<meta property="og:description" content="我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试
+那我们这里的重试间隔时间是如何控制的呢?
+下面我们去了解一下
+从 controller 找到 deployment 初始化方法看一下
  1 deployment 初始化  k8s的大多组件代码格式结构是类似的
  1. cmd/kube-controller-manager/controller-manager.go main() -&gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&gt; Run(...) -&gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&#34;deployment&#34;] = startDeploymentController } 3. cmd/kube-controller-manager/app/apps.go startDeploymentController(...) (...) { dc, err := deployment.NewDeploymentController(...) go dc.Run(int(ctx.ComponentConfig.DeploymentController.ConcurrentDeploymentSyncs), ctx.Stop) } 3.1 pkg/controller/deployment/deployment_controller.go -&gt; NewDeploymentController(...) (...) { dc := &amp;DeploymentController{ queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), &#34;deployment&#34;), } } -&gt; NewNamedRateLimitingQueue(." />
 <meta property="og:type" content="article" />
@@ -28,7 +34,10 @@
 <meta property="article:modified_time" content="2021-12-08T16:04:39+08:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="K8s源码学习 client-go延迟队列"/>
-<meta name="twitter:description" content="我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试 那我们这里的重试间隔时间是如何控制的呢? 下面我们去了解一下 从 controller 找到 deployment 初始化方法看一下
+<meta name="twitter:description" content="我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试
+那我们这里的重试间隔时间是如何控制的呢?
+下面我们去了解一下
+从 controller 找到 deployment 初始化方法看一下
  1 deployment 初始化  k8s的大多组件代码格式结构是类似的
  1. cmd/kube-controller-manager/controller-manager.go main() -&gt; app.NewControllerManagerCommand() 2. cmd/kube-controller-manager/app/controllermanager.go NewControllerManagerCommand() *cobra.Command -&gt; Run(...) -&gt; NewControllerInitializers(...) map[string]InitFunc // 这里返回控制器的map,后续会对他遍历执行InitFunc  { controllers[&#34;deployment&#34;] = startDeploymentController } 3. cmd/kube-controller-manager/app/apps.go startDeploymentController(...) (...) { dc, err := deployment.NewDeploymentController(...) go dc.Run(int(ctx.ComponentConfig.DeploymentController.ConcurrentDeploymentSyncs), ctx.Stop) } 3.1 pkg/controller/deployment/deployment_controller.go -&gt; NewDeploymentController(...) (...) { dc := &amp;DeploymentController{ queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), &#34;deployment&#34;), } } -&gt; NewNamedRateLimitingQueue(."/>
 
@@ -81,10 +90,10 @@
 			</header>
 			<div class="content">
 				<blockquote>
-<p>我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试
-那我们这里的重试间隔时间是如何控制的呢?
-下面我们去了解一下
-从 controller 找到 deployment 初始化方法看一下</p>
+<p>我们知道在部署 pod的时候, 如果失败了, pod会不断的重试, 重试的时间间隔也是不一样的, 重试到一定次数就不在重试</p>
+<p>那我们这里的重试间隔时间是如何控制的呢?</p>
+<p>下面我们去了解一下</p>
+<p>从 controller 找到 deployment 初始化方法看一下</p>
 </blockquote>
 <h2 id="1-deployment-初始化">1 deployment 初始化<a href="#1-deployment-初始化" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 <blockquote>
@@ -344,7 +353,7 @@
 </span><span class="c1"></span>                <span class="c1">// 当然如果没有元素, 这里就是never, 会被pass
 </span><span class="c1"></span>		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">nextReadyAt</span><span class="p">:</span>
 			<span class="c1">// continue the loop, which will add ready items
-</span><span class="c1"></span>                <span class="c1">// waitingForAddCh channel 有写入, 一般在Affter函数中
+</span><span class="c1"></span>                <span class="c1">// waitingForAddCh channel 有写入, 一般在After函数中
 </span><span class="c1"></span>		<span class="k">case</span> <span class="nx">waitEntry</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">q</span><span class="p">.</span><span class="nx">waitingForAddCh</span><span class="p">:</span>
                         <span class="c1">// 同样比较一个 waitEntry.readyAt 是否 大于 当前时间戳
 </span><span class="c1"></span>			<span class="k">if</span> <span class="nx">waitEntry</span><span class="p">.</span><span class="nx">readyAt</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">q</span><span class="p">.</span><span class="nx">clock</span><span class="p">.</span><span class="nf">Now</span><span class="p">())</span> <span class="p">{</span>
@@ -385,8 +394,7 @@
 </blockquote>
 <h3 id="22-sync方法">2.2 sync方法<a href="#22-sync方法" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <blockquote>
-<p>我们省略了其他初始化工作
-syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
+<p>syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 </blockquote>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">NewDeploymentController</span><span class="p">(</span><span class="nx">dInformer</span> <span class="nx">appsinformers</span><span class="p">.</span><span class="nx">DeploymentInformer</span><span class="p">,</span> <span class="nx">rsInformer</span> <span class="nx">appsinformers</span><span class="p">.</span><span class="nx">ReplicaSetInformer</span><span class="p">,</span> <span class="nx">podInformer</span> <span class="nx">coreinformers</span><span class="p">.</span><span class="nx">PodInformer</span><span class="p">,</span> <span class="nx">client</span> <span class="nx">clientset</span><span class="p">.</span><span class="nx">Interface</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">DeploymentController</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
         <span class="o">...</span>
@@ -704,7 +712,7 @@ syncHandler 是在什么时候执行的呢? 我们后面会见到</p>
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/k8s">k8s</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1576 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1575 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2021-12-08 16:04 &#43;0800</p>
 			</footer>
 		</article>
