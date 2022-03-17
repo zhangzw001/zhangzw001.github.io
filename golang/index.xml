@@ -6,8 +6,322 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>zh-hans</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Fri, 04 Mar 2022 13:55:22 +0800</lastBuildDate>
+		<lastBuildDate>Mon, 07 Mar 2022 17:58:09 +0800</lastBuildDate>
 		<atom:link href="https://www.ngirl.xyz/golang/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Go学习 6.824 lab2 raft2A</title>
+			<link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab2-raft2a/</link>
+			<pubDate>Mon, 07 Mar 2022 17:58:09 +0800</pubDate>
+			
+			<guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab2-raft2a/</guid>
+			<description>文档  Raft-Extended 论文翻译  实现 Raft Leader选举和心跳检测 首先对Raft-Extended的相关几点做个说明 1. raft集群在 ticker 超时 后进行选举, 节点未收到心跳检测就会发起选举 2. 选举的节点会存在几种状态切换 follower -&amp;gt; candidate : 开始选举的时候 candidate -&amp;gt; leader : 选举成功的时候 candidate -&amp;gt; follower : 选举失败的时候 leader -&amp;gt; follower : 旧的过期节点 对于 candidate -&amp;gt; candidate的情况, 这里是被分解成 candidate -&amp;gt; follower -&amp;gt; candidate 3. raft节点会在延迟不同的时间后 在切换成 candidate, 防止多节点同时切换 4. raft节点在成为 candidate 后, 会并发向每个节点发一次 RequestVote 来进行投票, 然后等到有半数同意就成为leader 并启动goroutine 进行持续心跳检测(AppendEntries RPC), 如果没有人同意那么就没人成为leader会等到下次超时发起新的选举 在成为leader之前, raft节点同样可能收到别的 旧leader发来的AppendEntries RPC, 所以在 AppendEntries RPC 方法里面,我们需要如下判断: i) 如果收到的任期号小于当前任期号, 那么直接拒绝忽略 ii) 如果收到的任期号大于等于那就做如下修改: 把自己的状态改为 follower, 记录候选人id, 领导人id , 修改自己的当前任期号 和已提交任期号 代码部分 raft结构体中的Log type Raft struct { .</description>
+			<content type="html"><![CDATA[<h3 id="文档">文档</h3>
+<ul>
+<li><a href="https://blog.csdn.net/Hedon954/article/details/119186225">Raft-Extended 论文翻译</a></li>
+</ul>
+<h3 id="实现-raft-leader选举和心跳检测">实现 Raft Leader选举和心跳检测</h3>
+<h4 id="首先对raft-extended的相关几点做个说明">首先对Raft-Extended的相关几点做个说明</h4>
+<pre><code>1. raft集群在 ticker 超时 后进行选举, 节点未收到心跳检测就会发起选举
+2. 选举的节点会存在几种状态切换
+    follower  -&gt; candidate : 开始选举的时候
+    candidate -&gt; leader    : 选举成功的时候
+    candidate -&gt; follower  : 选举失败的时候
+    leader    -&gt; follower  : 旧的过期节点
+    对于 candidate -&gt; candidate的情况, 这里是被分解成 candidate -&gt; follower -&gt; candidate
+3. raft节点会在延迟不同的时间后 在切换成 candidate, 防止多节点同时切换
+4. raft节点在成为 candidate 后, 会并发向每个节点发一次 RequestVote 来进行投票, 然后等到有半数同意就成为leader 并启动goroutine 进行持续心跳检测(AppendEntries RPC), 如果没有人同意那么就没人成为leader会等到下次超时发起新的选举
+    在成为leader之前, raft节点同样可能收到别的 旧leader发来的AppendEntries RPC, 所以在 AppendEntries RPC 方法里面,我们需要如下判断:
+    i) 如果收到的任期号小于当前任期号, 那么直接拒绝忽略
+    ii) 如果收到的任期号大于等于那就做如下修改:
+       把自己的状态改为 follower, 记录候选人id, 领导人id , 修改自己的当前任期号 和已提交任期号
+
+</code></pre><h3 id="代码部分">代码部分</h3>
+<h4 id="raft结构体中的log">raft结构体中的Log</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Raft</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="o">...</span>
+	<span class="nx">log</span> <span class="o">*</span><span class="nx">Log</span>
+<span class="p">}</span>
+<span class="kd">type</span> <span class="nx">Log</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">mu</span>	 <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
+	<span class="nx">leaderID</span>   <span class="kt">int</span>	   <span class="c1">// leaderID, 表示当前集群已经选举完成
+</span><span class="c1"></span>	<span class="nx">votedFor</span>   <span class="kt">int</span>	   <span class="c1">// 当前获得选票的候选人id, -1表示没有人获得选票, 用于一个节点值会给一个候选人投票
+</span><span class="c1"></span>	<span class="nx">role</span>       <span class="kt">int</span>	   <span class="c1">// 节点处在什么角色, follower,candidate,leader
+</span><span class="c1"></span>	<span class="nx">currTerm</span>   <span class="kt">int</span>	   <span class="c1">// 当前任期号
+</span><span class="c1"></span>	<span class="nx">eleRelay</span>   <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="c1">// 选举定时器
+</span><span class="c1"></span>	<span class="nx">ticker</span>     <span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Ticker</span>
+	<span class="nx">isElect</span>    <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="p">(</span>
+	<span class="nx">r</span>	   <span class="p">=</span> <span class="nf">newRand</span><span class="p">()</span>
+	<span class="nx">newDalyFunc</span> <span class="p">=</span> <span class="kd">func</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">vari</span> <span class="kt">int</span><span class="p">)</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Duration</span><span class="p">(</span><span class="nx">i</span><span class="o">+</span><span class="nx">r</span><span class="p">.</span><span class="nf">Intn</span><span class="p">(</span><span class="nx">vari</span><span class="p">))</span>
+	<span class="p">}</span>
+<span class="p">)</span>
+</code></pre></div><h4 id="make-方法">make 方法</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="kd">func</span> <span class="nf">Make</span><span class="p">(</span><span class="nx">peers</span> <span class="p">[]</span><span class="o">*</span><span class="nx">labrpc</span><span class="p">.</span><span class="nx">ClientEnd</span><span class="p">,</span> <span class="nx">me</span> <span class="kt">int</span><span class="p">,</span>
+	<span class="nx">persister</span> <span class="o">*</span><span class="nx">Persister</span><span class="p">,</span> <span class="nx">applyCh</span> <span class="kd">chan</span> <span class="nx">ApplyMsg</span><span class="p">)</span> <span class="o">*</span><span class="nx">Raft</span> <span class="p">{</span>
+	<span class="o">...</span>
+	<span class="c1">// Your initialization code here (2A, 2B, 2C).
+</span><span class="c1"></span>	<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">Log</span><span class="p">{</span>
+		<span class="nx">ticker</span><span class="p">:</span>   <span class="nx">time</span><span class="p">.</span><span class="nf">NewTicker</span><span class="p">(</span><span class="nf">newDalyFunc</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">)),</span>
+		<span class="nx">isElect</span><span class="p">:</span>  <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}),</span>
+		<span class="nx">eleRelay</span><span class="p">:</span> <span class="nf">newDalyFunc</span><span class="p">(</span><span class="mi">150</span><span class="p">,</span> <span class="mi">150</span><span class="p">),</span>
+		<span class="nx">votedFor</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+	<span class="p">}</span>
+	<span class="c1">// 选举的随机时间
+</span><span class="c1"></span>	<span class="k">go</span> <span class="nx">rf</span><span class="p">.</span><span class="nf">Election</span><span class="p">()</span>
+
+	<span class="o">...</span>
+<span class="p">}</span>
+</code></pre></div><h4 id="选举主进程-election">选举主进程 Election</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">rf</span> <span class="o">*</span><span class="nx">Raft</span><span class="p">)</span> <span class="nf">Election</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="p">{</span>
+		<span class="k">select</span> <span class="p">{</span>
+		<span class="c1">// 收到选举的请求
+</span><span class="c1"></span>		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">isElect</span><span class="p">:</span>
+			<span class="c1">// 开始选举
+</span><span class="c1"></span>			<span class="k">go</span> <span class="nx">rf</span><span class="p">.</span><span class="nf">startElect</span><span class="p">()</span>
+		<span class="c1">// 定时器超时, 没有收到心跳检测
+</span><span class="c1"></span>		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">ticker</span><span class="p">.</span><span class="nx">C</span><span class="p">:</span>
+			<span class="c1">// 需要选举
+</span><span class="c1"></span>			<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+				<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">isElect</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
+			<span class="p">}()</span>
+		<span class="k">default</span><span class="p">:</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h4 id="选举方法">选举方法</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">rf</span> <span class="o">*</span><span class="nx">Raft</span><span class="p">)</span> <span class="nf">startElect</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c1">// 发送投票 并提交
+</span><span class="c1"></span>	<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+	<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">ticker</span><span class="p">.</span><span class="nf">Stop</span><span class="p">()</span>
+	<span class="c1">// 并且设置所有 votedFor 都为-1
+</span><span class="c1"></span>	<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nf">convRole</span><span class="p">(</span><span class="nx">follower</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">currTerm</span><span class="p">)</span>
+	<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">leaderID</span> <span class="p">=</span> <span class="o">-</span><span class="mi">1</span>
+	<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">eleRelay</span> <span class="p">=</span> <span class="nf">newDalyFunc</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+	<span class="nx">currTerm</span> <span class="o">:=</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">currTerm</span>
+	<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+	<span class="c1">// 发送投票 并提交
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">role</span> <span class="o">==</span> <span class="nx">follower</span> <span class="p">{</span>
+		<span class="c1">// 新的任期号
+</span><span class="c1"></span>		<span class="nx">nextTerm</span> <span class="o">:=</span> <span class="nx">currTerm</span> <span class="o">+</span> <span class="mi">1</span>
+		<span class="c1">// 进行随机的延迟
+</span><span class="c1"></span>		<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">eleRelay</span><span class="p">)</span>
+
+		<span class="c1">// 多节点可能同时想要成为 candidate, leaderID如果不等于-1, 可能已经完成了选举, 选举随机时间慢的节点就不用在去选举了
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">leaderID</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="p">{</span>
+			<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+			<span class="c1">// 成为候选人
+</span><span class="c1"></span>			<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nf">convRole</span><span class="p">(</span><span class="nx">candidate</span><span class="p">,</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">me</span><span class="p">,</span> <span class="nx">nextTerm</span><span class="p">)</span>
+			<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+
+			<span class="kd">var</span> <span class="nx">agrees</span> <span class="kt">int32</span> <span class="p">=</span> <span class="mi">1</span>
+			<span class="nx">wg</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span><span class="p">{}</span>
+
+			<span class="k">for</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">peers</span> <span class="p">{</span>
+				<span class="k">if</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">me</span> <span class="o">==</span> <span class="nx">id</span> <span class="p">{</span>
+					<span class="k">continue</span>
+				<span class="p">}</span>
+				<span class="c1">// 并发发送
+</span><span class="c1"></span>				<span class="nx">wg</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+				<span class="k">go</span> <span class="kd">func</span><span class="p">(</span><span class="nx">id</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+					<span class="k">defer</span> <span class="nx">wg</span><span class="p">.</span><span class="nf">Done</span><span class="p">()</span>
+					<span class="nx">args</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">RequestVoteArgs</span><span class="p">{</span><span class="nx">Xterm</span><span class="p">:</span> <span class="nx">nextTerm</span><span class="p">,</span> <span class="nx">CandidateId</span><span class="p">:</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">me</span><span class="p">,</span> <span class="nx">LastLogTerm</span><span class="p">:</span> <span class="nx">currTerm</span><span class="p">}</span>
+					<span class="nx">reply</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">RequestVoteReply</span><span class="p">{}</span>
+					<span class="c1">// rpc请求投票, 同时告知其他人 自己是候选人
+</span><span class="c1"></span>					<span class="k">if</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">rf</span><span class="p">.</span><span class="nf">sendRequestVote</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">args</span><span class="p">,</span> <span class="nx">reply</span><span class="p">);</span> <span class="nx">ok</span> <span class="p">{</span>
+						<span class="c1">// 如果节点当前任期号小于其他节点,那么自己不配成为候选人
+</span><span class="c1"></span>						<span class="k">if</span> <span class="nx">reply</span><span class="p">.</span><span class="nx">Term</span> <span class="p">&gt;</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">currTerm</span> <span class="p">{</span>
+							<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+							<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nf">convRole</span><span class="p">(</span><span class="nx">follower</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nx">reply</span><span class="p">.</span><span class="nx">Term</span><span class="p">)</span>
+							<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+							<span class="k">return</span>
+						<span class="p">}</span>
+						<span class="c1">// 如果是赞成票
+</span><span class="c1"></span>						<span class="k">if</span> <span class="nx">reply</span><span class="p">.</span><span class="nx">Ok</span> <span class="p">{</span>
+							<span class="nx">atomic</span><span class="p">.</span><span class="nf">AddInt32</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">agrees</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+							<span class="k">if</span> <span class="nx">agrees</span> <span class="p">&gt;</span> <span class="nb">int32</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">rf</span><span class="p">.</span><span class="nx">peers</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">role</span> <span class="o">==</span> <span class="nx">candidate</span> <span class="p">{</span>
+								<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+								<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nf">convRole</span><span class="p">(</span><span class="nx">leader</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+								<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+								<span class="c1">// 心跳
+</span><span class="c1"></span>								<span class="k">go</span> <span class="nx">rf</span><span class="p">.</span><span class="nf">HeartBeat</span><span class="p">()</span>
+							<span class="p">}</span>
+						<span class="p">}</span>
+					<span class="p">}</span>
+				<span class="p">}(</span><span class="nx">id</span><span class="p">)</span>
+			<span class="p">}</span>
+			<span class="c1">// 可能没有选出来leader
+</span><span class="c1"></span>			<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+				<span class="nx">wg</span><span class="p">.</span><span class="nf">Wait</span><span class="p">()</span>
+				<span class="k">if</span> <span class="nx">agrees</span> <span class="o">&lt;=</span> <span class="nb">int32</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">rf</span><span class="p">.</span><span class="nx">peers</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+					<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+					<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nf">convRole</span><span class="p">(</span><span class="nx">follower</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">currTerm</span><span class="p">)</span>
+					<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+					<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">ticker</span><span class="p">.</span><span class="nf">Reset</span><span class="p">(</span><span class="nf">newDalyFunc</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+				<span class="p">}</span>
+			<span class="p">}()</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>设置状态</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">Log</span><span class="p">)</span> <span class="nf">setRole</span><span class="p">(</span><span class="nx">role</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">l</span><span class="p">.</span><span class="nx">role</span> <span class="p">=</span> <span class="nx">role</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">Log</span><span class="p">)</span> <span class="nf">setVotedFor</span><span class="p">(</span><span class="nx">votedFor</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">l</span><span class="p">.</span><span class="nx">votedFor</span> <span class="p">=</span> <span class="nx">votedFor</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">Log</span><span class="p">)</span> <span class="nf">setCurrTerm</span><span class="p">(</span><span class="nx">xterm</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">l</span><span class="p">.</span><span class="nx">currTerm</span> <span class="p">=</span> <span class="nx">xterm</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">Log</span><span class="p">)</span> <span class="nf">convRole</span><span class="p">(</span><span class="nx">role</span><span class="p">,</span> <span class="nx">votedFor</span><span class="p">,</span> <span class="nx">xterm</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">switch</span> <span class="nx">role</span> <span class="p">{</span>
+	<span class="c1">// 1. candidate -&gt; follower : 候选人没有获得半数的投票
+</span><span class="c1"></span>	<span class="c1">// 2. leader -&gt; follower : 过期的leader,或者xterm高于currTerm
+</span><span class="c1"></span>	<span class="k">case</span> <span class="nx">follower</span><span class="p">:</span>
+		<span class="nx">l</span><span class="p">.</span><span class="nf">setRole</span><span class="p">(</span><span class="nx">follower</span><span class="p">)</span>
+		<span class="nx">l</span><span class="p">.</span><span class="nf">setVotedFor</span><span class="p">(</span><span class="nx">votedFor</span><span class="p">)</span>
+		<span class="nx">l</span><span class="p">.</span><span class="nf">setCurrTerm</span><span class="p">(</span><span class="nx">xterm</span><span class="p">)</span>
+	<span class="c1">// 1. follower -&gt; candidate : 集群没有leader,或者没收到心跳检测
+</span><span class="c1"></span>	<span class="c1">// 2. candidate -&gt; candidate : 没有选出leader(比如集群数量少于半数)
+</span><span class="c1"></span>	<span class="k">case</span> <span class="nx">candidate</span><span class="p">:</span>
+		<span class="c1">// candidate 需要
+</span><span class="c1"></span>		<span class="nx">l</span><span class="p">.</span><span class="nf">setRole</span><span class="p">(</span><span class="nx">candidate</span><span class="p">)</span>
+		<span class="nx">l</span><span class="p">.</span><span class="nf">setVotedFor</span><span class="p">(</span><span class="nx">votedFor</span><span class="p">)</span>
+		<span class="nx">l</span><span class="p">.</span><span class="nf">setCurrTerm</span><span class="p">(</span><span class="nx">xterm</span><span class="p">)</span>
+	<span class="c1">// 1. candidate -&gt; leader : 得到过半选票
+</span><span class="c1"></span>	<span class="k">case</span> <span class="nx">leader</span><span class="p">:</span>
+		<span class="c1">// leader只需要修改第一个角色即可
+</span><span class="c1"></span>		<span class="nx">l</span><span class="p">.</span><span class="nf">setRole</span><span class="p">(</span><span class="nx">leader</span><span class="p">)</span>
+	<span class="k">default</span><span class="p">:</span>
+		<span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34; 不支持的角色&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>投票的rpc方法 RequestVote</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">rf</span> <span class="o">*</span><span class="nx">Raft</span><span class="p">)</span> <span class="nf">sendRequestVote</span><span class="p">(</span><span class="nx">server</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">args</span> <span class="o">*</span><span class="nx">RequestVoteArgs</span><span class="p">,</span> <span class="nx">reply</span> <span class="o">*</span><span class="nx">RequestVoteReply</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+	<span class="nx">ok</span> <span class="o">:=</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">peers</span><span class="p">[</span><span class="nx">server</span><span class="p">].</span><span class="nf">Call</span><span class="p">(</span><span class="s">&#34;Raft.RequestVote&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">,</span> <span class="nx">reply</span><span class="p">)</span>
+	<span class="k">return</span> <span class="nx">ok</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">rf</span> <span class="o">*</span><span class="nx">Raft</span><span class="p">)</span> <span class="nf">RequestVote</span><span class="p">(</span><span class="nx">args</span> <span class="o">*</span><span class="nx">RequestVoteArgs</span><span class="p">,</span> <span class="nx">reply</span> <span class="o">*</span><span class="nx">RequestVoteReply</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">// Your code here (2A, 2B).
+</span><span class="c1"></span>	<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+	<span class="k">defer</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+	<span class="c1">// 当前rf.me是有可能成为 candidate, 并且同样可能收到投票rpc
+</span><span class="c1"></span>	<span class="nx">reply</span><span class="p">.</span><span class="nx">Term</span> <span class="p">=</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">currTerm</span>
+
+	<span class="c1">// 你当前任期号比我的还小, 你发什么rpc?
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">args</span><span class="p">.</span><span class="nx">LastLogTerm</span> <span class="p">&lt;</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">currTerm</span> <span class="p">{</span>
+		<span class="nx">reply</span><span class="p">.</span><span class="nx">Ok</span> <span class="p">=</span> <span class="kc">false</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="c1">// 以前是leader, 下线了, 重新连上来的时候, 集群中最新的 LastLogTerm 已经比自己的大了
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">args</span><span class="p">.</span><span class="nx">LastLogTerm</span> <span class="p">&gt;</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">currTerm</span> <span class="p">{</span>
+		<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nf">convRole</span><span class="p">(</span><span class="nx">follower</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">LastLogTerm</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="c1">// 等于的情况本身是要判断追加日志长度是否 大于等于,所以这里先直接改为 follower, 否则多个 candidate 拥有相同的 LastLogTerm 就都保持 candidate 角色了, 我们要求只让一个成为 candidate
+</span><span class="c1"></span>	<span class="c1">// 这里暂时还没有 appendEntries 长度, 之后在添加
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">args</span><span class="p">.</span><span class="nx">LastLogTerm</span> <span class="o">==</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">currTerm</span> <span class="p">{</span>
+		<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nf">convRole</span><span class="p">(</span><span class="nx">follower</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">LastLogTerm</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="c1">// 只有没有 候选人id的才有资格投票
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">votedFor</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="p">{</span>
+		<span class="nx">reply</span><span class="p">.</span><span class="nx">Ok</span> <span class="p">=</span> <span class="kc">true</span>
+		<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">votedFor</span> <span class="p">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">CandidateId</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span>
+<span class="p">}</span>
+</code></pre></div><h4 id="leader节点的心跳检测-heartbeat">leader节点的心跳检测 HeartBeat</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">rf</span> <span class="o">*</span><span class="nx">Raft</span><span class="p">)</span> <span class="nf">HeartBeat</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="p">{</span>
+		<span class="c1">// 期间有可能 从leader 变成 follower
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">role</span> <span class="o">!=</span> <span class="nx">leader</span> <span class="p">{</span>
+			<span class="k">return</span>
+		<span class="p">}</span>
+		<span class="k">for</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">peers</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="nx">id</span> <span class="o">==</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">me</span> <span class="p">{</span>
+				<span class="c1">// leader 重置心跳超时定时器, follower 是由心跳检测的rpc重置
+</span><span class="c1"></span>				<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">ticker</span><span class="p">.</span><span class="nf">Reset</span><span class="p">(</span><span class="nf">newDalyFunc</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+				<span class="k">continue</span>
+			<span class="p">}</span>
+			<span class="c1">// 成功了就会重置超时时钟
+</span><span class="c1"></span>			<span class="c1">// 失败了就不管, 等超时时钟触发即可开始选举
+</span><span class="c1"></span>			<span class="k">go</span> <span class="nx">rf</span><span class="p">.</span><span class="nf">heartBeat</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span>
+		<span class="p">}</span>
+		<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nf">newDalyFunc</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+	<span class="p">}</span>
+
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">rf</span> <span class="o">*</span><span class="nx">Raft</span><span class="p">)</span> <span class="nf">heartBeat</span><span class="p">(</span><span class="nx">id</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">id</span> <span class="o">==</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">me</span> <span class="p">{</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="nx">arg</span> <span class="o">:=</span> <span class="nx">RequestVoteArgs</span><span class="p">{</span><span class="nx">Xterm</span><span class="p">:</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">currTerm</span><span class="p">,</span> <span class="nx">CandidateId</span><span class="p">:</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">me</span><span class="p">}</span>
+	<span class="nx">reply</span> <span class="o">:=</span> <span class="nx">RequestVoteReply</span><span class="p">{}</span>
+	<span class="k">if</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">rf</span><span class="p">.</span><span class="nf">sendAppendEntries</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">arg</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">reply</span><span class="p">);</span> <span class="nx">ok</span> <span class="p">{</span>
+		<span class="c1">// 如果 节点返回的任期号更大, 说明我是个 过期的旧leader -&gt; follower
+</span><span class="c1"></span>		<span class="c1">// 如果我是个旧的leader,那集群目前很有可能已经有leader了, 那么我的 votedFor和leaderID也是需要更新, 那我应该在哪更新呢?
+</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">reply</span><span class="p">.</span><span class="nx">Term</span> <span class="p">&gt;</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">currTerm</span> <span class="p">{</span>
+			<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+			<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nf">convRole</span><span class="p">(</span><span class="nx">follower</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nx">reply</span><span class="p">.</span><span class="nx">Term</span><span class="p">)</span>
+			<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">leaderID</span> <span class="p">=</span> <span class="o">-</span><span class="mi">1</span>
+			<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li>心跳检测的rpc AppendEntries</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">rf</span> <span class="o">*</span><span class="nx">Raft</span><span class="p">)</span> <span class="nf">sendAppendEntries</span><span class="p">(</span><span class="nx">server</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">args</span> <span class="o">*</span><span class="nx">RequestVoteArgs</span><span class="p">,</span> <span class="nx">reply</span> <span class="o">*</span><span class="nx">RequestVoteReply</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+	<span class="nx">ok</span> <span class="o">:=</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">peers</span><span class="p">[</span><span class="nx">server</span><span class="p">].</span><span class="nf">Call</span><span class="p">(</span><span class="s">&#34;Raft.AppendEntries&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">,</span> <span class="nx">reply</span><span class="p">)</span>
+	<span class="k">return</span> <span class="nx">ok</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">rf</span> <span class="o">*</span><span class="nx">Raft</span><span class="p">)</span> <span class="nf">AppendEntries</span><span class="p">(</span><span class="nx">args</span> <span class="o">*</span><span class="nx">RequestVoteArgs</span><span class="p">,</span> <span class="nx">reply</span> <span class="o">*</span><span class="nx">RequestVoteReply</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">// Your code here (2A, 2B).
+</span><span class="c1"></span>	<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+	<span class="k">defer</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+	<span class="nx">reply</span><span class="p">.</span><span class="nx">Term</span> <span class="p">=</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">currTerm</span>
+	<span class="c1">// 这里 rf.me 有可能刚好是 candidate 状态, 并且刚好收到了另外的 自称为leader的节点发送的 rpc
+</span><span class="c1"></span>	<span class="c1">// 这个心跳或者追加日志的任期号肯定不能小于当前任期号,
+</span><span class="c1"></span>	<span class="c1">// 等于的情况是持续的心跳检测, 大于的情况是刚成为leader第一次的append日志
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">args</span><span class="p">.</span><span class="nx">Xterm</span> <span class="p">&lt;</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">currTerm</span> <span class="p">{</span>
+		<span class="nx">reply</span><span class="p">.</span><span class="nx">Ok</span> <span class="p">=</span> <span class="kc">false</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="c1">// 以下就是大于等于的情况
+</span><span class="c1"></span>	<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">ticker</span><span class="p">.</span><span class="nf">Reset</span><span class="p">(</span><span class="nf">newDalyFunc</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+	<span class="c1">// 这里就要设置为 follower , 因为自己有可能在 candidate 状态
+</span><span class="c1"></span>	<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nf">convRole</span><span class="p">(</span><span class="nx">follower</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">CandidateId</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">Xterm</span><span class="p">)</span>
+	<span class="nx">rf</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">leaderID</span> <span class="p">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">CandidateId</span>
+	<span class="nx">reply</span><span class="p">.</span><span class="nx">Ok</span> <span class="p">=</span> <span class="kc">true</span>
+	<span class="k">return</span>
+<span class="p">}</span>
+
+</code></pre></div><ul>
+<li>遇到的几个问题</li>
+</ul>
+<pre><code>1. 在哪个时间点将 follower 切换成 candidate ?
+答: 首先让 follower 延迟随机时间 , 然后需要先判断当前集群是否 已经选举出了leader, 在没有leader的的情况下让当前节点成为 candidate.  当延迟更久的 follower 发现当前集群已经选举出了leader, 所以直接放弃选举了
+2. 当节点数量越多时,就会出现更多的分票的情况,导致选举不成功
+答: 这个问题是我 投票条件漏写了 args.LastLogTerm == rf.log.currTerm 等于的情况, 导致出现了多个 candidate, 从而出现了各个 candidate都给自己投票
+3. 为什么用ticker来超时, 还不适用time.Now来按时间分割任期号的有效期呢
+答: time.Now依赖各个节点时钟是否一致, 可能导致一些不可预料的错误
+</code></pre>]]></content>
+		</item>
 		
 		<item>
 			<title>Go学习 6.824-lab1-MapReduce实验</title>

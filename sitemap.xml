@@ -13,32 +13,37 @@
   </url>
   
   <url>
+    <loc>https://www.ngirl.xyz/tags/golang/</loc>
+    <lastmod>2022-03-07T17:58:09+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/golang/</loc>
+    <lastmod>2022-03-07T17:58:09+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab2-raft2a/</loc>
+    <lastmod>2022-03-07T17:58:09+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/tags/</loc>
+    <lastmod>2022-03-07T17:58:09+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/</loc>
+    <lastmod>2022-03-07T17:58:09+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.ngirl.xyz/tags/6.824/</loc>
     <lastmod>2022-03-04T13:55:22+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.ngirl.xyz/tags/golang/</loc>
-    <lastmod>2022-03-04T13:55:22+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.ngirl.xyz/golang/</loc>
-    <lastmod>2022-03-04T13:55:22+08:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab1-mapreduce/</loc>
-    <lastmod>2022-03-04T13:55:22+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.ngirl.xyz/tags/</loc>
-    <lastmod>2022-03-04T13:55:22+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.ngirl.xyz/</loc>
     <lastmod>2022-03-04T13:55:22+08:00</lastmod>
   </url>
   

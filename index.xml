@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 04 Mar 2022 13:55:22 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 07 Mar 2022 17:58:09 +0800</lastBuildDate><atom:link href="https://www.ngirl.xyz/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>linux遇到一些问题统计</title>
       <link>https://www.ngirl.xyz/posts/9-linux%E9%81%87%E5%88%B0%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E7%BB%9F%E8%AE%A1%E6%80%BB%E7%BB%93/</link>
@@ -30,6 +30,15 @@
   1. 单机版k8s pod一直是pending的问题  describe一下pod会发现错误: 1 node(s) had taints that the pod didnt tolerate. 这是因为master上存在污点,pod不会再改节点上创建 两种办法:
   deploy 的时候加上 容忍该污点 直接取消master上的污点  # 取消master上污点 kubectl taint nodes --all node-role.kubernetes.io/master- # 查看taint kubectl describe node node1   2. 修改service-node-port-range  由于traefik部署需要对外开放80端口, 但默认仅允许30000以上端口
  # kubeadm 1.14 配置 apiServer: extraArgs: authorization-mode: Node,RBAC service-node-port-range: 79-33000 # kubeadm 1.10配置 apiServerExtraArgs: service-node-port-range: 79-33000   3. traefik断电后重新启动报错 command traefik error: field not found, node: redirect 看到这个错误猜测可能是用的latest镜像问题, 从`hub.</description>
+    </item>
+    
+    <item>
+      <title>Go学习 6.824 lab2 raft2A</title>
+      <link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab2-raft2a/</link>
+      <pubDate>Mon, 07 Mar 2022 17:58:09 +0800</pubDate>
+      
+      <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab2-raft2a/</guid>
+      <description>文档  Raft-Extended 论文翻译  实现 Raft Leader选举和心跳检测 首先对Raft-Extended的相关几点做个说明 1. raft集群在 ticker 超时 后进行选举, 节点未收到心跳检测就会发起选举 2. 选举的节点会存在几种状态切换 follower -&amp;gt; candidate : 开始选举的时候 candidate -&amp;gt; leader : 选举成功的时候 candidate -&amp;gt; follower : 选举失败的时候 leader -&amp;gt; follower : 旧的过期节点 对于 candidate -&amp;gt; candidate的情况, 这里是被分解成 candidate -&amp;gt; follower -&amp;gt; candidate 3. raft节点会在延迟不同的时间后 在切换成 candidate, 防止多节点同时切换 4. raft节点在成为 candidate 后, 会并发向每个节点发一次 RequestVote 来进行投票, 然后等到有半数同意就成为leader 并启动goroutine 进行持续心跳检测(AppendEntries RPC), 如果没有人同意那么就没人成为leader会等到下次超时发起新的选举 在成为leader之前, raft节点同样可能收到别的 旧leader发来的AppendEntries RPC, 所以在 AppendEntries RPC 方法里面,我们需要如下判断: i) 如果收到的任期号小于当前任期号, 那么直接拒绝忽略 ii) 如果收到的任期号大于等于那就做如下修改: 把自己的状态改为 follower, 记录候选人id, 领导人id , 修改自己的当前任期号 和已提交任期号 代码部分 raft结构体中的Log type Raft struct { .</description>
     </item>
     
     <item>
@@ -100,15 +109,6 @@
       
       <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-go%E6%B1%87%E7%BC%96plan9/</guid>
       <description>在此之前,什么是函数栈? 先了解下几个汇编寄存器 通用寄存器包括: 1. 数据寄存器 AX:累加寄存器 BX:基地址寄存器 CX:计数器寄存器 DX:数据寄存器 2. 指针寄存器 SP:堆栈指针, 栈顶 BP:基址指针, 栈底 IP:指令指针,(或者PC) cpu下一条要执行指令的内存地址 3. 变址寄存器 SI:源变址 DI:目的变址 golang伪寄存器: FP: Frame pointer: arguments and locals.(指向当前frame的起始位置) FP+0 使用形如 symbol+offset(FP) 的方式，引用函数的输入参数。例如 arg0+0(FP)，arg1+8(FP)，使用 FP 不加 symbol 时，无法通过编译，在汇编层面来讲，symbol 并没有什么用，加 symbol 主要是为了提升代码可读性。另外，官方文档虽然将伪寄存器 FP 称之为 frame pointer，实际上它根本不是 frame pointer，按照传统的 x86 的习惯来讲，frame pointer 是指向整个 stack frame 底部的 BP 寄存器。假如当前的 callee 函数是 add，在 add 的代码中引用 FP，该 FP 指向的位置不在 callee 的 stack frame 之内，而是在 caller 的 stack frame 上。 PC: Program counter: jumps and branches.</description>
-    </item>
-    
-    <item>
-      <title>Go学习 Channel源码分析</title>
-      <link>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
-      <pubDate>Wed, 10 Nov 2021 15:18:42 +0800</pubDate>
-      
-      <guid>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
-      <description>根据以下代码我们逐个看下channel的实现 package main /* $ go tool compile -S channel源码分析.go|grep runtime|grep chan|grep -v &amp;#34;print&amp;#34; 0x003a 00058 (channel源码分析.go:32)	CALL	runtime.newobject(SB) 0x0060 00096 (channel源码分析.go:32)	CALL	runtime.makechan(SB) 0x006a 00106 (channel源码分析.go:32)	CMPL	runtime.writeBarrier(SB), $0 0x0097 00151 (channel源码分析.go:34)	CALL	runtime.newproc(SB) 0x00b1 00177 (channel源码分析.go:40)	CALL	runtime.chanrecv1(SB) 0x00cb 00203 (channel源码分析.go:42)	CALL	runtime.chanrecv2(SB) 0x0100 00256 (channel源码分析.go:44)	CALL	runtime.chanrecv2(SB) 0x0120 00288 (channel源码分析.go:47)	CALL	runtime.makechan(SB) 0x012a 00298 (channel源码分析.go:47)	CMPL	runtime.writeBarrier(SB), $0 0x01eb 00491 (channel源码分析.go:50)	CALL	runtime.selectgo(SB) 0x02c0 00704 (channel源码分析.go:47)	CALL	runtime.</description>
     </item>
     
   </channel>
