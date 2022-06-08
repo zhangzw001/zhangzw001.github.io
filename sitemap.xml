@@ -13,27 +13,47 @@
   </url>
   
   <url>
-    <loc>https://www.ngirl.xyz/tags/golang/</loc>
-    <lastmod>2022-03-07T17:58:09+08:00</lastmod>
+    <loc>https://www.ngirl.xyz/k8s/</loc>
+    <lastmod>2022-06-08T16:35:12+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.ngirl.xyz/golang/</loc>
-    <lastmod>2022-03-07T17:58:09+08:00</lastmod>
+    <loc>https://www.ngirl.xyz/tags/k8s/</loc>
+    <lastmod>2022-06-08T16:35:12+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab2-raft2a/</loc>
-    <lastmod>2022-03-07T17:58:09+08:00</lastmod>
+    <loc>https://www.ngirl.xyz/k8s/k8s%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/</loc>
+    <lastmod>2022-06-08T16:35:12+08:00</lastmod>
   </url>
   
   <url>
     <loc>https://www.ngirl.xyz/tags/</loc>
-    <lastmod>2022-03-07T17:58:09+08:00</lastmod>
+    <lastmod>2022-06-08T16:35:12+08:00</lastmod>
   </url>
   
   <url>
     <loc>https://www.ngirl.xyz/</loc>
+    <lastmod>2022-06-08T16:35:12+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/tags/golang/</loc>
+    <lastmod>2022-03-17T14:16:09+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/golang/</loc>
+    <lastmod>2022-03-17T14:16:09+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab2-raft2b/</loc>
+    <lastmod>2022-03-17T14:16:09+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab2-raft2a/</loc>
     <lastmod>2022-03-07T17:58:09+08:00</lastmod>
   </url>
   
@@ -50,16 +70,6 @@
   <url>
     <loc>https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-%E4%BB%A4%E7%89%8C%E6%A1%B6/</loc>
     <lastmod>2021-12-10T15:32:16+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.ngirl.xyz/k8s/</loc>
-    <lastmod>2021-12-09T10:22:02+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.ngirl.xyz/tags/k8s/</loc>
-    <lastmod>2021-12-09T10:22:02+08:00</lastmod>
   </url>
   
   <url>

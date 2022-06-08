@@ -8,23 +8,23 @@
 	<meta name="theme-color" content="#494f5c">
 	<meta name="msapplication-TileColor" content="#494f5c">
 <meta itemprop="name" content="Go学习 6.824 lab2 raft2A">
-<meta itemprop="description" content="文档  Raft-Extended 论文翻译  实现 Raft Leader选举和心跳检测 首先对Raft-Extended的相关几点做个说明 1. raft集群在 ticker 超时 后进行选举, 节点未收到心跳检测就会发起选举 2. 选举的节点会存在几种状态切换 follower -&gt; candidate : 开始选举的时候 candidate -&gt; leader : 选举成功的时候 candidate -&gt; follower : 选举失败的时候 leader -&gt; follower : 旧的过期节点 对于 candidate -&gt; candidate的情况, 这里是被分解成 candidate -&gt; follower -&gt; candidate 3. raft节点会在延迟不同的时间后 在切换成 candidate, 防止多节点同时切换 4. raft节点在成为 candidate 后, 会并发向每个节点发一次 RequestVote 来进行投票, 然后等到有半数同意就成为leader 并启动goroutine 进行持续心跳检测(AppendEntries RPC), 如果没有人同意那么就没人成为leader会等到下次超时发起新的选举 在成为leader之前, raft节点同样可能收到别的 旧leader发来的AppendEntries RPC, 所以在 AppendEntries RPC 方法里面,我们需要如下判断: i) 如果收到的任期号小于当前任期号, 那么直接拒绝忽略 ii) 如果收到的任期号大于等于那就做如下修改: 把自己的状态改为 follower, 记录候选人id, 领导人id , 修改自己的当前任期号 和已提交任期号 代码部分 raft结构体中的Log type Raft struct { .">
+<meta itemprop="description" content="文档  Raft-Extended 论文翻译 MIT 6.824 Lab2 实验翻译  实现 Raft Leader选举和心跳检测 首先对Raft-Extended的相关几点做个说明 1. raft集群在 ticker 超时 后进行选举, 节点未收到心跳检测就会发起选举 2. 选举的节点会存在几种状态切换 follower -&gt; candidate : 开始选举的时候 candidate -&gt; leader : 选举成功的时候 candidate -&gt; follower : 选举失败的时候 leader -&gt; follower : 旧的过期节点 对于 candidate -&gt; candidate的情况, 这里是被分解成 candidate -&gt; follower -&gt; candidate 3. raft节点会在延迟不同的时间后 在切换成 candidate, 防止多节点同时切换 4. raft节点在成为 candidate 后, 会并发向每个节点发一次 RequestVote 来进行投票, 然后等到有半数同意就成为leader 并启动goroutine 进行持续心跳检测(AppendEntries RPC), 如果没有人同意那么就没人成为leader会等到下次超时发起新的选举 在成为leader之前, raft节点同样可能收到别的 旧leader发来的AppendEntries RPC, 所以在 AppendEntries RPC 方法里面,我们需要如下判断: i) 如果收到的任期号小于当前任期号, 那么直接拒绝忽略 ii) 如果收到的任期号大于等于那就做如下修改: 把自己的状态改为 follower, 记录候选人id, 领导人id , 修改自己的当前任期号 和已提交任期号 代码部分 raft结构体中的Log type Raft struct { .">
 <meta itemprop="datePublished" content="2022-03-07T17:58:09+08:00" />
 <meta itemprop="dateModified" content="2022-03-07T17:58:09+08:00" />
-<meta itemprop="wordCount" content="867">
+<meta itemprop="wordCount" content="871">
 
 
 
 <meta itemprop="keywords" content="golang," />
 <meta property="og:title" content="Go学习 6.824 lab2 raft2A" />
-<meta property="og:description" content="文档  Raft-Extended 论文翻译  实现 Raft Leader选举和心跳检测 首先对Raft-Extended的相关几点做个说明 1. raft集群在 ticker 超时 后进行选举, 节点未收到心跳检测就会发起选举 2. 选举的节点会存在几种状态切换 follower -&gt; candidate : 开始选举的时候 candidate -&gt; leader : 选举成功的时候 candidate -&gt; follower : 选举失败的时候 leader -&gt; follower : 旧的过期节点 对于 candidate -&gt; candidate的情况, 这里是被分解成 candidate -&gt; follower -&gt; candidate 3. raft节点会在延迟不同的时间后 在切换成 candidate, 防止多节点同时切换 4. raft节点在成为 candidate 后, 会并发向每个节点发一次 RequestVote 来进行投票, 然后等到有半数同意就成为leader 并启动goroutine 进行持续心跳检测(AppendEntries RPC), 如果没有人同意那么就没人成为leader会等到下次超时发起新的选举 在成为leader之前, raft节点同样可能收到别的 旧leader发来的AppendEntries RPC, 所以在 AppendEntries RPC 方法里面,我们需要如下判断: i) 如果收到的任期号小于当前任期号, 那么直接拒绝忽略 ii) 如果收到的任期号大于等于那就做如下修改: 把自己的状态改为 follower, 记录候选人id, 领导人id , 修改自己的当前任期号 和已提交任期号 代码部分 raft结构体中的Log type Raft struct { ." />
+<meta property="og:description" content="文档  Raft-Extended 论文翻译 MIT 6.824 Lab2 实验翻译  实现 Raft Leader选举和心跳检测 首先对Raft-Extended的相关几点做个说明 1. raft集群在 ticker 超时 后进行选举, 节点未收到心跳检测就会发起选举 2. 选举的节点会存在几种状态切换 follower -&gt; candidate : 开始选举的时候 candidate -&gt; leader : 选举成功的时候 candidate -&gt; follower : 选举失败的时候 leader -&gt; follower : 旧的过期节点 对于 candidate -&gt; candidate的情况, 这里是被分解成 candidate -&gt; follower -&gt; candidate 3. raft节点会在延迟不同的时间后 在切换成 candidate, 防止多节点同时切换 4. raft节点在成为 candidate 后, 会并发向每个节点发一次 RequestVote 来进行投票, 然后等到有半数同意就成为leader 并启动goroutine 进行持续心跳检测(AppendEntries RPC), 如果没有人同意那么就没人成为leader会等到下次超时发起新的选举 在成为leader之前, raft节点同样可能收到别的 旧leader发来的AppendEntries RPC, 所以在 AppendEntries RPC 方法里面,我们需要如下判断: i) 如果收到的任期号小于当前任期号, 那么直接拒绝忽略 ii) 如果收到的任期号大于等于那就做如下修改: 把自己的状态改为 follower, 记录候选人id, 领导人id , 修改自己的当前任期号 和已提交任期号 代码部分 raft结构体中的Log type Raft struct { ." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab2-raft2a/" />
 <meta property="article:published_time" content="2022-03-07T17:58:09+08:00" />
 <meta property="article:modified_time" content="2022-03-07T17:58:09+08:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Go学习 6.824 lab2 raft2A"/>
-<meta name="twitter:description" content="文档  Raft-Extended 论文翻译  实现 Raft Leader选举和心跳检测 首先对Raft-Extended的相关几点做个说明 1. raft集群在 ticker 超时 后进行选举, 节点未收到心跳检测就会发起选举 2. 选举的节点会存在几种状态切换 follower -&gt; candidate : 开始选举的时候 candidate -&gt; leader : 选举成功的时候 candidate -&gt; follower : 选举失败的时候 leader -&gt; follower : 旧的过期节点 对于 candidate -&gt; candidate的情况, 这里是被分解成 candidate -&gt; follower -&gt; candidate 3. raft节点会在延迟不同的时间后 在切换成 candidate, 防止多节点同时切换 4. raft节点在成为 candidate 后, 会并发向每个节点发一次 RequestVote 来进行投票, 然后等到有半数同意就成为leader 并启动goroutine 进行持续心跳检测(AppendEntries RPC), 如果没有人同意那么就没人成为leader会等到下次超时发起新的选举 在成为leader之前, raft节点同样可能收到别的 旧leader发来的AppendEntries RPC, 所以在 AppendEntries RPC 方法里面,我们需要如下判断: i) 如果收到的任期号小于当前任期号, 那么直接拒绝忽略 ii) 如果收到的任期号大于等于那就做如下修改: 把自己的状态改为 follower, 记录候选人id, 领导人id , 修改自己的当前任期号 和已提交任期号 代码部分 raft结构体中的Log type Raft struct { ."/>
+<meta name="twitter:description" content="文档  Raft-Extended 论文翻译 MIT 6.824 Lab2 实验翻译  实现 Raft Leader选举和心跳检测 首先对Raft-Extended的相关几点做个说明 1. raft集群在 ticker 超时 后进行选举, 节点未收到心跳检测就会发起选举 2. 选举的节点会存在几种状态切换 follower -&gt; candidate : 开始选举的时候 candidate -&gt; leader : 选举成功的时候 candidate -&gt; follower : 选举失败的时候 leader -&gt; follower : 旧的过期节点 对于 candidate -&gt; candidate的情况, 这里是被分解成 candidate -&gt; follower -&gt; candidate 3. raft节点会在延迟不同的时间后 在切换成 candidate, 防止多节点同时切换 4. raft节点在成为 candidate 后, 会并发向每个节点发一次 RequestVote 来进行投票, 然后等到有半数同意就成为leader 并启动goroutine 进行持续心跳检测(AppendEntries RPC), 如果没有人同意那么就没人成为leader会等到下次超时发起新的选举 在成为leader之前, raft节点同样可能收到别的 旧leader发来的AppendEntries RPC, 所以在 AppendEntries RPC 方法里面,我们需要如下判断: i) 如果收到的任期号小于当前任期号, 那么直接拒绝忽略 ii) 如果收到的任期号大于等于那就做如下修改: 把自己的状态改为 follower, 记录候选人id, 领导人id , 修改自己的当前任期号 和已提交任期号 代码部分 raft结构体中的Log type Raft struct { ."/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -77,6 +77,7 @@
 				<h3 id="文档">文档<a href="#文档" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <ul>
 <li><a href="https://blog.csdn.net/Hedon954/article/details/119186225">Raft-Extended 论文翻译</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/248686289">MIT 6.824 Lab2 实验翻译</a></li>
 </ul>
 <h3 id="实现-raft-leader选举和心跳检测">实现 Raft Leader选举和心跳检测<a href="#实现-raft-leader选举和心跳检测" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 <h4 id="首先对raft-extended的相关几点做个说明">首先对Raft-Extended的相关几点做个说明<a href="#首先对raft-extended的相关几点做个说明" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h4>
@@ -387,7 +388,7 @@
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/golang">golang</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>867 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>871 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2022-03-07 17:58 &#43;0800</p>
 			</footer>
 		</article>
@@ -406,6 +407,9 @@
 </nav>
 		</aside>
 		<div class="post-nav thin">
+			<a class="next-post" href="https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab2-raft2b/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>Go学习 6.824 lab2 raft2B</span>
+			</a>
 			<a class="prev-post" href="https://www.ngirl.xyz/golang/go%E5%AD%A6%E4%B9%A0-6.824-lab1-mapreduce/">
 				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Go学习 6.824-lab1-MapReduce实验</span>
 			</a>

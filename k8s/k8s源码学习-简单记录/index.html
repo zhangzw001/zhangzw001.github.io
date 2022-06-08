@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="K8s源码学习 简单记录">
+<meta itemprop="description" content="源码查看rc和rs的区别 通过追寻 NewControllerInitializers 函数中到RS和RC的源码发现, startReplicationController 和 startReplicaSetController 都是 NewBaseController 函数初始化的 ReplicaSetController 结构体, 不过两个传参不通 RS是: ctx.InformerFactory.Apps().V1().ReplicaSets() RC是: ctx.InformerFactory.Core().V1().ReplicationControllers(), 所以我们就需要找到RC和RS的InformerFactory的不同 沿着 NewControllerInitializers 往回找, 我们看到了 StartControllers 中会真正的执行 NewControllerInitializers 初始化的 controllers 代码: for controllerName, initFn := range controllers { debugHandler, started, err := initFn(ctx) } 这里的循环就会执行 startReplicationController(ctx) 和 startReplicaSetController(ctx), 这里的ctx就是StartControllers的第一个参数 回到 (cmd/kube-controller-manager/app/controllermanager.go) Run方法中, StartControllers(controllerContext, saTokenControllerInitFunc, NewControllerInitializers(controllerContext.LoopMode), unsecuredMux) 的controllerContext 正是 我们要找的ctx 往上我们看到 -&gt; CreateControllerContext() -&gt; NewSharedInformerFactory() -&gt; NewSharedInformerFactoryWithOptions 找到了 sharedInformerFactory 结构体 sharedInformerFactory 就是真正的执行了 .Apps().V1().ReplicaSets() 和 .">
+<meta itemprop="datePublished" content="2022-06-08T16:35:12+08:00" />
+<meta itemprop="dateModified" content="2022-06-08T16:35:12+08:00" />
+<meta itemprop="wordCount" content="191">
+
+
+
+<meta itemprop="keywords" content="k8s," />
+<meta property="og:title" content="K8s源码学习 简单记录" />
+<meta property="og:description" content="源码查看rc和rs的区别 通过追寻 NewControllerInitializers 函数中到RS和RC的源码发现, startReplicationController 和 startReplicaSetController 都是 NewBaseController 函数初始化的 ReplicaSetController 结构体, 不过两个传参不通 RS是: ctx.InformerFactory.Apps().V1().ReplicaSets() RC是: ctx.InformerFactory.Core().V1().ReplicationControllers(), 所以我们就需要找到RC和RS的InformerFactory的不同 沿着 NewControllerInitializers 往回找, 我们看到了 StartControllers 中会真正的执行 NewControllerInitializers 初始化的 controllers 代码: for controllerName, initFn := range controllers { debugHandler, started, err := initFn(ctx) } 这里的循环就会执行 startReplicationController(ctx) 和 startReplicaSetController(ctx), 这里的ctx就是StartControllers的第一个参数 回到 (cmd/kube-controller-manager/app/controllermanager.go) Run方法中, StartControllers(controllerContext, saTokenControllerInitFunc, NewControllerInitializers(controllerContext.LoopMode), unsecuredMux) 的controllerContext 正是 我们要找的ctx 往上我们看到 -&gt; CreateControllerContext() -&gt; NewSharedInformerFactory() -&gt; NewSharedInformerFactoryWithOptions 找到了 sharedInformerFactory 结构体 sharedInformerFactory 就是真正的执行了 .Apps().V1().ReplicaSets() 和 ." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.ngirl.xyz/k8s/k8s%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-%E7%AE%80%E5%8D%95%E8%AE%B0%E5%BD%95/" />
+<meta property="article:published_time" content="2022-06-08T16:35:12+08:00" />
+<meta property="article:modified_time" content="2022-06-08T16:35:12+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="K8s源码学习 简单记录"/>
+<meta name="twitter:description" content="源码查看rc和rs的区别 通过追寻 NewControllerInitializers 函数中到RS和RC的源码发现, startReplicationController 和 startReplicaSetController 都是 NewBaseController 函数初始化的 ReplicaSetController 结构体, 不过两个传参不通 RS是: ctx.InformerFactory.Apps().V1().ReplicaSets() RC是: ctx.InformerFactory.Core().V1().ReplicationControllers(), 所以我们就需要找到RC和RS的InformerFactory的不同 沿着 NewControllerInitializers 往回找, 我们看到了 StartControllers 中会真正的执行 NewControllerInitializers 初始化的 controllers 代码: for controllerName, initFn := range controllers { debugHandler, started, err := initFn(ctx) } 这里的循环就会执行 startReplicationController(ctx) 和 startReplicaSetController(ctx), 这里的ctx就是StartControllers的第一个参数 回到 (cmd/kube-controller-manager/app/controllermanager.go) Run方法中, StartControllers(controllerContext, saTokenControllerInitFunc, NewControllerInitializers(controllerContext.LoopMode), unsecuredMux) 的controllerContext 正是 我们要找的ctx 往上我们看到 -&gt; CreateControllerContext() -&gt; NewSharedInformerFactory() -&gt; NewSharedInformerFactoryWithOptions 找到了 sharedInformerFactory 结构体 sharedInformerFactory 就是真正的执行了 .Apps().V1().ReplicaSets() 和 ."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>K8s源码学习 简单记录</title>
+	<link rel="stylesheet" href="https://www.ngirl.xyz/css/style.min.d3141168199607bf3a517216ce3c263814eecdbc8fca72a9a88700799a838219.css">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://www.ngirl.xyz">zhangzw</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="https://www.ngirl.xyz/golang/">golang</a>
+					<a href="https://www.ngirl.xyz/k8s/">k8s</a>
+					<a href="https://www.ngirl.xyz/posts/">文章</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<button id="toc-btn" class="hdr-btn desktop-only-ib" title="Table of Contents"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg></button><span class="hdr-social hide-in-mobile"><a href="https://github.com/zhangzw001" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://www.ngirl.xyz/posts/">文章</a></li>
+			<li><a href="https://www.ngirl.xyz/tags/">标签</a></li>
+			<li><a href="https://www.ngirl.xyz/about/">关于</a></li>
+		</ul>
+	</div>
+
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Jun 8, 2022</span></div>
+				<h1>K8s源码学习 简单记录</h1>
+			</header>
+			<div class="content">
+				<h3 id="源码查看rc和rs的区别">源码查看rc和rs的区别<a href="#源码查看rc和rs的区别" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">
+<span class="nx">通过追寻</span> <span class="nx">NewControllerInitializers</span> <span class="nx">函数中到RS和RC的源码发现</span><span class="p">,</span> <span class="nx">startReplicationController</span> <span class="nx">和</span> <span class="nx">startReplicaSetController</span> <span class="nx">都是</span> <span class="nx">NewBaseController</span> <span class="nx">函数初始化的</span> <span class="nx">ReplicaSetController</span> <span class="nx">结构体</span><span class="p">,</span> <span class="nx">不过两个传参不通</span>
+<span class="nx">RS是</span><span class="p">:</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">InformerFactory</span><span class="p">.</span><span class="nf">Apps</span><span class="p">().</span><span class="nf">V1</span><span class="p">().</span><span class="nf">ReplicaSets</span><span class="p">()</span>
+<span class="nx">RC是</span><span class="p">:</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">InformerFactory</span><span class="p">.</span><span class="nf">Core</span><span class="p">().</span><span class="nf">V1</span><span class="p">().</span><span class="nf">ReplicationControllers</span><span class="p">(),</span>
+<span class="nx">所以我们就需要找到RC和RS的InformerFactory的不同</span>
+
+<span class="nx">沿着</span> <span class="nx">NewControllerInitializers</span> <span class="nx">往回找</span><span class="p">,</span> <span class="nx">我们看到了</span> <span class="nx">StartControllers</span> <span class="nx">中会真正的执行</span> <span class="nx">NewControllerInitializers</span> <span class="nx">初始化的</span> <span class="nx">controllers</span>
+<span class="nx">代码</span><span class="p">:</span>
+<span class="k">for</span> <span class="nx">controllerName</span><span class="p">,</span> <span class="nx">initFn</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">controllers</span> <span class="p">{</span>
+        <span class="nx">debugHandler</span><span class="p">,</span> <span class="nx">started</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nf">initFn</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="nx">这里的循环就会执行</span> <span class="nf">startReplicationController</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span> <span class="nx">和</span> <span class="nf">startReplicaSetController</span><span class="p">(</span><span class="nx">ctx</span><span class="p">),</span> <span class="nx">这里的ctx就是StartControllers的第一个参数</span>
+
+<span class="nx">回到</span> <span class="p">(</span><span class="nx">cmd</span><span class="o">/</span><span class="nx">kube</span><span class="o">-</span><span class="nx">controller</span><span class="o">-</span><span class="nx">manager</span><span class="o">/</span><span class="nx">app</span><span class="o">/</span><span class="nx">controllermanager</span><span class="p">.</span><span class="k">go</span><span class="p">)</span> <span class="nx">Run方法中</span><span class="p">,</span> 		
+<span class="nf">StartControllers</span><span class="p">(</span><span class="nx">controllerContext</span><span class="p">,</span> <span class="nx">saTokenControllerInitFunc</span><span class="p">,</span> <span class="nf">NewControllerInitializers</span><span class="p">(</span><span class="nx">controllerContext</span><span class="p">.</span><span class="nx">LoopMode</span><span class="p">),</span> <span class="nx">unsecuredMux</span><span class="p">)</span>
+<span class="nx">的controllerContext</span> <span class="nx">正是</span> <span class="nx">我们要找的ctx</span>
+
+<span class="nx">往上我们看到</span> <span class="o">-</span><span class="p">&gt;</span> <span class="nf">CreateControllerContext</span><span class="p">()</span> <span class="o">-</span><span class="p">&gt;</span> <span class="nf">NewSharedInformerFactory</span><span class="p">()</span> <span class="o">-</span><span class="p">&gt;</span> <span class="nx">NewSharedInformerFactoryWithOptions</span> <span class="nx">找到了</span> <span class="nx">sharedInformerFactory</span> <span class="nx">结构体</span>
+<span class="nx">sharedInformerFactory</span> <span class="nx">就是真正的执行了</span>  <span class="p">.</span><span class="nf">Apps</span><span class="p">().</span><span class="nf">V1</span><span class="p">().</span><span class="nf">ReplicaSets</span><span class="p">()</span> <span class="nx">和</span> <span class="p">.</span><span class="nf">Core</span><span class="p">().</span><span class="nf">V1</span><span class="p">().</span><span class="nf">ReplicationControllers</span><span class="p">()</span><span class="nx">的结构体</span>
+
+<span class="nx">依次我们找到如下结构体</span><span class="p">:</span>
+
+<span class="c1">// vendor/k8s.io/api/apps/v1/types.go
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">ReplicaSet</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">metav1</span><span class="p">.</span><span class="nx">TypeMeta</span> <span class="s">`json:&#34;,inline&#34;`</span>
+	<span class="nx">metav1</span><span class="p">.</span><span class="nx">ObjectMeta</span> <span class="s">`json:&#34;metadata,omitempty&#34; protobuf:&#34;bytes,1,opt,name=metadata&#34;`</span>
+	<span class="nx">Spec</span> <span class="nx">ReplicaSetSpec</span> <span class="s">`json:&#34;spec,omitempty&#34; protobuf:&#34;bytes,2,opt,name=spec&#34;`</span>
+	<span class="nx">Status</span> <span class="nx">ReplicaSetStatus</span> <span class="s">`json:&#34;status,omitempty&#34; protobuf:&#34;bytes,3,opt,name=status&#34;`</span>
+<span class="p">}</span>
+<span class="kd">type</span> <span class="nx">ReplicaSetSpec</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Replicas</span> <span class="o">*</span><span class="kt">int32</span> <span class="s">`json:&#34;replicas,omitempty&#34; protobuf:&#34;varint,1,opt,name=replicas&#34;`</span>
+	<span class="nx">MinReadySeconds</span> <span class="kt">int32</span> <span class="s">`json:&#34;minReadySeconds,omitempty&#34; protobuf:&#34;varint,4,opt,name=minReadySeconds&#34;`</span>
+	<span class="nx">Selector</span> <span class="o">*</span><span class="nx">metav1</span><span class="p">.</span><span class="nx">LabelSelector</span> <span class="s">`json:&#34;selector&#34; protobuf:&#34;bytes,2,opt,name=selector&#34;`</span>
+	<span class="nx">Template</span> <span class="nx">v1</span><span class="p">.</span><span class="nx">PodTemplateSpec</span> <span class="s">`json:&#34;template,omitempty&#34; protobuf:&#34;bytes,3,opt,name=template&#34;`</span>
+<span class="p">}</span>
+<span class="kd">type</span> <span class="nx">LabelSelector</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">MatchLabels</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span> <span class="s">`json:&#34;matchLabels,omitempty&#34; protobuf:&#34;bytes,1,rep,name=matchLabels&#34;`</span>
+	<span class="nx">MatchExpressions</span> <span class="p">[]</span><span class="nx">LabelSelectorRequirement</span> <span class="s">`json:&#34;matchExpressions,omitempty&#34; protobuf:&#34;bytes,2,rep,name=matchExpressions&#34;`</span>
+<span class="p">}</span>
+<span class="kd">type</span> <span class="nx">LabelSelectorRequirement</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Key</span> <span class="kt">string</span> <span class="s">`json:&#34;key&#34; patchStrategy:&#34;merge&#34; patchMergeKey:&#34;key&#34; protobuf:&#34;bytes,1,opt,name=key&#34;`</span>
+	<span class="nx">Operator</span> <span class="nx">LabelSelectorOperator</span> <span class="s">`json:&#34;operator&#34; protobuf:&#34;bytes,2,opt,name=operator,casttype=LabelSelectorOperator&#34;`</span>
+	<span class="nx">Values</span> <span class="p">[]</span><span class="kt">string</span> <span class="s">`json:&#34;values,omitempty&#34; protobuf:&#34;bytes,3,rep,name=values&#34;`</span>
+<span class="p">}</span>
+
+<span class="c1">// vendor/k8s.io/api/core/v1/types.go
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">ReplicationController</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">metav1</span><span class="p">.</span><span class="nx">TypeMeta</span> <span class="s">`json:&#34;,inline&#34;`</span>
+	<span class="nx">metav1</span><span class="p">.</span><span class="nx">ObjectMeta</span> <span class="s">`json:&#34;metadata,omitempty&#34; protobuf:&#34;bytes,1,opt,name=metadata&#34;`</span>
+	<span class="nx">Spec</span> <span class="nx">ReplicationControllerSpec</span> <span class="s">`json:&#34;spec,omitempty&#34; protobuf:&#34;bytes,2,opt,name=spec&#34;`</span>
+	<span class="nx">Status</span> <span class="nx">ReplicationControllerStatus</span> <span class="s">`json:&#34;status,omitempty&#34; protobuf:&#34;bytes,3,opt,name=status&#34;`</span>
+<span class="p">}</span>
+<span class="kd">type</span> <span class="nx">ReplicationControllerSpec</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Replicas</span> <span class="o">*</span><span class="kt">int32</span> <span class="s">`json:&#34;replicas,omitempty&#34; protobuf:&#34;varint,1,opt,name=replicas&#34;`</span>
+	<span class="nx">MinReadySeconds</span> <span class="kt">int32</span> <span class="s">`json:&#34;minReadySeconds,omitempty&#34; protobuf:&#34;varint,4,opt,name=minReadySeconds&#34;`</span>
+	<span class="nx">Selector</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span> <span class="s">`json:&#34;selector,omitempty&#34; protobuf:&#34;bytes,2,rep,name=selector&#34;`</span>
+	<span class="nx">Template</span> <span class="o">*</span><span class="nx">PodTemplateSpec</span> <span class="s">`json:&#34;template,omitempty&#34; protobuf:&#34;bytes,3,opt,name=template&#34;`</span>
+<span class="p">}</span>
+
+
+<span class="nx">显然这里的区别很小</span><span class="p">,</span>  <span class="nx">RS</span> <span class="nx">的MatchLabels</span> <span class="nx">等同RC的Selector</span><span class="p">,</span> <span class="nx">同时RS还扩展了MatchExpressions</span>
+</code></pre></div>
+			</div>
+   
+
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://www.ngirl.xyz/tags/k8s">k8s</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>191 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2022-06-08 16:35 &#43;0800</p>
+			</footer>
+		</article>
+		<aside id="toc" class="show-toc">
+			<div class="toc-title">→K8s源码学习 简单记录←</div>
+			<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#源码查看rc和rs的区别">源码查看rc和rs的区别</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+		</aside>
+		<div class="post-nav thin">
+			<a class="prev-post" href="https://www.ngirl.xyz/k8s/k8s%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-job%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>K8s源码学习 Job源码分析</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+						<script src="https://utteranc.es/client.js"
+							repo="zhangzw001/blog-hugo"
+							issue-term="pathname"
+							theme="github-light"
+							crossorigin="anonymous"
+							async>
+			</script>
+
+		</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 - 2022 <a href="https://www.ngirl.xyz">zhangzw</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://www.ngirl.xyz/post/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="https://www.ngirl.xyz/js/main.min.784417f5847151f848c339cf0acb13a06cbb648b1483435a28ed4556c4ead69b.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-180942795-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>
