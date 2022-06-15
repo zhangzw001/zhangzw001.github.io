@@ -1984,7 +1984,7 @@ bash test-mr.sh
 </span><span class="c1"></span>	<span class="k">if</span> <span class="nx">c</span> <span class="o">:=</span> <span class="nx">h</span><span class="p">.</span><span class="nx">oldbuckets</span><span class="p">;</span> <span class="nx">c</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
 		<span class="c1">// 不是等量扩容
 </span><span class="c1"></span>		<span class="k">if</span> <span class="p">!</span><span class="nx">h</span><span class="p">.</span><span class="nf">sameSizeGrow</span><span class="p">()</span> <span class="p">{</span>
-			<span class="c1">// 翻倍扩容 需要缩小一倍m
+			<span class="c1">// 翻倍扩容 需要扩大一倍m
 </span><span class="c1"></span>			<span class="nx">m</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span>
 		<span class="p">}</span>
 		<span class="c1">// old bmap
